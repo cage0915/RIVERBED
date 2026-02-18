@@ -37,8 +37,38 @@ const imageUrl = `/api/image/${itemKey}`;
                 <span class="photo-caption">{caption}</span>
             </div>
         )}
+
+        {(tags.length > 0 || caption) && (
+            <button class="photo-info-toggle" aria-label="Toggle photo information">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+            </button>
+        )}
     </div>
 </div>
+
+<script>
+    // Handle info toggle on mobile
+    const initToggles = () => {
+        const buttons = document.querySelectorAll('.photo-info-toggle');
+        buttons.forEach(button => {
+            button.removeEventListener('click', toggleInfo);
+            button.addEventListener('click', toggleInfo);
+        });
+    };
+
+    function toggleInfo(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const wrapper = this.closest('.photo-wrapper');
+        wrapper?.classList.toggle('show-info');
+    }
+
+    // Initialize on load
+    initToggles();
+
+    // Re-initialize when Astro swaps pages (if using View Transitions)
+    document.addEventListener('astro:after-swap', initToggles);
+</script>
 
 <style>
     .photo-container {
@@ -65,12 +95,59 @@ const imageUrl = `/api/image/${itemKey}`;
         pointer-events: none;
     }
 
-    .photo-wrapper:hover .tags-overlay,
-    .photo-wrapper:hover .caption-overlay {
+    .photo-info-toggle {
+        position: absolute;
+        bottom: 0.5rem;
+        right: 0.5rem;
+        width: 14px;
+        height: 14px;
+        background: rgba(255, 255, 255, 0.4);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        display: none; /* Hidden on desktop */
+        align-items: center;
+        justify-content: center;
+        color: rgba(0, 0, 0, 0.7);
+        cursor: pointer;
+        z-index: 20;
+        transition: all 0.2s ease;
+        padding: 0;
+    }
+
+    .photo-info-toggle:active {
+        transform: scale(0.9);
+        background: rgba(255, 255, 255, 0.6);
+    }
+
+    .photo-wrapper.show-info .photo-info-toggle {
+        background: rgba(255, 255, 255, 0.8);
+        color: rgba(0, 0, 0, 0.9);
+    }
+
+    @media (max-width: 768px) {
+        .photo-info-toggle {
+            display: flex;
+        }
+    }
+
+    @media (hover: hover) {
+        .photo-wrapper:hover .tags-overlay,
+        .photo-wrapper:hover .caption-overlay {
+            opacity: 1;
+        }
+
+        .photo-wrapper:hover .tags-overlay {
+            background: rgba(255, 255, 255, 0.3);
+        }
+    }
+
+    .photo-wrapper.show-info .tags-overlay,
+    .photo-wrapper.show-info .caption-overlay {
         opacity: 1;
     }
 
-    .photo-wrapper:hover .tags-overlay {
+    .photo-wrapper.show-info .tags-overlay {
         background: rgba(255, 255, 255, 0.3);
     }
 

@@ -29,13 +29,13 @@ const imageSrc = useLocal
   <img
     src={imageSrc}
     alt={`Photo ${photo.id}`}
-    class="w-full h-auto aspect-[16/9] object-cover transition-transform duration-700 ease-in-out opacity-90 group-hover:opacity-100"
+    class="photo-card-image w-full h-auto aspect-[16/9] object-cover transition-transform duration-700 ease-in-out opacity-90"
     loading="lazy"
   />
 
   <!-- Overlay -->
   <div
-    class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+    class="photo-card-overlay absolute inset-0 bg-black/60 opacity-0 transition-opacity duration-500 pointer-events-none"
   >
     <!-- Tags Container -->
     <div class="relative w-full h-full">
@@ -59,4 +59,61 @@ const imageSrc = useLocal
       }
     </div>
   </div>
+
+  {photo.tags.length > 0 && (
+    <button
+      class="card-info-toggle absolute bottom-3 right-3 z-20 w-8 h-8 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white sm:hidden transition-all active:scale-90"
+      aria-label="Toggle tags"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+    </button>
+  )}
 </div>
+
+<script>
+  // Handle info toggle on mobile for PhotoCard
+  const initPhotoCardToggles = () => {
+    const buttons = document.querySelectorAll('.card-info-toggle');
+    buttons.forEach(button => {
+      button.removeEventListener('click', togglePhotoCardInfo);
+      button.addEventListener('click', togglePhotoCardInfo);
+    });
+  };
+
+  function togglePhotoCardInfo(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const container = this.closest('.group');
+    container?.classList.toggle('show-info');
+
+    // Change button color when active
+    if (container?.classList.contains('show-info')) {
+      this.style.backgroundColor = 'rgba(255, 255, 255, 0.4)';
+    } else {
+      this.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+    }
+  }
+
+  initPhotoCardToggles();
+  document.addEventListener('astro:after-swap', initPhotoCardToggles);
+</script>
+
+<style>
+  @media (hover: hover) {
+    .group:hover .photo-card-overlay {
+      opacity: 1;
+    }
+
+    .group:hover .photo-card-image {
+      opacity: 1;
+    }
+  }
+
+  .group.show-info .photo-card-overlay {
+    opacity: 1;
+  }
+
+  .group.show-info .photo-card-image {
+    opacity: 1;
+  }
+</style>

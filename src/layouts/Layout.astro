@@ -34,8 +34,14 @@ const currentPath = Astro.url.pathname;
 	<body class="bg-zinc-950 text-zinc-100 min-h-screen antialiased selection:bg-white/20">
 		<nav id="navbar" class="fixed top-0 left-0 right-0 z-50 bg-zinc-950/80 backdrop-blur-md border-b border-white/10 transition-transform duration-300 ease-in-out">
 			<div class="mx-auto px-4 h-16 flex items-center relative">
-				<!-- Navigation - Left Aligned -->
-				<div class="flex gap-4">
+				<!-- Menu Toggle - Mobile Only -->
+				<button id="menu-toggle" class="sm:hidden p-1 text-zinc-400 hover:text-white transition-colors" aria-label="Toggle menu">
+					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="menu-icon"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="close-icon hidden"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+				</button>
+
+				<!-- Navigation - Desktop -->
+				<div class="hidden sm:flex gap-4">
 					{sortedFolders.map(folder => {
 						const isActive = currentPath.startsWith(`/${folder.id}`);
 						return (
@@ -61,6 +67,25 @@ const currentPath = Astro.url.pathname;
 					</a>
 				</div>
 			</div>
+
+			<!-- Mobile Navigation Dropdown -->
+			<div id="mobile-menu" class="hidden sm:hidden border-t border-white/5 bg-zinc-950/95 backdrop-blur-xl overflow-hidden transition-all duration-300 ease-in-out max-h-0">
+				<div class="flex flex-col p-4 gap-4">
+					{sortedFolders.map(folder => {
+						const isActive = currentPath.startsWith(`/${folder.id}`);
+						return (
+							<a
+								href={`/${folder.id}`}
+								class={`text-base font-light transition-all ${
+									isActive ? 'text-white' : 'text-zinc-400'
+								}`}
+							>
+								{folder.data.title}
+							</a>
+						);
+					})}
+				</div>
+			</div>
 		</nav>
 
 		<main class="mx-auto px-2 pt-20 pb-20">
@@ -70,9 +95,49 @@ const currentPath = Astro.url.pathname;
 		<script>
 			let lastScrollY = window.scrollY;
 			const navbar = document.getElementById('navbar');
+			const menuToggle = document.getElementById('menu-toggle');
+			const mobileMenu = document.getElementById('mobile-menu');
+			const menuIcon = menuToggle?.querySelector('.menu-icon');
+			const closeIcon = menuToggle?.querySelector('.close-icon');
+
+			menuToggle?.addEventListener('click', () => {
+				const isExpanded = mobileMenu?.classList.contains('hidden');
+
+				if (isExpanded) {
+					// Open
+					mobileMenu?.classList.remove('hidden');
+					// Trigger browser reflow for transition
+					void mobileMenu?.offsetWidth;
+					mobileMenu!.style.maxHeight = '500px';
+					menuIcon?.classList.add('hidden');
+					closeIcon?.classList.remove('hidden');
+				} else {
+					// Close
+					mobileMenu!.style.maxHeight = '0px';
+					menuIcon?.classList.remove('hidden');
+					closeIcon?.classList.add('hidden');
+
+					// Wait for transition before hiding
+					setTimeout(() => {
+						if (mobileMenu!.style.maxHeight === '0px') {
+							mobileMenu?.classList.add('hidden');
+						}
+					}, 300);
+				}
+			});
 
 			window.addEventListener('scroll', () => {
 				const currentScrollY = window.scrollY;
+
+				// Close mobile menu on scroll
+				if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+					mobileMenu.style.maxHeight = '0px';
+					menuIcon?.classList.remove('hidden');
+					closeIcon?.classList.add('hidden');
+					setTimeout(() => {
+						mobileMenu.classList.add('hidden');
+					}, 300);
+				}
 
 				if (currentScrollY > lastScrollY && currentScrollY > 100) {
 					// Scrolling down - hide navbar
