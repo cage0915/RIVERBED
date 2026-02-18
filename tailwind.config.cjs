@@ -5,6 +5,7 @@ module.exports = {
         extend: {
             fontFamily: {
                 sans: ['"PT Sans"', '"Noto Sans TC"', 'sans-serif'],
+                fjalla: ['"Fjalla One"', 'sans-serif'],
             },
         },
     },

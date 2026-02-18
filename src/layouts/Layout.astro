@@ -1,5 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
+import '@fontsource/fjalla-one';
 import '@fontsource/pt-sans/400.css';
 import '@fontsource/pt-sans/700.css';
 import '@fontsource/noto-sans-tc/300.css';
@@ -48,7 +49,7 @@ const currentPath = Astro.url.pathname;
 						return (
 							<a
 								href={`/${folder.id}`}
-								class={`text-sm font-light transition-all hover:text-white relative py-1 ${
+								class={`text-sm font-fjalla tracking-wide transition-all hover:text-white relative py-1 ${
 									isActive ? 'text-white' : 'text-zinc-400'
 								}`}
 							>
@@ -63,7 +64,7 @@ const currentPath = Astro.url.pathname;
 
 				<!-- Logo - Centered -->
 				<div class="absolute left-1/2 -translate-x-1/2">
-					<a href="/" class="text-xl font-normal tracking-tighter hover:text-white transition-colors">
+					<a href="/" class="text-xl font-fjalla tracking-[0.2em] hover:text-white transition-colors">
 						RIVERBED
 					</a>
 				</div>
@@ -77,7 +78,7 @@ const currentPath = Astro.url.pathname;
 						return (
 							<a
 								href={`/${folder.id}`}
-								class={`text-base font-light transition-all ${
+								class={`text-base font-fjalla tracking-wide transition-all ${
 									isActive ? 'text-white' : 'text-zinc-400'
 								}`}
 							>
