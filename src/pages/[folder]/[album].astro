@@ -1,0 +1,76 @@
+---
+import { getCollection, getEntry } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import Row from '../../components/Row.astro';
+import Photo from '../../components/Photo.astro';
+
+const { folder, album } = Astro.params;
+
+// Get all albums and find the matching one
+const allAlbums = await getCollection('albums');
+const albumEntry = allAlbums.find(a => a.id === album && a.data.folder === folder);
+
+if (!albumEntry) {
+    return Astro.redirect('/404');
+}
+
+// Get the Content component from the entry
+let Content;
+try {
+    console.log('Rendering album:', albumEntry.id, 'Folder:', folder);
+    const rendered = await albumEntry.render();
+    Content = rendered.Content;
+} catch (e) {
+    console.error('Error rendering album:', e);
+    throw e;
+}
+---
+
+<Layout title={`${albumEntry.data.title} - RIVERBED`}>
+    <main class="container mx-auto px-4 py-4 max-w-5xl">
+
+        <h1 class="text-xl font-medium mb-6 text-center">{albumEntry.data.title}</h1>
+
+        <article class="album-content">
+            <Content components={{ Row, Photo }} />
+        </article>
+    </main>
+</Layout>
+
+<style>
+    .album-content {
+        width: 100%;
+    }
+
+    .album-content :global(h2) {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 2rem 0 1rem;
+    }
+
+    .album-content :global(p) {
+        margin: 0.5rem 0;
+        line-height: 1.6;
+    }
+</style>
+
+<script>
+    // Coordinate development tool
+    // Click on any image to get x, y percentage coordinates for tag placement
+    document.addEventListener('DOMContentLoaded', () => {
+        const images = document.querySelectorAll('.photo-wrapper img');
+
+        images.forEach(img => {
+            img.addEventListener('click', (e) => {
+                const rect = img.getBoundingClientRect();
+                const x = ((e.clientX - rect.left) / rect.width * 100).toFixed(2);
+                const y = ((e.clientY - rect.top) / rect.height * 100).toFixed(2);
+
+                console.log(`Tag coordinates: { x: ${x}, y: ${y} }`);
+                console.log(`Click position on image: (${x}%, ${y}%)`);
+            });
+        });
+
+        console.log('📍 Coordinate tool active: Click on any image to get tag coordinates');
+    });
+</script>

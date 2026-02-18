@@ -1,0 +1,25 @@
+---
+interface Props {
+    cols: number;
+}
+
+const { cols } = Astro.props;
+---
+
+<div class="photo-row" style={`--cols: ${cols}`}>
+    <slot />
+</div>
+
+<style>
+    .photo-row {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+        width: 100%;
+    }
+
+    .photo-row > :global(*) {
+        flex: 1;
+        min-width: 0;
+    }
+</style>

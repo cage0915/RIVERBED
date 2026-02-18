@@ -1,17 +1,48 @@
 ---
+import { getCollection } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
 
+// Get all folders and sort by order
+const folders = await getCollection('folders');
+const sortedFolders = folders.sort((a, b) => a.data.order - b.data.order);
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout title="RIVERBED">
+    <main class="mx-auto px-2 py-8">
+        <h1 class="text-4xl font-normal mb-8 text-center">RIVERBED</h1>
+        <p class="text-center text-gray-600 mb-12">山岳攝影集</p>
+
+        <div class="folders-grid">
+            {sortedFolders.map((folder) => (
+                <a href={`/${folder.id}`} class="folder-card">
+                    <h2 class="text-2xl font-light">{folder.data.title}</h2>
+                </a>
+            ))}
+        </div>
+    </main>
+</Layout>
+
+<style>
+    .folders-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 0.5rem;
+        margin: 0 auto;
+    }
+
+    .folder-card {
+        padding: 3rem 2rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 0.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .folder-card:hover {
+        border-color: #3b82f6;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+        transform: translateY(-2px);
+    }
+</style>

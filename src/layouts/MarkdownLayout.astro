@@ -1,0 +1,75 @@
+---
+import Layout from './Layout.astro';
+import PhotoCard from '../components/PhotoCard.astro';
+
+const { frontmatter } = Astro.props;
+---
+
+<Layout title={frontmatter.title}>
+	<header class="mb-24 flex flex-col items-start space-y-4">
+		<h1 class="text-3xl font-light tracking-tight text-white/90 sm:text-5xl">
+			{frontmatter.title}
+		</h1>
+		<div class="h-px w-20 bg-white/20"></div>
+		{frontmatter.subtitle && (
+			<p class="text-sm font-medium tracking-widest text-zinc-500 uppercase">
+				{frontmatter.subtitle}
+			</p>
+		)}
+	</header>
+
+	<!-- Photo Gallery -->
+	{frontmatter.photos && frontmatter.photos.length > 0 && (
+		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16 mb-24">
+			{frontmatter.photos.map((photo) => <PhotoCard photo={photo} />)}
+		</div>
+	)}
+
+	<!-- Markdown Content -->
+	<article class="prose prose-invert prose-zinc max-w-none">
+		<slot />
+	</article>
+</Layout>
+
+<style is:global>
+	/* Centralized Markdown Styling */
+	.prose {
+		@apply text-zinc-300;
+	}
+
+	.prose h1 {
+		@apply text-3xl font-light text-white/90 mb-8 mt-16;
+	}
+
+	.prose h2 {
+		@apply text-2xl font-light text-white/80 mb-6 mt-12;
+	}
+
+	.prose h3 {
+		@apply text-xl font-light text-white/70 mb-4 mt-8;
+	}
+
+	.prose p {
+		@apply text-base leading-relaxed mb-6;
+	}
+
+	.prose ul, .prose ol {
+		@apply space-y-2 mb-6;
+	}
+
+	.prose li {
+		@apply text-zinc-300;
+	}
+
+	.prose strong {
+		@apply text-white font-medium;
+	}
+
+	.prose a {
+		@apply text-white/70 underline decoration-white/20 hover:text-white hover:decoration-white/40 transition-colors;
+	}
+
+	.prose code {
+		@apply bg-zinc-800 text-zinc-200 px-1.5 py-0.5 rounded text-sm;
+	}
+</style>

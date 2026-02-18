@@ -1,0 +1,113 @@
+---
+interface Tag {
+    name: string;
+    x: number; // percentage 0-100
+    y: number; // percentage 0-100
+}
+
+interface Props {
+    itemKey: string; // R2 key (renamed from 'key' to avoid reserved keyword conflict)
+    caption?: string;
+    tags?: Tag[];
+}
+
+const { itemKey, caption, tags = [] } = Astro.props;
+const imageUrl = `/api/image/${itemKey}`;
+---
+
+<div class="photo-container">
+    <div class="photo-wrapper">
+        <img src={imageUrl} alt={caption || ''} loading="lazy" />
+
+        {tags.length > 0 && (
+            <div class="tags-overlay">
+                {tags.map((tag) => (
+                    <div
+                        class="tag-marker"
+                        style={`left: ${tag.x}%; top: ${tag.y}%;`}
+                    >
+                        <span class="tag-name">{tag.name}</span>
+                    </div>
+                ))}
+            </div>
+        )}
+
+        {caption && (
+            <div class="caption-overlay">
+                <span class="photo-caption">{caption}</span>
+            </div>
+        )}
+    </div>
+</div>
+
+<style>
+    .photo-container {
+        width: 100%;
+    }
+
+    .photo-wrapper {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .photo-wrapper img {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+
+    .tags-overlay, .caption-overlay {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+    }
+
+    .photo-wrapper:hover .tags-overlay,
+    .photo-wrapper:hover .caption-overlay {
+        opacity: 1;
+    }
+
+    .photo-wrapper:hover .tags-overlay {
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+    .tag-marker {
+        position: absolute;
+        transform: translate(-50%, -50%);
+        z-index: 10;
+    }
+
+    .tag-name {
+        display: inline-block;
+        color: rgba(0, 0, 0, 0.85);
+        background: rgba(255, 255, 255, 0.7);
+        padding: 0.15rem 0.3rem;
+        border-radius: 1rem;
+        font-size: 0.6rem;
+        white-space: nowrap;
+        backdrop-filter: blur(4px);
+    }
+
+    .caption-overlay {
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        padding-bottom: 0.5rem;
+    }
+
+    .photo-caption {
+        display: inline-block;
+        color: rgba(0, 0, 0, 0.95);
+        background: rgba(255, 255, 255, 0.5);
+        padding: 0.15rem 0.5rem;
+        border-radius: 0;
+        font-size: 0.6rem;
+        text-align: left;
+        backdrop-filter: blur(10px);
+        max-width: 90%;
+        border-left: 2px solid white;
+    }
+</style>

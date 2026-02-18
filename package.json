@@ -4,11 +4,24 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
+    "dev:r2": "wrangler pages dev --r2 --persist-to=.wrangler/state -- npm run dev",
+    "preview:r2": "wrangler pages dev dist --r2 --persist-to=.wrangler/state",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "new-album": "node scripts/new-album.js"
   },
   "dependencies": {
-    "astro": "^5.17.1"
+    "@astrojs/cloudflare": "^8.0.0",
+    "@astrojs/mdx": "^3.1.9",
+    "@astrojs/tailwind": "^5.0.0",
+    "@fontsource/ibm-plex-sans": "^5.2.8",
+    "@fontsource/noto-sans-tc": "^5.2.9",
+    "@fontsource/pt-sans": "^5.2.8",
+    "astro": "^4.0.0",
+    "tailwindcss": "^3.4.0"
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0"
   }
 }
