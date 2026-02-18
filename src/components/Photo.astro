@@ -26,7 +26,9 @@ const imageUrl = `/api/image/${itemKey}`;
                         class="tag-marker"
                         style={`left: ${tag.x}%; top: ${tag.y}%;`}
                     >
-                        <span class="tag-name">{tag.name}</span>
+                        <a href={`/tags/${encodeURIComponent(tag.name)}`} class="tag-link">
+                            <span class="tag-name">{tag.name}</span>
+                        </a>
                     </div>
                 ))}
             </div>
@@ -139,12 +141,14 @@ const imageUrl = `/api/image/${itemKey}`;
 
         .photo-wrapper:hover .tags-overlay {
             background: rgba(255, 255, 255, 0.3);
+            pointer-events: auto;
         }
     }
 
     .photo-wrapper.show-info .tags-overlay,
     .photo-wrapper.show-info .caption-overlay {
         opacity: 1;
+        pointer-events: auto;
     }
 
     .photo-wrapper.show-info .tags-overlay {
@@ -166,6 +170,20 @@ const imageUrl = `/api/image/${itemKey}`;
         font-size: 0.6rem;
         white-space: nowrap;
         backdrop-filter: blur(4px);
+        transition: all 0.2s ease;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .tag-link {
+        text-decoration: none;
+        pointer-events: auto;
+    }
+
+    .tag-link:hover .tag-name {
+        background: rgba(255, 255, 255, 0.95);
+        color: #000;
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
     .caption-overlay {
