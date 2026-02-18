@@ -26,12 +26,19 @@ const imageSrc = useLocal
 
 <div class="relative group overflow-hidden bg-zinc-900">
   <!-- Image -->
-  <img
-    src={imageSrc}
-    alt={`Photo ${photo.id}`}
-    class="photo-card-image w-full h-auto aspect-[16/9] object-cover transition-transform duration-700 ease-in-out opacity-90"
-    loading="lazy"
-  />
+  <a
+    href={imageSrc}
+    data-pswp-src={imageSrc}
+    target="_blank"
+    class="pswp-link block"
+  >
+    <img
+      src={imageSrc}
+      alt={`Photo ${photo.id}`}
+      class="photo-card-image w-full h-auto aspect-[16/9] object-cover transition-transform duration-700 ease-in-out opacity-90"
+      loading="lazy"
+    />
+  </a>
 
   <!-- Overlay -->
   <div

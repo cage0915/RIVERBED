@@ -6,6 +6,7 @@ import '@fontsource/noto-sans-tc/300.css';
 import '@fontsource/noto-sans-tc/400.css';
 import '@fontsource/noto-sans-tc/500.css';
 import '@fontsource/noto-sans-tc/700.css';
+import 'photoswipe/dist/photoswipe.css';
 
 interface Props {
 	title: string;
@@ -194,6 +195,67 @@ const currentPath = Astro.url.pathname;
 					e.preventDefault(); // Prevent default scroll
 				}
 			});
+
+			// PhotoSwipe Initialization
+			import PhotoSwipeLightbox from 'photoswipe/lightbox';
+
+			let lightbox: PhotoSwipeLightbox | null = null;
+
+			const initPhotoSwipe = () => {
+				if (lightbox) {
+					lightbox.destroy();
+				}
+
+				lightbox = new PhotoSwipeLightbox({
+					gallery: '.album-content, .tag-photos, .pswp-gallery, .prose',
+					children: '.pswp-link',
+					pswpModule: () => import('photoswipe')
+				});
+
+				// Initialize dimensions on the fly if not provided
+				lightbox.on('beforeOpen', () => {
+					const links = document.querySelectorAll('.pswp-link') as NodeListOf<HTMLAnchorElement>;
+					links.forEach(link => {
+						const img = link.querySelector('img');
+						if (img && (!link.dataset.pswpWidth || !link.dataset.pswpHeight)) {
+							if (img.naturalWidth) {
+								link.dataset.pswpWidth = img.naturalWidth.toString();
+								link.dataset.pswpHeight = img.naturalHeight.toString();
+							}
+						}
+					});
+				});
+
+				lightbox.init();
+			};
+
+			const initDimensions = () => {
+				const links = document.querySelectorAll('.pswp-link') as NodeListOf<HTMLAnchorElement>;
+				links.forEach(link => {
+					const img = link.querySelector('img');
+					if (img) {
+						if (img.complete) {
+							if (img.naturalWidth) {
+								link.dataset.pswpWidth = img.naturalWidth.toString();
+								link.dataset.pswpHeight = img.naturalHeight.toString();
+							}
+						} else {
+							img.addEventListener('load', () => {
+								link.dataset.pswpWidth = img.naturalWidth.toString();
+								link.dataset.pswpHeight = img.naturalHeight.toString();
+							});
+						}
+					}
+				});
+			};
+
+			const initAll = () => {
+				initDimensions();
+				initPhotoSwipe();
+			};
+
+			initAll();
+			document.addEventListener('astro:after-swap', initAll);
 		</script>
 	</body>
 </html>

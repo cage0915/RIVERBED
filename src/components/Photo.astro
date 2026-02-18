@@ -17,7 +17,14 @@ const imageUrl = `/api/image/${itemKey}`;
 
 <div class="photo-container">
     <div class="photo-wrapper">
-        <img src={imageUrl} alt={caption || ''} loading="lazy" />
+        <a
+            href={imageUrl}
+            data-pswp-src={imageUrl}
+            target="_blank"
+            class="pswp-link block"
+        >
+            <img src={imageUrl} alt={caption || ''} loading="lazy" class="photo-img" />
+        </a>
 
         {tags.length > 0 && (
             <div class="tags-overlay">
@@ -65,10 +72,10 @@ const imageUrl = `/api/image/${itemKey}`;
         wrapper?.classList.toggle('show-info');
     }
 
-    // Initialize on load
+    // Run on load
     initToggles();
 
-    // Re-initialize when Astro swaps pages (if using View Transitions)
+    // Re-initialize when Astro swaps pages
     document.addEventListener('astro:after-swap', initToggles);
 </script>
 
@@ -140,19 +147,17 @@ const imageUrl = `/api/image/${itemKey}`;
         }
 
         .photo-wrapper:hover .tags-overlay {
-            background: rgba(255, 255, 255, 0.3);
-            pointer-events: auto;
+            background: rgba(255, 255, 255, 0.1);
         }
     }
 
     .photo-wrapper.show-info .tags-overlay,
     .photo-wrapper.show-info .caption-overlay {
         opacity: 1;
-        pointer-events: auto;
     }
 
     .photo-wrapper.show-info .tags-overlay {
-        background: rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.1);
     }
 
     .tag-marker {
