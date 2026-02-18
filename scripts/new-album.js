@@ -100,7 +100,6 @@ const frontmatter = `---
 title: "${albumTitle}"
 coverKey: "${folderSlug}/${albumSlug}/${sortedFiles[0]}"
 order: 0
-folder: "${folderSlug}"
 ---
 
 `;
@@ -122,17 +121,18 @@ for (let i = 0; i < photoComponents.length; i += photosPerRow) {
 const mdxContent = frontmatter + rows.join('\n\n');
 
 // Write MDX file
-const outputPath = path.join(ALBUMS_DIR, `${albumSlug}.mdx`);
+const targetDir = path.join(ALBUMS_DIR, folderSlug);
+const outputPath = path.join(targetDir, `${albumSlug}.mdx`);
 
 // Check if file already exists
 if (fs.existsSync(outputPath)) {
-    console.error(`❌ Error: Album "${albumSlug}.mdx" already exists`);
+    console.error(`❌ Error: Album "${folderSlug}/${albumSlug}.mdx" already exists`);
     process.exit(1);
 }
 
-// Ensure albums directory exists
-if (!fs.existsSync(ALBUMS_DIR)) {
-    fs.mkdirSync(ALBUMS_DIR, { recursive: true });
+// Ensure directory exists
+if (!fs.existsSync(targetDir)) {
+    fs.mkdirSync(targetDir, { recursive: true });
 }
 
 fs.writeFileSync(outputPath, mdxContent, 'utf8');

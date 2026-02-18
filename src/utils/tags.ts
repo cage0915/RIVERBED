@@ -22,7 +22,8 @@ export async function getAllPhotosWithTags() {
 
     for (const album of albums) {
         const body = album.body;
-        const folder = album.data.folder;
+        const [folder, albumId] = album.slug.split('/');
+
         // Regex to match <Photo ... /> tags
         // Handle both double and single quotes for attributes, and capture the whole tag
         const photoRegex = /<Photo\s+([^>]*)\/>/g;
@@ -69,7 +70,7 @@ export async function getAllPhotosWithTags() {
                     caption,
                     tags,
                     albumTitle: album.data.title,
-                    albumId: album.id,
+                    albumId,
                     folder
                 });
             }

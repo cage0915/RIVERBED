@@ -1,10 +1,18 @@
----
 import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
+import { getFolderTitle, getFolderOrder } from '../lib/constants';
 
-// Get all folders and sort by order
-const folders = await getCollection('folders');
-const sortedFolders = folders.sort((a, b) => a.data.order - b.data.order);
+// Get all albums and extract unique folders from their slugs
+const albums = await getCollection('albums');
+const folderSlugs = [...new Set(albums.map(album => album.slug.split('/')[0]))];
+
+const sortedFolders = folderSlugs
+    .map(slug => ({
+        id: slug,
+        title: getFolderTitle(slug),
+        order: getFolderOrder(slug)
+    }))
+    .sort((a, b) => a.order - b.order);
 ---
 
 <Layout title="RIVERBED">
@@ -12,7 +20,7 @@ const sortedFolders = folders.sort((a, b) => a.data.order - b.data.order);
         <div class="folders-grid">
             {sortedFolders.map((folder) => (
                 <a href={`/${folder.id}`} class="folder-card">
-                    <h2 class="text-2xl font-fjalla tracking-wide uppercase">{folder.data.title}</h2>
+                    <h2 class="text-2xl font-fjalla tracking-wide uppercase">{folder.title}</h2>
                 </a>
             ))}
         </div>

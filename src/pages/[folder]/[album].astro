@@ -1,14 +1,14 @@
 ---
-import { getCollection, getEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import Row from '../../components/Row.astro';
 import Photo from '../../components/Photo.astro';
 
 const { folder, album } = Astro.params;
 
-// Get all albums and find the matching one
+// Get all albums and find the matching one by its combined slug
 const allAlbums = await getCollection('albums');
-const albumEntry = allAlbums.find(a => a.id === album && a.data.folder === folder);
+const albumEntry = allAlbums.find(a => a.slug === `${folder}/${album}`);
 
 if (!albumEntry) {
     return Astro.redirect('/404');

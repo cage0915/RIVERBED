@@ -1,42 +1,45 @@
 ---
-import { getCollection, getEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
+import { getFolderTitle } from '../../lib/constants';
 
 const { folder } = Astro.params;
 
-// Get folder metadata
-const folderData = await getEntry('folders', folder!);
+// Get all albums in this folder by checking the slug prefix
+const allAlbums = await getCollection('albums');
+const folderAlbums = allAlbums
+    .filter(album => album.slug.startsWith(`${folder}/`))
+    .sort((a, b) => a.data.order - b.data.order);
 
-if (!folderData) {
+if (folderAlbums.length === 0) {
     return Astro.redirect('/404');
 }
 
-// Get all albums in this folder
-const allAlbums = await getCollection('albums');
-const folderAlbums = allAlbums
-    .filter(album => album.data.folder === folder)
-    .sort((a, b) => a.data.order - b.data.order);
+const folderTitle = getFolderTitle(folder!);
 ---
 
-<Layout title={`${folderData.data.title} - RIVERBED`}>
+<Layout title={`${folderTitle} - RIVERBED`}>
     <main class="mx-auto px-2 py-8">
-        <div class="albums-grid" style={`--cols: ${folderData.data.albumCols}`}>
-            {folderAlbums.map((album) => (
-                <div class="album-card group">
-                    <a href={`/${folder}/${album.id}`} class="album-link">
-                        <div class="album-cover">
-                            <img
-                                src={`/api/image/${album.data.coverKey}`}
-                                alt={album.data.title}
-                                loading="lazy"
-                            />
-                            <div class="album-overlay">
-                                <h2 class="album-title">{album.data.title}</h2>
+        <div class="albums-grid">
+            {folderAlbums.map((album) => {
+                const albumSlug = album.slug.split('/')[1];
+                return (
+                    <div class="album-card group">
+                        <a href={`/${folder}/${albumSlug}`} class="album-link">
+                            <div class="album-cover">
+                                <img
+                                    src={`/api/image/${album.data.coverKey}`}
+                                    alt={album.data.title}
+                                    loading="lazy"
+                                />
+                                <div class="album-overlay">
+                                    <h2 class="album-title">{album.data.title}</h2>
+                                </div>
                             </div>
-                        </div>
-                    </a>
-                </div>
-            ))}
+                        </a>
+                    </div>
+                );
+            })}
         </div>
     </main>
 </Layout>

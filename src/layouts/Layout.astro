@@ -1,5 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
+import { getFolderTitle, getFolderOrder } from '../lib/constants';
 import '@fontsource/fjalla-one';
 import '@fontsource/pt-sans/400.css';
 import '@fontsource/pt-sans/700.css';
@@ -15,9 +16,17 @@ interface Props {
 
 const { title } = Astro.props;
 
-// Fetch folders for the navigation bar
-const folders = await getCollection('folders');
-const sortedFolders = folders.sort((a, b) => a.data.order - b.data.order);
+// Fetch unique folders from album slugs for navigation
+const albums = await getCollection('albums');
+const folderSlugs = [...new Set(albums.map(album => album.slug.split('/')[0]))];
+
+const sortedFolders = folderSlugs
+    .map(slug => ({
+        id: slug,
+        title: getFolderTitle(slug),
+        order: getFolderOrder(slug)
+    }))
+    .sort((a, b) => a.order - b.order);
 
 // Get the current path to highlight active link
 const currentPath = Astro.url.pathname;
@@ -53,7 +62,7 @@ const currentPath = Astro.url.pathname;
 									isActive ? 'text-white' : 'text-zinc-400'
 								}`}
 							>
-								{folder.data.title}
+								{folder.title}
 								{isActive && (
 									<span class="absolute bottom-0 left-0 right-0 h-0.5 bg-white rounded-full"></span>
 								)}
@@ -82,7 +91,7 @@ const currentPath = Astro.url.pathname;
 									isActive ? 'text-white' : 'text-zinc-400'
 								}`}
 							>
-								{folder.data.title}
+								{folder.title}
 							</a>
 						);
 					})}
