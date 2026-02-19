@@ -6,20 +6,6 @@ import mdx from '@astrojs/mdx';
 // https://astro.build/config
 export default defineConfig({
     output: 'server',
-    adapter: cloudflare({
-        routes: {
-            extend: {
-                include: ['/*'],
-                exclude: [
-                    '/_astro/*',
-                    '/fonts/*',
-                    '/images/*',
-                    '/favicon.ico',
-                    '/sitemap.xml',
-                    '/robots.txt'
-                ]
-            }
-        }
-    }),
+    adapter: cloudflare({}),
     integrations: [tailwind(), mdx()]
 });
