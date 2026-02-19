@@ -1,18 +1,18 @@
 ---
-import { getCollection } from 'astro:content';
-import Layout from '../../layouts/Layout.astro';
-import { getFolderTitle } from '../../lib/constants';
+import { getCollection } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import { getFolderTitle } from "../../lib/constants";
 
 const { folder } = Astro.params;
 
 // Get all albums in this folder by checking the slug prefix
-const allAlbums = await getCollection('albums');
+const allAlbums = await getCollection("albums");
 const folderAlbums = allAlbums
-    .filter(album => album.slug.startsWith(`${folder}/`))
-    .sort((a, b) => a.data.order - b.data.order);
+    .filter((album) => album.slug.startsWith(`${folder}/`))
+    .sort((a, b) => b.data.order - a.data.order);
 
 if (folderAlbums.length === 0) {
-    return Astro.redirect('/404');
+    return Astro.redirect("/404");
 }
 
 const folderTitle = getFolderTitle(folder!);
@@ -21,48 +21,57 @@ const folderTitle = getFolderTitle(folder!);
 <Layout title={`${folderTitle} - RIVERBED`}>
     <main class="mx-auto px-2 py-8">
         <div class="albums-grid">
-            {folderAlbums.map((album) => {
-                const albumSlug = album.slug.split('/')[1];
-                return (
-                    <div class="album-card group">
-                        <a href={`/${folder}/${albumSlug}`} class="album-link">
-                            <div class="album-cover">
-                                <img
-                                    src={`/api/image/${album.data.coverKey}`}
-                                    alt={album.data.title}
-                                    loading="lazy"
-                                />
-                                <div class="album-overlay">
-                                    <h2 class="album-title">{album.data.title}</h2>
+            {
+                folderAlbums.map((album) => {
+                    const albumSlug = album.slug.split("/")[1];
+                    return (
+                        <div class="album-card group">
+                            <a
+                                href={`/${folder}/${albumSlug}`}
+                                class="album-link"
+                            >
+                                <div class="album-cover">
+                                    <img
+                                        src={`/api/image/${album.data.coverKey}`}
+                                        alt={album.data.title}
+                                        loading="lazy"
+                                    />
+                                    <div class="album-overlay">
+                                        <h2 class="album-title">
+                                            {album.data.title}
+                                        </h2>
+                                    </div>
                                 </div>
-                            </div>
-                        </a>
-                    </div>
-                );
-            })}
+                            </a>
+                        </div>
+                    );
+                })
+            }
         </div>
     </main>
 </Layout>
 
 <script>
     const initAlbumCards = () => {
-        const cards = document.querySelectorAll('.album-card');
+        const cards = document.querySelectorAll(".album-card");
 
-        cards.forEach(card => {
-            const link = card.querySelector('.album-link');
+        cards.forEach((card) => {
+            const link = card.querySelector(".album-link");
 
-            card.addEventListener('click', (e) => {
-                const isMobile = window.matchMedia('(max-width: 768px) and (hover: none)').matches;
+            card.addEventListener("click", (e) => {
+                const isMobile = window.matchMedia(
+                    "(max-width: 768px) and (hover: none)",
+                ).matches;
                 if (!isMobile) return;
 
-                if (!card.classList.contains('show-info')) {
+                if (!card.classList.contains("show-info")) {
                     // First tap: show info
                     e.preventDefault();
 
                     // Close other cards
-                    cards.forEach(c => c.classList.remove('show-info'));
+                    cards.forEach((c) => c.classList.remove("show-info"));
 
-                    card.classList.add('show-info');
+                    card.classList.add("show-info");
                 } else {
                     // Second tap: follow link (natural behavior)
                 }
@@ -70,15 +79,15 @@ const folderTitle = getFolderTitle(folder!);
         });
 
         // Close when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!(e.target as Element).closest('.album-card')) {
-                cards.forEach(c => c.classList.remove('show-info'));
+        document.addEventListener("click", (e) => {
+            if (!(e.target as Element).closest(".album-card")) {
+                cards.forEach((c) => c.classList.remove("show-info"));
             }
         });
     };
 
     initAlbumCards();
-    document.addEventListener('astro:after-swap', initAlbumCards);
+    document.addEventListener("astro:after-swap", initAlbumCards);
 </script>
 
 <style>
@@ -140,7 +149,7 @@ const folderTitle = getFolderTitle(folder!);
     }
 
     .album-title {
-        font-family: 'Fjalla One', sans-serif;
+        font-family: "Fjalla One", sans-serif;
         font-size: 1.25rem;
         font-weight: 400;
         letter-spacing: 0.05em;
