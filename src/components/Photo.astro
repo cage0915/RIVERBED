@@ -106,10 +106,12 @@ const imageUrl = `/api/image/${itemKey}`;
         });
     };
 
-    function toggleInfo(e) {
+    function toggleInfo(e: Event) {
         e.preventDefault();
         e.stopPropagation();
-        const wrapper = this.closest(".photo-wrapper");
+        const wrapper = (e.currentTarget as HTMLElement).closest(
+            ".photo-wrapper",
+        );
         wrapper?.classList.toggle("show-info");
     }
 
