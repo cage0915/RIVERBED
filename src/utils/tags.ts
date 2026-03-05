@@ -1,7 +1,4 @@
-
 import { getCollection } from 'astro:content';
-import fs from 'fs';
-import path from 'path';
 
 export interface Tag {
     name: string;
@@ -18,6 +15,10 @@ export interface PhotoWithTags {
     folder: string;
 }
 
+// Use import.meta.glob for production-safe loading of JSON files
+const tagFiles = import.meta.glob('/src/album-tags/**/*.json', { eager: true });
+
+
 export async function getAllPhotosWithTags() {
     const albums = await getCollection('albums');
     const allPhotos: PhotoWithTags[] = [];
@@ -26,21 +27,10 @@ export async function getAllPhotosWithTags() {
         const body = album.body;
         const [folder, albumId] = album.slug.split('/');
 
-        // Load tags from the JSON sidecar file
-        const jsonPath = path.resolve(
-            process.cwd(),
-            'src/album-tags',
-            folder,
-            `${albumId}.json`
-        );
-        let tagsMap: Record<string, Tag[]> = {};
-        try {
-            if (fs.existsSync(jsonPath)) {
-                tagsMap = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
-            }
-        } catch (e) {
-            console.error(`Failed to load tags JSON for ${album.id}:`, e);
-        }
+        // Match the JSON path used in the glob
+        const jsonPath = `/src/album-tags/${folder}/${albumId}.json`;
+        const tagsMap = (tagFiles[jsonPath] as any)?.default || {};
+
 
         // Regex to match <Photo ... /> tags
         const photoRegex = /<Photo\s+([^>]*)\/>/g;

@@ -1,6 +1,4 @@
 import type { APIRoute } from 'astro';
-import fs from 'node:fs';
-import path from 'node:path';
 
 export const POST: APIRoute = async ({ request }) => {
     // Only allow in dev mode
@@ -41,6 +39,8 @@ export const POST: APIRoute = async ({ request }) => {
     }
     const [folder, album] = parts;
 
+    const fs = await import('node:fs');
+    const path = await import('node:path');
     const cwd = process.cwd();
 
     // --- Update album tags JSON ---

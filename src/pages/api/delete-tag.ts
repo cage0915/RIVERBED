@@ -1,6 +1,4 @@
 import type { APIRoute } from 'astro';
-import fs from 'node:fs';
-import path from 'node:path';
 
 export const POST: APIRoute = async ({ request }) => {
     // Only allow in dev mode
@@ -39,6 +37,8 @@ export const POST: APIRoute = async ({ request }) => {
     }
     const [folder, album] = parts;
 
+    const fs = await import('node:fs');
+    const path = await import('node:path');
     const cwd = process.cwd();
     const tagsFile = path.resolve(cwd, 'src/album-tags', folder, `${album}.json`);
 
@@ -62,7 +62,7 @@ export const POST: APIRoute = async ({ request }) => {
     if (tagsMap[photoId]) {
         // Filter out the tag that matches name, x, and y (approximate match for coordinates)
         tagsMap[photoId] = tagsMap[photoId].filter(t =>
-            !(t.name === tagName && Math.abs(t.x - x) < 0.1 && Math.abs(t.y - y) < 0.1)
+            !(t.name === tagName && Math.abs(t.x - (x ?? 0)) < 0.1 && Math.abs(t.y - (y ?? 0)) < 0.1)
         );
 
         // If no tags left for this photo, maybe keep the key as empty array?

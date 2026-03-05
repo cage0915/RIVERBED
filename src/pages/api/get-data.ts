@@ -1,48 +1,16 @@
 import type { APIRoute } from 'astro';
-import fs from 'node:fs';
-import path from 'node:path';
+import mountains from '../../mountains.json';
+const tagFiles = import.meta.glob('/src/album-tags/**/*.json', { eager: true });
+
 
 export const GET: APIRoute = async () => {
-    const cwd = process.cwd();
+    const allTags: Record<string, any> = {};
 
-    // --- Read mountains.json ---
-    interface MountainEntry {
-        name: string;
-        elevation: number | null;
-        description: string;
-    }
-
-    const mountainsFile = path.resolve(cwd, 'src/mountains.json');
-    let mountains: MountainEntry[] = [];
-    if (fs.existsSync(mountainsFile)) {
-        try {
-            mountains = JSON.parse(fs.readFileSync(mountainsFile, 'utf-8'));
-        } catch {
-            mountains = [];
-        }
-    }
-
-
-    // --- Read all album-tags JSONs ---
-    const tagsRoot = path.resolve(cwd, 'src/album-tags');
-    const allTags: Record<string, Record<string, { name: string; x: number; y: number }[]>> = {};
-
-    if (fs.existsSync(tagsRoot)) {
-        for (const folder of fs.readdirSync(tagsRoot)) {
-            const folderPath = path.join(tagsRoot, folder);
-            if (!fs.statSync(folderPath).isDirectory()) continue;
-
-            for (const file of fs.readdirSync(folderPath)) {
-                if (!file.endsWith('.json')) continue;
-                const album = file.replace('.json', '');
-                const filePath = path.join(folderPath, file);
-                try {
-                    const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-                    allTags[`${folder}/${album}`] = data;
-                } catch {
-                    // skip corrupt files
-                }
-            }
+    for (const path in tagFiles) {
+        // Transform path from '/src/album-tags/folder/album.json' to 'folder/album'
+        const match = path.match(/\/src\/album-tags\/(.*)\.json/);
+        if (match) {
+            allTags[match[1]] = (tagFiles[path] as any).default;
         }
     }
 
@@ -54,3 +22,4 @@ export const GET: APIRoute = async () => {
         }
     );
 };
+
