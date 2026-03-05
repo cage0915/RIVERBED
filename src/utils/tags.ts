@@ -1,5 +1,7 @@
 
 import { getCollection } from 'astro:content';
+import fs from 'fs';
+import path from 'path';
 
 export interface Tag {
     name: string;
@@ -24,8 +26,23 @@ export async function getAllPhotosWithTags() {
         const body = album.body;
         const [folder, albumId] = album.slug.split('/');
 
+        // Load tags from the JSON sidecar file
+        const jsonPath = path.resolve(
+            process.cwd(),
+            'src/album-tags',
+            folder,
+            `${albumId}.json`
+        );
+        let tagsMap: Record<string, Tag[]> = {};
+        try {
+            if (fs.existsSync(jsonPath)) {
+                tagsMap = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
+            }
+        } catch (e) {
+            console.error(`Failed to load tags JSON for ${album.id}:`, e);
+        }
+
         // Regex to match <Photo ... /> tags
-        // Handle both double and single quotes for attributes, and capture the whole tag
         const photoRegex = /<Photo\s+([^>]*)\/>/g;
         let match;
 
@@ -40,35 +57,11 @@ export async function getAllPhotosWithTags() {
             const captionMatch = propsStr.match(/caption=["']([^"']*)["']/);
             const caption = captionMatch ? captionMatch[1] : undefined;
 
-            // Extract tags
-            // This is the tricky part since it's a JS array
-            const tagsMatch = propsStr.match(/tags={(\[[\s\S]*?\])}/);
-            let tags: Tag[] = [];
-
-            if (itemKey && tagsMatch) {
-                try {
-                    const tagsStr = tagsMatch[1];
-                    // Very basic JS-like to JSON converter for simple objects
-                    // 1. Double quote keys
-                    // 2. Replace single quotes with double quotes
-                    // 3. Remove trailing commas
-                    let jsonStr = tagsStr
-                        .replace(/(\w+):/g, '"$1":')
-                        .replace(/'/g, '"')
-                        .replace(/,\s*\]/g, ']')
-                        .replace(/,\s*\}/g, '}');
-
-                    tags = JSON.parse(jsonStr);
-                } catch (e) {
-                    console.error(`Failed to parse tags in ${album.id} for ${itemKey}:`, e);
-                }
-            }
-
             if (itemKey) {
                 allPhotos.push({
                     itemKey,
                     caption,
-                    tags,
+                    tags: tagsMap[itemKey] || [],
                     albumTitle: album.data.title,
                     albumId,
                     folder
