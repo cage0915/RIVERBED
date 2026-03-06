@@ -1,12 +1,12 @@
 import { getCollection } from 'astro:content';
 
-export interface Tag {
+interface Tag {
     name: string;
     x: number;
     y: number;
 }
 
-export interface PhotoWithTags {
+interface PhotoWithTags {
     itemKey: string;
     caption?: string;
     tags: Tag[];
@@ -63,11 +63,3 @@ export async function getAllPhotosWithTags() {
     return allPhotos;
 }
 
-export async function getAllUniqueTags() {
-    const photos = await getAllPhotosWithTags();
-    const tagNames = new Set<string>();
-    photos.forEach(photo => {
-        photo.tags.forEach(tag => tagNames.add(tag.name));
-    });
-    return Array.from(tagNames);
-}
