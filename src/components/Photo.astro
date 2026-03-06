@@ -52,19 +52,22 @@ const isDev = import.meta.env.DEV;
                             class="tag-marker"
                             style={`left: ${tag.x}%; top: ${tag.y}%;`}
                         >
-                            <a
-                                href={`/tags/${encodeURIComponent(tag.name)}`}
-                                class="tag-link"
-                            >
-                                <span
-                                    class="tag-name"
-                                    data-name={tag.name}
-                                    data-x={tag.x}
-                                    data-y={tag.y}
+                            <div class="tag-content">
+                                <div class="tag-line" />
+                                <a
+                                    href={`/tags/${encodeURIComponent(tag.name)}`}
+                                    class="tag-link"
                                 >
-                                    {tag.name}
-                                </span>
-                            </a>
+                                    <span
+                                        class="tag-name"
+                                        data-name={tag.name}
+                                        data-x={tag.x}
+                                        data-y={tag.y}
+                                    >
+                                        {tag.name}
+                                    </span>
+                                </a>
+                            </div>
                         </div>
                     ))}
                 </div>
@@ -493,33 +496,55 @@ const isDev = import.meta.env.DEV;
 
     .tag-marker {
         position: absolute;
-        transform: translate(-50%, -50%);
         z-index: 10;
+        pointer-events: none;
+    }
+
+    .tag-content {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        display: flex;
+        flex-direction: column-reverse;
+        align-items: flex-start;
+    }
+
+    .tag-line {
+        width: 1px;
+        height: 1.2rem;
+        background: rgba(255, 255, 255, 0.9);
+        box-shadow: 0 0 1px rgba(0, 0, 0, 0.4);
+        flex-shrink: 0;
     }
 
     .tag-name {
         display: inline-block;
         color: rgba(0, 0, 0, 0.85);
         background: rgba(255, 255, 255, 0.7);
-        padding: 0.15rem 0.3rem;
+        padding: 0.15rem 0.35rem;
         border-radius: 1rem;
         font-size: 0.6rem;
         white-space: nowrap;
         backdrop-filter: blur(4px);
         transition: all 0.2s ease;
         border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transform: rotate(-45deg);
+        transform-origin: bottom left;
     }
 
     .tag-link {
         text-decoration: none;
         pointer-events: auto;
+        display: block;
+        margin-bottom: -1px; /* Align precisely with the top of the line */
     }
 
     .tag-link:hover .tag-name {
         background: rgba(255, 255, 255, 0.95);
         color: #000;
-        transform: scale(1.05);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        transform: rotate(-45deg) scale(1.05) translate(2px, -2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
 
     .caption-overlay {
