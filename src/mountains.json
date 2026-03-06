@@ -10,7 +10,32 @@
     "description": ""
   },
   {
+    "name": "大雪山",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "大雪山北峰",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "大劍山",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "大霸尖山",
+    "elevation": null,
+    "description": ""
+  },
+  {
     "name": "中央尖山",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "北稜角",
     "elevation": null,
     "description": ""
   },
@@ -20,12 +45,47 @@
     "description": "台灣最高峰，東北亞第一高峰。"
   },
   {
+    "name": "玉山北北峰",
+    "elevation": null,
+    "description": ""
+  },
+  {
     "name": "玉山北峰",
     "elevation": 3858,
     "description": ""
   },
   {
+    "name": "玉山南峰",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "甘薯峰",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "佳陽山",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "奇峻山",
+    "elevation": null,
+    "description": ""
+  },
+  {
     "name": "奇萊北峰",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "南湖大山",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "品田山",
     "elevation": null,
     "description": ""
   },
@@ -36,6 +96,31 @@
   },
   {
     "name": "雪山主峰",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "雪山北峰",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "無明山",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "塔山",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "穆特勒布山",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "頭鷹山",
     "elevation": null,
     "description": ""
   }

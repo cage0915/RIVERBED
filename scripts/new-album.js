@@ -91,7 +91,7 @@ order: 0
     // Generate Photo components
     const photoComponents = sortedFiles.map((filename) => {
         const key = `${folderSlug}/${albumSlug}/${filename}`;
-        return `<Photo itemKey="${key}" caption="" tags={[]} />`;
+        return `<Photo itemKey="${key}" caption="" />`;
     });
 
     // Group photos into rows

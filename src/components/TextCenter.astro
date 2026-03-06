@@ -1,0 +1,23 @@
+---
+interface Props {
+  padding?: string;
+  class?: string;
+}
+
+const { padding = "0.5rem 0 2rem 0", class: className } = Astro.props;
+---
+
+<div class:list={["text-center-wrapper", className]} style={`padding: ${padding};`}>
+  <slot />
+</div>
+
+<style>
+  .text-center-wrapper {
+    text-align: center;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+</style>
