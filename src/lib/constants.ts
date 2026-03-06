@@ -15,3 +15,10 @@ export const getFolderTitle = (slug: string) => {
 export const getFolderOrder = (slug: string) => {
     return FOLDER_METADATA[slug as FolderSlug]?.order ?? 99;
 };
+export const R2_DOMAIN = 'https://photos.cage0915.com';
+
+export const getImageUrl = (itemKey: string) => {
+    return import.meta.env.DEV
+        ? `/r2/${itemKey}`
+        : `${R2_DOMAIN}/${itemKey}`;
+};

@@ -10,6 +10,8 @@ interface Props {
     caption?: string;
 }
 
+import { getImageUrl, R2_DOMAIN } from "../lib/constants";
+
 const { itemKey, caption } = Astro.props;
 
 // Load all tags from JSON files
@@ -20,8 +22,9 @@ const [folder, album] = itemKey.split("/");
 const jsonPath = `/src/album-tags/${folder}/${album}.json`;
 const albumTags = (allTags[jsonPath] as any)?.default || {};
 const tags: Tag[] = albumTags[itemKey] || [];
-const imageUrl = `/api/image/${itemKey}`;
+const imageUrl = getImageUrl(itemKey);
 const isDev = import.meta.env.DEV;
+const fallbackUrl = `${R2_DOMAIN}/${itemKey}`;
 ---
 
 <div class="photo-container">
@@ -41,6 +44,9 @@ const isDev = import.meta.env.DEV;
                 alt={caption || ""}
                 loading="lazy"
                 class="photo-img"
+                onerror={isDev
+                    ? `this.onerror=null; this.src='${fallbackUrl}'; this.parentElement.href='${fallbackUrl}'; this.parentElement.dataset.pswpSrc='${fallbackUrl}';`
+                    : undefined}
             />
         </a>
 
@@ -150,13 +156,20 @@ const isDev = import.meta.env.DEV;
         if (!hasDevWrappers()) return;
 
         // Fetch mountain list once and cache
-        let mountainCache: string[] = [];
-        async function fetchMountains(): Promise<string[]> {
+        interface MountainData {
+            name: string;
+            elevation: number | null;
+            description: string;
+        }
+        let mountainCache: MountainData[] = [];
+        async function fetchMountains(): Promise<MountainData[]> {
             if (mountainCache.length > 0) return mountainCache;
             try {
                 const res = await fetch("/api/get-data");
                 if (res.ok) {
-                    const data = (await res.json()) as { mountains: string[] };
+                    const data = (await res.json()) as {
+                        mountains: MountainData[];
+                    };
                     mountainCache = data.mountains || [];
                 }
             } catch {
@@ -213,7 +226,7 @@ const isDev = import.meta.env.DEV;
             photoId: string,
             x: number,
             y: number,
-            mountains: string[],
+            mountains: MountainData[],
         ): Promise<string | null> {
             return new Promise((resolve) => {
                 const dialog = createTagDialog();

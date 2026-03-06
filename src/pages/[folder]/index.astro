@@ -1,7 +1,7 @@
 ---
 import { getCollection } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
-import { getFolderTitle } from "../../lib/constants";
+import { getFolderTitle, getImageUrl, R2_DOMAIN } from "../../lib/constants";
 
 const { folder } = Astro.params;
 
@@ -16,6 +16,7 @@ if (folderAlbums.length === 0) {
 }
 
 const folderTitle = getFolderTitle(folder!);
+const isDev = import.meta.env.DEV;
 ---
 
 <Layout title={`${folderTitle} - RIVERBED`}>
@@ -24,6 +25,8 @@ const folderTitle = getFolderTitle(folder!);
             {
                 folderAlbums.map((album) => {
                     const albumSlug = album.slug.split("/")[1];
+                    const coverUrl = getImageUrl(album.data.coverKey);
+                    const fallbackUrl = `${R2_DOMAIN}/${album.data.coverKey}`;
                     return (
                         <div class="album-card group">
                             <a
@@ -32,9 +35,14 @@ const folderTitle = getFolderTitle(folder!);
                             >
                                 <div class="album-cover">
                                     <img
-                                        src={`/api/image/${album.data.coverKey}`}
+                                        src={coverUrl}
                                         alt={album.data.title}
                                         loading="lazy"
+                                        onerror={
+                                            isDev
+                                                ? `this.onerror=null; this.src='${fallbackUrl}';`
+                                                : undefined
+                                        }
                                     />
                                     <div class="album-overlay">
                                         <h2 class="album-title">
