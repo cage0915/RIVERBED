@@ -70,6 +70,16 @@
     "description": ""
   },
   {
+    "name": "小霸尖山",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "小觀音山",
+    "elevation": null,
+    "description": ""
+  },
+  {
     "name": "干卓萬山",
     "elevation": null,
     "description": ""
@@ -80,7 +90,22 @@
     "description": ""
   },
   {
+    "name": "中央尖山東峰",
+    "elevation": null,
+    "description": ""
+  },
+  {
     "name": "太魯閣大山",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "加里山",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "加里山東南峰",
     "elevation": null,
     "description": ""
   },
@@ -150,7 +175,17 @@
     "description": ""
   },
   {
+    "name": "向天山",
+    "elevation": null,
+    "description": ""
+  },
+  {
     "name": "向陽山",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "池有山",
     "elevation": null,
     "description": ""
   },
@@ -195,12 +230,22 @@
     "description": ""
   },
   {
+    "name": "東霸尖山",
+    "elevation": null,
+    "description": ""
+  },
+  {
     "name": "油婆蘭山",
     "elevation": null,
     "description": ""
   },
   {
     "name": "南大武山",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "南插天山",
     "elevation": null,
     "description": ""
   },
@@ -215,12 +260,37 @@
     "description": ""
   },
   {
+    "name": "屏風山",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "閂山",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "面天山",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "桃山",
+    "elevation": null,
+    "description": ""
+  },
+  {
     "name": "素密達山",
     "elevation": null,
     "description": ""
   },
   {
     "name": "能高山",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "茶岩山",
     "elevation": null,
     "description": ""
   },
@@ -265,6 +335,11 @@
     "description": ""
   },
   {
+    "name": "凱蘭特崑山",
+    "elevation": null,
+    "description": ""
+  },
+  {
     "name": "無明山",
     "elevation": null,
     "description": ""
@@ -280,6 +355,16 @@
     "description": ""
   },
   {
+    "name": "鈴鳴山",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "榛山",
+    "elevation": null,
+    "description": ""
+  },
+  {
     "name": "翠池三叉山",
     "elevation": null,
     "description": ""
@@ -290,12 +375,27 @@
     "description": ""
   },
   {
+    "name": "魯培山",
+    "elevation": null,
+    "description": ""
+  },
+  {
     "name": "穆特勒布山",
     "elevation": null,
     "description": ""
   },
   {
+    "name": "鋸山",
+    "elevation": null,
+    "description": ""
+  },
+  {
     "name": "頭鷹山",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "龜山島",
     "elevation": null,
     "description": ""
   },
