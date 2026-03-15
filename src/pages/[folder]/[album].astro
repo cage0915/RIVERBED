@@ -3,6 +3,7 @@ import { getCollection } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 import Row from "../../components/Row.astro";
 import Photo from "../../components/Photo.astro";
+import PhotoCarousel from "../../components/PhotoCarousel.astro";
 import TextCenter from "../../components/TextCenter.astro";
 
 const { folder, album } = Astro.params;
@@ -63,7 +64,7 @@ try {
         </h1>
 
         <article class="album-content">
-            <Content components={{ Row, Photo, TextCenter }} />
+            <Content components={{ Row, Photo, TextCenter, PhotoCarousel }} />
         </article>
     </main>
 </Layout>

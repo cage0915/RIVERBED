@@ -1,0 +1,288 @@
+---
+interface Props {
+    /** Optional gap between slides (CSS value, default "1rem") */
+    gap?: string;
+    /** Percentage of the track NOT occupied by the active slide, split as side peeking (default 15 → ~7.5% each side) */
+    peekPercent?: number;
+    /** Padding around the carousel (default "0 0 0.5rem 0" to match Row.astro and TextCenter) */
+    padding?: string;
+    /** The index of the slide (0-based) to be centered on initial load */
+    initialSlide?: number;
+}
+
+const { gap = "1rem", peekPercent = 10, padding = "1rem 0 1rem 0", initialSlide = 0 } = Astro.props;
+
+// Each slide occupies (100 - peekPercent)% of the scroll container width.
+// Half the remaining is distributed to each side as a "peek".
+const slideWidthPercent = 100 - peekPercent;
+---
+
+<section
+    class="carousel-section group"
+    data-carousel
+    data-initial-slide={initialSlide}
+    style={`padding: ${padding};`}
+>
+    <!-- Scroll track -->
+    <div
+        class="carousel-track"
+        style={`--slide-width: ${slideWidthPercent}%; --gap: ${gap};`}
+    >
+        <slot />
+    </div>
+
+    <!-- Expanding dots container -->
+    <div class="carousel-dots"></div>
+</section>
+
+<script>
+    function initCarousels() {
+        document
+            .querySelectorAll<HTMLElement>("[data-carousel]")
+            .forEach((section) => {
+                // Guard: skip if already initialised
+                if (section.dataset.carouselReady) return;
+                section.dataset.carouselReady = "true";
+
+                const track = section.querySelector<HTMLElement>(
+                    ".carousel-track",
+                );
+                const dotsContainer = section.querySelector<HTMLElement>(
+                    ".carousel-dots",
+                );
+                if (!track) return;
+
+                const slides = Array.from(track.querySelectorAll<HTMLElement>(":scope > *"));
+                const dots: HTMLButtonElement[] = [];
+
+                // Generate dots if there are multiple slides
+                if (dotsContainer && slides.length > 1) {
+                    slides.forEach((slide, index) => {
+                        const dot = document.createElement("button");
+                        dot.className = "carousel-dot";
+                        dot.setAttribute("aria-label", `Go to slide ${index + 1}`);
+
+                        dot.addEventListener("click", () => {
+                            track.scrollTo({
+                                left: slide.offsetLeft - track.offsetLeft - (track.clientWidth - slide.clientWidth) / 2,
+                                behavior: "smooth"
+                            });
+                        });
+
+                        slide.dataset.slideIndex = index.toString();
+                        dotsContainer.appendChild(dot);
+                        dots.push(dot);
+                    });
+                }
+
+                // Handle click on slides
+                const handleSlideClick = (e: Event) => {
+                    const slide = (e.currentTarget as HTMLElement);
+
+                    // If the click is on a slide that is already active/centred,
+                    // let the click bubble up normally so the Photoswipe lightbox opens.
+                    if (slide.hasAttribute("data-active")) {
+                        return;
+                    }
+
+                    // Otherwise, prevent the lightbox from opening.
+                    // (Ensure we capture and stop the anchor link click)
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    // Scroll the track so this slide becomes the centre
+                    // Scroll snap will handle the final pixel-perfect alignment
+                    track.scrollTo({
+                        left: slide.offsetLeft - track.offsetLeft - (track.clientWidth - slide.clientWidth) / 2,
+                        behavior: "smooth"
+                    });
+                };
+
+                // ── IntersectionObserver: light-up the centred slide ──
+                // threshold: how much of the slide must be visible to be
+                // considered "active». 0.6 works well for 85%-wide slides.
+                const observer = new IntersectionObserver(
+                    (entries) => {
+                        let foundIntersecting = false;
+                        entries.forEach((entry) => {
+                            if (entry.isIntersecting) {
+                                foundIntersecting = true;
+                                // Remove active from siblings first
+                                slides.forEach((el) => el.removeAttribute("data-active"));
+                                dots.forEach((dot) => dot.classList.remove("active"));
+
+                                (entry.target as HTMLElement).setAttribute("data-active", "");
+                                const activeIndex = parseInt((entry.target as HTMLElement).dataset.slideIndex || "0");
+                                if (dots[activeIndex]) {
+                                    dots[activeIndex].classList.add("active");
+                                }
+                            }
+                        });
+                    },
+                    {
+                        root: track,
+                        // A symmetric margin equal to half the peeked area
+                        // ensures only the centred slide is observed.
+                        rootMargin: "0px -20% 0px -20%",
+                        threshold: 0.5,
+                    },
+                );
+
+                slides.forEach((slide) => {
+                        observer.observe(slide);
+                        // We use the `true` flag to attach the listener in the capture phase.
+                        // This makes sure our handler runs BEFORE the <a> tag triggers PhotoSwipe.
+                        slide.addEventListener("click", handleSlideClick, true);
+                    });
+
+                // Setup initial active slide and scroll position
+                const initialIndex = parseInt(section.dataset.initialSlide || "0");
+                const targetSlide = slides[initialIndex] || slides[0];
+
+                if (targetSlide && initialIndex > 0) {
+                    targetSlide.setAttribute("data-active", "");
+                    // Wait a moment for layout to properly compute flex sizes and for scroll-snap to be ready
+                    setTimeout(() => {
+                        track.scrollLeft = targetSlide.offsetLeft - track.offsetLeft - (track.clientWidth - targetSlide.clientWidth) / 2;
+                    }, 100);
+                } else if (slides[0]) {
+                    slides[0].setAttribute("data-active", "");
+                }
+
+                // Cleanup on page swap (stored on element for retrieval)
+                (section as any)._carouselObserver = observer;
+            });
+    }
+
+    function destroyCarousels() {
+        document
+            .querySelectorAll<HTMLElement>("[data-carousel]")
+            .forEach((section) => {
+                const obs = (section as any)._carouselObserver as
+                    | IntersectionObserver
+                    | undefined;
+                obs?.disconnect();
+                delete (section as any)._carouselObserver;
+                delete section.dataset.carouselReady;
+            });
+    }
+
+    // Boot on first load
+    initCarousels();
+
+    // Re-init after Astro View Transitions page swap
+    document.addEventListener("astro:before-swap", destroyCarousels);
+    document.addEventListener("astro:after-swap", initCarousels);
+</script>
+
+<style>
+    /* ── Section wrapper ─────────────────────────────────────────── */
+    .carousel-section {
+        position: relative;
+        width: 100%;
+    }
+
+    /* ── Scroll track ────────────────────────────────────────────── */
+    .carousel-track {
+        display: flex;
+        flex-direction: row;
+        gap: var(--gap, 1rem);
+
+        /* Inline padding creates the peek on both sides */
+        padding-inline: calc((100% - var(--slide-width, 85%)) / 2);
+
+        overflow-x: scroll;
+        -webkit-overflow-scrolling: touch;
+
+        /* Scroll snap */
+        scroll-snap-type: x mandatory;
+        scroll-padding-inline: calc((100% - var(--slide-width, 85%)) / 2);
+
+        /* Hide scrollbar – all browsers */
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none; /* IE / Edge */
+    }
+
+    .carousel-track::-webkit-scrollbar {
+        display: none; /* Chrome / Safari / Opera */
+    }
+
+    /* ── Each direct child = one slide ──────────────────────────── */
+    .carousel-track > :global(*) {
+        flex: 0 0 var(--slide-width, 85%);
+        scroll-snap-align: center;
+        min-width: 0;
+
+        /* Subtle dim + shrink for off-centre slides */
+        opacity: 0.65;
+        transform: scale(0.95);
+        transition:
+            opacity 0.4s ease,
+            transform 0.4s ease;
+    }
+
+    /*
+     * Highlight the snapped slide.
+     * :has() + scroll-snap-align isn't reliable, so we use a JS-free
+     * CSS trick: the slide closest to the centre padding edge is "active"
+     * when it is intersecting. As a lightweight fallback we brighten
+     * on hover, which is good enough for desktop use.
+     */
+    .carousel-track > :global(*:hover),
+    .carousel-track > :global(*:focus-within) {
+        opacity: 1;
+    }
+
+    /* When JS sets data-active the slide is fully lit.
+       (JS intersection observer is NOT used here to keep the component
+       simple — the hover effect is sufficient for most use-cases.) */
+    .carousel-track > :global([data-active]) {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    /* ── Expanding Dots ─────────────────────────────────────────── */
+    .carousel-dots {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.35rem;
+        margin-top: 0.75rem;
+    }
+
+    /* We use :global on dots because they're injected via JS natively */
+    .carousel-section :global(.carousel-dot) {
+        width: 6px;
+        height: 6px;
+        border-radius: 9999px;
+        background: rgba(100, 100, 100, 0.25);
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        transition:
+            width 0.3s ease,
+            background-color 0.3s ease;
+    }
+
+    .carousel-section :global(.carousel-dot:hover) {
+        background: rgba(100, 100, 100, 0.5);
+    }
+
+    .carousel-section :global(.carousel-dot.active) {
+        width: 18px; /* makes it expand into a pill shape */
+        background: rgba(120, 120, 120, 0.8);
+    }
+
+    /* Adapt to dark mode nicely if applicable */
+    @media (prefers-color-scheme: dark) {
+        .carousel-section :global(.carousel-dot) {
+            background: rgba(200, 200, 200, 0.25);
+        }
+        .carousel-section :global(.carousel-dot:hover) {
+            background: rgba(200, 200, 200, 0.5);
+        }
+        .carousel-section :global(.carousel-dot.active) {
+            background: rgba(255, 255, 255, 0.8);
+        }
+    }
+</style>
