@@ -4,8 +4,7 @@ module.exports = {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['"PT Sans"', '"Noto Sans TC"', 'sans-serif'],
-                fjalla: ['"Fjalla One"', 'sans-serif'],
+                sans: ['"PT Sans"', '"Noto Sans TC"', '"Noto Sans JP"', 'sans-serif'],
             },
         },
     },

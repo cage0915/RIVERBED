@@ -1,7 +1,10 @@
 ---
 import { getCollection } from "astro:content";
 import { getFolderTitle, getFolderOrder } from "../lib/constants";
-import "@fontsource/fjalla-one";
+import "@fontsource/noto-sans-jp/300.css";
+import "@fontsource/noto-sans-jp/400.css";
+import "@fontsource/noto-sans-jp/500.css";
+import "@fontsource/noto-sans-jp/700.css";
 import "@fontsource/pt-sans/400.css";
 import "@fontsource/pt-sans/700.css";
 import "@fontsource/noto-sans-tc/300.css";
@@ -105,7 +108,7 @@ const currentPath = Astro.url.pathname;
 							return (
 								<a
 									href={`/${folder.id}`}
-									class={`text-sm font-fjalla tracking-wide transition-all hover:text-white relative py-1 ${
+									class={`text-sm font-sans tracking-wide transition-all hover:text-white relative py-1 ${
 										isActive
 											? "text-white"
 											: "text-zinc-400"
@@ -125,7 +128,7 @@ const currentPath = Astro.url.pathname;
 				<div class="absolute left-1/2 -translate-x-1/2">
 					<a
 						href="/"
-						class="text-xl font-fjalla tracking-[0.2em] hover:text-white transition-colors"
+						class="text-xl font-sans tracking-[0.2em] hover:text-white transition-colors"
 					>
 						RIVERBED
 					</a>
@@ -146,7 +149,7 @@ const currentPath = Astro.url.pathname;
 							return (
 								<a
 									href={`/${folder.id}`}
-									class={`text-base font-fjalla tracking-wide transition-all text-center ${
+									class={`text-base font-sans tracking-wide transition-all text-center ${
 										isActive
 											? "text-white"
 											: "text-zinc-400"
@@ -380,10 +383,10 @@ const currentPath = Astro.url.pathname;
 	}
 
 	:root {
-		font-family: "PT Sans", "Noto Sans TC", sans-serif;
+		font-family: "PT Sans", "Noto Sans TC", "Noto Sans JP", sans-serif;
 	}
 
 	body {
-		font-family: "PT Sans", "Noto Sans TC", sans-serif;
+		font-family: "PT Sans", "Noto Sans TC", "Noto Sans JP", sans-serif;
 	}
 </style>
