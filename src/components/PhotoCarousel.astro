@@ -191,6 +191,10 @@ const slideWidthPercent = 100 - peekPercent;
         /* Inline padding creates the peek on both sides */
         padding-inline: calc((100% - var(--slide-width, 85%)) / 2);
 
+        /* Add vertical padding to prevent tags from being cropped by the overflow-x container */
+        padding-block: 3.5rem;
+        margin-block: -3.5rem;
+
         overflow-x: scroll;
         -webkit-overflow-scrolling: touch;
 
