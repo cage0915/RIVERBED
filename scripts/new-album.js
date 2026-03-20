@@ -84,6 +84,8 @@ async function processAlbum(folderSlug, albumSlug) {
 title: "${albumTitle}"
 coverKey: "${folderSlug}/${albumSlug}/${sortedFiles[0]}"
 order: 0
+coverZoom: 1
+coverOffset: { x: 50, y: 50 }
 ---
 
 `;

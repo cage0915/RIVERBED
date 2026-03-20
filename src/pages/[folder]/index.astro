@@ -38,6 +38,7 @@ const isDev = import.meta.env.DEV;
                                         src={coverUrl}
                                         alt={album.data.title}
                                         loading="lazy"
+                                        style={`object-position: ${album.data.coverOffset?.x ?? 50}% ${album.data.coverOffset?.y ?? 50}%; transform: scale(${album.data.coverZoom ?? 1});`}
                                         onerror={
                                             isDev
                                                 ? `this.onerror=null; this.src='${fallbackUrl}';`
@@ -133,13 +134,14 @@ const isDev = import.meta.env.DEV;
         width: 100%;
         aspect-ratio: 177/100;
         overflow: hidden;
+        background: #1a1a1a;
     }
 
     .album-cover img {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), object-position 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .album-overlay {
