@@ -390,6 +390,11 @@
     "description": ""
   },
   {
+    "name": "明神岳",
+    "elevation": null,
+    "description": ""
+  },
+  {
     "name": "東天井岳",
     "elevation": null,
     "description": ""
@@ -661,6 +666,11 @@
   },
   {
     "name": "権現岳",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "横岳",
     "elevation": null,
     "description": ""
   },
