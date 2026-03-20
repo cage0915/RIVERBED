@@ -433,7 +433,7 @@ const fallbackUrl = `${R2_DOMAIN}/${itemKey}`;
     .photo-wrapper {
         position: relative;
         width: 100%;
-        overflow: hidden;
+        /* removed overflow: hidden to allow tags near border to overflow smoothly */
     }
 
     .photo-wrapper img {
