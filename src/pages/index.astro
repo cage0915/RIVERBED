@@ -9,12 +9,21 @@ import {
 } from "../lib/constants";
 
 // Get all albums and extract unique folders from their slugs
-const albums = await getCollection("albums");
+const albums = (await getCollection("albums")).sort(
+    (a, b) => (b.data.order ?? 0) - (a.data.order ?? 0),
+);
+
 
 // Group albums by folder, sorted by album order descending
 const folderMap = new Map<
     string,
-    { coverUrl: string; fallbackUrl: string; title: string }[]
+    {
+        coverUrl: string;
+        fallbackUrl: string;
+        title: string;
+        coverZoom?: number;
+        coverOffset?: { x: number; y: number };
+    }[]
 >();
 for (const album of albums) {
     const folderSlug = album.slug.split("/")[0];
@@ -23,6 +32,8 @@ for (const album of albums) {
         coverUrl: getImageUrl(album.data.coverKey),
         fallbackUrl: `${R2_DOMAIN}/${album.data.coverKey}`,
         title: album.data.title,
+        coverZoom: album.data.coverZoom,
+        coverOffset: album.data.coverOffset,
     });
 }
 
@@ -58,6 +69,7 @@ const sortedFolders = folderSlugs
                                         alt={cover.title}
                                         loading={i === 0 ? "eager" : "lazy"}
                                         class={`slide ${i === 0 ? "active" : ""}`}
+                                        style={`--zoom: ${cover.coverZoom ?? 1}; --ox: ${cover.coverOffset?.x ?? 50}%; --oy: ${cover.coverOffset?.y ?? 50}%;`}
                                         onerror={
                                             isDev
                                                 ? `this.onerror=null; this.src='${cover.fallbackUrl}';`
@@ -170,9 +182,12 @@ const sortedFolders = folderSlugs
         height: 100%;
         object-fit: cover;
         opacity: 0;
+        object-position: var(--ox) var(--oy);
+        transform: scale(var(--zoom));
         transition:
             opacity 0.8s ease,
-            transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+            object-position 0.6s;
     }
 
     .album-cover .slide.active {
@@ -218,7 +233,7 @@ const sortedFolders = folderSlugs
 
     @media (hover: hover) {
         .album-card:hover .slide.active {
-            transform: scale(1.05);
+            transform: scale(calc(var(--zoom) * 1.05));
         }
 
         .album-card:hover .album-overlay {
