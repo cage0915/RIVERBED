@@ -175,7 +175,17 @@
     "description": ""
   },
   {
+    "name": "巴紗拉雲山",
+    "elevation": null,
+    "description": ""
+  },
+  {
     "name": "水晶岳",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "加利山",
     "elevation": null,
     "description": ""
   },
@@ -196,6 +206,11 @@
   },
   {
     "name": "北岳",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "北插天山",
     "elevation": null,
     "description": ""
   },
