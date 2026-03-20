@@ -15,6 +15,11 @@
     "description": ""
   },
   {
+    "name": "七倉岳",
+    "elevation": null,
+    "description": ""
+  },
+  {
     "name": "二尖山",
     "elevation": null,
     "description": ""
@@ -205,6 +210,16 @@
     "description": ""
   },
   {
+    "name": "北鎌尾根",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "北鎌独標",
+    "elevation": null,
+    "description": ""
+  },
+  {
     "name": "卡羅樓山",
     "elevation": null,
     "description": ""
@@ -325,7 +340,17 @@
     "description": ""
   },
   {
+    "name": "赤牛岳",
+    "elevation": null,
+    "description": ""
+  },
+  {
     "name": "赤石山脈",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "赤岩岳",
     "elevation": null,
     "description": ""
   },
@@ -565,6 +590,11 @@
     "description": ""
   },
   {
+    "name": "硫黃岳",
+    "elevation": null,
+    "description": ""
+  },
+  {
     "name": "硫黄岳",
     "elevation": null,
     "description": ""
@@ -635,6 +665,11 @@
     "description": ""
   },
   {
+    "name": "横通岳",
+    "elevation": null,
+    "description": ""
+  },
+  {
     "name": "編笠山",
     "elevation": null,
     "description": ""
@@ -700,12 +735,22 @@
     "description": ""
   },
   {
+    "name": "薬師岳",
+    "elevation": null,
+    "description": ""
+  },
+  {
     "name": "霧頭山",
     "elevation": null,
     "description": ""
   },
   {
     "name": "鷲羽岳",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "鷲岳",
     "elevation": null,
     "description": ""
   },
