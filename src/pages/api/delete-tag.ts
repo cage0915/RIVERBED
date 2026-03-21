@@ -35,7 +35,8 @@ export const POST: APIRoute = async ({ request }) => {
             headers: { 'Content-Type': 'application/json' },
         });
     }
-    const [folder, album] = parts;
+    const [folder, album, ...filenameParts] = parts;
+    const filename = filenameParts.join("/"); // e.g. "KCS00743.jpg"
 
     const fs = await import('node:fs');
     const path = await import('node:path');
@@ -59,16 +60,17 @@ export const POST: APIRoute = async ({ request }) => {
         });
     }
 
-    if (tagsMap[photoId]) {
+    // Use just the filename as the key (new relative format)
+    const tagKey = filename || photoId;
+    if (tagsMap[tagKey]) {
         // Filter out the tag that matches name, x, and y (approximate match for coordinates)
-        tagsMap[photoId] = tagsMap[photoId].filter(t =>
+        tagsMap[tagKey] = tagsMap[tagKey].filter(t =>
             !(t.name === tagName && Math.abs(t.x - (x ?? 0)) < 0.1 && Math.abs(t.y - (y ?? 0)) < 0.1)
         );
 
-        // If no tags left for this photo, maybe keep the key as empty array?
-        // Or remove the key if it's empty. Let's keep it clean.
-        if (tagsMap[photoId].length === 0) {
-            delete tagsMap[photoId];
+        // If no tags left for this photo, remove the key.
+        if (tagsMap[tagKey].length === 0) {
+            delete tagsMap[tagKey];
         }
 
         fs.writeFileSync(tagsFile, JSON.stringify(tagsMap, null, 2), 'utf-8');

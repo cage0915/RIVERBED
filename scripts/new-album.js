@@ -82,7 +82,7 @@ async function processAlbum(folderSlug, albumSlug) {
     const albumTitle = "";
     const frontmatter = `---
 title: "${albumTitle}"
-coverKey: "${folderSlug}/${albumSlug}/${sortedFiles[0]}"
+coverKey: "${sortedFiles[0]}"
 order: 0
 coverZoom: 1
 coverOffset: { x: 50, y: 50 }
@@ -92,8 +92,7 @@ coverOffset: { x: 50, y: 50 }
 
     // Generate Photo components
     const photoComponents = sortedFiles.map((filename) => {
-        const key = `${folderSlug}/${albumSlug}/${filename}`;
-        return `<Photo itemKey="${key}" caption="" />`;
+        return `<Photo itemKey="${filename}" caption="" />`;
     });
 
     // Group photos into rows

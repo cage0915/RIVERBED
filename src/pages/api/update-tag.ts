@@ -37,7 +37,8 @@ export const POST: APIRoute = async ({ request }) => {
             headers: { 'Content-Type': 'application/json' },
         });
     }
-    const [folder, album] = parts;
+    const [folder, album, ...filenameParts] = parts;
+    const filename = filenameParts.join("/"); // e.g. "KCS00743.jpg"
 
     const fs = await import('node:fs');
     const path = await import('node:path');
@@ -59,10 +60,12 @@ export const POST: APIRoute = async ({ request }) => {
         fs.mkdirSync(tagsDir, { recursive: true });
     }
 
-    if (!tagsMap[photoId]) {
-        tagsMap[photoId] = [];
+    // Use just the filename as the key (new relative format)
+    const tagKey = filename || photoId; // fallback to full photoId if no filename part
+    if (!tagsMap[tagKey]) {
+        tagsMap[tagKey] = [];
     }
-    tagsMap[photoId].push({ name: tagName, x: Math.round(x * 100) / 100, y: Math.round(y * 100) / 100 });
+    tagsMap[tagKey].push({ name: tagName, x: Math.round(x * 100) / 100, y: Math.round(y * 100) / 100 });
 
     fs.writeFileSync(tagsFile, JSON.stringify(tagsMap, null, 2), 'utf-8');
 

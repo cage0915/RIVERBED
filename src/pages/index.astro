@@ -28,9 +28,12 @@ const folderMap = new Map<
 for (const album of albums) {
     const folderSlug = album.slug.split("/")[0];
     if (!folderMap.has(folderSlug)) folderMap.set(folderSlug, []);
+    const resolvedCoverKey = album.data.coverKey.includes("/")
+        ? album.data.coverKey
+        : `${album.slug}/${album.data.coverKey}`;
     folderMap.get(folderSlug)!.push({
-        coverUrl: getImageUrl(album.data.coverKey),
-        fallbackUrl: `${R2_DOMAIN}/${album.data.coverKey}`,
+        coverUrl: getImageUrl(resolvedCoverKey),
+        fallbackUrl: `${R2_DOMAIN}/${resolvedCoverKey}`,
         title: album.data.title,
         coverZoom: album.data.coverZoom,
         coverOffset: album.data.coverOffset,

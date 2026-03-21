@@ -24,9 +24,12 @@ const isDev = import.meta.env.DEV;
         <div class="albums-grid">
             {
                 folderAlbums.map((album) => {
-                    const albumSlug = album.slug.split("/")[1];
-                    const coverUrl = getImageUrl(album.data.coverKey);
-                    const fallbackUrl = `${R2_DOMAIN}/${album.data.coverKey}`;
+                                    const albumSlug = album.slug.split("/")[1];
+                    const resolvedCoverKey = album.data.coverKey.includes("/")
+                        ? album.data.coverKey
+                        : `${album.slug}/${album.data.coverKey}`;
+                    const coverUrl = getImageUrl(resolvedCoverKey);
+                    const fallbackUrl = `${R2_DOMAIN}/${resolvedCoverKey}`;
                     return (
                         <div class="album-card group">
                             <a

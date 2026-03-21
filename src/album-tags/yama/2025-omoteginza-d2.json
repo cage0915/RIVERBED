@@ -1,5 +1,5 @@
 {
-  "yama/2025-omoteginza-d2/KCS06790.jpg": [
+  "KCS06790.jpg": [
     {
       "name": "富士山",
       "x": 49.52,
@@ -56,7 +56,7 @@
       "y": 48.23
     }
   ],
-  "yama/2025-omoteginza-d2/KCS06791.jpg": [
+  "KCS06791.jpg": [
     {
       "name": "富士山",
       "x": 50.18,
@@ -68,7 +68,7 @@
       "y": 45.7
     }
   ],
-  "yama/2025-omoteginza-d2/KCS06792.jpg": [
+  "KCS06792.jpg": [
     {
       "name": "編笠山",
       "x": 87.78,
@@ -110,14 +110,14 @@
       "y": 47.33
     }
   ],
-  "yama/2025-omoteginza-d2/KCS06817.jpg": [
+  "KCS06817.jpg": [
     {
       "name": "浅間山",
       "x": 48.91,
       "y": 46.3
     }
   ],
-  "yama/2025-omoteginza-d2/KCS06809.jpg": [
+  "KCS06809.jpg": [
     {
       "name": "槍ヶ岳",
       "x": 48.33,
@@ -134,7 +134,7 @@
       "y": 41.49
     }
   ],
-  "yama/2025-omoteginza-d2/KCS06808.jpg": [
+  "KCS06808.jpg": [
     {
       "name": "槍ヶ岳",
       "x": 47.9,
@@ -146,7 +146,7 @@
       "y": 25.83
     }
   ],
-  "yama/2025-omoteginza-d2/KCS06978.jpg": [
+  "KCS06978.jpg": [
     {
       "name": "槍ヶ岳",
       "x": 49.92,
@@ -163,7 +163,7 @@
       "y": 28.1
     }
   ],
-  "yama/2025-omoteginza-d2/KCS06981.jpg": [
+  "KCS06981.jpg": [
     {
       "name": "槍ヶ岳",
       "x": 46.52,
@@ -175,14 +175,14 @@
       "y": 22.61
     }
   ],
-  "yama/2025-omoteginza-d2/KCS06982.jpg": [
+  "KCS06982.jpg": [
     {
       "name": "大天井岳",
       "x": 48.24,
       "y": 21.87
     }
   ],
-  "yama/2025-omoteginza-d2/KCS06992.jpg": [
+  "KCS06992.jpg": [
     {
       "name": "浅間山",
       "x": 77.08,
@@ -199,7 +199,7 @@
       "y": 33.83
     }
   ],
-  "yama/2025-omoteginza-d2/KCS06993.jpg": [
+  "KCS06993.jpg": [
     {
       "name": "富士山",
       "x": 49.84,
@@ -211,14 +211,14 @@
       "y": 45.91
     }
   ],
-  "yama/2025-omoteginza-d2/KCS07006.jpg": [
+  "KCS07006.jpg": [
     {
       "name": "硫黄岳",
       "x": 50.24,
       "y": 15.29
     }
   ],
-  "yama/2025-omoteginza-d2/KCS07007.jpg": [
+  "KCS07007.jpg": [
     {
       "name": "剱岳",
       "x": 60.42,
@@ -255,7 +255,7 @@
       "y": 42.26
     }
   ],
-  "yama/2025-omoteginza-d2/KCS07059.jpg": [
+  "KCS07059.jpg": [
     {
       "name": "大天井岳",
       "x": 51.6,
@@ -267,7 +267,7 @@
       "y": 26.25
     }
   ],
-  "yama/2025-omoteginza-d2/KCS07067.jpg": [
+  "KCS07067.jpg": [
     {
       "name": "槍ヶ岳",
       "x": 48.72,
@@ -284,21 +284,21 @@
       "y": 30.77
     }
   ],
-  "yama/2025-omoteginza-d2/KCS07069.jpg": [
+  "KCS07069.jpg": [
     {
       "name": "槍ヶ岳",
       "x": 50.64,
       "y": 9.25
     }
   ],
-  "yama/2025-omoteginza-d2/KCS07117-全景.jpg": [
+  "KCS07117-全景.jpg": [
     {
       "name": "燕岳",
       "x": 20.35,
       "y": 7.61
     }
   ],
-  "yama/2025-omoteginza-d2/KCS07142.jpg": [
+  "KCS07142.jpg": [
     {
       "name": "針ノ木岳",
       "x": 53.04,
@@ -315,7 +315,7 @@
       "y": 10.73
     }
   ],
-  "yama/2025-omoteginza-d2/KCS07145.jpg": [
+  "KCS07145.jpg": [
     {
       "name": "野口五郎岳",
       "x": 70.67,
@@ -332,21 +332,21 @@
       "y": 65.6
     }
   ],
-  "yama/2025-omoteginza-d2/KCS07148.jpg": [
+  "KCS07148.jpg": [
     {
       "name": "前穂高岳",
       "x": 48.96,
       "y": 33.07
     }
   ],
-  "yama/2025-omoteginza-d2/KCS07166.jpg": [
+  "KCS07166.jpg": [
     {
       "name": "前穂高岳",
       "x": 47.84,
       "y": 17.8
     }
   ],
-  "yama/2025-omoteginza-d2/KCS07171.jpg": [
+  "KCS07171.jpg": [
     {
       "name": "槍ヶ岳",
       "x": 49.2,
@@ -358,7 +358,7 @@
       "y": 24.48
     }
   ],
-  "yama/2025-omoteginza-d2/KCS07175.jpg": [
+  "KCS07175.jpg": [
     {
       "name": "前穂高岳",
       "x": 23.32,
@@ -370,14 +370,14 @@
       "y": 18.83
     }
   ],
-  "yama/2025-omoteginza-d2/KCS07180.jpg": [
+  "KCS07180.jpg": [
     {
       "name": "大天井岳",
       "x": 68.03,
       "y": 44.07
     }
   ],
-  "yama/2025-omoteginza-d2/KCS07198.jpg": [
+  "KCS07198.jpg": [
     {
       "name": "剱岳",
       "x": 75.4,
@@ -409,14 +409,14 @@
       "y": 43.9
     }
   ],
-  "yama/2025-omoteginza-d2/KCS07094.jpg": [
+  "KCS07094.jpg": [
     {
       "name": "大天井岳",
       "x": 44.39,
       "y": 3.48
     }
   ],
-  "yama/2025-omoteginza-d2/KCS07141.jpg": [
+  "KCS07141.jpg": [
     {
       "name": "大天井岳",
       "x": 48.4,

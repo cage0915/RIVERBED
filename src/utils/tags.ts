@@ -48,10 +48,17 @@ export async function getAllPhotosWithTags() {
             const caption = captionMatch ? captionMatch[1] : undefined;
 
             if (itemKey) {
+                // itemKey from MDX may be a bare filename (new format) or a full path (legacy).
+                // Normalise to a full path so Photo.astro works outside the album URL context
+                // (e.g. on the /tags/[tag] page where the URL can't be used to infer the album).
+                const fullItemKey = itemKey.includes('/')
+                    ? itemKey
+                    : `${folder}/${albumId}/${itemKey}`;
+
                 allPhotos.push({
-                    itemKey,
+                    itemKey: fullItemKey,
                     caption,
-                    tags: tagsMap[itemKey] || [],
+                    tags: tagsMap[itemKey] || [],   // JSON key is always the bare filename now
                     albumTitle: album.data.title,
                     albumId,
                     folder

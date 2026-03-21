@@ -6,7 +6,7 @@ interface Tag {
 }
 
 interface Props {
-    itemKey: string; // R2 key (renamed from 'key' to avoid reserved keyword conflict)
+    itemKey: string; // R2 key or bare filename (relative to the album)
     caption?: string;
 }
 
@@ -14,23 +14,39 @@ import { getImageUrl, R2_DOMAIN } from "../lib/constants";
 
 const { itemKey, caption } = Astro.props;
 
+// Resolve full R2 key: if itemKey is a bare filename (no "/"), derive
+// the folder/album prefix from the current URL path (/folder/album/...).
+let fullItemKey: string;
+let tagLookupKey: string;
+if (itemKey.includes("/")) {
+    // Legacy full-path format: "yama/2024-alishan-yushan/KCS00743.jpg"
+    fullItemKey = itemKey;
+    tagLookupKey = itemKey; // old JSON keys were full paths
+} else {
+    // New relative format: "KCS00743.jpg"
+    const pathParts = Astro.url.pathname.split("/").filter(Boolean);
+    const albumPrefix = pathParts.slice(0, 2).join("/"); // "yama/2024-alishan-yushan"
+    fullItemKey = `${albumPrefix}/${itemKey}`;
+    tagLookupKey = itemKey; // new JSON keys are bare filenames
+}
+
 // Load all tags from JSON files
 const allTags = import.meta.glob("/src/album-tags/**/*.json", {
     eager: true,
 });
-const [folder, album] = itemKey.split("/");
+const [folder, album] = fullItemKey.split("/");
 const jsonPath = `/src/album-tags/${folder}/${album}.json`;
 const albumTags = (allTags[jsonPath] as any)?.default || {};
-const tags: Tag[] = albumTags[itemKey] || [];
-const imageUrl = getImageUrl(itemKey);
+const tags: Tag[] = albumTags[tagLookupKey] || [];
+const imageUrl = getImageUrl(fullItemKey);
 const isDev = import.meta.env.DEV;
-const fallbackUrl = `${R2_DOMAIN}/${itemKey}`;
+const fallbackUrl = `${R2_DOMAIN}/${fullItemKey}`;
 ---
 
 <div class="photo-container">
     <div
         class="photo-wrapper"
-        data-item-key={itemKey}
+        data-item-key={fullItemKey}
         data-dev={isDev ? "true" : undefined}
     >
         <a
