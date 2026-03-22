@@ -160,6 +160,11 @@
     "description": ""
   },
   {
+    "name": "弓水山",
+    "elevation": null,
+    "description": ""
+  },
+  {
     "name": "不動岳",
     "elevation": null,
     "description": ""
@@ -176,6 +181,11 @@
   },
   {
     "name": "中岳",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "中雪山",
     "elevation": null,
     "description": ""
   },
@@ -220,6 +230,11 @@
     "description": ""
   },
   {
+    "name": "火石山",
+    "elevation": null,
+    "description": ""
+  },
+  {
     "name": "加利山",
     "elevation": null,
     "description": ""
@@ -236,6 +251,11 @@
   },
   {
     "name": "北大武山",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "北坑山",
     "elevation": null,
     "description": ""
   },
@@ -485,6 +505,11 @@
     "description": ""
   },
   {
+    "name": "東洗水山",
+    "elevation": null,
+    "description": ""
+  },
+  {
     "name": "東郡大山",
     "elevation": null,
     "description": ""
@@ -680,6 +705,11 @@
     "description": ""
   },
   {
+    "name": "雪山西峰",
+    "elevation": null,
+    "description": ""
+  },
+  {
     "name": "雪山南峰",
     "elevation": null,
     "description": ""
@@ -690,12 +720,22 @@
     "description": ""
   },
   {
+    "name": "鹿場大山",
+    "elevation": null,
+    "description": ""
+  },
+  {
     "name": "黒部五郎岳",
     "elevation": null,
     "description": ""
   },
   {
     "name": "凱蘭特崑山",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "博可爾山",
     "elevation": null,
     "description": ""
   },
