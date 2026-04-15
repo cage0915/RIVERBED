@@ -1,0 +1,730 @@
+---
+// DEV-ONLY component for album editing
+---
+
+<script>
+    // Only run in development
+    if (import.meta.env.DEV) {
+        (async () => {
+            let mountainCache: { name: string; elevation: number | null; description: string }[] = [];
+
+            // Ensure we have CSS for the toolbar and interaction states
+            const injectStyles = () => {
+                if (document.getElementById('dev-tool-styles')) return;
+                const style = document.createElement('style');
+                style.id = 'dev-tool-styles';
+                style.textContent = `
+                    .dev-block-toolbar {
+                        position: absolute;
+                        top: 0.5rem;
+                        right: 0.5rem; /* Better right corner, out of the way */
+                        display: flex;
+                        gap: 0.5rem;
+                        z-index: 50;
+                    }
+                    .dev-toolbar-btn {
+                        width: 2rem;
+                        height: 2rem;
+                        border-radius: 9999px; /* rounded-full */
+                        border: 1px solid rgba(255,255,255,0.1); /* border-white/10 */
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        background: rgba(255,255,255,0.2); /* bg-white/20 */
+                        backdrop-filter: blur(4px); /* backdrop-blur-sm */
+                        color: rgba(161, 161, 170, 0.8); /* subtle text-zinc */
+                        cursor: pointer;
+                        transition: all 0.3s;
+                    }
+                    .dev-toolbar-btn:hover {
+                        border-color: rgba(255,255,255,0.3);
+                        color: white;
+                    }
+                    .dev-toolbar-btn.active {
+                        background: rgba(59, 130, 246, 0.5); /* blue */
+                        color: white;
+                        border-color: rgba(59, 130, 246, 0.8);
+                    }
+                    .dev-toolbar-btn.has-data {
+                        background: rgba(0,0,0,0.5);
+                        border: none;
+                        color: white;
+                    }
+                    .dev-toolbar-btn.has-data:hover {
+                        background: rgba(59, 130, 246, 0.8);
+                    }
+                    .dev-block-overlay {
+                        position: relative;
+                    }
+                    /* Turn all dev mode photo wrappers into tagging areas */
+                    .photo-wrapper {
+                        cursor: crosshair !important;
+                    }
+                    .photo-wrapper img {
+                        cursor: crosshair !important;
+                    }
+
+                    /* Show all tag names when hovering the photo in dev mode */
+                    .photo-wrapper:hover .tag-name {
+                        opacity: 1 !important;
+                    }
+
+                    .dev-tag-edit-btn {
+                        position: absolute;
+                        left: 100%;
+                        top: 50%;
+                        transform: translateY(-50%);
+                        margin-left: 0.35rem; /* Keeps it visually OUTSIDE the tag pill */
+                        display: flex;
+                        width: 22px;
+                        height: 22px;
+                        border-radius: 50%; /* Circle */
+                        background: rgba(0,0,0,0.5); /* Matches bg-black/50 */
+                        backdrop-filter: blur(4px); /* Matches backdrop-blur-sm */
+                        color: white;
+                        border: none; /* No border, same as tag */
+                        align-items: center;
+                        justify-content: center;
+                        cursor: pointer;
+                        transition: all 0.3s; /* Matches transition duration-300 */
+                    }
+                    .dev-tag-edit-btn svg {
+                        width: 12px;
+                        height: 12px;
+                    }
+                    .dev-tag-edit-btn:hover {
+                        background: rgba(59, 130, 246, 0.8);
+                    }
+                `;
+                document.head.appendChild(style);
+            };
+
+            const ICONS = {
+                pin: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>`,
+                pencil: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>`,
+                close: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`,
+                trash: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`,
+                copy: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`,
+                check: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`,
+                quote: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h1c0 2.2-1.8 4-4 4v3a7 7 0 0 0 7-7V5a2 2 0 0 0-2-2z"/><path d="M5 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h1c0 2.2-1.8 4-4 4v3a7 7 0 0 0 7-7V5a2 2 0 0 0-2-2z"/></svg>`,
+                refresh: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>`,
+                clipboard: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>`
+            };
+
+            async function fetchMountains() {
+                if (mountainCache.length > 0) return mountainCache;
+                try {
+                    const res = await fetch("/api/get-data");
+                    if (res.ok) {
+                        const data = await res.json();
+                        mountainCache = data.mountains || [];
+                    }
+                } catch {}
+                return mountainCache;
+            }
+
+            // Centralized toast
+            function showToast(msg: string) {
+                let toast = document.getElementById("dev-tag-toast");
+                if (!toast) {
+                    toast = document.createElement("div");
+                    toast.id = "dev-tag-toast";
+                    toast.style.cssText = `
+                        position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);
+                        background:rgba(0,0,0,0.8);color:#fff;padding:0.5rem 1rem;
+                        border-radius:6px;font-size:0.85rem;font-family:sans-serif;
+                        z-index:9999;pointer-events:none;opacity:0;transition:opacity 0.3s;
+                    `;
+                    document.body.appendChild(toast);
+                }
+                toast.textContent = msg;
+                toast.style.opacity = "1";
+                clearTimeout((toast as any)._timeout);
+                (toast as any)._timeout = setTimeout(() => {
+                    toast!.style.opacity = "0";
+                }, 3000);
+            }
+
+            // Tag Editing Dialog
+            function createTagDialog() {
+                let existing = document.getElementById("dev-tag-dialog") as HTMLDialogElement;
+                if (existing) return existing;
+
+                const dialog = document.createElement("dialog");
+                dialog.id = "dev-tag-dialog";
+                dialog.innerHTML = `
+                    <form method="dialog" id="dev-tag-form">
+                        <h3 id="dev-tag-dialog-title" style="margin:0 0 0.75rem;font-size:0.95rem;font-family:sans-serif;color:#111">
+                            📍 新增標籤點
+                        </h3>
+                        <p id="dev-tag-coords" style="font-size:0.75rem;color:#555;margin:0 0 0.5rem;font-family:monospace"></p>
+                        <input
+                            id="dev-tag-input"
+                            list="dev-tag-datalist"
+                            placeholder="山名（可選擇或輸入新名）"
+                            autocomplete="off"
+                            style="width:100%;padding:0.4rem 0.5rem;border:1px solid #ccc;border-radius:4px;font-size:0.9rem;box-sizing:border-box"
+                        />
+                        <datalist id="dev-tag-datalist"></datalist>
+                        <div style="display:flex;gap:0.5rem;margin-top:0.75rem;justify-content:flex-end">
+                            <button type="button" id="dev-tag-delete" class="hidden" title="Delete"
+                                style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:none;border-radius:4px;background:#ef4444;color:#fff;cursor:pointer;">
+                                ${ICONS.trash}
+                            </button>
+                            <button type="button" id="dev-tag-copy" class="hidden" title="Copy"
+                                style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:none;border-radius:4px;background:#10b981;color:#fff;cursor:pointer;">
+                                ${ICONS.copy}
+                            </button>
+                            <button type="button" id="dev-tag-paste" class="hidden" title="Paste"
+                                style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:none;border-radius:4px;background:#f59e0b;color:#fff;cursor:pointer;">
+                                ${ICONS.clipboard}
+                            </button>
+                            <button type="button" id="dev-tag-cancel" title="Cancel"
+                                style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:1px solid #ccc;border-radius:4px;background:#fff;cursor:pointer;color:#333;">
+                                ${ICONS.close}
+                            </button>
+                            <button type="submit" id="dev-tag-submit" title="Confirm"
+                                style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:none;border-radius:4px;background:#2563eb;color:#fff;cursor:pointer;">
+                                ${ICONS.check}
+                            </button>
+                        </div>
+                    </form>
+                `;
+                dialog.style.cssText = `
+                    border:none;border-radius:8px;padding:1rem 1.25rem;
+                    box-shadow:0 8px 30px rgba(0,0,0,0.18);max-width:320px;width:90vw;
+                    position:fixed;
+                `;
+                document.body.appendChild(dialog);
+                return dialog;
+            }
+
+            function showTagDialog(options: {
+                title: string; photoId: string; x: number; y: number; initialName?: string; showDelete?: boolean
+            }): Promise<{ action: 'save' | 'delete' | 'cancel', name?: string }> {
+                return new Promise(async (resolve) => {
+                    const mountains = await fetchMountains();
+                    const dialog = createTagDialog();
+                    const form = dialog.querySelector("#dev-tag-form") as HTMLFormElement;
+                    const titleEl = dialog.querySelector("#dev-tag-dialog-title") as HTMLElement;
+                    const input = dialog.querySelector("#dev-tag-input") as HTMLInputElement;
+                    const datalist = dialog.querySelector("#dev-tag-datalist") as HTMLDataListElement;
+                    const coordsEl = dialog.querySelector("#dev-tag-coords") as HTMLParagraphElement;
+                    const cancelBtn = dialog.querySelector("#dev-tag-cancel") as HTMLButtonElement;
+                    const deleteBtn = dialog.querySelector("#dev-tag-delete") as HTMLButtonElement;
+                    const copyBtn = dialog.querySelector("#dev-tag-copy") as HTMLButtonElement;
+                    const pasteBtn = dialog.querySelector("#dev-tag-paste") as HTMLButtonElement;
+
+                    titleEl.textContent = options.title;
+                    coordsEl.textContent = `${options.photoId.split('/').pop()}  x:${options.x.toFixed(1)}%  y:${options.y.toFixed(1)}%`;
+                    input.value = options.initialName || "";
+
+                    datalist.innerHTML = mountains.map((m) => `<option value="${m.name}"></option>`).join("");
+
+                    if (options.showDelete) {
+                        deleteBtn.style.display = 'flex';
+                        copyBtn.style.display = 'flex';
+                    } else {
+                        deleteBtn.style.display = 'none';
+                        copyBtn.style.display = 'none';
+                    }
+
+                    const copiedTag = localStorage.getItem('devCopiedTagName');
+                    if (copiedTag && !options.initialName) {
+                        pasteBtn.style.display = 'flex';
+                        pasteBtn.title = `Paste: ${copiedTag}`;
+                    } else {
+                        pasteBtn.style.display = 'none';
+                    }
+
+                    const cleanup = (result: { action: 'save' | 'delete' | 'cancel', name?: string }) => {
+                        form.removeEventListener("submit", submitHandler);
+                        cancelBtn.removeEventListener("click", cancelHandler);
+                        deleteBtn.removeEventListener("click", deleteHandler);
+                        copyBtn.removeEventListener("click", copyHandler);
+                        pasteBtn.removeEventListener("click", pasteHandler);
+                        resolve(result);
+                    };
+
+                    const submitHandler = (e: Event) => {
+                        e.preventDefault();
+                        const name = input.value.trim();
+                        dialog.close();
+                        cleanup({ action: 'save', name });
+                    };
+
+                    const cancelHandler = () => {
+                        dialog.close();
+                        cleanup({ action: 'cancel' });
+                    };
+
+                    const deleteHandler = () => {
+                        dialog.close();
+                        cleanup({ action: 'delete' });
+                    };
+
+                    const copyHandler = () => {
+                        const tagName = input.value.trim();
+                        if (tagName) {
+                            localStorage.setItem('devCopiedTagName', tagName);
+                            showToast(`📄 已複製 Tag: ${tagName}`);
+                        }
+                        dialog.close();
+                        cleanup({ action: 'cancel' });
+                    };
+
+                    const pasteHandler = () => {
+                        const copiedTag = localStorage.getItem('devCopiedTagName');
+                        if (copiedTag) {
+                            input.value = copiedTag;
+                            showToast(`📋 已填入「${copiedTag}」`);
+                            pasteBtn.style.display = 'none';
+                        }
+                    };
+
+                    form.addEventListener("submit", submitHandler);
+                    cancelBtn.addEventListener("click", cancelHandler);
+                    deleteBtn.addEventListener("click", deleteHandler);
+                    copyBtn.addEventListener("click", copyHandler);
+                    pasteBtn.addEventListener("click", pasteHandler);
+
+                    dialog.showModal();
+                    input.focus();
+                });
+            }
+
+            // Caption Editing Dialog
+            function createCaptionDialog() {
+                let existing = document.getElementById("dev-caption-dialog") as HTMLDialogElement;
+                if (existing) return existing;
+
+                const dialog = document.createElement("dialog");
+                dialog.id = "dev-caption-dialog";
+                dialog.innerHTML = `
+                    <form method="dialog" id="dev-caption-form" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        <h3 id="dev-caption-dialog-title" style="margin:0;font-size:0.95rem;font-family:sans-serif;color:#111">
+                            Edit Caption
+                        </h3>
+
+                        <label style="font-size:0.8rem;color:#333;display:flex;flex-direction:column;gap:0.25rem;">
+                            Caption
+                            <input id="dev-caption-text" type="text" style="padding:0.4rem;border:1px solid #ccc;border-radius:4px;" />
+                        </label>
+
+                        <div style="display:flex; gap:0.5rem;">
+                            <label style="flex:1; font-size:0.8rem;color:#333;display:flex;flex-direction:column;gap:0.25rem;">
+                                Alignment
+                                <select id="dev-caption-align" style="padding:0.4rem;border:1px solid #ccc;border-radius:4px;">
+                                    <option value="left">Left</option>
+                                    <option value="center">Center</option>
+                                    <option value="right">Right</option>
+                                </select>
+                            </label>
+                            <label style="flex:1; font-size:0.8rem;color:#333;display:flex;flex-direction:column;gap:0.25rem;">
+                                Position
+                                <select id="dev-caption-vpos" style="padding:0.4rem;border:1px solid #ccc;border-radius:4px;">
+                                    <option value="top">Top</option>
+                                    <option value="bottom">Bottom</option>
+                                </select>
+                            </label>
+                        </div>
+
+                        <div style="display:flex; flex-direction:column; gap:0.25rem;">
+                            <div style="display:flex; align-items:center; gap:0.4rem;">
+                                <span style="font-size:0.8rem; color:#333;">Padding</span>
+                                <button type="button" id="dev-pad-reset" title="Reset to default" style="background:none; border:none; padding:1px; cursor:pointer; color:#777; display:block; opacity:0.6; transition:opacity 0.2s;">
+                                    ${ICONS.refresh}
+                                </button>
+                                <style>#dev-pad-reset:hover { opacity: 1; color: #2563eb; }</style>
+                            </div>
+                            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:0.25rem; width: fit-content; margin: 0 auto; align-items: center;">
+                                <div></div>
+                                <input id="dev-pad-top" title="Top" placeholder="T" style="width:50px; text-align:center; padding:0.25rem; border:1px solid #ccc; border-radius:4px; font-size:0.8rem;" />
+                                <div></div>
+                                <input id="dev-pad-left" title="Left" placeholder="L" style="width:50px; text-align:center; padding:0.25rem; border:1px solid #ccc; border-radius:4px; font-size:0.8rem;" />
+                                <div style="width:50px; height:20px; border:1px dashed #ccc; border-radius:2px;"></div>
+                                <input id="dev-pad-right" title="Right" placeholder="R" style="width:50px; text-align:center; padding:0.25rem; border:1px solid #ccc; border-radius:4px; font-size:0.8rem;" />
+                                <div></div>
+                                <input id="dev-pad-bottom" title="Bottom" placeholder="B" style="width:50px; text-align:center; padding:0.25rem; border:1px solid #ccc; border-radius:4px; font-size:0.8rem;" />
+                                <div></div>
+                            </div>
+                        </div>
+
+                        <div style="display:flex;gap:0.5rem;margin-top:0.5rem;justify-content:flex-end">
+                            <button type="button" id="dev-caption-delete" class="hidden" title="Delete"
+                                style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:none;border-radius:4px;background:#ef4444;color:#fff;cursor:pointer;">
+                                ${ICONS.trash}
+                            </button>
+                            <button type="button" id="dev-caption-cancel" title="Cancel"
+                                style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:1px solid #ccc;border-radius:4px;background:#fff;cursor:pointer;color:#333;">
+                                ${ICONS.close}
+                            </button>
+                            <button type="submit" id="dev-caption-submit" title="Save"
+                                style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:none;border-radius:4px;background:#2563eb;color:#fff;cursor:pointer;">
+                                ${ICONS.check}
+                            </button>
+                        </div>
+                    </form>
+                `;
+                dialog.style.cssText = `
+                    border:none;border-radius:8px;padding:1rem 1.25rem;
+                    box-shadow:0 8px 30px rgba(0,0,0,0.18);max-width:320px;width:90vw;
+                    position:fixed;
+                `;
+                document.body.appendChild(dialog);
+                return dialog;
+            }
+
+            function showCaptionDialog(options: {
+                initialCaption?: string; initialPos?: string; initialPadding?: string; hasData?: boolean; blockType?: string
+            }): Promise<{ action: 'save' | 'delete' | 'cancel', caption?: string, pos?: string, padding?: string }> {
+                return new Promise((resolve) => {
+                    const dialog = createCaptionDialog();
+                    const form = dialog.querySelector("#dev-caption-form") as HTMLFormElement;
+                    const inputCaption = dialog.querySelector("#dev-caption-text") as HTMLInputElement;
+                    const inputAlign = dialog.querySelector("#dev-caption-align") as HTMLSelectElement;
+                    const inputVPos = dialog.querySelector("#dev-caption-vpos") as HTMLSelectElement;
+
+                    const getDefaultPadding = (cap: string, pos: string, type: string) => {
+                        if (type === 'carousel') {
+                            if (!cap) return "1rem 0 1rem 0";
+                            return pos.includes('top') ? "2rem 0 1rem 0" : "1rem 0 2rem 0";
+                        }
+                        // Default row padding
+                        if (!cap) return "0 0 0.5rem 0";
+                        return pos.includes('top') ? "1.5rem 0 0.5rem 0" : "0.5rem 0 1.5rem 0";
+                    };
+                    const padTop = dialog.querySelector("#dev-pad-top") as HTMLInputElement;
+                    const padRight = dialog.querySelector("#dev-pad-right") as HTMLInputElement;
+                    const padBottom = dialog.querySelector("#dev-pad-bottom") as HTMLInputElement;
+                    const padLeft = dialog.querySelector("#dev-pad-left") as HTMLInputElement;
+                    const resetBtn = dialog.querySelector("#dev-pad-reset") as HTMLButtonElement;
+                    const cancelBtn = dialog.querySelector("#dev-caption-cancel") as HTMLButtonElement;
+                    const deleteBtn = dialog.querySelector("#dev-caption-delete") as HTMLButtonElement;
+
+                    const posParts = (options.initialPos || "center bottom").split(' ');
+                    inputCaption.value = options.initialCaption || "";
+                    inputAlign.value = posParts[0] || "center";
+                    inputVPos.value = posParts[1] || "bottom";
+
+                    // Parse padding string: top [right] [bottom] [left]
+                    const effectiveDefault = getDefaultPadding(options.initialCaption || "", options.initialPos || "center bottom", options.blockType || "row");
+                    const p = (options.initialPadding || effectiveDefault).trim().split(/\s+/).filter(Boolean);
+                    let t="0", r="0", b="0", l="0";
+                    if (p.length === 1) { t=r=b=l=p[0]; }
+                    else if (p.length === 2) { t=b=p[0]; r=l=p[1]; }
+                    else if (p.length === 3) { t=p[0]; r=l=p[1]; b=p[2]; }
+                    else if (p.length === 4) { t=p[0]; r=p[1]; b=p[2]; l=p[3]; }
+
+                    padTop.value = t; padRight.value = r; padBottom.value = b; padLeft.value = l;
+
+                    const resetHandler = (e: Event) => {
+                        e.preventDefault();
+                        const def = getDefaultPadding(inputCaption.value.trim(), `${inputAlign.value} ${inputVPos.value}`, options.blockType || "row");
+                        const pts = def.split(/\s+/).filter(Boolean);
+                        let dt="0", dr="0", db="0", dl="0";
+                        if (pts.length === 4) { [dt, dr, db, dl] = pts; }
+                        padTop.value = dt; padRight.value = dr; padBottom.value = db; padLeft.value = dl;
+                    };
+                    resetBtn.addEventListener("click", resetHandler);
+
+                    if (options.hasData) {
+                        deleteBtn.style.display = 'flex';
+                    } else {
+                        deleteBtn.style.display = 'none';
+                    }
+
+                    const cleanup = (result: any) => {
+                        form.removeEventListener("submit", submitHandler);
+                        cancelBtn.removeEventListener("click", cancelHandler);
+                        deleteBtn.removeEventListener("click", deleteHandler);
+                        resetBtn.removeEventListener("click", resetHandler);
+                        resolve(result);
+                    };
+
+                    const submitHandler = (e: Event) => {
+                        e.preventDefault();
+                        const curCap = inputCaption.value.trim();
+                        const curPos = `${inputAlign.value} ${inputVPos.value}`;
+                        const currentDefault = getDefaultPadding(curCap, curPos, options.blockType || "row");
+
+                        const finalPadding = `${padTop.value.trim() || '0'} ${padRight.value.trim() || '0'} ${padBottom.value.trim() || '0'} ${padLeft.value.trim() || '0'}`;
+                        const isDefault = finalPadding === currentDefault;
+
+                        dialog.close();
+                        cleanup({
+                            action: 'save',
+                            caption: curCap,
+                            pos: curPos,
+                            padding: isDefault ? "" : finalPadding
+                        });
+                    };
+
+                    const cancelHandler = () => {
+                        dialog.close();
+                        cleanup({ action: 'cancel' });
+                    };
+
+                    const deleteHandler = () => {
+                        dialog.close();
+                        cleanup({ action: 'delete' });
+                    };
+
+                    form.addEventListener("submit", submitHandler);
+                    cancelBtn.addEventListener("click", cancelHandler);
+                    deleteBtn.addEventListener("click", deleteHandler);
+
+                    dialog.showModal();
+                    inputCaption.focus();
+                });
+            }
+
+            // Extract albumSlug from URL (e.g. /yama/2026-shinano-omachi)
+            const getAlbumSlug = () => {
+                const pathParts = window.location.pathname.split('/').filter(Boolean);
+                if (pathParts.length >= 2) {
+                    return `${pathParts[0]}/${pathParts[1]}`;
+                }
+                return "";
+            };
+
+            const performTagging = async (e: MouseEvent, wrapper: HTMLElement) => {
+                const img = wrapper.querySelector('img');
+                if (!img) return;
+
+                const rect = img.getBoundingClientRect();
+                const x = ((e.clientX - rect.left) / rect.width) * 100;
+                const y = ((e.clientY - rect.top) / rect.height) * 100;
+
+                const photoId = wrapper.dataset.itemKey;
+                if (!photoId) return;
+
+                const res = await showTagDialog({
+                    title: "📍 新增標籤點",
+                    photoId, x, y, showDelete: false
+                });
+
+                if (res.action === 'save' && res.name) {
+                    try {
+                        const response = await fetch("/api/edit-tag", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ action: "update", photoId, tagName: res.name, x, y }),
+                        });
+                        if (response.ok) {
+                            showToast(`✅ 已新增「${res.name}」`);
+                            setTimeout(() => window.location.reload(), 1000); // Reload to reflect
+                        } else {
+                            showToast("❌ 新增失敗");
+                        }
+                    } catch (err) {
+                        showToast("❌ 網路錯誤");
+                    }
+                }
+            };
+
+            const initToolbars = () => {
+                const blocks = Array.from(document.querySelectorAll('[data-dev-block]'));
+                const albumSlug = getAlbumSlug();
+
+                blocks.forEach((block, index) => {
+                    if (block.querySelector('.dev-block-toolbar')) return;
+
+                    block.classList.add('dev-block-overlay');
+
+                    const toolbar = document.createElement('div');
+                    toolbar.className = 'dev-block-toolbar';
+
+                    const hasCaption = !!(block as HTMLElement).dataset.devCaption;
+
+                    toolbar.innerHTML = `
+                        <button class="dev-toolbar-btn dev-btn-caption ${hasCaption ? 'has-data' : ''}" title="${hasCaption ? 'Edit Caption' : 'Add Caption'}">
+                            ${ICONS.quote}
+                        </button>
+                    `;
+
+                    const captionBtn = toolbar.querySelector('.dev-btn-caption');
+                    captionBtn?.addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        const el = block as HTMLElement;
+                        const initialCaption = el.dataset.devCaption;
+                        const initialPos = el.dataset.devCaptionPos;
+                        const initialPadding = el.dataset.devPadding;
+                        const blockType = el.dataset.devBlock;
+
+                        const res = await showCaptionDialog({
+                            initialCaption, initialPos, initialPadding, hasData: hasCaption, blockType
+                        });
+
+                        if (res.action === 'cancel') return;
+
+                        if (res.action === 'save') {
+                            try {
+                                const response = await fetch("/api/edit-caption", {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({
+                                        action: "update",
+                                        albumSlug,
+                                        blockIndex: index,
+                                        caption: res.caption,
+                                        captionPosition: res.pos,
+                                        padding: res.padding
+                                    }),
+                                });
+                                if (response.ok) {
+                                    showToast(`✅ 已更新 Caption`);
+                                    setTimeout(() => window.location.reload(), 1000);
+                                } else {
+                                    showToast("❌ 更新失敗");
+                                }
+                            } catch (err) {
+                                showToast("❌ 網路錯誤");
+                            }
+                        } else if (res.action === 'delete') {
+                            try {
+                                const response = await fetch("/api/edit-caption", {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({ action: "delete", albumSlug, blockIndex: index }),
+                                });
+                                if (response.ok) {
+                                    showToast(`✅ 已刪除 Caption`);
+                                    setTimeout(() => window.location.reload(), 1000);
+                                } else {
+                                    showToast("❌ 刪除失敗");
+                                }
+                            } catch (err) {
+                                showToast("❌ 網路錯誤");
+                            }
+                        }
+                    });
+
+                    block.appendChild(toolbar);
+                });
+
+                // Setup edit buttons for existing tags
+                document.querySelectorAll('.tag-link').forEach((link) => {
+                    const nameSpan = link.querySelector('.tag-name') as HTMLElement;
+                    if (!nameSpan) return;
+
+                    if (nameSpan.querySelector('.dev-tag-edit-btn')) return;
+
+                    const editBtn = document.createElement('div');
+                    editBtn.className = 'dev-tag-edit-btn';
+                    editBtn.innerHTML = ICONS.pencil;
+
+                    editBtn.addEventListener('click', async (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        const wrapper = link.closest('.photo-wrapper') as HTMLElement;
+                        const photoId = wrapper?.dataset.itemKey;
+                        const oldName = nameSpan.dataset.name || "";
+                        const oldX = parseFloat(nameSpan.dataset.x || "0");
+                        const oldY = parseFloat(nameSpan.dataset.y || "0");
+
+                        if (!photoId) return;
+
+                        const res = await showTagDialog({
+                            title: "Edit Tag",
+                            photoId, x: oldX, y: oldY, initialName: oldName, showDelete: true
+                        });
+
+                        if (res.action === 'cancel') return;
+
+                        if (res.action === 'delete') {
+                            try {
+                                const response = await fetch("/api/edit-tag", {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({ action: "delete", photoId, tagName: oldName, x: oldX, y: oldY }),
+                                });
+                                if (response.ok) {
+                                    showToast(`✅ 已刪除「${oldName}」`);
+                                    link.closest('.tag-marker')?.remove();
+                                } else {
+                                    showToast("❌ 刪除失敗");
+                                }
+                            } catch {
+                                showToast("❌ 網路錯誤");
+                            }
+                        } else if (res.action === 'save' && res.name) {
+                            try {
+                                const response = await fetch("/api/edit-tag", {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({ action: "update", photoId, tagName: res.name, x: oldX, y: oldY }),
+                                });
+                                if (response.ok) {
+                                    showToast(`✅ 已更新為「${res.name}」`);
+                                    setTimeout(() => window.location.reload(), 1000);
+                                } else {
+                                    showToast("❌ 更新失敗");
+                                }
+                            } catch {
+                                showToast("❌ 網路錯誤");
+                            }
+                        }
+                    });
+
+                    nameSpan.appendChild(editBtn);
+                });
+            };
+
+            // Block unwanted interactions in DEV mode
+            const enforceDevInteractionModes = (e: MouseEvent | PointerEvent) => {
+                const target = e.target as HTMLElement;
+
+                // Allow our specific Dev UI buttons and existing tags to function normally
+                if (target.closest('.dev-block-toolbar') || target.closest('.dev-tag-edit-btn') || target.closest('.tag-link')) {
+                    return;
+                }
+
+                const wrapper = target.closest('.photo-wrapper');
+
+                // In dev mode, clicking a photo wrapper now behaves like production (opens PhotoSwipe/Next)
+                // Tagging is reserved for right-click (contextmenu)
+                if (wrapper) {
+                    if (e.type === 'mousedown' || e.type === 'pointerdown') {
+                        // Let PhotoSwipe/interactions proceed
+                        return;
+                    }
+                    return;
+                }
+
+                // If right-clicking anywhere in dev, hide it from PhotoSwipe's pointerdown/clicks
+                if (e.button === 2) {
+                    e.stopPropagation();
+                }
+            };
+
+            window.addEventListener('mousedown', enforceDevInteractionModes, true);
+            window.addEventListener('pointerdown', enforceDevInteractionModes, true);
+            window.addEventListener('click', enforceDevInteractionModes, true);
+
+            // Native right-click context menu prevention to handle Tag Dialog
+            window.addEventListener('contextmenu', (e) => {
+                const target = e.target as HTMLElement;
+                const wrapper = target.closest('.photo-wrapper');
+                // Ensure clicks on toolbar elements get native menus or nothing
+                if (target.closest('.dev-block-toolbar') || target.closest('.dev-tag-edit-btn')) return;
+
+                if (wrapper) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    performTagging(e as MouseEvent, wrapper as HTMLElement);
+                }
+            }, true);
+
+            const init = () => {
+                injectStyles();
+                initToolbars();
+            };
+
+            init();
+            document.addEventListener('astro:after-swap', init);
+        })();
+    }
+</script>

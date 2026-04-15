@@ -12,6 +12,8 @@ const {
     captionPosition = "center bottom",
 } = Astro.props;
 
+const isDev = import.meta.env.DEV;
+
 const parsedPos = captionPosition.includes('top') ? 'top' : 'bottom';
 const parsedAlign = captionPosition.includes('left') ? 'left' : captionPosition.includes('right') ? 'right' : 'center';
 
@@ -25,7 +27,14 @@ if (!finalPadding) {
 }
 ---
 
-<div class="row-wrapper" style={`padding: ${finalPadding};`}>
+<div
+    class="row-wrapper"
+    style={`padding: ${finalPadding};`}
+    data-dev-block={isDev ? "row" : undefined}
+    data-dev-caption={isDev && caption ? caption : undefined}
+    data-dev-caption-pos={isDev ? captionPosition : undefined}
+    data-dev-padding={isDev && padding ? padding : undefined}
+>
     {caption && parsedPos === 'top' && (
         <div class="photo-caption top" style={`text-align: ${parsedAlign};`}>
             {caption}

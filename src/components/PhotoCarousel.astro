@@ -23,6 +23,8 @@ const {
     captionPosition = "center bottom"
 } = Astro.props;
 
+const isDev = import.meta.env.DEV;
+
 const parsedPos = captionPosition.includes('top') ? 'top' : 'bottom';
 const parsedAlign = captionPosition.includes('left') ? 'left' : captionPosition.includes('right') ? 'right' : 'center';
 
@@ -33,9 +35,9 @@ const slideWidthPercent = 100 - peekPercent;
 let finalPadding = padding;
 if (!finalPadding) {
     if (caption) {
-        finalPadding = parsedPos === 'top' ? "1.5rem 0 0.5rem 0" : "0.5rem 0 1.5rem 0";
+        finalPadding = parsedPos === 'top' ? "2rem 0 1rem 0" : "1rem 0 2rem 0";
     } else {
-        finalPadding = "0 0 0.5rem 0";
+        finalPadding = "1rem 0 1rem 0";
     }
 }
 ---
@@ -45,6 +47,10 @@ if (!finalPadding) {
     data-carousel
     data-initial-slide={initialSlide}
     style={`padding: ${finalPadding};`}
+    data-dev-block={isDev ? "carousel" : undefined}
+    data-dev-caption={isDev && caption ? caption : undefined}
+    data-dev-caption-pos={isDev ? captionPosition : undefined}
+    data-dev-padding={isDev && padding ? padding : undefined}
 >
     {caption && parsedPos === 'top' && (
         <div class="photo-caption top" style={`text-align: ${parsedAlign};`}>
@@ -211,10 +217,11 @@ if (!finalPadding) {
 </script>
 
 <style>
-    /* ── Section wrapper ─────────────────────────────────────────── */
     .carousel-section {
         position: relative;
         width: 100%;
+        display: flex;
+        flex-direction: column;
     }
 
     /* ── Scroll track ────────────────────────────────────────────── */
