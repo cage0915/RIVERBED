@@ -100,7 +100,7 @@ coverOffset: { x: 50, y: 50 }
     const rows = [];
     for (let i = 0; i < photoComponents.length; i += photosPerRow) {
         const rowPhotos = photoComponents.slice(i, i + photosPerRow);
-        rows.push(`<Row cols={${rowPhotos.length}}>\n  ${rowPhotos.join('\n  ')}\n</Row>`);
+        rows.push(`<Row>\n  ${rowPhotos.join('\n  ')}\n</Row>`);
     }
 
     const mdxContent = frontmatter + rows.join('\n\n');

@@ -1,13 +1,13 @@
 ---
 interface Props {
-    cols: number;
+    cols?: number; // Optional now, kept for backward compatibility with existing .mdx
     padding?: string;
 }
 
-const { cols, padding = "0 0 0.5rem 0" } = Astro.props;
+const { padding = "0 0 0.5rem 0" } = Astro.props;
 ---
 
-<div class="photo-row" style={`--cols: ${cols}; padding: ${padding};`}>
+<div class="photo-row" style={`padding: ${padding};`}>
     <slot />
 </div>
 
@@ -19,7 +19,41 @@ const { cols, padding = "0 0 0.5rem 0" } = Astro.props;
     }
 
     .photo-row > :global(*) {
-        flex: 0 0 calc((100% - (var(--cols) - 1) * 0.5rem) / var(--cols));
+        /* Default to equal widths based on actual child count. Overridden by JS aspect ratios. */
+        flex: 1 1 0%;
         min-width: 0;
     }
 </style>
+
+<script>
+    const adjustRowHeights = () => {
+        document.querySelectorAll('.photo-row').forEach(row => {
+            const items = row.querySelectorAll('.photo-container, :scope > *');
+            
+            items.forEach(item => {
+                const img = item.querySelector('img');
+                if (!img) return;
+
+                const applyRatio = () => {
+                    if (img.naturalWidth && img.naturalHeight) {
+                        const ratio = img.naturalWidth / img.naturalHeight;
+                        // Multiply ratio by 100 to ensure the sum of flex-grow values in the row 
+                        // is always >= 1. If sum(flex-grow) < 1, Flexbox won't fill the full width!
+                        // The relative proportions between items remain exactly the same.
+                        (item as HTMLElement).style.flex = `${ratio * 100} 1 0%`;
+                    }
+                };
+
+                if (img.complete) {
+                    applyRatio();
+                } else {
+                    img.addEventListener('load', applyRatio);
+                }
+            });
+        });
+    };
+
+    // Initialize on first load and re-run on Astro view transitions
+    adjustRowHeights();
+    document.addEventListener('astro:after-swap', adjustRowHeights);
+</script>
