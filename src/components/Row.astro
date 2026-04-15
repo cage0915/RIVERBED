@@ -2,16 +2,52 @@
 interface Props {
     cols?: number; // Optional now, kept for backward compatibility with existing .mdx
     padding?: string;
+    caption?: string;
+    captionPosition?: string; // e.g. "center top", "right bottom"
 }
 
-const { padding = "0 0 0.5rem 0" } = Astro.props;
+const {
+    padding,
+    caption,
+    captionPosition = "center bottom",
+} = Astro.props;
+
+const parsedPos = captionPosition.includes('top') ? 'top' : 'bottom';
+const parsedAlign = captionPosition.includes('left') ? 'left' : captionPosition.includes('right') ? 'right' : 'center';
+
+let finalPadding = padding;
+if (!finalPadding) {
+    if (caption) {
+        finalPadding = parsedPos === 'top' ? "1.5rem 0 0.5rem 0" : "0.5rem 0 1.5rem 0";
+    } else {
+        finalPadding = "0 0 0.5rem 0";
+    }
+}
 ---
 
-<div class="photo-row" style={`padding: ${padding};`}>
-    <slot />
+<div class="row-wrapper" style={`padding: ${finalPadding};`}>
+    {caption && parsedPos === 'top' && (
+        <div class="photo-caption top" style={`text-align: ${parsedAlign};`}>
+            {caption}
+        </div>
+    )}
+    <div class="photo-row">
+        <slot />
+    </div>
+    {caption && parsedPos === 'bottom' && (
+        <div class="photo-caption bottom" style={`text-align: ${parsedAlign};`}>
+            {caption}
+        </div>
+    )}
 </div>
 
 <style>
+    .row-wrapper {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
     .photo-row {
         display: flex;
         gap: 0.5rem;
@@ -23,13 +59,32 @@ const { padding = "0 0 0.5rem 0" } = Astro.props;
         flex: 1 1 0%;
         min-width: 0;
     }
+
+    .photo-caption {
+        font-size: 0.875rem;
+        color: #71717a;
+    }
+
+    .photo-caption.top {
+        margin-bottom: 0.5rem;
+    }
+
+    .photo-caption.bottom {
+        margin-top: 0.5rem;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        .photo-caption {
+            color: #a1a1aa;
+        }
+    }
 </style>
 
 <script>
     const adjustRowHeights = () => {
         document.querySelectorAll('.photo-row').forEach(row => {
             const items = row.querySelectorAll('.photo-container, :scope > *');
-            
+
             items.forEach(item => {
                 const img = item.querySelector('img');
                 if (!img) return;
@@ -37,7 +92,7 @@ const { padding = "0 0 0.5rem 0" } = Astro.props;
                 const applyRatio = () => {
                     if (img.naturalWidth && img.naturalHeight) {
                         const ratio = img.naturalWidth / img.naturalHeight;
-                        // Multiply ratio by 100 to ensure the sum of flex-grow values in the row 
+                        // Multiply ratio by 100 to ensure the sum of flex-grow values in the row
                         // is always >= 1. If sum(flex-grow) < 1, Flexbox won't fill the full width!
                         // The relative proportions between items remain exactly the same.
                         (item as HTMLElement).style.flex = `${ratio * 100} 1 0%`;

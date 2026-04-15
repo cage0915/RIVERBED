@@ -8,21 +8,50 @@ interface Props {
     padding?: string;
     /** The index of the slide (0-based) to be centered on initial load */
     initialSlide?: number;
+    /** Optional caption for the carousel */
+    caption?: string;
+    /** Position and alignment of the caption (e.g. "center top", "right bottom") */
+    captionPosition?: string;
 }
 
-const { gap = "1rem", peekPercent = 10, padding = "1rem 0 1rem 0", initialSlide = 0 } = Astro.props;
+const {
+    gap = "1rem",
+    peekPercent = 10,
+    padding,
+    initialSlide = 0,
+    caption,
+    captionPosition = "center bottom"
+} = Astro.props;
+
+const parsedPos = captionPosition.includes('top') ? 'top' : 'bottom';
+const parsedAlign = captionPosition.includes('left') ? 'left' : captionPosition.includes('right') ? 'right' : 'center';
 
 // Each slide occupies (100 - peekPercent)% of the scroll container width.
 // Half the remaining is distributed to each side as a "peek".
 const slideWidthPercent = 100 - peekPercent;
+
+let finalPadding = padding;
+if (!finalPadding) {
+    if (caption) {
+        finalPadding = parsedPos === 'top' ? "1.5rem 0 0.5rem 0" : "0.5rem 0 1.5rem 0";
+    } else {
+        finalPadding = "0 0 0.5rem 0";
+    }
+}
 ---
 
 <section
     class="carousel-section group"
     data-carousel
     data-initial-slide={initialSlide}
-    style={`padding: ${padding};`}
+    style={`padding: ${finalPadding};`}
 >
+    {caption && parsedPos === 'top' && (
+        <div class="photo-caption top" style={`text-align: ${parsedAlign};`}>
+            {caption}
+        </div>
+    )}
+
     <!-- Scroll track -->
     <div
         class="carousel-track"
@@ -33,6 +62,12 @@ const slideWidthPercent = 100 - peekPercent;
 
     <!-- Expanding dots container -->
     <div class="carousel-dots"></div>
+
+    {caption && parsedPos === 'bottom' && (
+        <div class="photo-caption bottom" style={`text-align: ${parsedAlign};`}>
+            {caption}
+        </div>
+    )}
 </section>
 
 <script>
@@ -288,5 +323,21 @@ const slideWidthPercent = 100 - peekPercent;
         .carousel-section :global(.carousel-dot.active) {
             background: rgba(255, 255, 255, 0.8);
         }
+        .photo-caption {
+            color: #a1a1aa;
+        }
+    }
+
+    .photo-caption {
+        font-size: 0.875rem;
+        color: #71717a;
+    }
+
+    .photo-caption.top {
+        margin-bottom: 0.5rem;
+    }
+
+    .photo-caption.bottom {
+        margin-top: 0.5rem;
     }
 </style>
