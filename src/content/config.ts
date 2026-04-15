@@ -5,6 +5,7 @@ const albums = defineCollection({
     type: 'content',
     schema: z.object({
         title: z.string(),
+        info: z.string().optional(),
         coverKey: z.string(), // R2 key for cover image
         order: z.number().default(0), // display order within folder
         coverZoom: z.number().optional().default(1),

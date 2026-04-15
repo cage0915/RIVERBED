@@ -57,11 +57,18 @@ try {
     </div>
 
     <main class="container mx-auto px-4 py-4 max-w-7xl">
-        <h1
-            class="text-xl font-sans tracking-widest uppercase mb-6 text-center"
-        >
-            {albumEntry.data.title}
-        </h1>
+        <div class="mb-8 text-center">
+            <h1
+                class="text-xl font-sans tracking-widest uppercase mb-1"
+            >
+                {albumEntry.data.title}
+            </h1>
+            {albumEntry.data.info && (
+                <p class="text-sm text-zinc-500 font-light tracking-wider uppercase">
+                    {albumEntry.data.info}
+                </p>
+            )}
+        </div>
 
         <article class="album-content">
             <Content components={{ Row, Photo, TextCenter, PhotoCarousel }} />
