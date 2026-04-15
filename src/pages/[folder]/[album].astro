@@ -29,16 +29,15 @@ try {
 ---
 
 <Layout title={`${albumEntry.data.title} - RIVERBED`}>
-    <div class="fixed bottom-8 right-8 z-40">
+    <div class="fixed bottom-8 right-8 z-40 flex flex-col gap-3">
         <button
             onclick="window.scrollTo({top: 0, behavior: 'smooth'})"
-            class="group flex items-center gap-2 text-zinc-500 hover:text-white transition-colors opacity-0 translate-y-4 pointer-events-none transition-all duration-300"
+            class="group text-zinc-500 hover:text-white transition-all duration-300 opacity-0 translate-y-4 pointer-events-none"
             id="back-to-top"
+            aria-label="Scroll to top"
         >
-            <span class="text-xs font-light tracking-widest uppercase">Top</span
-            >
             <div
-                class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center group-hover:border-white/30 transition-colors"
+                class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center group-hover:border-white/30 transition-colors bg-white/20 backdrop-blur-sm"
             >
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -51,6 +50,29 @@ try {
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     ><path d="m18 15-6-6-6 6"></path></svg
+                >
+            </div>
+        </button>
+        <button
+            onclick="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})"
+            class="group text-zinc-500 hover:text-white transition-all duration-300 opacity-0 translate-y-4 pointer-events-none"
+            id="scroll-to-bottom"
+            aria-label="Scroll to bottom"
+        >
+            <div
+                class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center group-hover:border-white/30 transition-colors bg-white/20 backdrop-blur-sm"
+            >
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    ><path d="m6 9l6 6 6-6"></path></svg
                 >
             </div>
         </button>
@@ -94,35 +116,33 @@ try {
 </style>
 
 <script>
-    const backToTop = document.getElementById("back-to-top");
-
     const handleScroll = () => {
-        if (!backToTop) return;
-        if (window.scrollY > 300) {
-            backToTop.classList.remove(
-                "opacity-0",
-                "translate-y-4",
-                "pointer-events-none",
-            );
-            backToTop.classList.add(
-                "opacity-100",
-                "translate-y-0",
-                "pointer-events-auto",
-            );
-        } else {
-            backToTop.classList.add(
-                "opacity-0",
-                "translate-y-4",
-                "pointer-events-none",
-            );
-            backToTop.classList.remove(
-                "opacity-100",
-                "translate-y-0",
-                "pointer-events-auto",
-            );
+        const backToTop = document.getElementById("back-to-top");
+        const scrollToBottom = document.getElementById("scroll-to-bottom");
+
+        if (backToTop) {
+            if (window.scrollY > 300) {
+                backToTop.classList.remove("opacity-0", "translate-y-4", "pointer-events-none");
+                backToTop.classList.add("opacity-100", "translate-y-0", "pointer-events-auto");
+            } else {
+                backToTop.classList.add("opacity-0", "translate-y-4", "pointer-events-none");
+                backToTop.classList.remove("opacity-100", "translate-y-0", "pointer-events-auto");
+            }
+        }
+
+        if (scrollToBottom) {
+            const isNearBottom = (window.scrollY + window.innerHeight) >= (document.documentElement.scrollHeight - 300);
+            if (!isNearBottom) {
+                scrollToBottom.classList.remove("opacity-0", "translate-y-4", "pointer-events-none");
+                scrollToBottom.classList.add("opacity-100", "translate-y-0", "pointer-events-auto");
+            } else {
+                scrollToBottom.classList.add("opacity-0", "translate-y-4", "pointer-events-none");
+                scrollToBottom.classList.remove("opacity-100", "translate-y-0", "pointer-events-auto");
+            }
         }
     };
 
     window.addEventListener("scroll", handleScroll);
     document.addEventListener("astro:after-swap", handleScroll);
+    handleScroll();
 </script>
