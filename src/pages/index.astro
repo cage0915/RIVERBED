@@ -8,13 +8,14 @@ import {
     R2_DOMAIN,
 } from "../lib/constants";
 
-// Get all albums and extract unique folders from their slugs
-const albums = (await getCollection("albums")).sort(
-    (a, b) => (b.data.order ?? 0) - (a.data.order ?? 0),
-);
+// Get all albums
+const allAlbums = await getCollection("albums");
 
+// Load external order using import.meta.glob
+const orderFiles = import.meta.glob("../content/albums/**/_order.json", { eager: true });
 
-// Group albums by folder, sorted by album order descending
+// Group albums by folder, sorted by album order (matching folder page logic)
+const folderSlugs = [...new Set(allAlbums.map((album) => album.slug.split("/")[0]))];
 const folderMap = new Map<
     string,
     {
@@ -25,25 +26,45 @@ const folderMap = new Map<
         coverOffset?: { x: number; y: number };
     }[]
 >();
-for (const album of albums) {
-    const folderSlug = album.slug.split("/")[0];
-    if (!folderMap.has(folderSlug)) folderMap.set(folderSlug, []);
-    const resolvedCoverKey = album.data.coverKey.includes("/")
-        ? album.data.coverKey
-        : `${album.slug}/${album.data.coverKey}`;
-    folderMap.get(folderSlug)!.push({
-        coverUrl: getImageUrl(resolvedCoverKey),
-        fallbackUrl: `${R2_DOMAIN}/${resolvedCoverKey}`,
-        title: album.data.title,
-        coverZoom: album.data.coverZoom,
-        coverOffset: album.data.coverOffset,
+
+for (const slug of folderSlugs) {
+    const albumsInFolder = allAlbums.filter((album) => album.slug.startsWith(`${slug}/`));
+    
+    // Sort according to _order.json if exists
+    const targetOrderPath = `../content/albums/${slug}/_order.json`;
+    const orderData = orderFiles[targetOrderPath] as { default: string[] } | undefined;
+    const order = orderData ? orderData.default : [];
+
+    albumsInFolder.sort((a, b) => {
+        const albumSlugA = a.slug.split("/")[1];
+        const albumSlugB = b.slug.split("/")[1];
+        const idxA = order.indexOf(albumSlugA);
+        const idxB = order.indexOf(albumSlugB);
+
+        if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+        if (idxA !== -1) return -1;
+        if (idxB !== -1) return 1;
+        return (b.data.order ?? 0) - (a.data.order ?? 0);
     });
+
+    folderMap.set(slug, albumsInFolder.map(album => {
+        const resolvedCoverKey = album.data.coverKey.includes("/")
+            ? album.data.coverKey
+            : `${album.slug}/${album.data.coverKey}`;
+        return {
+            coverUrl: getImageUrl(resolvedCoverKey),
+            fallbackUrl: `${R2_DOMAIN}/${resolvedCoverKey}`,
+            title: album.data.title,
+            coverZoom: album.data.coverZoom,
+            coverOffset: album.data.coverOffset,
+        };
+    }));
 }
 
-const folderSlugs = [
-    ...new Set(albums.map((album) => album.slug.split("/")[0])),
-];
 const isDev = import.meta.env.DEV;
+
+const globalOrderData = orderFiles["../content/albums/_order.json"] as { default: string[] } | undefined;
+const globalOrder = globalOrderData ? globalOrderData.default : [];
 
 const sortedFolders = folderSlugs
     .map((slug) => ({
@@ -52,7 +73,15 @@ const sortedFolders = folderSlugs
         order: getFolderOrder(slug),
         covers: folderMap.get(slug) ?? [],
     }))
-    .sort((a, b) => a.order - b.order);
+    .sort((a, b) => {
+        const idxA = globalOrder.indexOf(a.id);
+        const idxB = globalOrder.indexOf(b.id);
+        if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+        if (idxA !== -1) return -1;
+        if (idxB !== -1) return 1;
+        return a.order - b.order;
+    });
+
 ---
 
 <Layout title="RIVERBED">
