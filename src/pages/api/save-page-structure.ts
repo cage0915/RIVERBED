@@ -39,7 +39,11 @@ export const POST: APIRoute = async ({ request }) => {
         if (props.captionPosition && props.captionPosition !== 'center bottom') {
             propsStr += `\n  captionPosition="${props.captionPosition}"`;
         }
-        if (props.padding) propsStr += `\n  padding="${props.padding}"`;
+        if (props.captionMargin) propsStr += `\n  captionMargin="${props.captionMargin}"`;
+        if (props.blockMargin) propsStr += `\n  blockMargin="${props.blockMargin}"`;
+        // mt/mb are legacy and will be migrated to the above if they exist in state but the above don't
+        if (!props.captionMargin && props.caption && props.mt) propsStr += `\n  captionMargin="${props.mt}"`;
+        if (!props.blockMargin && !props.captionMargin && props.mb) propsStr += `\n  blockMargin="${props.mb}"`;
 
         newBody += `<${type}${propsStr}>\n`;
         photos.forEach((photo: any) => {

@@ -207,7 +207,9 @@
                 gear: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>`,
                 plus: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>`,
                 drag: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 9 2 12 5 15"></polyline><polyline points="9 5 12 2 15 5"></polyline><polyline points="15 19 12 22 9 19"></polyline><polyline points="19 9 22 12 19 15"></polyline><line x1="2" y1="12" x2="22" y2="12"></line><line x1="12" y1="2" x2="12" y2="22"></line></svg>`,
-                type: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 4 20 8 16 12"></polyline><line x1="4" y1="8" x2="20" y2="8"></line><polyline points="8 20 4 16 8 12"></polyline><line x1="4" y1="16" x2="20" y2="16"></line></svg>`
+                type: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 4 20 8 16 12"></polyline><line x1="4" y1="8" x2="20" y2="8"></line><polyline points="8 20 4 16 8 12"></polyline><line x1="4" y1="16" x2="20" y2="16"></line></svg>`,
+                vmargin: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 8 12 3 17 8"></polyline><polyline points="7 16 12 21 17 16"></polyline><line x1="12" y1="3" x2="12" y2="21"></line></svg>`,
+                minus: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>`
             };
 
             async function fetchMountains() {
@@ -393,190 +395,7 @@
             }
 
             // Caption Editing Dialog
-            function createCaptionDialog() {
-                let existing = document.getElementById("dev-caption-dialog") as HTMLDialogElement;
-                if (existing) return existing;
 
-                const dialog = document.createElement("dialog");
-                dialog.id = "dev-caption-dialog";
-                dialog.innerHTML = `
-                    <form method="dialog" id="dev-caption-form" style="display: flex; flex-direction: column; gap: 0.75rem;">
-                        <h3 id="dev-caption-dialog-title" style="margin:0;font-size:0.95rem;font-family:sans-serif;color:#111">
-                            Edit Caption
-                        </h3>
-
-                        <label style="font-size:0.8rem;color:#333;display:flex;flex-direction:column;gap:0.25rem;">
-                            Caption
-                            <input id="dev-caption-text" type="text" style="padding:0.4rem;border:1px solid #ccc;border-radius:4px;" />
-                        </label>
-
-                        <div style="display:flex; gap:0.5rem;">
-                            <label style="flex:1; font-size:0.8rem;color:#333;display:flex;flex-direction:column;gap:0.25rem;">
-                                Alignment
-                                <select id="dev-caption-align" style="padding:0.4rem;border:1px solid #ccc;border-radius:4px;">
-                                    <option value="left">Left</option>
-                                    <option value="center">Center</option>
-                                    <option value="right">Right</option>
-                                </select>
-                            </label>
-                            <label style="flex:1; font-size:0.8rem;color:#333;display:flex;flex-direction:column;gap:0.25rem;">
-                                Position
-                                <select id="dev-caption-vpos" style="padding:0.4rem;border:1px solid #ccc;border-radius:4px;">
-                                    <option value="top">Top</option>
-                                    <option value="bottom">Bottom</option>
-                                </select>
-                            </label>
-                        </div>
-
-                        <div style="display:flex; flex-direction:column; gap:0.25rem;">
-                            <div style="display:flex; align-items:center; gap:0.4rem;">
-                                <span style="font-size:0.8rem; color:#333;">Padding</span>
-                                <button type="button" id="dev-pad-reset" title="Reset to default" style="background:none; border:none; padding:1px; cursor:pointer; color:#777; display:block; opacity:0.6; transition:opacity 0.2s;">
-                                    ${ICONS.refresh}
-                                </button>
-                                <style>#dev-pad-reset:hover { opacity: 1; color: #2563eb; }</style>
-                            </div>
-                            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:0.25rem; width: fit-content; margin: 0 auto; align-items: center;">
-                                <div></div>
-                                <input id="dev-pad-top" title="Top" placeholder="T" style="width:50px; text-align:center; padding:0.25rem; border:1px solid #ccc; border-radius:4px; font-size:0.8rem;" />
-                                <div></div>
-                                <input id="dev-pad-left" title="Left" placeholder="L" style="width:50px; text-align:center; padding:0.25rem; border:1px solid #ccc; border-radius:4px; font-size:0.8rem;" />
-                                <div style="width:50px; height:20px; border:1px dashed #ccc; border-radius:2px;"></div>
-                                <input id="dev-pad-right" title="Right" placeholder="R" style="width:50px; text-align:center; padding:0.25rem; border:1px solid #ccc; border-radius:4px; font-size:0.8rem;" />
-                                <div></div>
-                                <input id="dev-pad-bottom" title="Bottom" placeholder="B" style="width:50px; text-align:center; padding:0.25rem; border:1px solid #ccc; border-radius:4px; font-size:0.8rem;" />
-                                <div></div>
-                            </div>
-                        </div>
-
-                        <div style="display:flex;gap:0.5rem;margin-top:0.5rem;justify-content:flex-end">
-                            <button type="button" id="dev-caption-delete" class="hidden" title="Delete"
-                                style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:none;border-radius:4px;background:#ef4444;color:#fff;cursor:pointer;">
-                                ${ICONS.trash}
-                            </button>
-                            <button type="button" id="dev-caption-cancel" title="Cancel"
-                                style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:1px solid #ccc;border-radius:4px;background:#fff;cursor:pointer;color:#333;">
-                                ${ICONS.close}
-                            </button>
-                            <button type="submit" id="dev-caption-submit" title="Save"
-                                style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:none;border-radius:4px;background:#2563eb;color:#fff;cursor:pointer;">
-                                ${ICONS.check}
-                            </button>
-                        </div>
-                    </form>
-                `;
-                dialog.style.cssText = `
-                    border:none;border-radius:8px;padding:1rem 1.25rem;
-                    box-shadow:0 8px 30px rgba(0,0,0,0.18);max-width:320px;width:90vw;
-                    position:fixed;
-                `;
-                document.body.appendChild(dialog);
-                return dialog;
-            }
-
-            function showCaptionDialog(options: {
-                initialCaption?: string; initialPos?: string; initialPadding?: string; hasData?: boolean; blockType?: string
-            }): Promise<{ action: 'save' | 'delete' | 'cancel', caption?: string, pos?: string, padding?: string }> {
-                return new Promise((resolve) => {
-                    const dialog = createCaptionDialog();
-                    const form = dialog.querySelector("#dev-caption-form") as HTMLFormElement;
-                    const inputCaption = dialog.querySelector("#dev-caption-text") as HTMLInputElement;
-                    const inputAlign = dialog.querySelector("#dev-caption-align") as HTMLSelectElement;
-                    const inputVPos = dialog.querySelector("#dev-caption-vpos") as HTMLSelectElement;
-
-                    const getDefaultPadding = (cap: string, pos: string, type: string) => {
-                        if (type === 'carousel') {
-                            if (!cap) return "1rem 0 1rem 0";
-                            return pos.includes('top') ? "2rem 0 1rem 0" : "1rem 0 2rem 0";
-                        }
-                        // Default row padding
-                        if (!cap) return "0 0 0.5rem 0";
-                        return pos.includes('top') ? "1.5rem 0 0.5rem 0" : "0.5rem 0 1.5rem 0";
-                    };
-                    const padTop = dialog.querySelector("#dev-pad-top") as HTMLInputElement;
-                    const padRight = dialog.querySelector("#dev-pad-right") as HTMLInputElement;
-                    const padBottom = dialog.querySelector("#dev-pad-bottom") as HTMLInputElement;
-                    const padLeft = dialog.querySelector("#dev-pad-left") as HTMLInputElement;
-                    const resetBtn = dialog.querySelector("#dev-pad-reset") as HTMLButtonElement;
-                    const cancelBtn = dialog.querySelector("#dev-caption-cancel") as HTMLButtonElement;
-                    const deleteBtn = dialog.querySelector("#dev-caption-delete") as HTMLButtonElement;
-
-                    const posParts = (options.initialPos || "center bottom").split(' ');
-                    inputCaption.value = options.initialCaption || "";
-                    inputAlign.value = posParts[0] || "center";
-                    inputVPos.value = posParts[1] || "bottom";
-
-                    // Parse padding string: top [right] [bottom] [left]
-                    const effectiveDefault = getDefaultPadding(options.initialCaption || "", options.initialPos || "center bottom", options.blockType || "row");
-                    const p = (options.initialPadding || effectiveDefault).trim().split(/\s+/).filter(Boolean);
-                    let t="0", r="0", b="0", l="0";
-                    if (p.length === 1) { t=r=b=l=p[0]; }
-                    else if (p.length === 2) { t=b=p[0]; r=l=p[1]; }
-                    else if (p.length === 3) { t=p[0]; r=l=p[1]; b=p[2]; }
-                    else if (p.length === 4) { t=p[0]; r=p[1]; b=p[2]; l=p[3]; }
-
-                    padTop.value = t; padRight.value = r; padBottom.value = b; padLeft.value = l;
-
-                    const resetHandler = (e: Event) => {
-                        e.preventDefault();
-                        const def = getDefaultPadding(inputCaption.value.trim(), `${inputAlign.value} ${inputVPos.value}`, options.blockType || "row");
-                        const pts = def.split(/\s+/).filter(Boolean);
-                        let dt="0", dr="0", db="0", dl="0";
-                        if (pts.length === 4) { [dt, dr, db, dl] = pts; }
-                        padTop.value = dt; padRight.value = dr; padBottom.value = db; padLeft.value = dl;
-                    };
-                    resetBtn.addEventListener("click", resetHandler);
-
-                    if (options.hasData) {
-                        deleteBtn.style.display = 'flex';
-                    } else {
-                        deleteBtn.style.display = 'none';
-                    }
-
-                    const cleanup = (result: any) => {
-                        form.removeEventListener("submit", submitHandler);
-                        cancelBtn.removeEventListener("click", cancelHandler);
-                        deleteBtn.removeEventListener("click", deleteHandler);
-                        resetBtn.removeEventListener("click", resetHandler);
-                        resolve(result);
-                    };
-
-                    const submitHandler = (e: Event) => {
-                        e.preventDefault();
-                        const curCap = inputCaption.value.trim();
-                        const curPos = `${inputAlign.value} ${inputVPos.value}`;
-                        const currentDefault = getDefaultPadding(curCap, curPos, options.blockType || "row");
-
-                        const finalPadding = `${padTop.value.trim() || '0'} ${padRight.value.trim() || '0'} ${padBottom.value.trim() || '0'} ${padLeft.value.trim() || '0'}`;
-                        const isDefault = finalPadding === currentDefault;
-
-                        dialog.close();
-                        cleanup({
-                            action: 'save',
-                            caption: curCap,
-                            pos: curPos,
-                            padding: isDefault ? "" : finalPadding
-                        });
-                    };
-
-                    const cancelHandler = () => {
-                        dialog.close();
-                        cleanup({ action: 'cancel' });
-                    };
-
-                    const deleteHandler = () => {
-                        dialog.close();
-                        cleanup({ action: 'delete' });
-                    };
-
-                    form.addEventListener("submit", submitHandler);
-                    cancelBtn.addEventListener("click", cancelHandler);
-                    deleteBtn.addEventListener("click", deleteHandler);
-
-                    dialog.showModal();
-                    inputCaption.focus();
-                });
-            }
 
             // Page Manager (Tree View)
             let sortableInstances: any[] = [];
@@ -643,6 +462,10 @@
                                                 <input type="number" step="0.1" id="dev-pm-oy" style="width: 100%; box-sizing: border-box; padding: 0.4rem 0.6rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;" />
                                             </label>
                                         </div>
+                                        <label style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.75rem; color: #64748b;">
+                                            Block Gap
+                                            <input type="text" id="dev-pm-gap" placeholder="e.g. 2rem" style="width: 100%; box-sizing: border-box; padding: 0.4rem 0.6rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;" />
+                                        </label>
                                     </div>
                                 </div>
                             </div>
@@ -727,6 +550,10 @@
                 fZoom.value = fmData.coverZoom;
                 fOX.value = fmData.ox;
                 fOY.value = fmData.oy;
+                
+                const fGap = dialog.querySelector("#dev-pm-gap") as HTMLInputElement;
+                const getGapFromFM = (fm: string) => (fm.match(/^gap:\s*(.*)$/m) || [])[1]?.trim().replace(/^"(.*)"$/, '$1').replace(/^'(.*)'$/, '$1');
+                fGap.value = getGapFromFM(data.frontmatter) || '';
 
                 const fmSection = dialog.querySelector("#dev-pm-fm-section") as HTMLElement;
                 const fmToggle = dialog.querySelector("#dev-pm-fm-toggle") as HTMLButtonElement;
@@ -747,8 +574,25 @@
                 fmTitle.addEventListener('click', toggleFM);
                 updateFMState();
 
-                let currentBlocks = JSON.parse(JSON.stringify(data.blocks));
+                let currentBlocks = JSON.parse(JSON.stringify(data.blocks)).map((b: any) => {
+                    // Migrate legacy props to semantic ones on load
+                    if (b.props.mt && b.props.caption && !b.props.captionMargin) {
+                        b.props.captionMargin = b.props.mt;
+                        delete b.props.mt;
+                    }
+                    if (b.props.mb && b.props.caption && !b.props.captionMargin && !b.props.captionPosition?.includes('top')) {
+                        // If it's a bottom caption, mb might have been intended for it
+                        b.props.captionMargin = b.props.mb;
+                        delete b.props.mb;
+                    }
+                    if (b.props.mb && !b.props.blockMargin) {
+                        b.props.blockMargin = b.props.mb;
+                        delete b.props.mb;
+                    }
+                    return b;
+                });
                 let collapsedBlocks = new Set(); // Track collapsed block indices
+                let captionOpenBlocks = new Set(); // Track open caption editors
 
                 const renderTree = () => {
                     sortableInstances.forEach(s => s.destroy());
@@ -767,23 +611,165 @@
                                 </button>
                                 <span style="font-size: 0.7rem; color: #999; cursor: grab;">${ICONS.drag}</span>
                                 <strong style="font-size: 0.85rem; color: #444; cursor: grab;">${block.type}</strong>
-                                <span style="font-size: 0.7rem; color: #aaa; margin-left: auto;">${block.props.caption ? '📝' : ''}</span>
-                                <button class="block-toggle" title="Toggle Type" style="background: none; border: none; cursor: pointer; color: #777; padding: 4px;">${ICONS.type}</button>
-                                <button class="block-delete" title="Delete Block" style="background: none; border: none; cursor: pointer; color: #ef4444; padding: 4px;">${ICONS.trash}</button>
+                                
+                                <div style="display:flex; align-items:center; gap:0.25rem; margin-left: auto;">
+                                    <button class="block-caption-toggle ${block.props.caption ? 'has-data' : ''}" title="Edit Caption" style="background: none; border: none; cursor: pointer; color: ${captionOpenBlocks.has(bIdx) ? '#2563eb' : '#777'}; padding: 4px;">${ICONS.quote}</button>
+                                    <button class="block-toggle" title="Toggle Type" style="background: none; border: none; cursor: pointer; color: #777; padding: 4px;">${ICONS.type}</button>
+                                    <button class="block-delete" title="Delete Block" style="background: none; border: none; cursor: pointer; color: #ef4444; padding: 4px;">${ICONS.trash}</button>
+                                </div>
                             </div>
-                            <div class="dev-pm-photo-list" data-block-idx="${bIdx}">
-                                ${block.photos.map((p: any, pIdx: number) => `
-                                    <div class="dev-pm-photo" data-p-idx="${pIdx}">
-                                        <span style="color: #999;">${ICONS.drag}</span>
-                                        <span style="flex: 1;">${p.itemKey.split('/').pop()}</span>
-                                        <button class="photo-delete" style="background: none; border: none; cursor: pointer; color: #999; padding: 4px;">${ICONS.close}</button>
-                                    </div>
-                                `).join('')}
-                                <button class="photo-add" title="Add Photo" style="background: #f0f0f0; border: none; border-radius: 4px; padding: 0.2rem 0.5rem; cursor: pointer; font-size: 0.75rem; color: #666;">${ICONS.plus}</button>
+                            <div class="dev-pm-block-content" style="display: ${isCollapsed ? 'none' : 'block'}; padding-left: 1rem;">
+                                ${(() => {
+                                    const isTop = block.props.captionPosition?.includes('top');
+                                    const isBottom = !block.props.captionPosition || block.props.captionPosition.includes('bottom');
+                                    
+                                    const renderPreview = () => {
+                                        if (!block.props.caption) return '';
+                                        const val = block.props.captionMargin || '';
+                                        const marginInfo = val ? ` <span style="opacity: 0.5; font-size: 0.65rem;">(${val})</span>` : '';
+                                        return `
+                                            <div class="tree-caption-preview" style="font-size: 0.75rem; color: #000; padding: 0.25rem 0.5rem; border-left: 2px solid #22c55e; margin: 0.25rem 0; font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                ${block.props.caption}${marginInfo}
+                                            </div>
+                                        `;
+                                    };
+
+                                    const renderCaptionArea = (vpos: 'top' | 'bottom') => {
+                                        if (captionOpenBlocks.has(bIdx)) return renderEditor(vpos);
+                                        return renderPreview();
+                                    };
+
+                                    const renderEditor = (vpos: 'top' | 'bottom') => `
+                                        <div class="dev-pm-caption-editor" style="padding: 0.75rem; background: #fdfdfd; border: 1px dashed #ddd; border-radius: 8px; margin: 0.5rem 0; display: flex; flex-direction: column; gap: 0.75rem; box-shadow: inset 0 1px 3px rgba(0,0,0,0.02);">
+                                            <div style="display: flex; gap: 0.25rem; align-items: center;">
+                                                <input class="block-caption" type="text" placeholder="Add caption..." value="${block.props.caption || ''}" style="flex: 1; box-sizing:border-box; padding:6px; border:1px solid #ddd; border-radius:4px; font-size:0.85rem;" />
+                                                <button class="caption-delete" title="Delete Caption" style="background: none; border: none; cursor: pointer; color: #ef4444; opacity: 0.6; display: flex; align-items: center;">${ICONS.trash}</button>
+                                            </div>
+                                            
+                                            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                                <div style="display: flex; gap: 0.25rem; flex: 1;">
+                                                    <select class="block-align" style="flex: 1; font-size:0.75rem; padding:4px; border:1px solid #ddd; border-radius:4px; background: white;">
+                                                        <option value="left" ${block.props.captionPosition?.includes('left') ? 'selected' : ''}>Left</option>
+                                                        <option value="center" ${(!block.props.captionPosition || block.props.captionPosition.includes('center')) ? 'selected' : ''}>Center</option>
+                                                        <option value="right" ${block.props.captionPosition?.includes('right') ? 'selected' : ''}>Right</option>
+                                                    </select>
+                                                    <select class="block-vpos" style="flex: 1; font-size:0.75rem; padding:4px; border:1px solid #ddd; border-radius:4px; background: white;">
+                                                        <option value="top" ${vpos === 'top' ? 'selected' : ''}>Top</option>
+                                                        <option value="bottom" ${vpos === 'bottom' ? 'selected' : ''}>Bottom</option>
+                                                    </select>
+                                                </div>
+                                                
+                                                <div style="display: flex; gap: 0.25rem; align-items: center; border-left: 1px solid #eee; padding-left: 0.5rem;">
+                                                    <span style="color: #999; display: flex; align-items: center; opacity: 0.6;">${ICONS.vmargin}</span>
+                                                    <input class="block-margin-caption" type="text" placeholder="2rem" title="Caption Margin" value="${block.props.captionMargin || ''}" style="width: 45px; box-sizing:border-box; padding:4px; border:1px solid #ddd; border-radius:4px; font-size:0.75rem; text-align: center;" />
+                                                    ${block.props.captionMargin ? `
+                                                        <button class="margin-caption-reset" title="Clear margin" style="background: none; border: none; padding: 2px; cursor: pointer; color: #ef4444; opacity: 0.8; display:flex; align-items:center;">${ICONS.minus}</button>
+                                                    ` : ''}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `;
+
+                                    const captionAreaTop = isTop ? renderCaptionArea('top') : '';
+                                    const captionAreaBottom = isBottom ? renderCaptionArea('bottom') : '';
+                                    
+                                    return `
+                                        ${captionAreaTop}
+                                        <div class="dev-pm-photo-list" data-block-idx="${bIdx}">
+                                            ${block.photos.map((p: any, pIdx: number) => `
+                                                <div class="dev-pm-photo" data-p-idx="${pIdx}">
+                                                    <span style="color: #999;">${ICONS.drag}</span>
+                                                    <span style="flex: 1;">${p.itemKey.split('/').pop()}</span>
+                                                    <button class="photo-delete" style="background: none; border: none; cursor: pointer; color: #999; padding: 4px;">${ICONS.close}</button>
+                                                </div>
+                                            `).join('')}
+                                            <button class="photo-add" title="Add Photo" style="background: #f0f0f0; border: none; border-radius: 4px; padding: 0.2rem 0.5rem; cursor: pointer; font-size: 0.75rem; color: #666;">${ICONS.plus}</button>
+                                        </div>
+                                        ${captionAreaBottom}
+                                        
+                                        <div style="display: flex; align-items: center; gap: 0.4rem; justify-content: center; padding-top: 0.5rem; border-top: 1px dashed #eee; margin-top: 0.5rem;">
+                                            <span style="color: #999; display: flex; align-items: center; opacity: 0.6;" title="Block Spacing">${ICONS.vmargin}</span>
+                                            <input class="block-margin-block" type="text" placeholder="${block.type === 'PhotoCarousel' ? '2rem' : (fGap.value || '0.5rem')}" title="Block Margin" value="${block.props.blockMargin || ''}" style="width:45px; padding:2px 4px; border:1px solid #ddd; border-radius:3px; font-size:0.7rem; text-align:center;" />
+                                            ${block.props.blockMargin ? `
+                                                <button class="margin-block-reset" title="Clear spacing" style="background:none; border:none; padding:2px; cursor:pointer; color:#ef4444; opacity:0.8; display:flex; align-items:center;">${ICONS.minus}</button>
+                                            ` : ''}
+                                        </div>
+                                    `;
+                                })()}
                             </div>
                         `;
 
                         // Block events
+                        const capInput = blockEl.querySelector('.block-caption') as HTMLInputElement;
+                        const alignSel = blockEl.querySelector('.block-align') as HTMLSelectElement;
+                        const vposSel = blockEl.querySelector('.block-vpos') as HTMLSelectElement;
+                        const captionToggle = blockEl.querySelector('.block-caption-toggle');
+
+                        captionToggle?.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            if (captionOpenBlocks.has(bIdx)) captionOpenBlocks.delete(bIdx);
+                            else captionOpenBlocks.add(bIdx);
+                            renderTree();
+                        });
+
+                        capInput?.addEventListener('input', () => {
+                            const oldVal = block.props.caption;
+                            block.props.caption = capInput.value.trim();
+                            
+                            // If first character or cleared, re-render to create/remove the preview element
+                            if (!oldVal || !block.props.caption) {
+                                renderTree();
+                                return;
+                            }
+
+                            // Otherwise update preview directly for performance
+                            const preview = blockEl.querySelector('.tree-caption-preview');
+                            if (preview) {
+                                preview.innerHTML = `${block.props.caption}${block.props.captionMargin ? ` <span style="opacity: 0.5; font-size: 0.65rem;">(${block.props.captionMargin})</span>` : ''}`;
+                            }
+                        });
+
+                        const getVPos = () => block.props.captionPosition?.includes('top') ? 'top' : 'bottom';
+
+                        alignSel?.addEventListener('change', () => {
+                            block.props.captionPosition = `${alignSel.value} ${getVPos()}`;
+                        });
+
+                        vposSel?.addEventListener('change', () => {
+                            const align = alignSel?.value || (block.props.captionPosition?.includes('right') ? 'right' : block.props.captionPosition?.includes('left') ? 'left' : 'center');
+                            block.props.captionPosition = `${align} ${vposSel.value}`;
+                            renderTree(); // Shift editor position
+                        });
+
+                        const marginCaptionInput = blockEl.querySelector('.block-margin-caption') as HTMLInputElement;
+                        marginCaptionInput?.addEventListener('change', () => {
+                            block.props.captionMargin = marginCaptionInput.value.trim();
+                        });
+                        blockEl.querySelector('.margin-caption-reset')?.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            block.props.captionMargin = "";
+                            renderTree();
+                        });
+
+                        const marginBlockInput = blockEl.querySelector('.block-margin-block') as HTMLInputElement;
+                        marginBlockInput?.addEventListener('change', () => {
+                            block.props.blockMargin = marginBlockInput.value.trim();
+                        });
+                        blockEl.querySelector('.margin-block-reset')?.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            block.props.blockMargin = "";
+                            renderTree();
+                        });
+
+                        blockEl.querySelector('.caption-delete')?.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            block.props.caption = "";
+                            block.props.captionMargin = "";
+                            block.props.captionPosition = "center bottom";
+                            captionOpenBlocks.delete(bIdx);
+                            renderTree();
+                        });
+
                         blockEl.querySelector('.block-expander')?.addEventListener('click', (e) => {
                             e.stopPropagation();
                             if (collapsedBlocks.has(bIdx)) collapsedBlocks.delete(bIdx);
@@ -818,36 +804,37 @@
                     });
 
                     // Init Sortable for nested photos
-                    treeContainer.querySelectorAll('.dev-pm-photo-list').forEach((el: any) => {
-                        sortableInstances.push(new Tree(el, {
+                    treeContainer.querySelectorAll('.dev-pm-photo-list').forEach((el) => {
+                        const s = new Tree(el, {
                             group: 'photos',
                             animation: 150,
                             ghostClass: 'dev-pm-ghost',
                             draggable: '.dev-pm-photo',
-                            onEnd: (evt: any) => {
+                            onEnd: (evt) => {
                                 const fromIdx = parseInt(evt.from.dataset.blockIdx);
                                 const toIdx = parseInt(evt.to.dataset.blockIdx);
                                 const oldPIdx = evt.oldIndex;
                                 const newPIdx = evt.newIndex;
-
+                                
                                 const [moved] = currentBlocks[fromIdx].photos.splice(oldPIdx, 1);
                                 currentBlocks[toIdx].photos.splice(newPIdx, 0, moved);
-                                // No re-render needed by Sortable itself, but internal state is updated
                             }
-                        }));
+                        });
+                        sortableInstances.push(s);
                     });
 
                     // Init Sortable for blocks
-                    sortableInstances.push(new Tree(treeContainer, {
+                    const sBlocks = new Tree(treeContainer, {
                         animation: 150,
                         ghostClass: 'dev-pm-ghost',
                         draggable: '.dev-pm-block',
                         handle: '.dev-pm-block-header',
-                        onEnd: (evt: any) => {
+                        onEnd: (evt) => {
                             const [moved] = currentBlocks.splice(evt.oldIndex, 1);
                             currentBlocks.splice(evt.newIndex, 0, moved);
                         }
-                    }));
+                    });
+                    sortableInstances.push(sBlocks);
                 };
 
                 const closeHandler = () => {
@@ -863,6 +850,7 @@
                         `info: "${fInfo.value.trim()}"`,
                         `coverKey: "${fCover.value.trim()}"`
                     ];
+                    if (fGap.value.trim()) newFM.push(`gap: "${fGap.value.trim()}"`);
                     if (fZoom.value) newFM.push(`coverZoom: ${parseFloat(fZoom.value)}`);
                     if (fOX.value || fOY.value) {
                         newFM.push(`coverOffset: { x: ${parseFloat(fOX.value || '0')}, y: ${parseFloat(fOY.value || '0')} }`);
@@ -1153,70 +1141,7 @@
 
                     const hasCaption = !!(block as HTMLElement).dataset.devCaption;
 
-                    toolbar.innerHTML = `
-                        <button class="dev-toolbar-btn dev-btn-caption ${hasCaption ? 'has-data' : ''}" title="${hasCaption ? 'Edit Caption' : 'Add Caption'}">
-                            ${ICONS.quote}
-                        </button>
-                    `;
-
-                    const captionBtn = toolbar.querySelector('.dev-btn-caption');
-                    captionBtn?.addEventListener('click', async (e) => {
-                        e.stopPropagation();
-                        e.preventDefault();
-                        const el = block as HTMLElement;
-                        const initialCaption = el.dataset.devCaption;
-                        const initialPos = el.dataset.devCaptionPos;
-                        const initialPadding = el.dataset.devPadding;
-                        const blockType = el.dataset.devBlock;
-
-                        const res = await showCaptionDialog({
-                            initialCaption, initialPos, initialPadding, hasData: hasCaption, blockType
-                        });
-
-                        if (res.action === 'cancel') return;
-
-                        if (res.action === 'save') {
-                            try {
-                                const response = await fetch("/api/edit-caption", {
-                                    method: "POST",
-                                    headers: { "Content-Type": "application/json" },
-                                    body: JSON.stringify({
-                                        action: "update",
-                                        albumSlug,
-                                        blockIndex: index,
-                                        caption: res.caption,
-                                        captionPosition: res.pos,
-                                        padding: res.padding
-                                    }),
-                                });
-                                if (response.ok) {
-                                    showToast(`✅ 已更新 Caption`);
-                                    setTimeout(() => window.location.reload(), 1000);
-                                } else {
-                                    showToast("❌ 更新失敗");
-                                }
-                            } catch (err) {
-                                showToast("❌ 網路錯誤");
-                            }
-                        } else if (res.action === 'delete') {
-                            try {
-                                const response = await fetch("/api/edit-caption", {
-                                    method: "POST",
-                                    headers: { "Content-Type": "application/json" },
-                                    body: JSON.stringify({ action: "delete", albumSlug, blockIndex: index }),
-                                });
-                                if (response.ok) {
-                                    showToast(`✅ 已刪除 Caption`);
-                                    setTimeout(() => window.location.reload(), 1000);
-                                } else {
-                                    showToast("❌ 刪除失敗");
-                                }
-                            } catch (err) {
-                                showToast("❌ 網路錯誤");
-                            }
-                        }
-                    });
-
+                    toolbar.innerHTML = ``;
                     block.appendChild(toolbar);
                 });
 

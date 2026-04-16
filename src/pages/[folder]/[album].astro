@@ -92,7 +92,10 @@ try {
             )}
         </div>
 
-        <article class="album-content">
+        <article 
+            class="album-content" 
+            style={albumEntry.data.gap ? `--album-block-gap: ${albumEntry.data.gap}` : undefined}
+        >
             <Content components={{ Row, Photo, TextCenter, PhotoCarousel }} />
         </article>
     </main>
@@ -101,6 +104,17 @@ try {
 <style>
     .album-content {
         width: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Apply the gap to all blocks except the last one */
+    .album-content > :global(*) {
+        margin-bottom: var(--album-block-gap, 0.5rem);
+    }
+
+    .album-content > :global(*:last-child) {
+        margin-bottom: 0;
     }
 
     .album-content :global(h2) {

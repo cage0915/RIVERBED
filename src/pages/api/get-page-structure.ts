@@ -52,6 +52,18 @@ export const GET: APIRoute = async ({ request }) => {
         const paddingMatch = propsStr.match(/padding="([^"]*)"/);
         if (paddingMatch) props.padding = paddingMatch[1];
 
+        const mbMatch = propsStr.match(/mb="([^"]*)"/);
+        if (mbMatch) props.mb = mbMatch[1];
+
+        const mtMatch = propsStr.match(/mt="([^"]*)"/);
+        if (mtMatch) props.mt = mtMatch[1];
+
+        const blockMarginMatch = propsStr.match(/blockMargin="([^"]*)"/);
+        if (blockMarginMatch) props.blockMargin = blockMarginMatch[1];
+
+        const captionMarginMatch = propsStr.match(/captionMargin="([^"]*)"/);
+        if (captionMarginMatch) props.captionMargin = captionMarginMatch[1];
+
         // Parse Photos inside Block
         const photoRegex = /<Photo\s+([^>]*?)\/>/g;
         const photos: any[] = [];

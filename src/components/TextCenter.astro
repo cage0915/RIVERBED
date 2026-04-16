@@ -1,13 +1,20 @@
 ---
 interface Props {
-  padding?: string;
+  mb?: string;
   class?: string;
 }
 
-const { padding = "0.5rem 0 2rem 0", class: className } = Astro.props;
+const { mb, class: className } = Astro.props;
+
+const styles = [];
+if (mb) {
+    styles.push(`margin-bottom: ${mb} !important;`);
+} else {
+    styles.push("margin-bottom: 2rem;");
+}
 ---
 
-<div class:list={["text-center-wrapper", className]} style={`padding: ${padding};`}>
+<div class:list={["text-center-wrapper", className]} style={styles.join(" ")}>
   <slot />
 </div>
 

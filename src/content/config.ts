@@ -13,8 +13,8 @@ const albums = defineCollection({
             x: z.number(),
             y: z.number(),
         }).optional().default({ x: 50, y: 50 }),
+        gap: z.string().optional(), // CSS value (e.g. "2rem") for spacing between blocks
     }),
 });
 
 export const collections = { albums };
-

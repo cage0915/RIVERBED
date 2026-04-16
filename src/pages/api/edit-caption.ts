@@ -7,11 +7,11 @@ export const POST: APIRoute = async ({ request }) => {
         });
     }
 
-    let body: { action: 'update' | 'delete'; albumSlug?: string; blockIndex?: number; caption?: string; captionPosition?: string; padding?: string };
+    let body: { action: 'update' | 'delete'; albumSlug?: string; blockIndex?: number; caption?: string; captionPosition?: string; mb?: string };
     try { body = await request.json(); }
     catch { return new Response(JSON.stringify({ error: 'Invalid JSON' }), { status: 400, headers: { 'Content-Type': 'application/json' } }); }
 
-    const { action, albumSlug, blockIndex, caption, captionPosition, padding } = body;
+    const { action, albumSlug, blockIndex, caption, captionPosition, mb } = body;
     if (!action || !albumSlug || blockIndex == null) {
         return new Response(JSON.stringify({ error: 'Missing required parameters' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
     }
@@ -41,7 +41,7 @@ export const POST: APIRoute = async ({ request }) => {
     let cleaned = target.props
         .replace(/\s*caption="[^"]*"/g, '')
         .replace(/\s*captionPosition="[^"]*"/g, '')
-        .replace(/\s*padding="[^"]*"/g, '')
+        .replace(/\s*(padding|mb)="[^"]*"/g, '')
         .replace(/\s+/g, ' ')
         .trim();
 
@@ -50,7 +50,7 @@ export const POST: APIRoute = async ({ request }) => {
         const additions: string[] = [];
         if (caption) additions.push(`caption="${caption}"`);
         if (captionPosition && captionPosition !== 'center bottom') additions.push(`captionPosition="${captionPosition}"`);
-        if (padding) additions.push(`padding="${padding}"`);
+        if (mb) additions.push(`mb="${mb}"`);
 
         const allParts = [cleaned, ...additions].filter(Boolean);
         newTag = allParts.length > 0

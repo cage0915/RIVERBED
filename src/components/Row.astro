@@ -1,13 +1,19 @@
 ---
 interface Props {
     cols?: number; // Optional now, kept for backward compatibility with existing .mdx
-    padding?: string;
+    mb?: string; // technical override
+    mt?: string; // technical override
+    blockMargin?: string; // semantic block gap
+    captionMargin?: string; // semantic caption space
     caption?: string;
     captionPosition?: string; // e.g. "center top", "right bottom"
 }
 
 const {
-    padding,
+    mb,
+    mt,
+    blockMargin,
+    captionMargin,
     caption,
     captionPosition = "center bottom",
 } = Astro.props;
@@ -17,23 +23,35 @@ const isDev = import.meta.env.DEV;
 const parsedPos = captionPosition.includes('top') ? 'top' : 'bottom';
 const parsedAlign = captionPosition.includes('left') ? 'left' : captionPosition.includes('right') ? 'right' : 'center';
 
-let finalPadding = padding;
-if (!finalPadding) {
-    if (caption) {
-        finalPadding = parsedPos === 'top' ? "1.5rem 0 0.5rem 0" : "0.5rem 0 1.5rem 0";
-    } else {
-        finalPadding = "0 0 0.5rem 0";
-    }
+const hasTopCaption = caption && parsedPos === 'top';
+const hasBottomCaption = caption && parsedPos === 'bottom';
+
+const styles = [];
+
+// Determine final margins
+const finalMT = mt || (hasTopCaption ? captionMargin : undefined);
+const finalMB = mb || blockMargin || (hasBottomCaption ? captionMargin : undefined);
+
+if (finalMT) {
+    styles.push(`margin-top: ${finalMT} !important;`);
+} else if (hasTopCaption) {
+    styles.push("margin-top: 2rem;");
+}
+
+if (finalMB) {
+    styles.push(`margin-bottom: ${finalMB} !important;`);
+} else if (hasBottomCaption) {
+    styles.push("margin-bottom: 2rem;");
 }
 ---
 
 <div
     class="row-wrapper"
-    style={`padding: ${finalPadding};`}
+    style={styles.length > 0 ? styles.join(" ") : undefined}
     data-dev-block={isDev ? "row" : undefined}
     data-dev-caption={isDev && caption ? caption : undefined}
     data-dev-caption-pos={isDev ? captionPosition : undefined}
-    data-dev-padding={isDev && padding ? padding : undefined}
+    data-dev-mb={isDev && mb ? mb : undefined}
 >
     {caption && parsedPos === 'top' && (
         <div class="photo-caption top" style={`text-align: ${parsedAlign};`}>

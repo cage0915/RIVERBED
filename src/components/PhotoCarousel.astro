@@ -4,8 +4,10 @@ interface Props {
     gap?: string;
     /** Percentage of the track NOT occupied by the active slide, split as side peeking (default 15 → ~7.5% each side) */
     peekPercent?: number;
-    /** Padding around the carousel (default "0 0 0.5rem 0" to match Row.astro and TextCenter) */
-    padding?: string;
+    mb?: string; // technical override
+    mt?: string; // technical override
+    blockMargin?: string; // semantic block gap
+    captionMargin?: string; // semantic caption space
     /** The index of the slide (0-based) to be centered on initial load */
     initialSlide?: number;
     /** Optional caption for the carousel */
@@ -17,7 +19,10 @@ interface Props {
 const {
     gap = "1rem",
     peekPercent = 10,
-    padding,
+    mb,
+    mt,
+    blockMargin,
+    captionMargin,
     initialSlide = 0,
     caption,
     captionPosition = "center bottom"
@@ -28,29 +33,41 @@ const isDev = import.meta.env.DEV;
 const parsedPos = captionPosition.includes('top') ? 'top' : 'bottom';
 const parsedAlign = captionPosition.includes('left') ? 'left' : captionPosition.includes('right') ? 'right' : 'center';
 
+const hasTopCaption = caption && parsedPos === 'top';
+const hasBottomCaption = caption && parsedPos === 'bottom';
+
+const styles = [];
+
+// Determine final margins
+const finalMT = mt || (hasTopCaption ? captionMargin : undefined);
+const finalMB = mb || blockMargin || (hasBottomCaption ? captionMargin : "2rem");
+
+if (finalMT) {
+    styles.push(`margin-top: ${finalMT} !important;`);
+} else if (hasTopCaption) {
+    styles.push("margin-top: 2rem;");
+}
+
+if (finalMB) {
+    styles.push(`margin-bottom: ${finalMB} !important;`);
+} else if (hasBottomCaption) {
+    styles.push("margin-bottom: 2rem;");
+}
+
 // Each slide occupies (100 - peekPercent)% of the scroll container width.
 // Half the remaining is distributed to each side as a "peek".
 const slideWidthPercent = 100 - peekPercent;
-
-let finalPadding = padding;
-if (!finalPadding) {
-    if (caption) {
-        finalPadding = parsedPos === 'top' ? "2rem 0 1rem 0" : "1rem 0 2rem 0";
-    } else {
-        finalPadding = "1rem 0 1rem 0";
-    }
-}
 ---
 
 <section
     class="carousel-section group"
     data-carousel
     data-initial-slide={initialSlide}
-    style={`padding: ${finalPadding};`}
+    style={styles.length > 0 ? styles.join(" ") : undefined}
     data-dev-block={isDev ? "carousel" : undefined}
     data-dev-caption={isDev && caption ? caption : undefined}
     data-dev-caption-pos={isDev ? captionPosition : undefined}
-    data-dev-padding={isDev && padding ? padding : undefined}
+    data-dev-mb={isDev && mb ? mb : undefined}
 >
     {caption && parsedPos === 'top' && (
         <div class="photo-caption top" style={`text-align: ${parsedAlign};`}>
