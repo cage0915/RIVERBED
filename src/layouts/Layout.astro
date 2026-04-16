@@ -1,6 +1,7 @@
 ---
 import { getCollection } from "astro:content";
-import { getFolderTitle, getFolderOrder } from "../lib/constants";
+import { ViewTransitions } from "astro:transitions";
+import { getFolderTitle, getFolderOrder, getFolderFooter, FOLDER_METADATA } from "../lib/constants";
 import "@fontsource/noto-sans-jp/300.css";
 import "@fontsource/noto-sans-jp/400.css";
 import "@fontsource/noto-sans-jp/500.css";
@@ -19,11 +20,15 @@ interface Props {
 
 const { title } = Astro.props;
 
-// Fetch unique folders from album slugs for navigation
+// Use FOLDER_METADATA keys as the base for navigation
+const metadataSlugs = Object.keys(FOLDER_METADATA);
+
+// Fetch unique folders from album slugs to catch any folders missing from metadata
 const albums = await getCollection("albums");
-const folderSlugs = [
-	...new Set(albums.map((album) => album.slug.split("/")[0])),
-];
+const albumFolderSlugs = albums.map((album) => album.slug.split("/")[0]);
+
+// Combine and get unique slugs
+const folderSlugs = [...new Set([...metadataSlugs, ...albumFolderSlugs])];
 
 const sortedFolders = folderSlugs
 	.map((slug) => ({
@@ -35,6 +40,10 @@ const sortedFolders = folderSlugs
 
 // Get the current path to highlight active link
 const currentPath = Astro.url.pathname;
+
+// Determine current folder for footer
+const currentFolderSlug = currentPath.split("/").filter(Boolean)[0];
+const folderFooter = currentFolderSlug ? getFolderFooter(currentFolderSlug) : null;
 ---
 
 <!doctype html>
@@ -46,6 +55,7 @@ const currentPath = Astro.url.pathname;
 		<link rel="icon" type="image/x-icon" href="/favicon.ico" />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
+		<ViewTransitions />
 	</head>
 	<body
 		class="bg-[#121212] text-zinc-100 min-h-screen antialiased selection:bg-white/20"
@@ -98,26 +108,26 @@ const currentPath = Astro.url.pathname;
 					>
 				</button>
 
-				<!-- Navigation - Desktop -->
+				<!-- Navigation -->
 				<div class="hidden sm:flex gap-8">
 					{
 						sortedFolders.map((folder) => {
-							const isActive = currentPath.startsWith(
-								`/${folder.id}`,
-							);
+							const isActive = currentPath === `/${folder.id}` || currentPath.startsWith(`/${folder.id}/`);
 							return (
 								<a
 									href={`/${folder.id}`}
-									class={`text-base font-sans tracking-wide transition-all hover:text-white relative py-1 ${
+									class={`text-base font-sans tracking-wide transition-colors hover:text-white relative py-1 ${
 										isActive
 											? "text-white"
 											: "text-zinc-400"
 									}`}
 								>
-									{folder.title}
-									{isActive && (
-										<span class="absolute bottom-0 left-0 right-0 h-0.5 bg-white rounded-full" />
-									)}
+									<span class={folder.id === 'dalin' ? 'condensed-kanji' : ''}>
+										{folder.title}
+									</span>
+									<span
+										class={`absolute bottom-0 left-0 right-0 h-0.5 bg-white rounded-full transition-opacity duration-300 ${isActive ? 'opacity-100' : 'opacity-0'} ${folder.id === 'dalin' ? 'condensed-kanji' : ''}`}
+									/>
 								</a>
 							);
 						})
@@ -135,27 +145,33 @@ const currentPath = Astro.url.pathname;
 				</div>
 			</div>
 
+				</div>
+			</div>
+
 			<!-- Mobile Navigation Dropdown -->
 			<div
 				id="mobile-menu"
-				class="hidden sm:hidden border-t border-white/5 bg-[#555555]/95 backdrop-blur-xl overflow-hidden transition-all duration-300 ease-in-out max-h-0"
+				class="hidden sm:hidden border-t border-white/5 bg-[#121212]/95 backdrop-blur-xl overflow-hidden transition-all duration-300 ease-in-out max-h-0"
 			>
-				<div class="flex flex-col items-center p-4 gap-4">
+				<div class="flex flex-row items-center p-4 gap-6 overflow-x-auto scrollbar-none mask-linear-right">
 					{
 						sortedFolders.map((folder) => {
-							const isActive = currentPath.startsWith(
-								`/${folder.id}`,
-							);
+							const isActive = currentPath === `/${folder.id}` || currentPath.startsWith(`/${folder.id}/`);
 							return (
 								<a
 									href={`/${folder.id}`}
-									class={`text-xl font-sans tracking-wide transition-all text-center ${
+									class={`text-base font-sans tracking-wide transition-all whitespace-nowrap relative py-1 ${
 										isActive
 											? "text-white"
 											: "text-zinc-400"
 									}`}
 								>
-									{folder.title}
+									<span class={folder.id === 'dalin' ? 'condensed-kanji' : ''}>
+										{folder.title}
+									</span>
+									<span
+										class={`absolute bottom-0 left-0 right-0 h-0.5 bg-white rounded-full transition-opacity duration-300 ${isActive ? 'opacity-100' : 'opacity-0'} ${folder.id === 'dalin' ? 'condensed-kanji' : ''}`}
+									/>
 								</a>
 							);
 						})
@@ -168,75 +184,85 @@ const currentPath = Astro.url.pathname;
 			<slot />
 		</main>
 
-		<footer class="py-12 border-t border-white/5">
-			<div class="mx-auto max-w-[1100px] px-4 sm:px-8 text-center">
-				<p
-					class="text-zinc-500 font-sans tracking-[0.3em] text-sm uppercase"
-				>
-					見る・撮る・歩く
-				</p>
-			</div>
-		</footer>
+		{folderFooter && (
+			<footer class="py-12 border-t border-white/5">
+				<div class="mx-auto max-w-[1100px] px-4 sm:px-8 text-center">
+					<p
+						class="text-zinc-500 font-sans tracking-[0.3em] text-sm"
+					>
+						{folderFooter}
+					</p>
+				</div>
+			</footer>
+		)}
 
         {import.meta.env.DEV && <DevTool />}
 
 		<script>
 			let lastScrollY = window.scrollY;
-			const navbar = document.getElementById("navbar");
-			const menuToggle = document.getElementById("menu-toggle");
-			const mobileMenu = document.getElementById("mobile-menu");
-			const menuIcon = menuToggle?.querySelector(".menu-icon");
-			const closeIcon = menuToggle?.querySelector(".close-icon");
+			let navElements = {
+				navbar: null as HTMLElement | null,
+				menuToggle: null as HTMLElement | null,
+				mobileMenu: null as HTMLElement | null
+			};
 
-			menuToggle?.addEventListener("click", () => {
-				const isExpanded = mobileMenu?.classList.contains("hidden");
+			function initNavbar() {
+				navElements.navbar = document.getElementById("navbar");
+				navElements.menuToggle = document.getElementById("menu-toggle");
+				navElements.mobileMenu = document.getElementById("mobile-menu");
 
-				if (isExpanded) {
-					// Open
-					mobileMenu?.classList.remove("hidden");
-					// Trigger browser reflow for transition
-					void mobileMenu?.offsetWidth;
-					mobileMenu!.style.maxHeight = "500px";
-					menuIcon?.classList.add("hidden");
-					closeIcon?.classList.remove("hidden");
-				} else {
-					// Close
-					mobileMenu!.style.maxHeight = "0px";
-					menuIcon?.classList.remove("hidden");
-					closeIcon?.classList.add("hidden");
+				if (!navElements.menuToggle || !navElements.mobileMenu) return;
 
-					// Wait for transition before hiding
-					setTimeout(() => {
-						if (mobileMenu!.style.maxHeight === "0px") {
-							mobileMenu?.classList.add("hidden");
-						}
-					}, 300);
-				}
-			});
+				// Use a fresh listener by replacing the element (simplest for ViewTransitions)
+				const oldToggle = navElements.menuToggle;
+				const newToggle = oldToggle.cloneNode(true) as HTMLElement;
+				oldToggle.parentNode?.replaceChild(newToggle, oldToggle);
+				navElements.menuToggle = newToggle;
 
+				newToggle.addEventListener("click", () => {
+					const isExpanded = navElements.mobileMenu?.classList.contains("hidden");
+
+					if (isExpanded) {
+						navElements.mobileMenu?.classList.remove("hidden");
+						void navElements.mobileMenu?.offsetWidth;
+						navElements.mobileMenu!.style.maxHeight = "500px";
+						newToggle.querySelector(".menu-icon")?.classList.add("hidden");
+						newToggle.querySelector(".close-icon")?.classList.remove("hidden");
+					} else {
+						navElements.mobileMenu!.style.maxHeight = "0px";
+						newToggle.querySelector(".menu-icon")?.classList.remove("hidden");
+						newToggle.querySelector(".close-icon")?.classList.add("hidden");
+						setTimeout(() => {
+							if (navElements.mobileMenu!.style.maxHeight === "0px") {
+								navElements.mobileMenu?.classList.add("hidden");
+							}
+						}, 300);
+					}
+				});
+			}
+
+			// Window listeners should be added ONCE
 			window.addEventListener("scroll", () => {
 				const currentScrollY = window.scrollY;
+				const { navbar, mobileMenu, menuToggle } = navElements;
 
-				// Close mobile menu on scroll
 				if (mobileMenu && !mobileMenu.classList.contains("hidden")) {
 					mobileMenu.style.maxHeight = "0px";
-					menuIcon?.classList.remove("hidden");
-					closeIcon?.classList.add("hidden");
+					menuToggle?.querySelector(".menu-icon")?.classList.remove("hidden");
+					menuToggle?.querySelector(".close-icon")?.classList.add("hidden");
 					setTimeout(() => {
 						mobileMenu.classList.add("hidden");
 					}, 300);
 				}
 
 				if (currentScrollY > lastScrollY && currentScrollY > 120) {
-					// Scrolling down - hide navbar
 					navbar?.classList.add("-translate-y-full");
 				} else {
-					// Scrolling up - show navbar
 					navbar?.classList.remove("-translate-y-full");
 				}
 
 				lastScrollY = currentScrollY;
-			});
+			}, { passive: true });
 
 			// Keyboard Navigation
 			window.addEventListener("keydown", (e) => {
@@ -248,8 +274,6 @@ const currentPath = Astro.url.pathname;
 				)
 					return;
 
-				// In photography contexts, "Right/Down" usually means "Next Row"
-				// Targets: photo rows in albums, cards in folders/home
 				const targets = Array.from(
 					document.querySelectorAll(
 						".photo-row, .album-card, .folder-card",
@@ -257,12 +281,10 @@ const currentPath = Astro.url.pathname;
 				);
 				if (targets.length === 0) return;
 
-				const navbarHeight = 110; // Approximate height including padding
+				const navbarHeight = 110;
 				const scrollPadding = 20;
-				const currentPos =
-					window.scrollY + navbarHeight + scrollPadding;
+				const currentPos = window.scrollY + navbarHeight + scrollPadding;
 
-				// Find the first target that is currently visible or below the current position
 				const nextIndex = targets.findIndex((t) => {
 					const rect = t.getBoundingClientRect();
 					return window.scrollY + rect.top > currentPos;
@@ -270,32 +292,21 @@ const currentPath = Astro.url.pathname;
 
 				let target;
 				if (e.key === "ArrowRight" || e.key === "ArrowDown") {
-					// Go to next
-					if (nextIndex !== -1) {
-						target = targets[nextIndex];
-					}
+					if (nextIndex !== -1) target = targets[nextIndex];
 				} else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
-					// Go to previous
-					// If nextIndex is -1, it means we are past all targets
-					const currentIndex =
-						nextIndex === -1 ? targets.length : nextIndex;
+					const currentIndex = nextIndex === -1 ? targets.length : nextIndex;
 					if (currentIndex > 1) {
 						target = targets[currentIndex - 2];
 					} else if (currentIndex === 1) {
-						// Scroll to top if on first item
 						window.scrollTo({ top: 0, behavior: "smooth" });
 						return;
 					}
 				}
 
 				if (target) {
-					const targetTop =
-						window.scrollY +
-						target.getBoundingClientRect().top -
-						navbarHeight +
-						10;
+					const targetTop = window.scrollY + target.getBoundingClientRect().top - navbarHeight + 10;
 					window.scrollTo({ top: targetTop, behavior: "smooth" });
-					e.preventDefault(); // Prevent default scroll
+					e.preventDefault();
 				}
 			});
 
@@ -368,6 +379,7 @@ const currentPath = Astro.url.pathname;
 			};
 
 			const initAll = () => {
+				initNavbar();
 				initDimensions();
 				initPhotoSwipe();
 			};
@@ -396,9 +408,27 @@ const currentPath = Astro.url.pathname;
 
 	:root {
 		font-family: "PT Sans", "Noto Sans TC", "Noto Sans JP", sans-serif;
+		scrollbar-gutter: stable;
 	}
 
 	body {
 		font-family: "PT Sans", "Noto Sans TC", "Noto Sans JP", sans-serif;
+	}
+
+	.condensed-kanji {
+		display: inline-block;
+		transform: scaleX(0.7);
+		transform-origin: center;
+		letter-spacing: -0.05em;
+	}
+
+	.mask-linear-right {
+		mask-image: linear-gradient(to right, black 85%, transparent 100%);
+	}
+
+	@media (min-width: 640px) {
+		.mask-none {
+			mask-image: none;
+		}
 	}
 </style>

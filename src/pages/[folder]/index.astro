@@ -1,7 +1,7 @@
 ---
 import { getCollection } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
-import { getFolderTitle, getImageUrl, R2_DOMAIN } from "../../lib/constants";
+import { getFolderTitle, getImageUrl, R2_DOMAIN, FOLDER_METADATA } from "../../lib/constants";
 
 const { folder } = Astro.params;
 
@@ -31,7 +31,9 @@ if (order.length > 0) {
     folderAlbums.sort((a, b) => (b.data.order ?? 0) - (a.data.order ?? 0));
 }
 
-if (folderAlbums.length === 0) {
+const isExistentFolder = folder && (folder in FOLDER_METADATA || folderAlbums.length > 0);
+
+if (!isExistentFolder) {
     return Astro.redirect("/404");
 }
 
@@ -43,44 +45,50 @@ const isDev = import.meta.env.DEV;
     <div class="py-8">
         <div class="albums-grid">
             {
-                folderAlbums.map((album) => {
-                                    const albumSlug = album.slug.split("/")[1];
-                    const resolvedCoverKey = album.data.coverKey.includes("/")
-                        ? album.data.coverKey
-                        : `${album.slug}/${album.data.coverKey}`;
-                    const coverUrl = getImageUrl(resolvedCoverKey);
-                    const fallbackUrl = `${R2_DOMAIN}/${resolvedCoverKey}`;
-                    return (
-                        <div class="album-card group">
-                            <a
-                                href={`/${folder}/${albumSlug}`}
-                                class="album-link"
-                            >
-                                <div class="album-cover">
-                                    <img
-                                        src={coverUrl}
-                                        alt={album.data.title}
-                                        loading="lazy"
-                                        style={`--zoom: ${album.data.coverZoom ?? 1}; --ox: ${album.data.coverOffset?.x ?? 50}%; --oy: ${album.data.coverOffset?.y ?? 50}%;`}
-                                        onerror={
-                                            isDev
-                                                ? `this.onerror=null; this.src='${fallbackUrl}';`
-                                                : undefined
-                                        }
-                                    />
-                                    <div class="album-overlay">
-                                        <h2 class="album-title">
-                                            {album.data.title}
-                                        </h2>
-                                        {album.data.info && (
-                                            <p class="album-info">{album.data.info}</p>
-                                        )}
+                folderAlbums.length > 0 ? (
+                    folderAlbums.map((album) => {
+                        const albumSlug = album.slug.split("/")[1];
+                        const resolvedCoverKey = album.data.coverKey.includes("/")
+                            ? album.data.coverKey
+                            : `${album.slug}/${album.data.coverKey}`;
+                        const coverUrl = getImageUrl(resolvedCoverKey);
+                        const fallbackUrl = `${R2_DOMAIN}/${resolvedCoverKey}`;
+                        return (
+                            <div class="album-card group">
+                                <a
+                                    href={`/${folder}/${albumSlug}`}
+                                    class="album-link"
+                                >
+                                    <div class="album-cover">
+                                        <img
+                                            src={coverUrl}
+                                            alt={album.data.title}
+                                            loading="lazy"
+                                            style={`--zoom: ${album.data.coverZoom ?? 1}; --ox: ${album.data.coverOffset?.x ?? 50}%; --oy: ${album.data.coverOffset?.y ?? 50}%;`}
+                                            onerror={
+                                                isDev
+                                                    ? `this.onerror=null; this.src='${fallbackUrl}';`
+                                                    : undefined
+                                            }
+                                        />
+                                        <div class="album-overlay">
+                                            <h2 class="album-title">
+                                                {album.data.title}
+                                            </h2>
+                                            {album.data.info && (
+                                                <p class="album-info">{album.data.info}</p>
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
-                            </a>
-                        </div>
-                    );
-                })
+                                </a>
+                            </div>
+                        );
+                    })
+                ) : (
+                    <div class="col-span-full py-40 text-center opacity-30 text-sm tracking-[0.2em] uppercase">
+                        Coming Soon
+                    </div>
+                )
             }
         </div>
     </div>
