@@ -31,8 +31,7 @@ export const POST: APIRoute = async ({ request }) => {
     const originalFrontmatter = fmMatch ? fmMatch[0] : '';
 
     let newBody = '';
-
-    blocks.forEach((block) => {
+    blocks.forEach((block: any) => {
         const { type, props, photos } = block;
         let propsStr = '';
         if (props.caption) propsStr += `\n  caption="${props.caption}"`;
@@ -51,6 +50,11 @@ export const POST: APIRoute = async ({ request }) => {
     let finalFrontmatter = newFrontmatter || originalFrontmatter;
     if (finalFrontmatter && !finalFrontmatter.startsWith('---')) {
         finalFrontmatter = `---\n${finalFrontmatter}\n---`;
+    }
+
+    // Actively strip 'order: ...' from frontmatter to fulfill external ordering goal
+    if (finalFrontmatter) {
+        finalFrontmatter = finalFrontmatter.replace(/^order:\s*.*$\n?/m, '');
     }
 
     const newContent = `${finalFrontmatter}\n\n${newBody.trim()}\n`;

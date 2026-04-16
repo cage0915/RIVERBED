@@ -1,4 +1,6 @@
 ---
+import fs from "node:fs";
+import path from "node:path";
 import { getCollection } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 import { getFolderTitle, getImageUrl, R2_DOMAIN } from "../../lib/constants";
@@ -7,9 +9,34 @@ const { folder } = Astro.params;
 
 // Get all albums in this folder by checking the slug prefix
 const allAlbums = await getCollection("albums");
-const folderAlbums = allAlbums
-    .filter((album) => album.slug.startsWith(`${folder}/`))
-    .sort((a, b) => b.data.order - a.data.order);
+let folderAlbums = allAlbums.filter((album) => album.slug.startsWith(`${folder}/`));
+
+// Try to load external order from _order.json
+const orderFilePath = path.resolve(process.cwd(), "src/content/albums", folder!, "_order.json");
+let order: string[] = [];
+if (fs.existsSync(orderFilePath)) {
+    try {
+        order = JSON.parse(fs.readFileSync(orderFilePath, "utf8"));
+    } catch (e) {
+        console.error(`Failed to parse _order.json for ${folder}:`, e);
+    }
+}
+
+if (order.length > 0) {
+    folderAlbums.sort((a, b) => {
+        const slugA = a.slug.split("/")[1];
+        const slugB = b.slug.split("/")[1];
+        const idxA = order.indexOf(slugA);
+        const idxB = order.indexOf(slugB);
+
+        if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+        if (idxA !== -1) return -1;
+        if (idxB !== -1) return 1;
+        return (b.data.order ?? 0) - (a.data.order ?? 0);
+    });
+} else {
+    folderAlbums.sort((a, b) => (b.data.order ?? 0) - (a.data.order ?? 0));
+}
 
 if (folderAlbums.length === 0) {
     return Astro.redirect("/404");
