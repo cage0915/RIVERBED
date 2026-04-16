@@ -95,6 +95,101 @@
                     .dev-tag-edit-btn:hover {
                         background: rgba(59, 130, 246, 0.8);
                     }
+                    .dev-gear-btn {
+                        width: 2rem;
+                        height: 2rem;
+                        border-radius: 50%;
+                        background: rgba(255,255,255,0.2);
+                        backdrop-filter: blur(4px);
+                        border: 1px solid rgba(255,255,255,0.1);
+                        color: rgba(161, 161, 170, 0.8);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        cursor: pointer;
+                        z-index: 50;
+                        transition: all 0.3s;
+                    }
+                    /* If not inside a container, give it a default position */
+                    .dev-gear-btn:not(.in-container) {
+                        position: fixed;
+                        right: 2rem;
+                        bottom: 4.75rem;
+                    }
+                    .dev-gear-btn:hover {
+                        background: rgba(59, 130, 246, 0.8);
+                        color: white;
+                        transform: rotate(45deg);
+                    }
+                    /* Page Manager Tree Styles */
+                    .dev-pm-tree {
+                        list-style: none;
+                        padding: 0;
+                        margin: 0;
+                    }
+                    .dev-pm-block {
+                        background: #f9f9f9;
+                        border: 1px solid #eee;
+                        border-radius: 8px;
+                        margin-bottom: 1rem;
+                        padding: 0.75rem;
+                    }
+                    .dev-pm-block-header {
+                        display: flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                        cursor: grab;
+                    }
+                    .dev-pm-block.collapsed .dev-pm-block-header {
+                        margin-bottom: 0;
+                        padding-bottom: 0;
+                        border-bottom: none;
+                    }
+                    .dev-pm-block.collapsed .dev-pm-photo-list {
+                        display: none !important;
+                    }
+                    .dev-pm-fm-section .dev-pm-fm-content {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 0.75rem;
+                        margin-top: 1rem;
+                    }
+                    .dev-pm-fm-section.collapsed .dev-pm-fm-content {
+                        display: none !important;
+                    }
+                    .dev-pm-fm-section.collapsed {
+                        margin-bottom: 0.75rem !important;
+                    }
+                    .dev-pm-photo-list {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 0.25rem;
+                        min-height: 40px;
+                        padding: 0.5rem;
+                        background: #fff;
+                        border-radius: 4px;
+                        border: 1px inset #eee;
+                    }
+                    .dev-pm-photo {
+                        background: #f5f5f5;
+                        border: 1px solid #e5e5e5;
+                        border-radius: 4px;
+                        padding: 0.4rem 0.6rem;
+                        font-family: monospace;
+                        font-size: 0.8rem;
+                        display: flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                        cursor: grab;
+                    }
+                    .dev-pm-photo:hover {
+                        background: #eee;
+                        border-color: #d5d5d5;
+                    }
+                    .dev-pm-ghost {
+                        opacity: 0.4;
+                        background: #3b82f6 !important;
+                    }
                 `;
                 document.head.appendChild(style);
             };
@@ -108,7 +203,11 @@
                 check: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`,
                 quote: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h1c0 2.2-1.8 4-4 4v3a7 7 0 0 0 7-7V5a2 2 0 0 0-2-2z"/><path d="M5 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h1c0 2.2-1.8 4-4 4v3a7 7 0 0 0 7-7V5a2 2 0 0 0-2-2z"/></svg>`,
                 refresh: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>`,
-                clipboard: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>`
+                clipboard: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>`,
+                gear: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>`,
+                plus: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>`,
+                drag: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 9 2 12 5 15"></polyline><polyline points="9 5 12 2 15 5"></polyline><polyline points="15 19 12 22 9 19"></polyline><polyline points="19 9 22 12 19 15"></polyline><line x1="2" y1="12" x2="22" y2="12"></line><line x1="12" y1="2" x2="12" y2="22"></line></svg>`,
+                type: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 4 20 8 16 12"></polyline><line x1="4" y1="8" x2="20" y2="8"></line><polyline points="8 20 4 16 8 12"></polyline><line x1="4" y1="16" x2="20" y2="16"></line></svg>`
             };
 
             async function fetchMountains() {
@@ -479,6 +578,342 @@
                 });
             }
 
+            // Page Manager (Tree View)
+            let sortableInstances: any[] = [];
+
+            function loadSortable() {
+                return new Promise((resolve) => {
+                    if ((window as any).Sortable) return resolve((window as any).Sortable);
+                    const script = document.createElement('script');
+                    script.src = 'https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js';
+                    script.onload = () => resolve((window as any).Sortable);
+                    document.head.appendChild(script);
+                });
+            }
+
+            function createPageManagerDialog() {
+                let existing = document.getElementById("dev-pm-dialog") as HTMLDialogElement;
+                if (existing) return existing;
+
+                const dialog = document.createElement("dialog");
+                dialog.id = "dev-pm-dialog";
+                dialog.innerHTML = `
+                    <div style="display: flex; flex-direction: column; height: 80vh; max-height: 800px; width: 600px; max-width: 90vw; background: white; border-radius: 12px; overflow: hidden; font-family: sans-serif;">
+                        <div style="padding: 1rem 1.5rem; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; background: #fafafa;">
+                            <h3 style="margin: 0; font-size: 1rem; color: #333;">Page Manager</h3>
+                            <button id="dev-pm-close" style="background: none; border: none; cursor: pointer; color: #999;">${ICONS.close}</button>
+                        </div>
+                        <div id="dev-pm-content" style="flex: 1; overflow-y: auto; padding: 1.5rem;">
+                            <!-- Frontmatter Form -->
+                            <div id="dev-pm-fm-section" class="dev-pm-fm-section collapsed" style="margin-bottom: 1.5rem; padding: 0.75rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <button id="dev-pm-fm-toggle" style="background: none; border: none; cursor: pointer; color: #666; padding: 4px; display: flex; align-items: center; transition: transform 0.2s;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                    </button>
+                                    <h4 style="margin: 0; font-size: 0.85rem; color: #475569; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 0.5rem; flex: 1; cursor: pointer;">
+                                        ${ICONS.pencil} Album Metadata
+                                    </h4>
+                                </div>
+                                <div class="dev-pm-fm-content">
+                                    <label style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.75rem; color: #64748b;">
+                                        Title
+                                        <input type="text" id="dev-pm-title" style="width: 100%; box-sizing: border-box; padding: 0.4rem 0.6rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;" />
+                                    </label>
+                                    <label style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.75rem; color: #64748b;">
+                                        Info
+                                        <input type="text" id="dev-pm-info" style="width: 100%; box-sizing: border-box; padding: 0.4rem 0.6rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;" />
+                                    </label>
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                                        <label style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.75rem; color: #64748b;">
+                                            Cover Image Key
+                                            <input type="text" id="dev-pm-cover" style="width: 100%; box-sizing: border-box; padding: 0.4rem 0.6rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;" />
+                                        </label>
+                                        <label style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.75rem; color: #64748b;">
+                                            Order
+                                            <input type="number" id="dev-pm-order" style="width: 100%; box-sizing: border-box; padding: 0.4rem 0.6rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;" />
+                                        </label>
+                                        <label style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.75rem; color: #64748b;">
+                                            Cover Zoom
+                                            <input type="number" step="0.1" id="dev-pm-zoom" style="width: 100%; box-sizing: border-box; padding: 0.4rem 0.6rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;" />
+                                        </label>
+                                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                                            <label style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.75rem; color: #64748b;">
+                                                Offset X
+                                                <input type="number" step="0.1" id="dev-pm-ox" style="width: 100%; box-sizing: border-box; padding: 0.4rem 0.6rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;" />
+                                            </label>
+                                            <label style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.75rem; color: #64748b;">
+                                                Offset Y
+                                                <input type="number" step="0.1" id="dev-pm-oy" style="width: 100%; box-sizing: border-box; padding: 0.4rem 0.6rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;" />
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="border-top: 1px dashed #eee; margin: 1.5rem 0;"></div>
+                            <div id="dev-pm-tree" class="dev-pm-tree"></div>
+                            <div style="margin-top: 1rem;">
+                                <button id="dev-pm-add-block" style="width: 100%; padding: 0.6rem; border: 1px dashed #ccc; border-radius: 6px; background: #fff; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
+                                    ${ICONS.plus} Add Block
+                                </button>
+                            </div>
+                        </div>
+                        <div style="padding: 1rem 1.5rem; border-top: 1px solid #eee; display: flex; justify-content: flex-end; gap: 1rem; background: #fafafa;">
+                            <button id="dev-pm-confirm" style="padding: 0.6rem 1.5rem; background: #2563eb; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">
+                                Confirm Changes
+                            </button>
+                        </div>
+                    </div>
+                `;
+                dialog.style.cssText = `
+                    border: none; border-radius: 12px; padding: 0;
+                    box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+                    overflow: visible;
+                `;
+                document.body.appendChild(dialog);
+                return dialog;
+            }
+
+            async function openPageManager() {
+                const albumSlug = getAlbumSlug();
+                if (!albumSlug) return showToast("❌ Cannot identify album");
+
+                showToast("⌛ Loading structure...");
+                const res = await fetch(`/api/get-page-structure?albumSlug=${albumSlug}`);
+                if (!res.ok) return showToast("❌ Failed to load structure");
+
+                const data = await res.json();
+                const Tree = (window as any).Sortable ? (window as any).Sortable : await loadSortable();
+
+                const dialog = createPageManagerDialog();
+                const treeContainer = dialog.querySelector("#dev-pm-tree") as HTMLElement;
+                const closeBtn = dialog.querySelector("#dev-pm-close") as HTMLButtonElement;
+                const confirmBtn = dialog.querySelector("#dev-pm-confirm") as HTMLButtonElement;
+                const addBlockBtn = dialog.querySelector("#dev-pm-add-block") as HTMLButtonElement;
+
+                // FM Form elements
+                const fTitle = dialog.querySelector("#dev-pm-title") as HTMLInputElement;
+                const fInfo = dialog.querySelector("#dev-pm-info") as HTMLInputElement;
+                const fCover = dialog.querySelector("#dev-pm-cover") as HTMLInputElement;
+                const fOrder = dialog.querySelector("#dev-pm-order") as HTMLInputElement;
+                const fZoom = dialog.querySelector("#dev-pm-zoom") as HTMLInputElement;
+                const fOX = dialog.querySelector("#dev-pm-ox") as HTMLInputElement;
+                const fOY = dialog.querySelector("#dev-pm-oy") as HTMLInputElement;
+
+                const parseFM = (fm: string) => {
+                    const get = (key: string) => (fm.match(new RegExp(`^${key}:\\s*(.*)$`, 'm')) || [])[1]?.trim().replace(/^"(.*)"$/, '$1').replace(/^'(.*)'$/, '$1');
+                    const getObj = (key: string) => {
+                        const m = fm.match(new RegExp(`^${key}:\\s*\\{(.*)\\}`, 'm'));
+                        if (!m) return {};
+                        const parts = m[1].split(',').reduce((acc: any, p) => {
+                            const [k, v] = p.split(':').map(s => s.trim());
+                            acc[k] = v;
+                            return acc;
+                        }, {});
+                        return parts;
+                    };
+                    const offset = getObj('coverOffset');
+                    return {
+                        title: get('title') || '',
+                        info: get('info') || '',
+                        coverKey: get('coverKey') || '',
+                        order: get('order') || '',
+                        coverZoom: get('coverZoom') || '',
+                        ox: offset.x || '',
+                        oy: offset.y || ''
+                    };
+                };
+
+                const fmData = parseFM(data.frontmatter);
+                fTitle.value = fmData.title;
+                fInfo.value = fmData.info;
+                fCover.value = fmData.coverKey;
+                fOrder.value = fmData.order;
+                fZoom.value = fmData.coverZoom;
+                fOX.value = fmData.ox;
+                fOY.value = fmData.oy;
+
+                const fmSection = dialog.querySelector("#dev-pm-fm-section") as HTMLElement;
+                const fmToggle = dialog.querySelector("#dev-pm-fm-toggle") as HTMLButtonElement;
+                const fmTitle = fmSection.querySelector("h4") as HTMLElement;
+
+                const updateFMState = () => {
+                    const isCollapsed = fmSection.classList.contains('collapsed');
+                    fmToggle.style.transform = isCollapsed ? 'rotate(0deg)' : 'rotate(90deg)';
+                };
+
+                const toggleFM = (e: Event) => {
+                    e.stopPropagation();
+                    fmSection.classList.toggle('collapsed');
+                    updateFMState();
+                };
+
+                fmToggle.addEventListener('click', toggleFM);
+                fmTitle.addEventListener('click', toggleFM);
+                updateFMState();
+
+                let currentBlocks = JSON.parse(JSON.stringify(data.blocks));
+                let collapsedBlocks = new Set(); // Track collapsed block indices
+
+                const renderTree = () => {
+                    sortableInstances.forEach(s => s.destroy());
+                    sortableInstances = [];
+
+                    treeContainer.innerHTML = '';
+                    currentBlocks.forEach((block: any, bIdx: number) => {
+                        const isCollapsed = collapsedBlocks.has(bIdx);
+                        const blockEl = document.createElement('div');
+                        blockEl.className = `dev-pm-block ${isCollapsed ? 'collapsed' : ''}`;
+                        blockEl.dataset.idx = bIdx.toString();
+                        blockEl.innerHTML = `
+                            <div class="dev-pm-block-header">
+                                <button class="block-expander" style="background: none; border: none; cursor: pointer; color: #666; padding: 4px; display: flex; align-items: center; transition: transform 0.2s; ${isCollapsed ? '' : 'transform: rotate(90deg);'}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                </button>
+                                <span style="font-size: 0.7rem; color: #999; cursor: grab;">${ICONS.drag}</span>
+                                <strong style="font-size: 0.85rem; color: #444; cursor: grab;">${block.type}</strong>
+                                <span style="font-size: 0.7rem; color: #aaa; margin-left: auto;">${block.props.caption ? '📝' : ''}</span>
+                                <button class="block-toggle" title="Toggle Type" style="background: none; border: none; cursor: pointer; color: #777; padding: 4px;">${ICONS.type}</button>
+                                <button class="block-delete" title="Delete Block" style="background: none; border: none; cursor: pointer; color: #ef4444; padding: 4px;">${ICONS.trash}</button>
+                            </div>
+                            <div class="dev-pm-photo-list" data-block-idx="${bIdx}">
+                                ${block.photos.map((p: any, pIdx: number) => `
+                                    <div class="dev-pm-photo" data-p-idx="${pIdx}">
+                                        <span style="color: #999;">${ICONS.drag}</span>
+                                        <span style="flex: 1;">${p.itemKey.split('/').pop()}</span>
+                                        <button class="photo-delete" style="background: none; border: none; cursor: pointer; color: #999; padding: 4px;">${ICONS.close}</button>
+                                    </div>
+                                `).join('')}
+                                <button class="photo-add" title="Add Photo" style="background: #f0f0f0; border: none; border-radius: 4px; padding: 0.2rem 0.5rem; cursor: pointer; font-size: 0.75rem; color: #666;">${ICONS.plus}</button>
+                            </div>
+                        `;
+
+                        // Block events
+                        blockEl.querySelector('.block-expander')?.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            if (collapsedBlocks.has(bIdx)) collapsedBlocks.delete(bIdx);
+                            else collapsedBlocks.add(bIdx);
+                            renderTree();
+                        });
+                        blockEl.querySelector('.block-toggle')?.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            block.type = block.type === 'Row' ? 'PhotoCarousel' : 'Row';
+                            renderTree();
+                        });
+                        blockEl.querySelector('.block-delete')?.addEventListener('click', () => {
+                            currentBlocks.splice(bIdx, 1);
+                            renderTree();
+                        });
+                        blockEl.querySelector('.photo-add')?.addEventListener('click', () => {
+                            const key = prompt("Enter photo itemKey (e.g. KCS01234.jpg):");
+                            if (key) {
+                                block.photos.push({ itemKey: key.trim() });
+                                renderTree();
+                            }
+                        });
+                        blockEl.querySelectorAll('.photo-delete').forEach((btn, pIdx) => {
+                            btn.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                block.photos.splice(pIdx, 1);
+                                renderTree();
+                            });
+                        });
+
+                        treeContainer.appendChild(blockEl);
+                    });
+
+                    // Init Sortable for nested photos
+                    treeContainer.querySelectorAll('.dev-pm-photo-list').forEach((el: any) => {
+                        sortableInstances.push(new Tree(el, {
+                            group: 'photos',
+                            animation: 150,
+                            ghostClass: 'dev-pm-ghost',
+                            draggable: '.dev-pm-photo',
+                            onEnd: (evt: any) => {
+                                const fromIdx = parseInt(evt.from.dataset.blockIdx);
+                                const toIdx = parseInt(evt.to.dataset.blockIdx);
+                                const oldPIdx = evt.oldIndex;
+                                const newPIdx = evt.newIndex;
+
+                                const [moved] = currentBlocks[fromIdx].photos.splice(oldPIdx, 1);
+                                currentBlocks[toIdx].photos.splice(newPIdx, 0, moved);
+                                // No re-render needed by Sortable itself, but internal state is updated
+                            }
+                        }));
+                    });
+
+                    // Init Sortable for blocks
+                    sortableInstances.push(new Tree(treeContainer, {
+                        animation: 150,
+                        ghostClass: 'dev-pm-ghost',
+                        draggable: '.dev-pm-block',
+                        handle: '.dev-pm-block-header',
+                        onEnd: (evt: any) => {
+                            const [moved] = currentBlocks.splice(evt.oldIndex, 1);
+                            currentBlocks.splice(evt.newIndex, 0, moved);
+                        }
+                    }));
+                };
+
+                const closeHandler = () => {
+                    dialog.close();
+                    closeBtn.removeEventListener('click', closeHandler);
+                    confirmBtn.removeEventListener('click', confirmHandler);
+                    addBlockBtn.removeEventListener('click', addBlockHandler);
+                };
+
+                const confirmHandler = async () => {
+                    const newFM = [
+                        `title: "${fTitle.value.trim()}"`,
+                        `info: "${fInfo.value.trim()}"`,
+                        `coverKey: "${fCover.value.trim()}"`,
+                        `order: ${parseInt(fOrder.value) || 0}`
+                    ];
+                    if (fZoom.value) newFM.push(`coverZoom: ${parseFloat(fZoom.value)}`);
+                    if (fOX.value || fOY.value) {
+                        newFM.push(`coverOffset: { x: ${parseFloat(fOX.value || '0')}, y: ${parseFloat(fOY.value || '0')} }`);
+                    }
+
+                    confirmBtn.disabled = true;
+                    confirmBtn.textContent = "Saving...";
+                    try {
+                        const res = await fetch("/api/save-page-structure", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                albumSlug,
+                                blocks: currentBlocks,
+                                frontmatter: newFM.join('\n')
+                            }),
+                        });
+                        if (res.ok) {
+                            showToast("✅ Page structure updated!");
+                            setTimeout(() => window.location.reload(), 1000);
+                        } else {
+                            showToast("❌ Save failed");
+                            confirmBtn.disabled = false;
+                            confirmBtn.textContent = "Confirm Changes";
+                        }
+                    } catch {
+                        showToast("❌ Network error");
+                        confirmBtn.disabled = false;
+                        confirmBtn.textContent = "Confirm Changes";
+                    }
+                };
+
+                const addBlockHandler = () => {
+                    currentBlocks.push({ type: 'Row', props: {}, photos: [] });
+                    renderTree();
+                };
+
+                closeBtn.addEventListener('click', closeHandler);
+                confirmBtn.addEventListener('click', confirmHandler);
+                addBlockBtn.addEventListener('click', addBlockHandler);
+
+                renderTree();
+                dialog.showModal();
+            }
+
             // Extract albumSlug from URL (e.g. /yama/2026-shinano-omachi)
             const getAlbumSlug = () => {
                 const pathParts = window.location.pathname.split('/').filter(Boolean);
@@ -721,6 +1156,25 @@
             const init = () => {
                 injectStyles();
                 initToolbars();
+
+                // Add Gear button
+                if (!document.getElementById('dev-gear-btn')) {
+                    const gearBtn = document.createElement('div');
+                    gearBtn.id = 'dev-gear-btn';
+                    gearBtn.className = 'dev-gear-btn';
+                    gearBtn.innerHTML = ICONS.gear;
+                    gearBtn.title = 'Page Manager';
+                    gearBtn.addEventListener('click', openPageManager);
+
+                    // Try to find the scroll buttons container
+                    const scrollContainer = document.querySelector('.fixed.bottom-8.right-8.flex-col');
+                    if (scrollContainer) {
+                        gearBtn.classList.add('in-container');
+                        scrollContainer.appendChild(gearBtn);
+                    } else {
+                        document.body.appendChild(gearBtn);
+                    }
+                }
             };
 
             init();
