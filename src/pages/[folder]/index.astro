@@ -40,7 +40,7 @@ const isDev = import.meta.env.DEV;
 ---
 
 <Layout title={`${folderTitle} - RIVERBED`}>
-    <main class="mx-auto px-2 py-8">
+    <div class="py-8">
         <div class="albums-grid">
             {
                 folderAlbums.map((album) => {
@@ -83,7 +83,7 @@ const isDev = import.meta.env.DEV;
                 })
             }
         </div>
-    </main>
+    </div>
 </Layout>
 
 <script>
