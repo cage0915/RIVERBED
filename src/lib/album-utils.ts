@@ -1,11 +1,16 @@
-import fs from 'node:fs';
-import path from 'node:path';
-import ExifReader from 'exifreader';
+// album-utils.ts
 
-const IMAGES_DIR = path.resolve(process.cwd(), 'public/r2');
-const ALBUMS_DIR = path.resolve(process.cwd(), 'src/content/albums');
+async function getFs() { return await import('node:fs'); }
+async function getPath() { return await import('node:path'); }
 
 export async function processAlbum(folderSlug: string, albumSlug: string) {
+    const fs = await getFs();
+    const path = await getPath();
+    const ExifReader = (await import('exifreader')).default;
+
+    const IMAGES_DIR = path.resolve(process.cwd(), 'r2');
+    const ALBUMS_DIR = path.resolve(process.cwd(), 'src/content/albums');
+
     const folderPath = path.join(IMAGES_DIR, folderSlug, albumSlug);
     const targetDir = path.join(ALBUMS_DIR, folderSlug);
     const outputPath = path.join(targetDir, `${albumSlug}.mdx`);
@@ -86,7 +91,7 @@ coverOffset: { x: 50, y: 50 }
 
 `;
 
-    // Group photos into rows (1 per row by default like script)
+    // Group photos into rows
     const photoComponents = sortedFiles.map((filename) => {
         return `<Photo itemKey="${filename}" />`;
     });
@@ -107,9 +112,6 @@ coverOffset: { x: 50, y: 50 }
 
     fs.writeFileSync(outputPath, mdxContent, 'utf8');
 
-    // Also update order if possible? 
-    // We'll handle order in a separate step via Folder Manager, 
-    // but maybe we should append it to the end of _order.json if it exists.
     const orderFile = path.join(targetDir, '_order.json');
     if (fs.existsSync(orderFile)) {
         try {
@@ -127,7 +129,13 @@ coverOffset: { x: 50, y: 50 }
     return { success: true, path: outputPath };
 }
 
-export function getAvailableFolders(folderSlug: string) {
+export async function getAvailableFolders(folderSlug: string) {
+    const fs = await getFs();
+    const path = await getPath();
+    
+    const IMAGES_DIR = path.resolve(process.cwd(), 'r2');
+    const ALBUMS_DIR = path.resolve(process.cwd(), 'src/content/albums');
+
     const folderPath = path.join(IMAGES_DIR, folderSlug);
     if (!fs.existsSync(folderPath)) return [];
 

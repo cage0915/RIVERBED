@@ -1,6 +1,4 @@
 ---
-import fs from "node:fs";
-import path from "node:path";
 import { getCollection } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 import { getFolderTitle, getImageUrl, R2_DOMAIN } from "../../lib/constants";
@@ -11,16 +9,11 @@ const { folder } = Astro.params;
 const allAlbums = await getCollection("albums");
 let folderAlbums = allAlbums.filter((album) => album.slug.startsWith(`${folder}/`));
 
-// Try to load external order from _order.json
-const orderFilePath = path.resolve(process.cwd(), "src/content/albums", folder!, "_order.json");
-let order: string[] = [];
-if (fs.existsSync(orderFilePath)) {
-    try {
-        order = JSON.parse(fs.readFileSync(orderFilePath, "utf8"));
-    } catch (e) {
-        console.error(`Failed to parse _order.json for ${folder}:`, e);
-    }
-}
+// Load external order using import.meta.glob (works in production/Cloudflare)
+const orderFiles = import.meta.glob("../../content/albums/**/_order.json", { eager: true });
+const targetOrderPath = `../../content/albums/${folder}/_order.json`;
+const orderData = orderFiles[targetOrderPath] as { default: string[] } | undefined;
+const order = orderData ? orderData.default : [];
 
 if (order.length > 0) {
     folderAlbums.sort((a, b) => {

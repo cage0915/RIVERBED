@@ -1,6 +1,4 @@
 import type { APIRoute } from 'astro';
-import fs from 'node:fs';
-import path from 'node:path';
 
 export const POST: APIRoute = async ({ request }) => {
     if (!import.meta.env.DEV) {
@@ -8,6 +6,9 @@ export const POST: APIRoute = async ({ request }) => {
             status: 403, headers: { 'Content-Type': 'application/json' },
         });
     }
+
+    const fs = await import('node:fs');
+    const path = await import('node:path');
 
     let body: { albumSlug: string; blocks: any[] };
     try {

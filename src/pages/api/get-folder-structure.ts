@@ -1,7 +1,4 @@
-import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
-import fs from 'node:fs';
-import path from 'node:path';
 import { getAvailableFolders } from '../../lib/album-utils';
 
 export const GET: APIRoute = async ({ url }) => {
@@ -10,6 +7,9 @@ export const GET: APIRoute = async ({ url }) => {
             status: 403, headers: { 'Content-Type': 'application/json' },
         });
     }
+
+    const fs = await import('node:fs');
+    const path = await import('node:path');
 
     const folder = url.searchParams.get('folder');
     if (!folder) {
@@ -55,7 +55,7 @@ export const GET: APIRoute = async ({ url }) => {
         }));
 
         // 4. Get available folders for new albums
-        const candidates = getAvailableFolders(folder);
+        const candidates = await getAvailableFolders(folder);
 
         return new Response(JSON.stringify({
             albums: sortedAlbums,

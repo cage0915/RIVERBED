@@ -8,8 +8,7 @@
     "preview:r2": "wrangler pages dev dist --r2 --persist-to=.wrangler/state",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro",
-    "new-album": "node scripts/new-album.js"
+    "astro": "astro"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^8.0.0",
