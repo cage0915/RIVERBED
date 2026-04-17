@@ -283,6 +283,47 @@
                         flex-shrink: 0;
                         opacity: 0.85;
                     }
+                    /* Block move mode */
+                    .block-drag-handle {
+                        background: none;
+                        border: none;
+                        cursor: grab;
+                        color: #999;
+                        font-size: 0.7rem;
+                        display: flex;
+                        align-items: center;
+                        padding: 4px;
+                        flex-shrink: 0;
+                        border-radius: 4px;
+                    }
+                    .block-drag-handle:hover { color: #555; }
+                    .block-drag-handle.selected {
+                        cursor: default;
+                        color: #2563eb;
+                        background: #eff6ff;
+                    }
+                    .block-move-arrows {
+                        display: flex;
+                        flex-direction: column;
+                        flex-shrink: 0;
+                        align-self: stretch;
+                    }
+                    .block-insert-btn {
+                        background: none;
+                        border: none;
+                        cursor: pointer;
+                        padding: 0 5px;
+                        flex: 1;
+                        display: flex;
+                        align-items: center;
+                        color: #94a3b8;
+                        border-radius: 3px;
+                        line-height: 1;
+                    }
+                    .block-insert-btn:hover {
+                        background: #eff6ff;
+                        color: #2563eb;
+                    }
                     /* Type badge (R / C) */
                     .block-type-badge {
                         width: 20px;
@@ -339,7 +380,10 @@
                 slideOne: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M10 10l2-2"/></svg>`,
                 star: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`,
                 expandAll: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>`,
-                collapseAll: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 20 5-5 5 5"/><path d="m7 4 5 5 5-5"/></svg>`
+                collapseAll: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 20 5-5 5 5"/><path d="m7 4 5 5 5-5"/></svg>`,
+                rename: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>`,
+                split: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3"/><path d="M16 3h3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-3"/><line x1="12" y1="3" x2="12" y2="21"/></svg>`,
+                arrowRight: `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg>`
             };
 
             async function fetchMountains() {
@@ -551,7 +595,8 @@
                         <div style="padding: 1rem 1.5rem; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; background: #fafafa;">
                             <h3 style="margin: 0; font-size: 1rem; color: #333;">Page Manager</h3>
                             <div style="display:flex; align-items:center; gap:0.25rem;">
-                                <button id="dev-pm-expand-all" title="Expand All" style="background: none; border: none; cursor: pointer; color: #999; padding: 4px; display:flex; align-items:center;">${ICONS.expandAll}</button>
+                                <button id="dev-pm-expand-all" title="Expand / Collapse All" style="background: none; border: none; cursor: pointer; color: #999; padding: 4px; display:flex; align-items:center;">${ICONS.expandAll}</button>
+                                <button id="dev-pm-rename" title="Rename photos by current order" style="background: none; border: none; cursor: pointer; color: #999; padding: 4px; display:flex; align-items:center;">${ICONS.rename}</button>
                                 <button id="dev-pm-close" style="background: none; border: none; cursor: pointer; color: #999; padding: 4px; display:flex; align-items:center;">${ICONS.close}</button>
                             </div>
                         </div>
@@ -643,6 +688,48 @@
                 const confirmBtn = dialog.querySelector("#dev-pm-confirm") as HTMLButtonElement;
                 const addBlockBtn = dialog.querySelector("#dev-pm-add-block") as HTMLButtonElement;
                 const expandAllBtn = dialog.querySelector("#dev-pm-expand-all") as HTMLButtonElement;
+                const renameBtn = dialog.querySelector("#dev-pm-rename") as HTMLButtonElement;
+
+                renameBtn.addEventListener('click', async () => {
+                    const orderedKeys = currentBlocks.flatMap((b: any) => b.photos.map((p: any) => p.itemKey));
+                    if (orderedKeys.length === 0) return showToast('⚠️ No photos to rename');
+                    const preview = orderedKeys.slice(0, 3).map((k: string, i: number) => {
+                        const ext = k.split('.').pop()?.toLowerCase() || 'jpg';
+                        const base = k.includes('/') ? k.split('/').pop()! : k;
+                        return `${base} → ${String(i + 1).padStart(3, '0')}.${ext}`;
+                    }).join('\n');
+                    const more = orderedKeys.length > 3 ? `\n...and ${orderedKeys.length - 3} more` : '';
+                    if (!confirm(`Rename ${orderedKeys.length} photos by current order?\n\n${preview}${more}\n\nThis cannot be undone.`)) return;
+                    renameBtn.style.opacity = '0.4';
+                    renameBtn.style.pointerEvents = 'none';
+                    try {
+                        const res = await fetch('/api/rename-photos', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ albumSlug, orderedKeys }),
+                        });
+                        const json = await res.json();
+                        if (!res.ok) throw new Error(json.error || 'Unknown error');
+                        // Update currentBlocks with new keys
+                        const renamed: Record<string, string> = json.renamed;
+                        currentBlocks.forEach((b: any) => {
+                            b.photos.forEach((p: any) => {
+                                const base = p.itemKey.includes('/') ? p.itemKey.split('/').pop()! : p.itemKey;
+                                if (renamed[base]) p.itemKey = renamed[base];
+                            });
+                        });
+                        // Update cover field if it was renamed
+                        const coverBase = fCover.value.includes('/') ? fCover.value.split('/').pop()! : fCover.value;
+                        if (renamed[coverBase]) fCover.value = renamed[coverBase];
+                        showToast(`✅ Renamed ${Object.keys(renamed).length} photos`);
+                        renderTree();
+                    } catch (err: any) {
+                        showToast(`❌ Rename failed: ${err.message}`);
+                    } finally {
+                        renameBtn.style.opacity = '';
+                        renameBtn.style.pointerEvents = '';
+                    }
+                });
 
                 // FM Form elements
                 const fTitle = dialog.querySelector("#dev-pm-title") as HTMLInputElement;
@@ -724,9 +811,10 @@
                     }
                     return b;
                 });
-                let collapsedBlocks = new Set(); // Track collapsed block indices
+                let collapsedBlocks = new Set(currentBlocks.map((_: any, i: number) => i)); // All collapsed by default
                 let captionOpenBlocks = new Set(); // Track open caption editors
                 let selectedPhoto: {bIdx: number, pIdx: number} | null = null;
+                let selectedBlock: number | null = null;
 
                 const handlePhotoClick = (bIdx: number, pIdx: number, insertAfter = false) => {
                     if (!selectedPhoto) {
@@ -767,7 +855,15 @@
                                 <button class="block-expander" style="background: none; border: none; cursor: pointer; color: #666; padding: 4px; display: flex; align-items: center; transition: transform 0.2s; ${isCollapsed ? '' : 'transform: rotate(90deg);'}">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
                                 </button>
-                                <span style="font-size: 0.7rem; color: #999; cursor: grab; display:flex; align-items:center;">${ICONS.drag}</span>
+                                ${selectedBlock === bIdx
+                                    ? `<button class="block-drag-handle selected" title="Cancel move">${ICONS.drag}</button>`
+                                    : selectedBlock !== null
+                                        ? `<div class="block-move-arrows">
+                                            <button class="block-insert-btn block-insert-above" title="Insert above">${ICONS.arrowRight}</button>
+                                            <button class="block-insert-btn block-insert-below" title="Insert below">${ICONS.arrowRight}</button>
+                                           </div>`
+                                        : `<button class="block-drag-handle" title="Click to move / drag">${ICONS.drag}</button>`
+                                }
                                 <button class="block-toggle block-type-badge" title="Toggle Type (${block.type})">${block.type === 'PhotoCarousel' ? 'C' : 'R'}</button>
                                 ${isCollapsed && isLocalhost && block.photos.length > 0 ? `
                                 <div class="dev-pm-thumb-strip">
@@ -779,7 +875,7 @@
                                     }).join('')}
                                 </div>` : '<div style="flex:1;"></div>'}
                                 <div style="display:flex; align-items:center; gap:0.25rem; flex-shrink:0;">
-                                    <button class="block-caption-toggle ${block.props.caption ? 'has-data' : ''}" title="Edit Caption" style="background: none; border: none; cursor: pointer; color: ${captionOpenBlocks.has(bIdx) ? '#2563eb' : '#777'}; padding: 4px;">${ICONS.quote}</button>
+                                    <button class="block-caption-toggle ${block.props.caption ? 'has-data' : ''}" title="Edit Caption" style="background: none; border: none; cursor: pointer; color: ${captionOpenBlocks.has(bIdx) ? '#2563eb' : block.props.caption ? '#22c55e' : '#777'}; padding: 4px;">${ICONS.quote}</button>
                                     <button class="block-delete" title="Delete Block" style="background: none; border: none; cursor: pointer; color: #ef4444; padding: 4px;">${ICONS.trash}</button>
                                 </div>
                             </div>
@@ -859,6 +955,10 @@
                                                                 ${ICONS.slideOne} Set as Initial Slide
                                                             </div>
                                                             ` : ''}
+                                                            ${block.photos.length > 1 ? `
+                                                            <div class="dev-pm-photo-menu-item split-btn">
+                                                                ${ICONS.split} Extract to own block
+                                                            </div>` : ''}
                                                             <div class="dev-pm-photo-menu-item delete-btn delete">
                                                                 ${ICONS.trash} Delete Photo
                                                             </div>
@@ -891,7 +991,10 @@
                         captionToggle?.addEventListener('click', (e) => {
                             e.stopPropagation();
                             if (captionOpenBlocks.has(bIdx)) captionOpenBlocks.delete(bIdx);
-                            else captionOpenBlocks.add(bIdx);
+                            else {
+                                captionOpenBlocks.add(bIdx);
+                                collapsedBlocks.delete(bIdx); // auto-expand if collapsed
+                            }
                             renderTree();
                         });
 
@@ -977,10 +1080,41 @@
                             renderTree();
                         });
 
+                        blockEl.querySelector('.block-drag-handle')?.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            selectedBlock = selectedBlock === bIdx ? null : bIdx;
+                            renderTree();
+                        });
+
+                        blockEl.querySelector('.block-insert-above')?.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            const from = selectedBlock!;
+                            selectedBlock = null;
+                            const [moved] = currentBlocks.splice(from, 1);
+                            let target = bIdx;
+                            if (from < bIdx) target--;
+                            currentBlocks.splice(target, 0, moved);
+                            renderTree();
+                        });
+
+                        blockEl.querySelector('.block-insert-below')?.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            const from = selectedBlock!;
+                            selectedBlock = null;
+                            const [moved] = currentBlocks.splice(from, 1);
+                            let target = bIdx + 1;
+                            if (from < bIdx) target--;
+                            currentBlocks.splice(target, 0, moved);
+                            renderTree();
+                        });
+
                         blockEl.querySelector('.block-expander')?.addEventListener('click', (e) => {
                             e.stopPropagation();
                             if (collapsedBlocks.has(bIdx)) collapsedBlocks.delete(bIdx);
-                            else collapsedBlocks.add(bIdx);
+                            else {
+                                collapsedBlocks.add(bIdx);
+                                captionOpenBlocks.delete(bIdx);
+                            }
                             renderTree();
                         });
 
@@ -1052,6 +1186,18 @@
                             photoEl.querySelector('.initial-slide-btn')?.addEventListener('click', (e) => {
                                 e.stopPropagation();
                                 block.props.initialSlide = pIdx;
+                                renderTree();
+                            });
+
+                            photoEl.querySelector('.split-btn')?.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                const [extracted] = block.photos.splice(pIdx, 1);
+                                if (block.photos.length === 0) {
+                                    // Replace the now-empty block
+                                    currentBlocks.splice(bIdx, 1, { type: 'Row', props: {}, photos: [extracted] });
+                                } else {
+                                    currentBlocks.splice(bIdx + 1, 0, { type: 'Row', props: {}, photos: [extracted] });
+                                }
                                 renderTree();
                             });
 
@@ -1141,9 +1287,9 @@
                     }
                 };
                 document.addEventListener('keydown', (e: KeyboardEvent) => {
-                    if (e.key === 'Escape' && selectedPhoto) {
-                        selectedPhoto = null;
-                        renderTree();
+                    if (e.key === 'Escape') {
+                        if (selectedPhoto) { selectedPhoto = null; renderTree(); }
+                        else if (selectedBlock !== null) { selectedBlock = null; renderTree(); }
                     }
                 });
                 document.addEventListener('click', globalClickHandler);
