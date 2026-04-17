@@ -41,6 +41,7 @@ export const POST: APIRoute = async ({ request }) => {
         }
         if (props.captionMargin) propsStr += `\n  captionMargin="${props.captionMargin}"`;
         if (props.blockMargin) propsStr += `\n  blockMargin="${props.blockMargin}"`;
+        if (type === 'PhotoCarousel' && props.initialSlide) propsStr += `\n  initialSlide={${props.initialSlide}}`;
         // mt/mb are legacy and will be migrated to the above if they exist in state but the above don't
         if (!props.captionMargin && props.caption && props.mt) propsStr += `\n  captionMargin="${props.mt}"`;
         if (!props.blockMargin && !props.captionMargin && props.mb) propsStr += `\n  blockMargin="${props.mb}"`;

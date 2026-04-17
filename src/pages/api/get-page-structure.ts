@@ -45,7 +45,7 @@ export const GET: APIRoute = async ({ request }) => {
         const props: any = {};
         const captionMatch = propsStr.match(/caption="([^"]*)"/);
         if (captionMatch) props.caption = captionMatch[1];
-        
+
         const posMatch = propsStr.match(/captionPosition="([^"]*)"/);
         if (posMatch) props.captionPosition = posMatch[1];
 
@@ -63,6 +63,9 @@ export const GET: APIRoute = async ({ request }) => {
 
         const captionMarginMatch = propsStr.match(/captionMargin="([^"]*)"/);
         if (captionMarginMatch) props.captionMargin = captionMarginMatch[1];
+
+        const initialSlideMatch = propsStr.match(/initialSlide=\{(\d+)\}/);
+        if (initialSlideMatch) props.initialSlide = parseInt(initialSlideMatch[1]);
 
         // Parse Photos inside Block
         const photoRegex = /<Photo\s+([^>]*?)\/>/g;
