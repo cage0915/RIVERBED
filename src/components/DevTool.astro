@@ -789,13 +789,31 @@
                             renderTree();
                         });
 
+                        let isComposing = false;
+                        capInput?.addEventListener('compositionstart', () => { isComposing = true; });
+                        capInput?.addEventListener('compositionend', () => {
+                            isComposing = false;
+                            // Trigger re-render now that IME composition is committed
+                            const oldVal = block.props.caption;
+                            block.props.caption = capInput.value.trim();
+                            if (!oldVal || !block.props.caption) {
+                                renderTree();
+                                const newInput = treeContainer.querySelector(`[data-idx="${bIdx}"] .block-caption`) as HTMLInputElement;
+                                newInput?.focus();
+                            }
+                        });
                         capInput?.addEventListener('input', () => {
+                            // Skip re-render while IME composition is in progress
+                            if (isComposing) return;
+
                             const oldVal = block.props.caption;
                             block.props.caption = capInput.value.trim();
 
                             // If first character or cleared, re-render to create/remove the preview element
                             if (!oldVal || !block.props.caption) {
                                 renderTree();
+                                const newInput = treeContainer.querySelector(`[data-idx="${bIdx}"] .block-caption`) as HTMLInputElement;
+                                newInput?.focus();
                                 return;
                             }
 
