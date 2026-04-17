@@ -190,6 +190,71 @@
                         opacity: 0.4;
                         background: #3b82f6 !important;
                     }
+                    .dev-pm-photo-menu-btn {
+                        background: none;
+                        border: none;
+                        cursor: pointer;
+                        color: #999;
+                        padding: 4px;
+                        display: flex;
+                        align-items: center;
+                        position: relative;
+                        border-radius: 4px;
+                    }
+                    .dev-pm-photo-menu-btn:hover {
+                        background: rgba(0,0,0,0.05);
+                        color: #666;
+                    }
+                    .dev-pm-photo-menu {
+                        position: absolute;
+                        right: 0;
+                        top: 100%;
+                        background: white;
+                        border: 1px solid #e2e8f0;
+                        border-radius: 8px;
+                        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+                        z-index: 100;
+                        display: none;
+                        min-width: 140px;
+                        padding: 0.4rem;
+                    }
+                    .dev-pm-photo-menu.active {
+                        display: block;
+                    }
+                    .dev-pm-photo-menu-item {
+                        padding: 0.5rem 0.75rem;
+                        display: flex;
+                        align-items: center;
+                        gap: 0.6rem;
+                        font-size: 0.8rem;
+                        color: #475569;
+                        cursor: pointer;
+                        border-radius: 6px;
+                        white-space: nowrap;
+                    }
+                    .dev-pm-photo-menu-item:hover {
+                        background: #f1f5f9;
+                        color: #1e293b;
+                    }
+                    .dev-pm-photo-menu-item.delete:hover {
+                        background: #fef2f2;
+                        color: #ef4444;
+                    }
+                    .dev-star-golden {
+                        color: #f59e0b;
+                    }
+                    .dev-star-golden svg {
+                        fill: #f59e0b;
+                    }
+                    /* Remove number input spin buttons */
+                    input::-webkit-outer-spin-button,
+                    input::-webkit-inner-spin-button {
+                        -webkit-appearance: none;
+                        margin: 0;
+                    }
+                    input[type=number] {
+                        -moz-appearance: textfield;
+                    }
                 `;
                 document.head.appendChild(style);
             };
@@ -209,7 +274,9 @@
                 drag: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 9 2 12 5 15"></polyline><polyline points="9 5 12 2 15 5"></polyline><polyline points="15 19 12 22 9 19"></polyline><polyline points="19 9 22 12 19 15"></polyline><line x1="2" y1="12" x2="22" y2="12"></line><line x1="12" y1="2" x2="12" y2="22"></line></svg>`,
                 type: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 4 20 8 16 12"></polyline><line x1="4" y1="8" x2="20" y2="8"></line><polyline points="8 20 4 16 8 12"></polyline><line x1="4" y1="16" x2="20" y2="16"></line></svg>`,
                 vmargin: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 8 12 3 17 8"></polyline><polyline points="7 16 12 21 17 16"></polyline><line x1="12" y1="3" x2="12" y2="21"></line></svg>`,
-                minus: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>`
+                minus: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>`,
+                dots: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.5"></circle><circle cx="19" cy="12" r="1.5"></circle><circle cx="5" cy="12" r="1.5"></circle></svg>`,
+                star: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`
             };
 
             async function fetchMountains() {
@@ -434,39 +501,38 @@
                                     </h4>
                                 </div>
                                 <div class="dev-pm-fm-content">
-                                    <label style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.75rem; color: #64748b;">
-                                        Title
-                                        <input type="text" id="dev-pm-title" style="width: 100%; box-sizing: border-box; padding: 0.4rem 0.6rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;" />
-                                    </label>
-                                    <label style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.75rem; color: #64748b;">
-                                        Info
-                                        <input type="text" id="dev-pm-info" style="width: 100%; box-sizing: border-box; padding: 0.4rem 0.6rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;" />
-                                    </label>
                                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
                                         <label style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.75rem; color: #64748b;">
-                                            Cover Image Key
-                                            <input type="text" id="dev-pm-cover" style="width: 100%; box-sizing: border-box; padding: 0.4rem 0.6rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;" />
+                                            Title
+                                            <input type="text" id="dev-pm-title" style="width: 100%; box-sizing: border-box; padding: 0.4rem 0.6rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;" />
                                         </label>
-                                    <!-- Order field removed as it is now managed by Folder Manager -->
                                         <label style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.75rem; color: #64748b;">
-                                            Cover Zoom
-                                            <input type="number" step="0.1" id="dev-pm-zoom" style="width: 100%; box-sizing: border-box; padding: 0.4rem 0.6rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;" />
-                                        </label>
-                                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
-                                            <label style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.75rem; color: #64748b;">
-                                                Offset X
-                                                <input type="number" step="0.1" id="dev-pm-ox" style="width: 100%; box-sizing: border-box; padding: 0.4rem 0.6rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;" />
-                                            </label>
-                                            <label style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.75rem; color: #64748b;">
-                                                Offset Y
-                                                <input type="number" step="0.1" id="dev-pm-oy" style="width: 100%; box-sizing: border-box; padding: 0.4rem 0.6rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;" />
-                                            </label>
-                                        </div>
-                                        <label style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.75rem; color: #64748b;">
-                                            Block Gap
-                                            <input type="text" id="dev-pm-gap" placeholder="e.g. 2rem" style="width: 100%; box-sizing: border-box; padding: 0.4rem 0.6rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;" />
+                                            Info
+                                            <input type="text" id="dev-pm-info" style="width: 100%; box-sizing: border-box; padding: 0.4rem 0.6rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;" />
                                         </label>
                                     </div>
+                                    <div style="display: grid; grid-template-columns: 3fr 1fr 1fr 1fr; gap: 0.75rem;">
+                                        <label style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.75rem; color: #64748b;">
+                                            Cover Image
+                                            <input type="text" id="dev-pm-cover" style="width: 100%; box-sizing: border-box; padding: 0.4rem 0.6rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;" />
+                                        </label>
+                                        <label style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.75rem; color: #64748b;">
+                                            Zoom
+                                            <input type="number" step="0.1" id="dev-pm-zoom" style="width: 100%; box-sizing: border-box; padding: 0.4rem 0.6rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;" />
+                                        </label>
+                                        <label style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.75rem; color: #64748b;">
+                                            Offset X
+                                            <input type="number" step="0.1" id="dev-pm-ox" style="width: 100%; box-sizing: border-box; padding: 0.4rem 0.6rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;" />
+                                        </label>
+                                        <label style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.75rem; color: #64748b;">
+                                            Offset Y
+                                            <input type="number" step="0.1" id="dev-pm-oy" style="width: 100%; box-sizing: border-box; padding: 0.4rem 0.6rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;" />
+                                        </label>
+                                    </div>
+                                    <label style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.75rem; color: #64748b;">
+                                        Block Gap
+                                        <input type="text" id="dev-pm-gap" placeholder="0.5rem" style="width: 100%; box-sizing: border-box; padding: 0.4rem 0.6rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;" />
+                                    </label>
                                 </div>
                             </div>
 
@@ -537,9 +603,9 @@
                         info: get('info') || '',
                         coverKey: get('coverKey') || '',
                         order: get('order') || '',
-                        coverZoom: get('coverZoom') || '',
-                        ox: offset.x || '',
-                        oy: offset.y || ''
+                        coverZoom: get('coverZoom') || '1',
+                        ox: offset.x || '50',
+                        oy: offset.y || '50'
                     };
                 };
 
@@ -550,7 +616,7 @@
                 fZoom.value = fmData.coverZoom;
                 fOX.value = fmData.ox;
                 fOY.value = fmData.oy;
-                
+
                 const fGap = dialog.querySelector("#dev-pm-gap") as HTMLInputElement;
                 const getGapFromFM = (fm: string) => (fm.match(/^gap:\s*(.*)$/m) || [])[1]?.trim().replace(/^"(.*)"$/, '$1').replace(/^'(.*)'$/, '$1');
                 fGap.value = getGapFromFM(data.frontmatter) || '';
@@ -611,7 +677,7 @@
                                 </button>
                                 <span style="font-size: 0.7rem; color: #999; cursor: grab;">${ICONS.drag}</span>
                                 <strong style="font-size: 0.85rem; color: #444; cursor: grab;">${block.type}</strong>
-                                
+
                                 <div style="display:flex; align-items:center; gap:0.25rem; margin-left: auto;">
                                     <button class="block-caption-toggle ${block.props.caption ? 'has-data' : ''}" title="Edit Caption" style="background: none; border: none; cursor: pointer; color: ${captionOpenBlocks.has(bIdx) ? '#2563eb' : '#777'}; padding: 4px;">${ICONS.quote}</button>
                                     <button class="block-toggle" title="Toggle Type" style="background: none; border: none; cursor: pointer; color: #777; padding: 4px;">${ICONS.type}</button>
@@ -622,7 +688,7 @@
                                 ${(() => {
                                     const isTop = block.props.captionPosition?.includes('top');
                                     const isBottom = !block.props.captionPosition || block.props.captionPosition.includes('bottom');
-                                    
+
                                     const renderPreview = () => {
                                         if (!block.props.caption) return '';
                                         const val = block.props.captionMargin || '';
@@ -645,7 +711,7 @@
                                                 <input class="block-caption" type="text" placeholder="Add caption..." value="${block.props.caption || ''}" style="flex: 1; box-sizing:border-box; padding:6px; border:1px solid #ddd; border-radius:4px; font-size:0.85rem;" />
                                                 <button class="caption-delete" title="Delete Caption" style="background: none; border: none; cursor: pointer; color: #ef4444; opacity: 0.6; display: flex; align-items: center;">${ICONS.trash}</button>
                                             </div>
-                                            
+
                                             <div style="display: flex; gap: 0.5rem; align-items: center;">
                                                 <div style="display: flex; gap: 0.25rem; flex: 1;">
                                                     <select class="block-align" style="flex: 1; font-size:0.75rem; padding:4px; border:1px solid #ddd; border-radius:4px; background: white;">
@@ -658,7 +724,7 @@
                                                         <option value="bottom" ${vpos === 'bottom' ? 'selected' : ''}>Bottom</option>
                                                     </select>
                                                 </div>
-                                                
+
                                                 <div style="display: flex; gap: 0.25rem; align-items: center; border-left: 1px solid #eee; padding-left: 0.5rem;">
                                                     <span style="color: #999; display: flex; align-items: center; opacity: 0.6;">${ICONS.vmargin}</span>
                                                     <input class="block-margin-caption" type="text" placeholder="2rem" title="Caption Margin" value="${block.props.captionMargin || ''}" style="width: 45px; box-sizing:border-box; padding:4px; border:1px solid #ddd; border-radius:4px; font-size:0.75rem; text-align: center;" />
@@ -672,7 +738,7 @@
 
                                     const captionAreaTop = isTop ? renderCaptionArea('top') : '';
                                     const captionAreaBottom = isBottom ? renderCaptionArea('bottom') : '';
-                                    
+
                                     return `
                                         ${captionAreaTop}
                                         <div class="dev-pm-photo-list" data-block-idx="${bIdx}">
@@ -680,13 +746,24 @@
                                                 <div class="dev-pm-photo" data-p-idx="${pIdx}">
                                                     <span style="color: #999;">${ICONS.drag}</span>
                                                     <span style="flex: 1;">${p.itemKey.split('/').pop()}</span>
-                                                    <button class="photo-delete" style="background: none; border: none; cursor: pointer; color: #999; padding: 4px;">${ICONS.close}</button>
+                                                    ${p.itemKey === fCover.value.trim() ? `<span class="dev-star-golden" style="display: flex; align-items: center; margin-right: 4px;" title="Cover Photo">${ICONS.star}</span>` : ''}
+                                                    <div style="position: relative;">
+                                                        <button class="photo-menu-trigger dev-pm-photo-menu-btn" title="Options">${ICONS.dots}</button>
+                                                        <div class="dev-pm-photo-menu">
+                                                            <div class="dev-pm-photo-menu-item star-btn">
+                                                                ${ICONS.star} Set as Cover
+                                                            </div>
+                                                            <div class="dev-pm-photo-menu-item delete-btn delete">
+                                                                ${ICONS.trash} Delete Photo
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             `).join('')}
                                             <button class="photo-add" title="Add Photo" style="background: #f0f0f0; border: none; border-radius: 4px; padding: 0.2rem 0.5rem; cursor: pointer; font-size: 0.75rem; color: #666;">${ICONS.plus}</button>
                                         </div>
                                         ${captionAreaBottom}
-                                        
+
                                         <div style="display: flex; align-items: center; gap: 0.4rem; justify-content: center; padding-top: 0.5rem; border-top: 1px dashed #eee; margin-top: 0.5rem;">
                                             <span style="color: #999; display: flex; align-items: center; opacity: 0.6;" title="Block Spacing">${ICONS.vmargin}</span>
                                             <input class="block-margin-block" type="text" placeholder="${block.type === 'PhotoCarousel' ? '2rem' : (fGap.value || '0.5rem')}" title="Block Margin" value="${block.props.blockMargin || ''}" style="width:45px; padding:2px 4px; border:1px solid #ddd; border-radius:3px; font-size:0.7rem; text-align:center;" />
@@ -715,7 +792,7 @@
                         capInput?.addEventListener('input', () => {
                             const oldVal = block.props.caption;
                             block.props.caption = capInput.value.trim();
-                            
+
                             // If first character or cleared, re-render to create/remove the preview element
                             if (!oldVal || !block.props.caption) {
                                 renderTree();
@@ -782,8 +859,10 @@
                             renderTree();
                         });
                         blockEl.querySelector('.block-delete')?.addEventListener('click', () => {
-                            currentBlocks.splice(bIdx, 1);
-                            renderTree();
+                            if (confirm("Delete this block?")) {
+                                currentBlocks.splice(bIdx, 1);
+                                renderTree();
+                            }
                         });
                         blockEl.querySelector('.photo-add')?.addEventListener('click', () => {
                             const key = prompt("Enter photo itemKey (e.g. KCS01234.jpg):");
@@ -792,11 +871,35 @@
                                 renderTree();
                             }
                         });
-                        blockEl.querySelectorAll('.photo-delete').forEach((btn, pIdx) => {
-                            btn.addEventListener('click', (e) => {
+                        blockEl.querySelectorAll('.dev-pm-photo').forEach((photoEl, pIdx) => {
+                            const pMenuTrigger = photoEl.querySelector('.photo-menu-trigger');
+                            const pMenu = photoEl.querySelector('.dev-pm-photo-menu');
+                            const photo = block.photos[pIdx];
+
+                            pMenuTrigger?.addEventListener('click', (e) => {
                                 e.stopPropagation();
-                                block.photos.splice(pIdx, 1);
+                                // Close other menus
+                                document.querySelectorAll('.dev-pm-photo-menu.active').forEach(m => {
+                                    if (m !== pMenu) m.classList.remove('active');
+                                });
+                                pMenu?.classList.toggle('active');
+                            });
+
+                            photoEl.querySelector('.star-btn')?.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                fCover.value = photo.itemKey;
                                 renderTree();
+                            });
+
+                            photoEl.querySelector('.delete-btn')?.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                if (confirm(`Delete photo: ${photo.itemKey}?`)) {
+                                    block.photos.splice(pIdx, 1);
+                                    if (block.photos.length === 0) {
+                                        currentBlocks.splice(bIdx, 1);
+                                    }
+                                    renderTree();
+                                }
                             });
                         });
 
@@ -813,11 +916,15 @@
                             onEnd: (evt) => {
                                 const fromIdx = parseInt(evt.from.dataset.blockIdx);
                                 const toIdx = parseInt(evt.to.dataset.blockIdx);
-                                const oldPIdx = evt.oldIndex;
-                                const newPIdx = evt.newIndex;
-                                
-                                const [moved] = currentBlocks[fromIdx].photos.splice(oldPIdx, 1);
-                                currentBlocks[toIdx].photos.splice(newPIdx, 0, moved);
+                                if (fromIdx === toIdx && evt.oldIndex === evt.newIndex) return;
+
+                                const [moved] = currentBlocks[fromIdx].photos.splice(evt.oldIndex, 1);
+                                currentBlocks[toIdx].photos.splice(evt.newIndex, 0, moved);
+
+                                if (currentBlocks[fromIdx].photos.length === 0) {
+                                    currentBlocks.splice(fromIdx, 1);
+                                }
+                                renderTree();
                             }
                         });
                         sortableInstances.push(s);
@@ -837,8 +944,16 @@
                     sortableInstances.push(sBlocks);
                 };
 
+                const globalClickHandler = (e: MouseEvent) => {
+                    if (!(e.target as HTMLElement).closest('.dev-pm-photo-menu-btn')) {
+                        document.querySelectorAll('.dev-pm-photo-menu.active').forEach(m => m.classList.remove('active'));
+                    }
+                };
+                document.addEventListener('click', globalClickHandler);
+
                 const closeHandler = () => {
                     dialog.close();
+                    document.removeEventListener('click', globalClickHandler);
                     closeBtn.removeEventListener('click', closeHandler);
                     confirmBtn.removeEventListener('click', confirmHandler);
                     addBlockBtn.removeEventListener('click', addBlockHandler);
@@ -853,7 +968,7 @@
                     if (fGap.value.trim()) newFM.push(`gap: "${fGap.value.trim()}"`);
                     if (fZoom.value) newFM.push(`coverZoom: ${parseFloat(fZoom.value)}`);
                     if (fOX.value || fOY.value) {
-                        newFM.push(`coverOffset: { x: ${parseFloat(fOX.value || '0')}, y: ${parseFloat(fOY.value || '0')} }`);
+                        newFM.push(`coverOffset: { x: ${parseFloat(fOX.value || '50')}, y: ${parseFloat(fOY.value || '50')} }`);
                     }
 
                     confirmBtn.disabled = true;
@@ -911,7 +1026,7 @@
                         </div>
                         <div id="dev-fm-content" style="flex: 1; overflow-y: auto; padding: 1.5rem;">
                             <div id="dev-fm-tree" class="dev-pm-tree"></div>
-                            
+
                             <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px dashed #eee;">
                                 <h4 style="margin: 0 0 1rem; font-size: 0.85rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">Available Folders</h4>
                                 <div id="dev-fm-candidates" style="display: flex; flex-direction: column; gap: 0.5rem;"></div>
@@ -1218,8 +1333,8 @@
             const enforceDevInteractionModes = (e: MouseEvent | PointerEvent) => {
                 const target = e.target as HTMLElement;
 
-                // Allow our specific Dev UI buttons and existing tags to function normally
-                if (target.closest('.dev-block-toolbar') || target.closest('.dev-tag-edit-btn') || target.closest('.tag-link')) {
+                // Allow our specific Dev UI buttons, tags, AND all interactions within dialogs
+                if (target.closest('.dev-block-toolbar') || target.closest('.dev-tag-edit-btn') || target.closest('.tag-link') || target.closest('dialog')) {
                     return;
                 }
 
@@ -1269,7 +1384,7 @@
                     gearBtn.id = 'dev-gear-btn';
                     gearBtn.className = 'dev-gear-btn';
                     gearBtn.innerHTML = ICONS.gear;
-                    
+
                     if (isFolderPage()) {
                         gearBtn.title = 'Folder Manager';
                         gearBtn.addEventListener('click', openFolderManager);
