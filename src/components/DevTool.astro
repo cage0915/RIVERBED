@@ -791,6 +791,14 @@
 
                         let isComposing = false;
                         capInput?.addEventListener('compositionstart', () => { isComposing = true; });
+                        const refocusCaptionInput = () => {
+                            const newInput = treeContainer.querySelector(`[data-idx="${bIdx}"] .block-caption`) as HTMLInputElement;
+                            if (newInput) {
+                                newInput.focus();
+                                const len = newInput.value.length;
+                                newInput.setSelectionRange(len, len);
+                            }
+                        };
                         capInput?.addEventListener('compositionend', () => {
                             isComposing = false;
                             // Trigger re-render now that IME composition is committed
@@ -798,8 +806,7 @@
                             block.props.caption = capInput.value.trim();
                             if (!oldVal || !block.props.caption) {
                                 renderTree();
-                                const newInput = treeContainer.querySelector(`[data-idx="${bIdx}"] .block-caption`) as HTMLInputElement;
-                                newInput?.focus();
+                                refocusCaptionInput();
                             }
                         });
                         capInput?.addEventListener('input', () => {
@@ -812,8 +819,7 @@
                             // If first character or cleared, re-render to create/remove the preview element
                             if (!oldVal || !block.props.caption) {
                                 renderTree();
-                                const newInput = treeContainer.querySelector(`[data-idx="${bIdx}"] .block-caption`) as HTMLInputElement;
-                                newInput?.focus();
+                                refocusCaptionInput();
                                 return;
                             }
 
