@@ -7,6 +7,7 @@
     if (import.meta.env.DEV) {
         (async () => {
             let mountainCache: { name: string; elevation: number | null; description: string }[] = [];
+            const isLocalhost = ['localhost', '127.0.0.1'].includes(location.hostname);
 
             // Ensure we have CSS for the toolbar and interaction states
             const injectStyles = () => {
@@ -240,11 +241,70 @@
                         background: #fef2f2;
                         color: #ef4444;
                     }
+                    /* Photo move-select mode */
+                    .pm-photo-selected {
+                        outline: 2px solid #2563eb !important;
+                        outline-offset: -2px;
+                        background: #eff6ff !important;
+                    }
+                    .pm-photo-selected img {
+                        outline: 2px solid #2563eb;
+                        outline-offset: 1px;
+                    }
+                    .pm-move-target {
+                        cursor: copy !important;
+                    }
+                    .pm-move-target:hover {
+                        outline: 2px dashed #93c5fd !important;
+                        outline-offset: -2px;
+                    }
                     .dev-star-golden {
                         color: #f59e0b;
                     }
                     .dev-star-golden svg {
                         fill: #f59e0b;
+                    }
+                    /* Collapsed thumbnail strip */
+                    .dev-pm-thumb-strip {
+                        display: flex;
+                        gap: 3px;
+                        overflow-x: auto;
+                        padding: 2px 0;
+                        scrollbar-width: none;
+                        flex: 1;
+                        min-width: 0;
+                    }
+                    .dev-pm-thumb-strip::-webkit-scrollbar { display: none; }
+                    .dev-pm-thumb-strip img {
+                        width: 40px;
+                        height: 30px;
+                        object-fit: cover;
+                        border-radius: 3px;
+                        flex-shrink: 0;
+                        opacity: 0.85;
+                    }
+                    /* Type badge (R / C) */
+                    .block-type-badge {
+                        width: 20px;
+                        height: 20px;
+                        border-radius: 50%;
+                        border: 1.5px solid #aaa;
+                        background: none;
+                        font-size: 0.65rem;
+                        font-weight: 700;
+                        color: #666;
+                        cursor: pointer;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        flex-shrink: 0;
+                        transition: border-color 0.15s, color 0.15s;
+                        padding: 0;
+                        line-height: 1;
+                    }
+                    .block-type-badge:hover {
+                        border-color: #2563eb;
+                        color: #2563eb;
                     }
                     /* Remove number input spin buttons */
                     input::-webkit-outer-spin-button,
@@ -277,7 +337,9 @@
                 minus: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>`,
                 dots: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.5"></circle><circle cx="19" cy="12" r="1.5"></circle><circle cx="5" cy="12" r="1.5"></circle></svg>`,
                 slideOne: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M10 10l2-2"/></svg>`,
-                star: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`
+                star: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`,
+                expandAll: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>`,
+                collapseAll: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 20 5-5 5 5"/><path d="m7 4 5 5 5-5"/></svg>`
             };
 
             async function fetchMountains() {
@@ -488,7 +550,10 @@
                     <div style="display: flex; flex-direction: column; height: 80vh; max-height: 800px; width: 600px; max-width: 90vw; background: white; border-radius: 12px; overflow: hidden; font-family: sans-serif;">
                         <div style="padding: 1rem 1.5rem; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; background: #fafafa;">
                             <h3 style="margin: 0; font-size: 1rem; color: #333;">Page Manager</h3>
-                            <button id="dev-pm-close" style="background: none; border: none; cursor: pointer; color: #999;">${ICONS.close}</button>
+                            <div style="display:flex; align-items:center; gap:0.25rem;">
+                                <button id="dev-pm-expand-all" title="Expand All" style="background: none; border: none; cursor: pointer; color: #999; padding: 4px; display:flex; align-items:center;">${ICONS.expandAll}</button>
+                                <button id="dev-pm-close" style="background: none; border: none; cursor: pointer; color: #999; padding: 4px; display:flex; align-items:center;">${ICONS.close}</button>
+                            </div>
                         </div>
                         <div id="dev-pm-content" style="flex: 1; overflow-y: auto; padding: 1.5rem;">
                             <!-- Frontmatter Form -->
@@ -577,6 +642,7 @@
                 const closeBtn = dialog.querySelector("#dev-pm-close") as HTMLButtonElement;
                 const confirmBtn = dialog.querySelector("#dev-pm-confirm") as HTMLButtonElement;
                 const addBlockBtn = dialog.querySelector("#dev-pm-add-block") as HTMLButtonElement;
+                const expandAllBtn = dialog.querySelector("#dev-pm-expand-all") as HTMLButtonElement;
 
                 // FM Form elements
                 const fTitle = dialog.querySelector("#dev-pm-title") as HTMLInputElement;
@@ -660,6 +726,31 @@
                 });
                 let collapsedBlocks = new Set(); // Track collapsed block indices
                 let captionOpenBlocks = new Set(); // Track open caption editors
+                let selectedPhoto: {bIdx: number, pIdx: number} | null = null;
+
+                const handlePhotoClick = (bIdx: number, pIdx: number, insertAfter = false) => {
+                    if (!selectedPhoto) {
+                        selectedPhoto = {bIdx, pIdx};
+                        renderTree();
+                        return;
+                    }
+                    if (selectedPhoto.bIdx === bIdx && selectedPhoto.pIdx === pIdx) {
+                        selectedPhoto = null;
+                        renderTree();
+                        return;
+                    }
+                    // Move selected photo to before/after the clicked position
+                    const from = selectedPhoto;
+                    selectedPhoto = null;
+                    const [moved] = currentBlocks[from.bIdx].photos.splice(from.pIdx, 1);
+                    let targetPIdx = insertAfter ? pIdx + 1 : pIdx;
+                    if (from.bIdx === bIdx && from.pIdx < targetPIdx) targetPIdx--;
+                    currentBlocks[bIdx].photos.splice(targetPIdx, 0, moved);
+                    if (currentBlocks[from.bIdx].photos.length === 0) {
+                        currentBlocks.splice(from.bIdx, 1);
+                    }
+                    renderTree();
+                };
 
                 const renderTree = () => {
                     sortableInstances.forEach(s => s.destroy());
@@ -676,12 +767,19 @@
                                 <button class="block-expander" style="background: none; border: none; cursor: pointer; color: #666; padding: 4px; display: flex; align-items: center; transition: transform 0.2s; ${isCollapsed ? '' : 'transform: rotate(90deg);'}">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
                                 </button>
-                                <span style="font-size: 0.7rem; color: #999; cursor: grab;">${ICONS.drag}</span>
-                                <strong style="font-size: 0.85rem; color: #444; cursor: grab;">${block.type}</strong>
-
-                                <div style="display:flex; align-items:center; gap:0.25rem; margin-left: auto;">
+                                <span style="font-size: 0.7rem; color: #999; cursor: grab; display:flex; align-items:center;">${ICONS.drag}</span>
+                                <button class="block-toggle block-type-badge" title="Toggle Type (${block.type})">${block.type === 'PhotoCarousel' ? 'C' : 'R'}</button>
+                                ${isCollapsed && isLocalhost && block.photos.length > 0 ? `
+                                <div class="dev-pm-thumb-strip">
+                                    ${block.photos.map((p: any, pIdx: number) => {
+                                        const fullKey = p.itemKey.includes('/') ? p.itemKey : `${albumSlug}/${p.itemKey}`;
+                                        const isSel = selectedPhoto?.bIdx === bIdx && selectedPhoto?.pIdx === pIdx;
+                                        const isTarget = selectedPhoto && !(selectedPhoto.bIdx === bIdx && selectedPhoto.pIdx === pIdx);
+                                        return `<img src="/r2/${fullKey}" loading="lazy" title="${p.itemKey.split('/').pop()}" data-bidx="${bIdx}" data-pidx="${pIdx}" class="pm-thumb-click${isSel ? ' pm-photo-selected' : ''}${isTarget ? ' pm-move-target' : ''}" style="cursor:${selectedPhoto ? 'copy' : 'pointer'};${isSel ? 'outline:2px solid #2563eb;outline-offset:1px;opacity:1;' : ''}" />`;
+                                    }).join('')}
+                                </div>` : '<div style="flex:1;"></div>'}
+                                <div style="display:flex; align-items:center; gap:0.25rem; flex-shrink:0;">
                                     <button class="block-caption-toggle ${block.props.caption ? 'has-data' : ''}" title="Edit Caption" style="background: none; border: none; cursor: pointer; color: ${captionOpenBlocks.has(bIdx) ? '#2563eb' : '#777'}; padding: 4px;">${ICONS.quote}</button>
-                                    <button class="block-toggle" title="Toggle Type" style="background: none; border: none; cursor: pointer; color: #777; padding: 4px;">${ICONS.type}</button>
                                     <button class="block-delete" title="Delete Block" style="background: none; border: none; cursor: pointer; color: #ef4444; padding: 4px;">${ICONS.trash}</button>
                                 </div>
                             </div>
@@ -744,8 +842,9 @@
                                         ${captionAreaTop}
                                         <div class="dev-pm-photo-list" data-block-idx="${bIdx}">
                                             ${block.photos.map((p: any, pIdx: number) => `
-                                                <div class="dev-pm-photo" data-p-idx="${pIdx}">
+                                                <div class="dev-pm-photo${selectedPhoto && !(selectedPhoto.bIdx === bIdx && selectedPhoto.pIdx === pIdx) ? ' pm-move-target' : ''}${selectedPhoto?.bIdx === bIdx && selectedPhoto?.pIdx === pIdx ? ' pm-photo-selected' : ''}" data-p-idx="${pIdx}">
                                                     <span style="color: #999;">${ICONS.drag}</span>
+                                                    ${isLocalhost ? (() => { const fk = p.itemKey.includes('/') ? p.itemKey : `${albumSlug}/${p.itemKey}`; return `<img src="/r2/${fk}" loading="lazy" style="width:40px;height:30px;object-fit:cover;border-radius:3px;flex-shrink:0;" />`; })() : ''}
                                                     <span style="flex: 1;">${p.itemKey.split('/').pop()}</span>
                                                     ${p.itemKey === fCover.value.trim() ? `<span class="dev-star-golden" style="display: flex; align-items: center; margin-right: 4px;" title="Cover Photo">${ICONS.star}</span>` : ''}
                                                     ${block.type === 'PhotoCarousel' && pIdx === (block.props.initialSlide ?? 0) ? `<span style="display: flex; align-items: center; margin-right: 4px; color: #2563eb;" title="Initial Slide">${ICONS.slideOne}</span>` : ''}
@@ -884,6 +983,21 @@
                             else collapsedBlocks.add(bIdx);
                             renderTree();
                         });
+
+                        // Expand / Collapse All toggle (bound once, updates icon each render)
+                        if (bIdx === 0) {
+                            const allCollapsed = currentBlocks.length > 0 && collapsedBlocks.size === currentBlocks.length;
+                            expandAllBtn.title = allCollapsed ? 'Expand All' : 'Collapse All';
+                            expandAllBtn.innerHTML = allCollapsed ? ICONS.expandAll : ICONS.collapseAll;
+                            expandAllBtn.onclick = () => {
+                                if (collapsedBlocks.size === currentBlocks.length) {
+                                    collapsedBlocks.clear();
+                                } else {
+                                    currentBlocks.forEach((_: any, i: number) => collapsedBlocks.add(i));
+                                }
+                                renderTree();
+                            };
+                        }
                         blockEl.querySelector('.block-toggle')?.addEventListener('click', (e) => {
                             e.stopPropagation();
                             block.type = block.type === 'Row' ? 'PhotoCarousel' : 'Row';
@@ -906,6 +1020,19 @@
                             const pMenuTrigger = photoEl.querySelector('.photo-menu-trigger');
                             const pMenu = photoEl.querySelector('.dev-pm-photo-menu');
                             const photo = block.photos[pIdx];
+
+                            photoEl.addEventListener('click', (e) => {
+                                if ((e.target as HTMLElement).closest('.photo-menu-trigger, .dev-pm-photo-menu')) return;
+                                e.stopPropagation();
+                                handlePhotoClick(bIdx, pIdx, false);
+                            });
+
+                            photoEl.addEventListener('contextmenu', (e) => {
+                                if (!selectedPhoto) return;
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handlePhotoClick(bIdx, pIdx, true);
+                            });
 
                             pMenuTrigger?.addEventListener('click', (e) => {
                                 e.stopPropagation();
@@ -941,6 +1068,24 @@
                                     }
                                     renderTree();
                                 }
+                            });
+                        });
+
+                        // Thumb strip click-to-move
+                        blockEl.querySelectorAll('.pm-thumb-click').forEach((img) => {
+                            img.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                const bi = parseInt((img as HTMLElement).dataset.bidx || '0');
+                                const pi = parseInt((img as HTMLElement).dataset.pidx || '0');
+                                handlePhotoClick(bi, pi, false);
+                            });
+                            img.addEventListener('contextmenu', (e) => {
+                                if (!selectedPhoto) return;
+                                e.preventDefault();
+                                e.stopPropagation();
+                                const bi = parseInt((img as HTMLElement).dataset.bidx || '0');
+                                const pi = parseInt((img as HTMLElement).dataset.pidx || '0');
+                                handlePhotoClick(bi, pi, true);
                             });
                         });
 
@@ -989,7 +1134,18 @@
                     if (!(e.target as HTMLElement).closest('.dev-pm-photo-menu-btn')) {
                         document.querySelectorAll('.dev-pm-photo-menu.active').forEach(m => m.classList.remove('active'));
                     }
+                    // Deselect if clicking outside any photo
+                    if (selectedPhoto && !(e.target as HTMLElement).closest('.dev-pm-photo, .pm-thumb-click')) {
+                        selectedPhoto = null;
+                        renderTree();
+                    }
                 };
+                document.addEventListener('keydown', (e: KeyboardEvent) => {
+                    if (e.key === 'Escape' && selectedPhoto) {
+                        selectedPhoto = null;
+                        renderTree();
+                    }
+                });
                 document.addEventListener('click', globalClickHandler);
 
                 const closeHandler = () => {
