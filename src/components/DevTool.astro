@@ -276,6 +276,7 @@
                 vmargin: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 8 12 3 17 8"></polyline><polyline points="7 16 12 21 17 16"></polyline><line x1="12" y1="3" x2="12" y2="21"></line></svg>`,
                 minus: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>`,
                 dots: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.5"></circle><circle cx="19" cy="12" r="1.5"></circle><circle cx="5" cy="12" r="1.5"></circle></svg>`,
+                slideOne: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M10 10l2-2"/></svg>`,
                 star: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`
             };
 
@@ -747,12 +748,18 @@
                                                     <span style="color: #999;">${ICONS.drag}</span>
                                                     <span style="flex: 1;">${p.itemKey.split('/').pop()}</span>
                                                     ${p.itemKey === fCover.value.trim() ? `<span class="dev-star-golden" style="display: flex; align-items: center; margin-right: 4px;" title="Cover Photo">${ICONS.star}</span>` : ''}
+                                                    ${block.type === 'PhotoCarousel' && pIdx === (block.props.initialSlide ?? 0) ? `<span style="display: flex; align-items: center; margin-right: 4px; color: #2563eb;" title="Initial Slide">${ICONS.slideOne}</span>` : ''}
                                                     <div style="position: relative;">
                                                         <button class="photo-menu-trigger dev-pm-photo-menu-btn" title="Options">${ICONS.dots}</button>
                                                         <div class="dev-pm-photo-menu">
                                                             <div class="dev-pm-photo-menu-item star-btn">
                                                                 ${ICONS.star} Set as Cover
                                                             </div>
+                                                            ${block.type === 'PhotoCarousel' ? `
+                                                            <div class="dev-pm-photo-menu-item initial-slide-btn">
+                                                                ${ICONS.slideOne} Set as Initial Slide
+                                                            </div>
+                                                            ` : ''}
                                                             <div class="dev-pm-photo-menu-item delete-btn delete">
                                                                 ${ICONS.trash} Delete Photo
                                                             </div>
@@ -915,12 +922,22 @@
                                 renderTree();
                             });
 
+                            photoEl.querySelector('.initial-slide-btn')?.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                block.props.initialSlide = pIdx;
+                                renderTree();
+                            });
+
                             photoEl.querySelector('.delete-btn')?.addEventListener('click', (e) => {
                                 e.stopPropagation();
                                 if (confirm(`Delete photo: ${photo.itemKey}?`)) {
                                     block.photos.splice(pIdx, 1);
                                     if (block.photos.length === 0) {
                                         currentBlocks.splice(bIdx, 1);
+                                    }
+                                    // Reset initialSlide if it's now out of bounds
+                                    if (block.props.initialSlide >= block.photos.length) {
+                                        block.props.initialSlide = 0;
                                     }
                                     renderTree();
                                 }
