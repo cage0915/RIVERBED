@@ -4,7 +4,7 @@ import Layout from "../../layouts/Layout.astro";
 import Row from "../../components/Row.astro";
 import Photo from "../../components/Photo.astro";
 import PhotoCarousel from "../../components/PhotoCarousel.astro";
-import TextCenter from "../../components/TextCenter.astro";
+import Text from "../../components/Text.astro";
 
 const { folder, album } = Astro.params;
 
@@ -92,11 +92,11 @@ try {
             )}
         </div>
 
-        <article 
-            class="album-content" 
+        <article
+            class="album-content"
             style={albumEntry.data.gap ? `--album-block-gap: ${albumEntry.data.gap}` : undefined}
         >
-            <Content components={{ Row, Photo, TextCenter, PhotoCarousel }} />
+            <Content components={{ Row, Photo, Text, PhotoCarousel }} />
         </article>
     </div>
 </Layout>

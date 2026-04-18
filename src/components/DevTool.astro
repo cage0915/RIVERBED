@@ -595,6 +595,7 @@
                         <div style="padding: 1rem 1.5rem; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; background: #fafafa;">
                             <h3 style="margin: 0; font-size: 1rem; color: #333;">Page Manager</h3>
                             <div style="display:flex; align-items:center; gap:0.25rem;">
+                                <button id="dev-pm-add-block" title="Add Block" style="background: none; border: none; cursor: pointer; color: #999; padding: 4px; display:flex; align-items:center; position:relative;">${ICONS.plus}</button>
                                 <button id="dev-pm-expand-all" title="Expand / Collapse All" style="background: none; border: none; cursor: pointer; color: #999; padding: 4px; display:flex; align-items:center;">${ICONS.expandAll}</button>
                                 <button id="dev-pm-rename" title="Rename photos by current order" style="background: none; border: none; cursor: pointer; color: #999; padding: 4px; display:flex; align-items:center;">${ICONS.rename}</button>
                                 <button id="dev-pm-close" style="background: none; border: none; cursor: pointer; color: #999; padding: 4px; display:flex; align-items:center;">${ICONS.close}</button>
@@ -649,11 +650,6 @@
 
                             <div style="border-top: 1px dashed #eee; margin: 1.5rem 0;"></div>
                             <div id="dev-pm-tree" class="dev-pm-tree"></div>
-                            <div style="margin-top: 1rem;">
-                                <button id="dev-pm-add-block" style="width: 100%; padding: 0.6rem; border: 1px dashed #ccc; border-radius: 6px; background: #fff; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
-                                    ${ICONS.plus} Add Block
-                                </button>
-                            </div>
                         </div>
                         <div style="padding: 1rem 1.5rem; border-top: 1px solid #eee; display: flex; justify-content: flex-end; gap: 1rem; background: #fafafa;">
                             <button id="dev-pm-confirm" title="Confirm Changes" style="width:36px; height:36px; display:flex; align-items:center; justify-content:center; background: #2563eb; color: white; border: none; border-radius: 6px; cursor: pointer;">
@@ -815,6 +811,7 @@
                 let captionOpenBlocks = new Set(); // Track open caption editors
                 let selectedPhoto: {bIdx: number, pIdx: number} | null = null;
                 let selectedBlock: number | null = null;
+                let pendingInsertType: string | null = null;
 
                 const handlePhotoClick = (bIdx: number, pIdx: number, insertAfter = false) => {
                     if (!selectedPhoto) {
@@ -862,10 +859,17 @@
                                             <button class="block-insert-btn block-insert-above" title="Insert above">${ICONS.arrowRight}</button>
                                             <button class="block-insert-btn block-insert-below" title="Insert below">${ICONS.arrowRight}</button>
                                            </div>`
-                                        : `<button class="block-drag-handle" title="Click to move / drag">${ICONS.drag}</button>`
+                                        : pendingInsertType !== null
+                                            ? `<div class="block-move-arrows">
+                                                <button class="block-insert-btn block-insert-new-above" title="Insert before">${ICONS.arrowRight}</button>
+                                                <button class="block-insert-btn block-insert-new-below" title="Insert after">${ICONS.arrowRight}</button>
+                                               </div>`
+                                            : `<button class="block-drag-handle" title="Click to move / drag">${ICONS.drag}</button>`
                                 }
-                                <button class="block-toggle block-type-badge" title="Toggle Type (${block.type})">${block.type === 'PhotoCarousel' ? 'C' : 'R'}</button>
-                                ${isCollapsed && isLocalhost && block.photos.length > 0 ? `
+                                <button class="block-toggle block-type-badge" title="Toggle Type (${block.type})" ${block.type === 'Text' ? 'disabled style="opacity:0.5;cursor:default;"' : ''}>${block.type === 'PhotoCarousel' ? 'C' : block.type === 'Text' ? 'T' : 'R'}</button>
+                                ${isCollapsed && block.type === 'Text' && block.text ? `
+                                <div style="flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 0.75rem; color: #64748b; padding: 0 0.25rem; ${block.props.size === 'title' ? 'font-weight: 700;' : ''}">${block.text}</div>
+                                ` : isCollapsed && block.type !== 'Text' && isLocalhost && block.photos.length > 0 ? `
                                 <div class="dev-pm-thumb-strip">
                                     ${block.photos.map((p: any, pIdx: number) => {
                                         const fullKey = p.itemKey.includes('/') ? p.itemKey : `${albumSlug}/${p.itemKey}`;
@@ -875,12 +879,39 @@
                                     }).join('')}
                                 </div>` : '<div style="flex:1;"></div>'}
                                 <div style="display:flex; align-items:center; gap:0.25rem; flex-shrink:0;">
-                                    <button class="block-caption-toggle ${block.props.caption ? 'has-data' : ''}" title="Edit Caption" style="background: none; border: none; cursor: pointer; color: ${captionOpenBlocks.has(bIdx) ? '#2563eb' : block.props.caption ? '#22c55e' : '#777'}; padding: 4px;">${ICONS.quote}</button>
+                                    ${block.type !== 'Text' ? `<button class="block-caption-toggle ${block.props.caption ? 'has-data' : ''}" title="Edit Caption" style="background: none; border: none; cursor: pointer; color: ${captionOpenBlocks.has(bIdx) ? '#2563eb' : block.props.caption ? '#22c55e' : '#777'}; padding: 4px;">${ICONS.quote}</button>` : ''}
                                     <button class="block-delete" title="Delete Block" style="background: none; border: none; cursor: pointer; color: #ef4444; padding: 4px;">${ICONS.trash}</button>
                                 </div>
                             </div>
                             <div class="dev-pm-block-content" style="display: ${isCollapsed ? 'none' : 'block'}; padding-left: 1rem;">
-                                ${(() => {
+                                ${block.type === 'Text' ? (() => {
+                                    const align = block.props.align || 'center';
+                                    const size = block.props.size || 'caption';
+                                    const mt = block.props.mt || '';
+                                    const mb = block.props.mb || '';
+                                    return `
+                                        <div style="display: flex; flex-direction: column; gap: 0.5rem; padding: 0.5rem 0;">
+                                            <textarea class="text-block-content" placeholder="Enter text..." style="width: 100%; box-sizing: border-box; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 0.85rem; min-height: 60px; resize: vertical; font-family: inherit;">${block.text || ''}</textarea>
+                                            <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                                                <select class="text-block-align" style="flex: 1; min-width: 80px; font-size: 0.75rem; padding: 4px; border: 1px solid #ddd; border-radius: 4px; background: white;">
+                                                    <option value="left" ${align === 'left' ? 'selected' : ''}>Left</option>
+                                                    <option value="center" ${align === 'center' ? 'selected' : ''}>Center</option>
+                                                    <option value="right" ${align === 'right' ? 'selected' : ''}>Right</option>
+                                                </select>
+                                                <select class="text-block-size" style="flex: 1; min-width: 80px; font-size: 0.75rem; padding: 4px; border: 1px solid #ddd; border-radius: 4px; background: white;">
+                                                    <option value="caption" ${size === 'caption' ? 'selected' : ''}>Caption</option>
+                                                    <option value="title" ${size === 'title' ? 'selected' : ''}>Title</option>
+                                                </select>
+                                                <div style="display: flex; gap: 0.25rem; align-items: center; border-left: 1px solid #eee; padding-left: 0.5rem;">
+                                                    <span style="color: #999; display:flex; align-items:center;" title="Margin top"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="4" x2="19" y2="4"/><polyline points="12 8 12 20"/><polyline points="8 12 12 8 16 12"/></svg></span>
+                                                    <input class="text-block-mt" type="text" placeholder="2rem" value="${mt}" style="width: 45px; padding: 4px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.75rem; text-align: center;" />
+                                                    <span style="color: #999; display:flex; align-items:center;" title="Margin bottom"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="20" x2="19" y2="20"/><polyline points="12 16 12 4"/><polyline points="8 12 12 16 16 12"/></svg></span>
+                                                    <input class="text-block-mb" type="text" placeholder="0.5rem" value="${mb}" style="width: 45px; padding: 4px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.75rem; text-align: center;" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `;
+                                })() : (() => {
                                     const isTop = block.props.captionPosition?.includes('top');
                                     const isBottom = !block.props.captionPosition || block.props.captionPosition.includes('bottom');
 
@@ -921,7 +952,10 @@
                                                 </div>
 
                                                 <div style="display: flex; gap: 0.25rem; align-items: center; border-left: 1px solid #eee; padding-left: 0.5rem;">
-                                                    <span style="color: #999; display: flex; align-items: center; opacity: 0.6;">${ICONS.vmargin}</span>
+                                                    ${vpos === 'top'
+                                                        ? `<span style="color: #999; display: flex; align-items: center; opacity: 0.6;" title="Caption Margin (above caption)"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="4" x2="19" y2="4"/><polyline points="12 8 12 20"/><polyline points="8 12 12 8 16 12"/></svg></span>`
+                                                        : `<span style="color: #999; display: flex; align-items: center; opacity: 0.6;" title="Caption Margin (below caption)"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="20" x2="19" y2="20"/><polyline points="12 16 12 4"/><polyline points="8 12 12 16 16 12"/></svg></span>`
+                                                    }
                                                     <input class="block-margin-caption" type="text" placeholder="2rem" title="Caption Margin" value="${block.props.captionMargin || ''}" style="width: 45px; box-sizing:border-box; padding:4px; border:1px solid #ddd; border-radius:4px; font-size:0.75rem; text-align: center;" />
                                                     ${block.props.captionMargin ? `
                                                         <button class="margin-caption-reset" title="Clear margin" style="background: none; border: none; padding: 2px; cursor: pointer; color: #ef4444; opacity: 0.8; display:flex; align-items:center;">${ICONS.minus}</button>
@@ -971,7 +1005,7 @@
                                         ${captionAreaBottom}
 
                                         <div style="display: flex; align-items: center; gap: 0.4rem; justify-content: center; padding-top: 0.5rem; border-top: 1px dashed #eee; margin-top: 0.5rem;">
-                                            <span style="color: #999; display: flex; align-items: center; opacity: 0.6;" title="Block Spacing">${ICONS.vmargin}</span>
+                                            <span style="color: #999; display: flex; align-items: center; opacity: 0.6;" title="Block Spacing"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="20" x2="19" y2="20"/><polyline points="12 16 12 4"/><polyline points="8 12 12 16 16 12"/></svg></span>
                                             <input class="block-margin-block" type="text" placeholder="${block.type === 'PhotoCarousel' ? '2rem' : (fGap.value || '0.5rem')}" title="Block Margin" value="${block.props.blockMargin || ''}" style="width:45px; padding:2px 4px; border:1px solid #ddd; border-radius:3px; font-size:0.7rem; text-align:center;" />
                                             ${block.props.blockMargin ? `
                                                 <button class="margin-block-reset" title="Clear spacing" style="background:none; border:none; padding:2px; cursor:pointer; color:#ef4444; opacity:0.8; display:flex; align-items:center;">${ICONS.minus}</button>
@@ -1108,6 +1142,32 @@
                             renderTree();
                         });
 
+                        blockEl.querySelector('.block-insert-new-above')?.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            const type = pendingInsertType!;
+                            pendingInsertType = null;
+                            const newBlock = type === 'Text' ? { type: 'Text', props: { align: 'left', size: 'title' }, text: '', photos: [] } : { type, props: {}, photos: [] };
+                            currentBlocks.splice(bIdx, 0, newBlock);
+                            // shift existing indices up by 1, keep new block expanded
+                            const newCollapsed = new Set<number>();
+                            collapsedBlocks.forEach((i: number) => { if (i >= bIdx) newCollapsed.add(i + 1); else newCollapsed.add(i); });
+                            collapsedBlocks = newCollapsed;
+                            renderTree();
+                        });
+
+                        blockEl.querySelector('.block-insert-new-below')?.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            const type = pendingInsertType!;
+                            pendingInsertType = null;
+                            const newBlock = type === 'Text' ? { type: 'Text', props: { align: 'left', size: 'title' }, text: '', photos: [] } : { type, props: {}, photos: [] };
+                            currentBlocks.splice(bIdx + 1, 0, newBlock);
+                            // shift existing indices above insertion point, keep new block expanded
+                            const newCollapsed = new Set<number>();
+                            collapsedBlocks.forEach((i: number) => { if (i > bIdx) newCollapsed.add(i + 1); else newCollapsed.add(i); });
+                            collapsedBlocks = newCollapsed;
+                            renderTree();
+                        });
+
                         blockEl.querySelector('.block-expander')?.addEventListener('click', (e) => {
                             e.stopPropagation();
                             if (collapsedBlocks.has(bIdx)) collapsedBlocks.delete(bIdx);
@@ -1131,9 +1191,16 @@
                                 }
                                 renderTree();
                             };
+                            // Highlight add-block button when in insert mode
+                            const addBtn = dialog.querySelector('#dev-pm-add-block') as HTMLElement;
+                            if (addBtn) {
+                                addBtn.style.color = pendingInsertType ? '#2563eb' : '#999';
+                                addBtn.title = pendingInsertType ? `Click to cancel (inserting ${pendingInsertType})` : 'Add Block';
+                            }
                         }
                         blockEl.querySelector('.block-toggle')?.addEventListener('click', (e) => {
                             e.stopPropagation();
+                            if (block.type === 'Text') return;
                             block.type = block.type === 'Row' ? 'PhotoCarousel' : 'Row';
                             renderTree();
                         });
@@ -1143,6 +1210,20 @@
                                 renderTree();
                             }
                         });
+
+                        // Text block controls
+                        if (block.type === 'Text') {
+                            const textArea = blockEl.querySelector('.text-block-content') as HTMLTextAreaElement;
+                            const alignSel = blockEl.querySelector('.text-block-align') as HTMLSelectElement;
+                            const sizeSel = blockEl.querySelector('.text-block-size') as HTMLSelectElement;
+                            const mtInput = blockEl.querySelector('.text-block-mt') as HTMLInputElement;
+                            const mbInput = blockEl.querySelector('.text-block-mb') as HTMLInputElement;
+                            textArea?.addEventListener('input', () => { block.text = textArea.value; });
+                            alignSel?.addEventListener('change', () => { block.props.align = alignSel.value; });
+                            sizeSel?.addEventListener('change', () => { block.props.size = sizeSel.value; });
+                            mtInput?.addEventListener('change', () => { block.props.mt = mtInput.value.trim(); });
+                            mbInput?.addEventListener('change', () => { block.props.mb = mbInput.value.trim(); });
+                        }
                         blockEl.querySelector('.photo-add')?.addEventListener('click', () => {
                             const key = prompt("Enter photo itemKey (e.g. KCS01234.jpg):");
                             if (key) {
@@ -1290,6 +1371,7 @@
                     if (e.key === 'Escape') {
                         if (selectedPhoto) { selectedPhoto = null; renderTree(); }
                         else if (selectedBlock !== null) { selectedBlock = null; renderTree(); }
+                        else if (pendingInsertType !== null) { pendingInsertType = null; renderTree(); }
                     }
                 });
                 document.addEventListener('click', globalClickHandler);
@@ -1316,13 +1398,14 @@
 
                     confirmBtn.disabled = true;
                     confirmBtn.innerHTML = '...';
+                    const blocksToSave = currentBlocks.filter((b: any) => b.type !== 'Text' || b.text?.trim());
                     try {
                         const res = await fetch("/api/save-page-structure", {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({
                                 albumSlug,
-                                blocks: currentBlocks,
+                                blocks: blocksToSave,
                                 frontmatter: newFM.join('\n')
                             }),
                         });
@@ -1342,8 +1425,56 @@
                 };
 
                 const addBlockHandler = () => {
-                    currentBlocks.push({ type: 'Row', props: {}, photos: [] });
-                    renderTree();
+                    // If already in insert mode, cancel it
+                    if (pendingInsertType !== null) {
+                        pendingInsertType = null;
+                        renderTree();
+                        return;
+                    }
+                    // Show a small popup to choose block type
+                    let menu = document.getElementById('dev-pm-add-menu');
+                    if (menu) { menu.remove(); return; }
+                    menu = document.createElement('div');
+                    menu.id = 'dev-pm-add-menu';
+                    menu.style.cssText = 'position:absolute; top: calc(100% + 0.25rem); right: 0; background: white; border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.15); padding: 0.4rem; display: flex; flex-direction: column; gap: 0.25rem; z-index: 200; min-width: 140px;';
+                    const types = [
+                        { label: 'Row', value: 'Row' },
+                        { label: 'Carousel', value: 'PhotoCarousel' },
+                        { label: 'Text', value: 'Text' },
+                    ];
+                    types.forEach(({ label, value }) => {
+                        const btn = document.createElement('button');
+                        btn.textContent = label;
+                        btn.style.cssText = 'padding: 0.4rem 0.75rem; border: none; border-radius: 4px; background: none; cursor: pointer; font-size: 0.85rem; text-align: left; color: #333;';
+                        btn.onmouseenter = () => btn.style.background = '#f1f5f9';
+                        btn.onmouseleave = () => btn.style.background = 'none';
+                        btn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            menu!.remove();
+                            if (currentBlocks.length === 0) {
+                                // No blocks yet — just append directly
+                                const newBlock = value === 'Text' ? { type: 'Text', props: { align: 'left', size: 'title' }, text: '', photos: [] } : { type: value, props: {}, photos: [] };
+                                currentBlocks.push(newBlock);
+                                renderTree();
+                            } else {
+                                // Enter insert-position mode
+                                pendingInsertType = value;
+                                renderTree();
+                            }
+                        });
+                        menu!.appendChild(btn);
+                    });
+                    // Position relative to the add-block button
+                    const addBtn = dialog.querySelector('#dev-pm-add-block') as HTMLElement;
+                    addBtn.style.position = 'relative';
+                    addBtn.appendChild(menu);
+                    const closeMenu = (e: MouseEvent) => {
+                        if (!menu!.contains(e.target as Node) && e.target !== addBtn) {
+                            menu!.remove();
+                            document.removeEventListener('click', closeMenu);
+                        }
+                    };
+                    setTimeout(() => document.addEventListener('click', closeMenu), 0);
                 };
 
                 closeBtn.addEventListener('click', closeHandler);

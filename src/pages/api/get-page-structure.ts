@@ -30,9 +30,8 @@ export const GET: APIRoute = async ({ request }) => {
     const body = fmMatch ? content.slice(fmMatch[0].length).trim() : content;
 
     // 2. Extract Blocks
-    // Regex to match <Row ...>...</Row> or <PhotoCarousel ...>...</PhotoCarousel>
-    // Note: We'll use a simplified regex that expects one level of nesting (Photos inside Blocks)
-    const blockRegex = /<(Row|PhotoCarousel)\b([^>]*?)>([\s\S]*?)<\/\1>/g;
+    // Regex to match <Row ...>...</Row>, <PhotoCarousel ...>...</PhotoCarousel>, or <Text ...>...</Text>
+    const blockRegex = /<(Row|PhotoCarousel|Text)\b([^>]*?)>([\s\S]*?)<\/\1>/g;
     const blocks: any[] = [];
     let match;
 
@@ -41,7 +40,22 @@ export const GET: APIRoute = async ({ request }) => {
         const propsStr = match[2];
         const innerContent = match[3];
 
-        // Parse Block Props
+        // Handle Text blocks separately
+        if (type === 'Text') {
+            const props: any = {};
+            const alignMatch = propsStr.match(/align="([^"]*)"/);
+            if (alignMatch) props.align = alignMatch[1];
+            const sizeMatch = propsStr.match(/size="([^"]*)"/);
+            if (sizeMatch) props.size = sizeMatch[1];
+            const mtMatch = propsStr.match(/mt="([^"]*)"/);
+            if (mtMatch) props.mt = mtMatch[1];
+            const mbMatch = propsStr.match(/mb="([^"]*)"/);
+            if (mbMatch) props.mb = mbMatch[1];
+            blocks.push({ type: 'Text', props, text: innerContent.trim(), photos: [] });
+            continue;
+        }
+
+        // Parse Block Props (Row / PhotoCarousel)
         const props: any = {};
         const captionMatch = propsStr.match(/caption="([^"]*)"/);
         if (captionMatch) props.caption = captionMatch[1];

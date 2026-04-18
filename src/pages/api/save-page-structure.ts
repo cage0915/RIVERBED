@@ -34,6 +34,18 @@ export const POST: APIRoute = async ({ request }) => {
     let newBody = '';
     blocks.forEach((block: any) => {
         const { type, props, photos } = block;
+
+        // Handle Text blocks
+        if (type === 'Text') {
+            let propsStr = '';
+            if (props.align && props.align !== 'center') propsStr += `\n  align="${props.align}"`;
+            if (props.size && props.size !== 'caption') propsStr += `\n  size="${props.size}"`;
+            if (props.mt && props.mt !== '2rem') propsStr += `\n  mt="${props.mt}"`;
+            if (props.mb && props.mb !== '0.5rem') propsStr += `\n  mb="${props.mb}"`;
+            newBody += `<Text${propsStr}>\n  ${block.text || ''}\n</Text>\n\n`;
+            return;
+        }
+
         let propsStr = '';
         if (props.caption) propsStr += `\n  caption="${props.caption}"`;
         if (props.captionPosition && props.captionPosition !== 'center bottom') {
