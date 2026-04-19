@@ -117,7 +117,7 @@ coverOffset: { x: 50, y: 50 }
         try {
             const currentOrder = JSON.parse(fs.readFileSync(orderFile, 'utf8'));
             if (Array.isArray(currentOrder) && !currentOrder.includes(albumSlug)) {
-                currentOrder.push(albumSlug);
+                currentOrder.unshift(albumSlug);
                 fs.writeFileSync(orderFile, JSON.stringify(currentOrder, null, 4), 'utf8');
             }
         } catch (e) {

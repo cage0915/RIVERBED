@@ -36,13 +36,13 @@ export const GET: APIRoute = async ({ url }) => {
         const sortedAlbums = folderAlbums.sort((a, b) => {
             const slugA = a.slug.split('/')[1];
             const slugB = b.slug.split('/')[1];
-            
+
             const idxA = order.indexOf(slugA);
             const idxB = order.indexOf(slugB);
 
             if (idxA !== -1 && idxB !== -1) return idxA - idxB;
-            if (idxA !== -1) return -1;
-            if (idxB !== -1) return 1;
+            if (idxA !== -1) return 1;
+            if (idxB !== -1) return -1;
 
             // Fallback to title
             return a.data.title.localeCompare(b.data.title);
