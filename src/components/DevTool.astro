@@ -383,7 +383,8 @@
                 collapseAll: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 20 5-5 5 5"/><path d="m7 4 5 5 5-5"/></svg>`,
                 rename: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>`,
                 split: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3"/><path d="M16 3h3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-3"/><line x1="12" y1="3" x2="12" y2="21"/></svg>`,
-                arrowRight: `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg>`
+                arrowRight: `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg>`,
+                cloudSync: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="4" x2="19" y2="4"/><polyline points="12 8 12 20"/><polyline points="8 12 12 8 16 12"/></svg>`
             };
 
             async function fetchMountains() {
@@ -595,6 +596,7 @@
                         <div style="padding: 1rem 1.5rem; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; background: #fafafa;">
                             <h3 style="margin: 0; font-size: 1rem; color: #333;">Page Manager</h3>
                             <div style="display:flex; align-items:center; gap:0.25rem;">
+                                <button id="dev-pm-sync-photos" title="Scan folder &amp; add new photos" style="background: none; border: none; cursor: pointer; color: #999; padding: 4px; display:flex; align-items:center;">${ICONS.cloudSync}</button>
                                 <button id="dev-pm-add-block" title="Add Block" style="background: none; border: none; cursor: pointer; color: #999; padding: 4px; display:flex; align-items:center; position:relative;">${ICONS.plus}</button>
                                 <button id="dev-pm-expand-all" title="Expand / Collapse All" style="background: none; border: none; cursor: pointer; color: #999; padding: 4px; display:flex; align-items:center;">${ICONS.expandAll}</button>
                                 <button id="dev-pm-rename" title="Rename photos by current order" style="background: none; border: none; cursor: pointer; color: #999; padding: 4px; display:flex; align-items:center;">${ICONS.rename}</button>
@@ -683,6 +685,7 @@
                 const closeBtn = dialog.querySelector("#dev-pm-close") as HTMLButtonElement;
                 const confirmBtn = dialog.querySelector("#dev-pm-confirm") as HTMLButtonElement;
                 const addBlockBtn = dialog.querySelector("#dev-pm-add-block") as HTMLButtonElement;
+                const syncPhotosBtn = dialog.querySelector("#dev-pm-sync-photos") as HTMLButtonElement;
                 const expandAllBtn = dialog.querySelector("#dev-pm-expand-all") as HTMLButtonElement;
                 const renameBtn = dialog.querySelector("#dev-pm-rename") as HTMLButtonElement;
 
@@ -1481,6 +1484,41 @@
                 confirmBtn.addEventListener('click', confirmHandler);
                 addBlockBtn.addEventListener('click', addBlockHandler);
 
+                syncPhotosBtn.addEventListener('click', async () => {
+                    const folder = getFolderSlug();
+                    const pathParts = window.location.pathname.split('/').filter(Boolean);
+                    const album = pathParts[1];
+                    if (!folder || !album) return showToast('❌ Cannot identify album');
+                    syncPhotosBtn.style.opacity = '0.4';
+                    syncPhotosBtn.style.pointerEvents = 'none';
+                    try {
+                        const res = await fetch('/api/sync-new-photos', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ folder, albumSlug: album }),
+                        });
+                        const json = await res.json();
+                        if (!res.ok) throw new Error(json.error || 'Unknown error');
+                        if (json.added === 0) {
+                            showToast('✨ No new photos found');
+                        } else {
+                            showToast(`✅ Added ${json.added} new photo${json.added > 1 ? 's' : ''}`);
+                            // Re-fetch page structure and re-render
+                            const r2 = await fetch(`/api/get-page-structure?albumSlug=${albumSlug}`);
+                            if (r2.ok) {
+                                const d2 = await r2.json();
+                                currentBlocks = d2.blocks || [];
+                                renderTree();
+                            }
+                        }
+                    } catch (err: any) {
+                        showToast(`❌ ${err.message}`);
+                    } finally {
+                        syncPhotosBtn.style.opacity = '';
+                        syncPhotosBtn.style.pointerEvents = '';
+                    }
+                });
+
                 renderTree();
                 dialog.showModal();
             }
@@ -1540,6 +1578,7 @@
                 const confirmBtn = dialog.querySelector("#dev-fm-confirm") as HTMLButtonElement;
 
                 let currentAlbums = [...data.albums];
+                let selectedAlbum: number | null = null;
 
                 const renderView = () => {
                     sortableInstances.forEach(s => s.destroy());
@@ -1548,25 +1587,75 @@
                     treeContainer.innerHTML = '';
                     currentAlbums.forEach((album: any, idx: number) => {
                         const el = document.createElement('div');
-                        el.className = 'dev-pm-photo'; // Reuse photo style for simple row
+                        el.className = 'dev-pm-photo';
                         el.style.padding = '0.75rem';
                         el.style.marginBottom = '0.5rem';
-                        el.style.background = '#f8fafc';
+                        el.style.background = selectedAlbum === idx ? '#eff6ff' : '#f8fafc';
+                        el.style.outline = selectedAlbum === idx ? '2px solid #2563eb' : 'none';
+                        el.style.outlineOffset = '1px';
+                        el.style.borderRadius = '6px';
                         el.dataset.slug = album.slug;
                         el.innerHTML = `
-                            <span style="color: #94a3b8; cursor: grab;">${ICONS.drag}</span>
+                            ${selectedAlbum === idx
+                                ? `<button class="fm-drag-handle fm-selected" style="background:none;border:none;cursor:pointer;color:#2563eb;padding:4px;display:flex;align-items:center;" title="Cancel move">${ICONS.drag}</button>`
+                                : selectedAlbum !== null
+                                    ? `<div class="block-move-arrows">
+                                        <button class="block-insert-btn fm-insert-above" title="Insert above">${ICONS.arrowRight}</button>
+                                        <button class="block-insert-btn fm-insert-below" title="Insert below">${ICONS.arrowRight}</button>
+                                       </div>`
+                                    : `<button class="fm-drag-handle" style="background:none;border:none;cursor:pointer;color:#94a3b8;padding:4px;display:flex;align-items:center;" title="Click to move">${ICONS.drag}</button>`
+                            }
                             <span style="flex: 1; font-weight: 500; color: #334155;">${album.title || album.slug.split('/').pop()}</span>
                             <span style="font-size: 0.7rem; color: #94a3b8; font-family: monospace;">${album.slug}</span>
                         `;
+
+                        el.querySelector('.fm-drag-handle')?.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            selectedAlbum = selectedAlbum === idx ? null : idx;
+                            renderView();
+                        });
+
+                        el.querySelector('.fm-insert-above')?.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            const from = selectedAlbum!;
+                            selectedAlbum = null;
+                            const [moved] = currentAlbums.splice(from, 1);
+                            let target = idx;
+                            if (from < idx) target--;
+                            currentAlbums.splice(target, 0, moved);
+                            renderView();
+                        });
+
+                        el.querySelector('.fm-insert-below')?.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            const from = selectedAlbum!;
+                            selectedAlbum = null;
+                            const [moved] = currentAlbums.splice(from, 1);
+                            let target = idx + 1;
+                            if (from < idx) target--;
+                            currentAlbums.splice(target, 0, moved);
+                            renderView();
+                        });
+
                         treeContainer.appendChild(el);
                     });
+
+                    document.addEventListener('keydown', function escHandler(e: KeyboardEvent) {
+                        if (e.key === 'Escape' && selectedAlbum !== null) {
+                            selectedAlbum = null;
+                            renderView();
+                            document.removeEventListener('keydown', escHandler);
+                        }
+                    }, { once: false });
 
                     sortableInstances.push(new Tree(treeContainer, {
                         animation: 150,
                         ghostClass: 'dev-pm-ghost',
+                        handle: '.fm-drag-handle',
                         onEnd: (evt: any) => {
                             const [moved] = currentAlbums.splice(evt.oldIndex, 1);
                             currentAlbums.splice(evt.newIndex, 0, moved);
+                            selectedAlbum = null;
                         }
                     }));
 

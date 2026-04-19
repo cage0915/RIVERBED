@@ -129,10 +129,78 @@ coverOffset: { x: 50, y: 50 }
     return { success: true, path: outputPath };
 }
 
+export async function syncNewPhotos(folderSlug: string, albumSlug: string) {
+    const fs = await getFs();
+    const path = await getPath();
+    const ExifReader = (await import('exifreader')).default;
+
+    const IMAGES_DIR = path.resolve(process.cwd(), 'r2');
+    const ALBUMS_DIR = path.resolve(process.cwd(), 'src/content/albums');
+
+    const folderPath = path.join(IMAGES_DIR, folderSlug, albumSlug);
+    const mdxPath = path.join(ALBUMS_DIR, folderSlug, `${albumSlug}.mdx`);
+
+    if (!fs.existsSync(folderPath)) return { success: false, error: 'Source folder not found' };
+    if (!fs.existsSync(mdxPath)) return { success: false, error: 'MDX file not found' };
+
+    // Scan folder for image files
+    const imageExtensions = ['.jpg', '.jpeg', '.png', '.webp', '.avif'];
+    const allFiles = fs.readdirSync(folderPath)
+        .filter((f: string) => imageExtensions.includes(path.extname(f).toLowerCase()));
+
+    // Extract existing itemKeys from MDX (basename only)
+    const mdxContent = fs.readFileSync(mdxPath, 'utf-8');
+    const existingKeys = new Set<string>();
+    const photoRegex = /<Photo\s+itemKey="([^"]+)"/g;
+    let m: RegExpExecArray | null;
+    while ((m = photoRegex.exec(mdxContent)) !== null) {
+        // itemKey may be "filename.jpg" or "folder/album/filename.jpg"
+        existingKeys.add(m[1].split('/').pop()!);
+    }
+
+    const newFiles = allFiles.filter((f: string) => !existingKeys.has(f));
+    if (newFiles.length === 0) return { success: true, added: 0, filenames: [] };
+
+    // Read EXIF and sort new files
+    const imageData: { filename: string; date: Date | null }[] = await Promise.all(
+        newFiles.map(async (filename: string) => {
+            const filePath = path.join(folderPath, filename);
+            let date: Date | null = null;
+            try {
+                const buffer = fs.readFileSync(filePath);
+                const tags = ExifReader.load(buffer);
+                const dateTag = tags['DateTimeOriginal'] || tags['DateTime'] || tags['CreateDate'];
+                if (dateTag?.description) {
+                    const formatted = dateTag.description.replace(/^(\d{4}):(\d{2}):(\d{2})/, '$1-$2-$3');
+                    const d = new Date(formatted);
+                    if (!isNaN(d.getTime())) date = d;
+                }
+            } catch {}
+            return { filename, date };
+        })
+    );
+
+    imageData.sort((a, b) => {
+        if (a.date && b.date) return a.date.getTime() - b.date.getTime();
+        if (a.date && !b.date) return -1;
+        if (!a.date && b.date) return 1;
+        return a.filename.localeCompare(b.filename, undefined, { numeric: true, sensitivity: 'base' });
+    });
+
+    const sortedNew = imageData.map(d => d.filename);
+
+    // Append new Row blocks at end of MDX
+    const newRows = sortedNew.map((f: string) => `<Row>\n  <Photo itemKey="${f}" />\n</Row>`).join('\n\n');
+    const updated = mdxContent.trimEnd() + '\n\n' + newRows + '\n';
+    fs.writeFileSync(mdxPath, updated, 'utf-8');
+
+    return { success: true, added: sortedNew.length, filenames: sortedNew };
+}
+
 export async function getAvailableFolders(folderSlug: string) {
     const fs = await getFs();
     const path = await getPath();
-    
+
     const IMAGES_DIR = path.resolve(process.cwd(), 'r2');
     const ALBUMS_DIR = path.resolve(process.cwd(), 'src/content/albums');
 
