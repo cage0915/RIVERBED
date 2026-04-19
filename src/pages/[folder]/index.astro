@@ -1,7 +1,7 @@
 ---
 import { getCollection } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
-import { getFolderTitle, getImageUrl, R2_DOMAIN, FOLDER_METADATA } from "../../lib/constants";
+import { getFolderTitle, getFolderCols, getImageUrl, R2_DOMAIN, FOLDER_METADATA } from "../../lib/constants";
 
 const { folder } = Astro.params;
 
@@ -38,12 +38,13 @@ if (!isExistentFolder) {
 }
 
 const folderTitle = getFolderTitle(folder!);
+const folderCols = getFolderCols(folder!);
 const isDev = import.meta.env.DEV;
 ---
 
 <Layout title={`${folderTitle} - RIVERBED`}>
     <div class="py-8">
-        <div class="albums-grid">
+        <div class="albums-grid" style={`--cols: ${folderCols}`}>
             {
                 folderAlbums.length > 0 ? (
                     folderAlbums.map((album) => {
@@ -201,7 +202,6 @@ const isDev = import.meta.env.DEV;
         font-size: 1.25rem;
         font-weight: 400;
         letter-spacing: 0.05em;
-        text-transform: uppercase;
         text-align: center;
         color: #111827;
         transform: translateY(10px);
@@ -213,7 +213,6 @@ const isDev = import.meta.env.DEV;
         font-size: 0.875rem;
         font-weight: 300;
         letter-spacing: 0.05em;
-        text-transform: uppercase;
         text-align: center;
         color: #111827;
         margin-top: 0.5rem;
