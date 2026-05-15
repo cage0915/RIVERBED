@@ -6,6 +6,42 @@ import Photo from "../../components/Photo.astro";
 import PhotoCarousel from "../../components/PhotoCarousel.astro";
 import Text from "../../components/Text.astro";
 
+const slugifySectionTitle = (value: string) => value
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-") || "section";
+
+const extractTitleSections = (body: string) => {
+    const sections: Array<{ id: string; label: string }> = [];
+    const slugCounts = new Map<string, number>();
+    const titleBlockPattern = /<Text\b(?=[^>]*\bsize="title")[^>]*>([\s\S]*?)<\/Text>/g;
+
+    for (const match of body.matchAll(titleBlockPattern)) {
+        const label = match[1]
+            .replace(/<[^>]+>/g, " ")
+            .replace(/\s+/g, " ")
+            .trim();
+
+        if (!label) {
+            continue;
+        }
+
+        const baseSlug = slugifySectionTitle(label);
+        const nextCount = (slugCounts.get(baseSlug) ?? 0) + 1;
+        slugCounts.set(baseSlug, nextCount);
+
+        sections.push({
+            id: nextCount === 1 ? baseSlug : `${baseSlug}-${nextCount}`,
+            label,
+        });
+    }
+
+    return sections;
+};
+
 const { folder, album } = Astro.params;
 
 // Get all albums and find the matching one by its combined slug
@@ -26,6 +62,8 @@ try {
     console.error("Error rendering album:", e);
     throw e;
 }
+
+const titleSections = extractTitleSections(albumEntry.body);
 ---
 
 <Layout title={`${albumEntry.data.title} - RIVERBED`}>
@@ -78,7 +116,26 @@ try {
         </button>
     </div>
 
-    <div class="py-4">
+    <div class="relative py-4">
+        {titleSections.length > 0 && (
+            <div class="pointer-events-none fixed left-8 top-28 z-30 hidden xl:block">
+                <nav
+                    aria-label="Album sections"
+                    class="pointer-events-auto flex max-w-28 flex-col items-start gap-2 text-left"
+                >
+                    {titleSections.map((section) => (
+                        <a
+                            href={`#${section.id}`}
+                            data-album-breadcrumb={section.id}
+                            class="album-breadcrumb-link text-xs uppercase tracking-[0.18em] text-zinc-600 transition-colors duration-200 hover:text-zinc-200"
+                        >
+                            {section.label}
+                        </a>
+                    ))}
+                </nav>
+            </div>
+        )}
+
         <div class="mb-8 text-center">
             <h1
                 class="text-xl font-sans tracking-widest uppercase mb-1"
@@ -123,13 +180,81 @@ try {
         margin: 2rem 0 1rem;
     }
 
+    .album-content :global(.text-block--title) {
+        scroll-margin-top: 7rem;
+    }
+
     .album-content :global(p) {
         margin: 0.5rem 0;
         line-height: 1.6;
     }
+
+    .album-breadcrumb-link[data-active="true"] {
+        color: rgba(255, 255, 255, 0.9);
+    }
 </style>
 
 <script>
+    let breadcrumbObserver: IntersectionObserver | null = null;
+
+    const slugifySectionTitle = (value) => value
+        .toLowerCase()
+        .normalize("NFKD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9\s-]/g, "")
+        .trim()
+        .replace(/\s+/g, "-") || "section";
+
+    const initAlbumBreadcrumbs = () => {
+        const titleNodes = Array.from(document.querySelectorAll(".album-content .text-block--title"));
+        const breadcrumbLinks = Array.from(document.querySelectorAll("[data-album-breadcrumb]"));
+
+        if (titleNodes.length === 0 || breadcrumbLinks.length === 0) {
+            return;
+        }
+
+        const slugCounts = new Map();
+
+        titleNodes.forEach((node, index) => {
+            const label = node.textContent?.replace(/\s+/g, " ").trim() || `section-${index + 1}`;
+            const baseSlug = slugifySectionTitle(label);
+            const nextCount = (slugCounts.get(baseSlug) ?? 0) + 1;
+            slugCounts.set(baseSlug, nextCount);
+
+            node.id = nextCount === 1 ? baseSlug : `${baseSlug}-${nextCount}`;
+        });
+
+        const updateActiveBreadcrumb = (activeId) => {
+            breadcrumbLinks.forEach((link) => {
+                const isActive = link.getAttribute("data-album-breadcrumb") === activeId;
+                link.toggleAttribute("data-active", isActive);
+                link.setAttribute("aria-current", isActive ? "true" : "false");
+            });
+        };
+
+        breadcrumbObserver?.disconnect();
+        breadcrumbObserver = new IntersectionObserver(
+            (entries) => {
+                const visibleEntry = entries
+                    .filter((entry) => entry.isIntersecting)
+                    .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+                if (visibleEntry?.target instanceof HTMLElement) {
+                    updateActiveBreadcrumb(visibleEntry.target.id);
+                }
+            },
+            {
+                rootMargin: "-20% 0px -60% 0px",
+                threshold: [0.2, 0.6, 1],
+            }
+        );
+
+        titleNodes.forEach((node) => breadcrumbObserver?.observe(node));
+        if (titleNodes[0] instanceof HTMLElement) {
+            updateActiveBreadcrumb(titleNodes[0].id);
+        }
+    };
+
     const handleScroll = () => {
         const backToTop = document.getElementById("back-to-top");
         const scrollToBottom = document.getElementById("scroll-to-bottom");
@@ -158,5 +283,7 @@ try {
 
     window.addEventListener("scroll", handleScroll);
     document.addEventListener("astro:after-swap", handleScroll);
+    document.addEventListener("astro:after-swap", initAlbumBreadcrumbs);
     handleScroll();
+    initAlbumBreadcrumbs();
 </script>
