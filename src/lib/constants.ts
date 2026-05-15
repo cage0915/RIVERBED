@@ -3,7 +3,7 @@ export const FOLDER_METADATA = {
     'yama': { title: '山', footer: '見る・撮る・歩く', order: 2, cols: 3 },
     'k': { title: 'K', footer: 'So Much Water So Close to Home', order: 3, cols: 3 },
     'y': { title: 'y', footer: 'Y aller', order: 4, cols: 4 },
-    'palette': { title: 'P', footer: 'P for Palette', order: 5, cols: 3 },
+    'palette': { title: 'Palette', footer: 'P for Palette', order: 5, cols: 3 },
 } as const;
 
 type FolderSlug = keyof typeof FOLDER_METADATA;
