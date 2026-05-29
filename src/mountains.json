@@ -40,6 +40,16 @@
     "description": ""
   },
   {
+    "name": "八仙山",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "八通關山",
+    "elevation": null,
+    "description": ""
+  },
+  {
     "name": "八ヶ岳連峰",
     "elevation": null,
     "description": ""
@@ -171,11 +181,6 @@
   },
   {
     "name": "小遠見山",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "小劍山",
     "elevation": null,
     "description": ""
   },
@@ -420,6 +425,11 @@
     "description": ""
   },
   {
+    "name": "玉山小南山",
+    "elevation": null,
+    "description": ""
+  },
+  {
     "name": "玉山主峰",
     "elevation": 3952,
     "description": "台灣最高峰，東北亞第一高峰。"
@@ -466,6 +476,11 @@
   },
   {
     "name": "甲斐駒ヶ岳",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "白毛山",
     "elevation": null,
     "description": ""
   },
@@ -660,7 +675,17 @@
     "description": ""
   },
   {
+    "name": "東八仙山",
+    "elevation": null,
+    "description": ""
+  },
+  {
     "name": "東天井岳",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "東卯山",
     "elevation": null,
     "description": ""
   },
@@ -711,6 +736,11 @@
   },
   {
     "name": "治茆山南峰",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "阿冷山",
     "elevation": null,
     "description": ""
   },
@@ -836,6 +866,11 @@
   },
   {
     "name": "郡大山北峰",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "郡東山",
     "elevation": null,
     "description": ""
   },
@@ -1065,6 +1100,11 @@
     "description": ""
   },
   {
+    "name": "對關山",
+    "elevation": null,
+    "description": ""
+  },
+  {
     "name": "榛山",
     "elevation": null,
     "description": ""
@@ -1091,6 +1131,11 @@
   },
   {
     "name": "鳶嘴山",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "劍山",
     "elevation": null,
     "description": ""
   },
@@ -1231,6 +1276,11 @@
   },
   {
     "name": "霧頭山",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "巒潭山",
     "elevation": null,
     "description": ""
   },
