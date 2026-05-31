@@ -1815,8 +1815,13 @@
                 const closeBtn = dialog.querySelector("#dev-fm-close") as HTMLButtonElement;
                 const confirmBtn = dialog.querySelector("#dev-fm-confirm") as HTMLButtonElement;
 
-                let currentAlbums = [...data.albums];
+                let currentAlbums = data.albums.map((album: any) => ({
+                    ...album,
+                    coverZoom: album.coverZoom ?? 1,
+                    coverOffset: album.coverOffset ?? { x: 50, y: 50 },
+                }));
                 let selectedAlbum: number | null = null;
+                let expandedAlbums = new Set<number>();
 
                 const renderView = () => {
                     sortableInstances.forEach(s => s.destroy());
@@ -1824,8 +1829,9 @@
 
                     treeContainer.innerHTML = '';
                     currentAlbums.forEach((album: any, idx: number) => {
+                        const isExpanded = expandedAlbums.has(idx);
                         const el = document.createElement('div');
-                        el.className = 'dev-pm-photo';
+                        el.className = 'dev-pm-block';
                         el.style.padding = '0.75rem';
                         el.style.marginBottom = '0.5rem';
                         el.style.background = selectedAlbum === idx ? '#eff6ff' : '#f8fafc';
@@ -1834,18 +1840,53 @@
                         el.style.borderRadius = '6px';
                         el.dataset.slug = album.slug;
                         el.innerHTML = `
-                            ${selectedAlbum === idx
-                                ? `<button class="fm-drag-handle fm-selected" style="background:none;border:none;cursor:pointer;color:#2563eb;padding:4px;display:flex;align-items:center;" title="Cancel move">${ICONS.drag}</button>`
-                                : selectedAlbum !== null
-                                    ? `<div class="block-move-arrows">
-                                        <button class="block-insert-btn fm-insert-above" title="Insert above">${ICONS.arrowRight}</button>
-                                        <button class="block-insert-btn fm-insert-below" title="Insert below">${ICONS.arrowRight}</button>
-                                       </div>`
-                                    : `<button class="fm-drag-handle" style="background:none;border:none;cursor:pointer;color:#94a3b8;padding:4px;display:flex;align-items:center;" title="Click to move">${ICONS.drag}</button>`
-                            }
-                            <span style="flex: 1; font-weight: 500; color: #334155;">${album.title || album.slug.split('/').pop()}</span>
-                            <span style="font-size: 0.7rem; color: #94a3b8; font-family: monospace;">${album.slug}</span>
+                            <div style="display:flex;align-items:center;gap:0.75rem;">
+                                ${selectedAlbum === idx
+                                    ? `<button class="fm-drag-handle fm-selected" style="background:none;border:none;cursor:pointer;color:#2563eb;padding:4px;display:flex;align-items:center;" title="Cancel move">${ICONS.drag}</button>`
+                                    : selectedAlbum !== null
+                                        ? `<div class="block-move-arrows">
+                                            <button class="block-insert-btn fm-insert-above" title="Insert above">${ICONS.arrowRight}</button>
+                                            <button class="block-insert-btn fm-insert-below" title="Insert below">${ICONS.arrowRight}</button>
+                                           </div>`
+                                        : `<button class="fm-drag-handle" style="background:none;border:none;cursor:pointer;color:#94a3b8;padding:4px;display:flex;align-items:center;" title="Click to move">${ICONS.drag}</button>`
+                                }
+                                <button class="fm-expand" type="button" style="background:none;border:none;cursor:pointer;color:#64748b;padding:4px;display:flex;align-items:center;transform:${isExpanded ? 'rotate(90deg)' : 'rotate(0deg)'};transition:transform 0.2s;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                </button>
+                                <div class="fm-main" style="flex:1;min-width:0;cursor:pointer;">
+                                    <div style="font-weight:500;color:#334155;">${album.title || album.slug.split('/').pop()}</div>
+                                    <div style="font-size:0.7rem;color:#94a3b8;font-family:monospace;">${album.slug}</div>
+                                </div>
+                            </div>
+                            <div class="fm-settings" style="display:${isExpanded ? 'grid' : 'none'};grid-template-columns:2.5fr 1fr 1fr 1fr;gap:0.75rem;margin-top:0.85rem;padding-top:0.85rem;border-top:1px dashed #dbe4ee;">
+                                <label style="display:flex;flex-direction:column;gap:0.25rem;font-size:0.75rem;color:#64748b;">
+                                    Cover Image
+                                    <input class="fm-cover-key" type="text" value="${album.coverKey || ''}" style="width:100%;box-sizing:border-box;padding:0.4rem 0.6rem;border:1px solid #cbd5e1;border-radius:4px;font-size:0.85rem;" />
+                                </label>
+                                <label style="display:flex;flex-direction:column;gap:0.25rem;font-size:0.75rem;color:#64748b;">
+                                    Zoom
+                                    <input class="fm-cover-zoom" type="number" step="0.1" value="${album.coverZoom ?? 1}" style="width:100%;box-sizing:border-box;padding:0.4rem 0.6rem;border:1px solid #cbd5e1;border-radius:4px;font-size:0.85rem;" />
+                                </label>
+                                <label style="display:flex;flex-direction:column;gap:0.25rem;font-size:0.75rem;color:#64748b;">
+                                    Offset X
+                                    <input class="fm-cover-ox" type="number" step="0.1" value="${album.coverOffset?.x ?? 50}" style="width:100%;box-sizing:border-box;padding:0.4rem 0.6rem;border:1px solid #cbd5e1;border-radius:4px;font-size:0.85rem;" />
+                                </label>
+                                <label style="display:flex;flex-direction:column;gap:0.25rem;font-size:0.75rem;color:#64748b;">
+                                    Offset Y
+                                    <input class="fm-cover-oy" type="number" step="0.1" value="${album.coverOffset?.y ?? 50}" style="width:100%;box-sizing:border-box;padding:0.4rem 0.6rem;border:1px solid #cbd5e1;border-radius:4px;font-size:0.85rem;" />
+                                </label>
+                            </div>
                         `;
+
+                        const toggleExpanded = (e?: Event) => {
+                            e?.stopPropagation();
+                            if (expandedAlbums.has(idx)) expandedAlbums.delete(idx);
+                            else expandedAlbums.add(idx);
+                            renderView();
+                        };
+
+                        el.querySelector('.fm-expand')?.addEventListener('click', toggleExpanded);
+                        el.querySelector('.fm-main')?.addEventListener('click', toggleExpanded);
 
                         el.querySelector('.fm-drag-handle')?.addEventListener('click', (e) => {
                             e.stopPropagation();
@@ -1873,6 +1914,30 @@
                             if (from < idx) target--;
                             currentAlbums.splice(target, 0, moved);
                             renderView();
+                        });
+
+                        const coverKeyInput = el.querySelector('.fm-cover-key') as HTMLInputElement | null;
+                        const coverZoomInput = el.querySelector('.fm-cover-zoom') as HTMLInputElement | null;
+                        const coverOXInput = el.querySelector('.fm-cover-ox') as HTMLInputElement | null;
+                        const coverOYInput = el.querySelector('.fm-cover-oy') as HTMLInputElement | null;
+
+                        coverKeyInput?.addEventListener('input', () => {
+                            album.coverKey = coverKeyInput.value.trim();
+                        });
+                        coverZoomInput?.addEventListener('input', () => {
+                            album.coverZoom = parseFloat(coverZoomInput.value || '1');
+                        });
+                        coverOXInput?.addEventListener('input', () => {
+                            album.coverOffset = {
+                                x: parseFloat(coverOXInput.value || '50'),
+                                y: album.coverOffset?.y ?? 50,
+                            };
+                        });
+                        coverOYInput?.addEventListener('input', () => {
+                            album.coverOffset = {
+                                x: album.coverOffset?.x ?? 50,
+                                y: parseFloat(coverOYInput.value || '50'),
+                            };
                         });
 
                         treeContainer.appendChild(el);
@@ -1961,7 +2026,16 @@
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({
                                 folder,
-                                order: currentAlbums.map(a => a.slug)
+                                order: currentAlbums.map(a => a.slug),
+                                albums: currentAlbums.map((album: any) => ({
+                                    slug: album.slug,
+                                    coverKey: album.coverKey || '',
+                                    coverZoom: parseFloat(String(album.coverZoom || 1)),
+                                    coverOffset: {
+                                        x: parseFloat(String(album.coverOffset?.x ?? 50)),
+                                        y: parseFloat(String(album.coverOffset?.y ?? 50)),
+                                    },
+                                })),
                             }),
                         });
                         if (res.ok) {

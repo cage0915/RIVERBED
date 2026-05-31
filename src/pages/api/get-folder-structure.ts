@@ -1,3 +1,4 @@
+import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
 import { getAvailableFolders } from '../../lib/album-utils';
 
@@ -51,7 +52,9 @@ export const GET: APIRoute = async ({ url }) => {
             slug: a.slug,
             title: a.data.title,
             info: a.data.info,
-            coverKey: a.data.coverKey
+            coverKey: a.data.coverKey,
+            coverZoom: a.data.coverZoom ?? 1,
+            coverOffset: a.data.coverOffset ?? { x: 50, y: 50 },
         }));
 
         // 4. Get available folders for new albums
