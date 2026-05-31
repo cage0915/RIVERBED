@@ -69,6 +69,31 @@ const titleSections = extractTitleSections(albumEntry.body);
 <Layout title={`${albumEntry.data.title} - RIVERBED`}>
     <div class="fixed bottom-8 right-8 z-40 flex flex-col gap-3">
         <button
+            class="album-tags-toggle group text-zinc-500 hover:text-white transition-all duration-300"
+            id="toggle-all-tags"
+            aria-label="Toggle all photo tags"
+            data-active="false"
+            data-visible="false"
+            type="button"
+        >
+            <div
+                class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center group-hover:border-white/30 transition-colors bg-white/20 backdrop-blur-sm"
+            >
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    ><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg
+                >
+            </div>
+        </button>
+        <button
             onclick="window.scrollTo({top: 0, behavior: 'smooth'})"
             class="group text-zinc-500 hover:text-white transition-all duration-300 opacity-0 translate-y-4 pointer-events-none"
             id="back-to-top"
@@ -192,10 +217,27 @@ const titleSections = extractTitleSections(albumEntry.body);
     .album-breadcrumb-link[data-active="true"] {
         color: rgba(255, 255, 255, 0.9);
     }
+
+    .album-tags-toggle {
+        display: none;
+    }
+
+    .album-tags-toggle[data-active="true"] > div {
+        background: rgba(37, 99, 235, 0.8);
+        color: white;
+        border-color: rgba(37, 99, 235, 0.95);
+    }
+
+    @media (max-width: 768px) and (hover: none) {
+        .album-tags-toggle[data-visible="true"] {
+            display: block;
+        }
+    }
 </style>
 
 <script>
     let breadcrumbObserver: IntersectionObserver | null = null;
+    let areAllTagsVisible = false;
 
     const slugifySectionTitle = (value) => value
         .toLowerCase()
@@ -255,6 +297,39 @@ const titleSections = extractTitleSections(albumEntry.body);
         }
     };
 
+    const syncAlbumTagToggle = () => {
+        const toggleButton = document.getElementById("toggle-all-tags") as HTMLButtonElement | null;
+        if (!toggleButton) return;
+
+        const wrappers = Array.from(document.querySelectorAll(".photo-wrapper[data-has-tags='true']")) as HTMLElement[];
+        const hasTags = wrappers.length > 0;
+
+        toggleButton.dataset.visible = hasTags ? "true" : "false";
+        if (!hasTags) {
+            areAllTagsVisible = false;
+            toggleButton.dataset.active = "false";
+            return;
+        }
+
+        wrappers.forEach((wrapper) => {
+            wrapper.classList.toggle("show-info", areAllTagsVisible);
+        });
+        toggleButton.dataset.active = areAllTagsVisible ? "true" : "false";
+    };
+
+    const initAlbumTagToggle = () => {
+        const toggleButton = document.getElementById("toggle-all-tags") as HTMLButtonElement | null;
+        if (!toggleButton) return;
+
+        toggleButton.onclick = (event) => {
+            event.preventDefault();
+            areAllTagsVisible = !areAllTagsVisible;
+            syncAlbumTagToggle();
+        };
+
+        syncAlbumTagToggle();
+    };
+
     const handleScroll = () => {
         const backToTop = document.getElementById("back-to-top");
         const scrollToBottom = document.getElementById("scroll-to-bottom");
@@ -284,6 +359,8 @@ const titleSections = extractTitleSections(albumEntry.body);
     window.addEventListener("scroll", handleScroll);
     document.addEventListener("astro:after-swap", handleScroll);
     document.addEventListener("astro:after-swap", initAlbumBreadcrumbs);
+    document.addEventListener("astro:after-swap", initAlbumTagToggle);
     handleScroll();
     initAlbumBreadcrumbs();
+    initAlbumTagToggle();
 </script>
