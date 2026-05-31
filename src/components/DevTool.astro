@@ -3,10 +3,19 @@
 ---
 
 <script>
+    import {
+        addOrUpdateTag,
+        collectTagNames,
+        deleteTag as removeTagFromMap,
+        normalizeTagMap,
+    } from "../lib/dev-tag-state.js";
+
     // Only run in development
     if (import.meta.env.DEV) {
         (async () => {
             let mountainCache: { name: string; elevation: number | null; description: string }[] = [];
+            let savedAlbumTagMap: Record<string, { name: string; x: number; y: number }[]> = {};
+            let currentAlbumTagMap: Record<string, { name: string; x: number; y: number }[]> = {};
             const isLocalhost = ['localhost', '127.0.0.1'].includes(location.hostname);
 
             // Ensure we have CSS for the toolbar and interaction states
@@ -63,6 +72,65 @@
                     }
                     .photo-wrapper img {
                         cursor: crosshair !important;
+                    }
+                    .tags-overlay {
+                        position: absolute;
+                        inset: 0;
+                        opacity: 0;
+                        transition: opacity 0.3s ease;
+                        pointer-events: none;
+                    }
+                    .photo-wrapper:hover .tags-overlay,
+                    .photo-wrapper.show-info .tags-overlay {
+                        opacity: 1;
+                        background: rgba(255, 255, 255, 0.1);
+                    }
+                    .tag-marker {
+                        position: absolute;
+                        z-index: 10;
+                        pointer-events: none;
+                    }
+                    .tag-content {
+                        position: absolute;
+                        bottom: 0;
+                        left: 0;
+                        display: flex;
+                        flex-direction: column-reverse;
+                        align-items: flex-start;
+                    }
+                    .tag-line {
+                        width: 1px;
+                        height: 1.2rem;
+                        background: rgba(255, 255, 255, 0.9);
+                        box-shadow: 0 0 1px rgba(0, 0, 0, 0.4);
+                        flex-shrink: 0;
+                    }
+                    .tag-name {
+                        display: inline-block;
+                        color: rgba(0, 0, 0, 0.85);
+                        background: rgba(255, 255, 255, 0.7);
+                        padding: 0.15rem 0.35rem;
+                        border-radius: 1rem;
+                        font-size: 0.6rem;
+                        white-space: nowrap;
+                        backdrop-filter: blur(4px);
+                        transition: all 0.2s ease;
+                        border: 1px solid rgba(255, 255, 255, 0.2);
+                        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                        transform: rotate(-45deg);
+                        transform-origin: bottom left;
+                    }
+                    .tag-link {
+                        text-decoration: none;
+                        pointer-events: auto;
+                        display: block;
+                        margin-bottom: -1px;
+                    }
+                    .tag-link:hover .tag-name {
+                        background: rgba(255, 255, 255, 0.95);
+                        color: #000;
+                        transform: rotate(-45deg) scale(1.05) translate(2px, -2px);
+                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
                     }
 
                     /* Show all tag names when hovering the photo in dev mode */
@@ -121,6 +189,39 @@
                         background: rgba(59, 130, 246, 0.8);
                         color: white;
                         transform: rotate(45deg);
+                    }
+                    .dev-save-btn {
+                        width: 2rem;
+                        height: 2rem;
+                        border-radius: 50%;
+                        background: rgba(255,255,255,0.2);
+                        backdrop-filter: blur(4px);
+                        border: 1px solid rgba(255,255,255,0.1);
+                        color: rgba(161, 161, 170, 0.8);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        cursor: pointer;
+                        z-index: 50;
+                        transition: all 0.3s;
+                    }
+                    .dev-save-btn:not(.in-container) {
+                        position: fixed;
+                        right: 2rem;
+                        bottom: 2rem;
+                    }
+                    .dev-save-btn:hover:not([disabled]) {
+                        background: rgba(16, 185, 129, 0.85);
+                        color: white;
+                    }
+                    .dev-save-btn.has-pending {
+                        background: rgba(37, 99, 235, 0.85);
+                        color: white;
+                        border-color: rgba(37, 99, 235, 0.95);
+                    }
+                    .dev-save-btn[disabled] {
+                        opacity: 0.45;
+                        cursor: default;
                     }
                     /* Page Manager Tree Styles */
                     .dev-pm-tree {
@@ -420,6 +521,143 @@
                     toast!.style.opacity = "0";
                 }, 3000);
             }
+
+            const getTagKeyFromPhotoId = (photoId: string) => {
+                const parts = photoId.split('/');
+                if (parts.length < 3) return photoId;
+                return parts.slice(2).join('/');
+            };
+
+            const escapeHtml = (value: string) => value
+                .replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;')
+                .replaceAll('"', '&quot;')
+                .replaceAll("'", '&#39;');
+
+            const serializeTagMap = (tagMap: Record<string, { name: string; x: number; y: number }[]>) => {
+                return JSON.stringify(normalizeTagMap(tagMap));
+            };
+
+            const updateSaveButtonState = (isSaving = false) => {
+                const saveBtn = document.getElementById('dev-save-btn') as HTMLButtonElement | null;
+                if (!saveBtn) return;
+
+                const hasPendingChanges = serializeTagMap(currentAlbumTagMap) !== serializeTagMap(savedAlbumTagMap);
+                saveBtn.disabled = isSaving || !hasPendingChanges;
+                saveBtn.classList.toggle('has-pending', hasPendingChanges);
+                saveBtn.title = isSaving
+                    ? 'Saving tag changes...'
+                    : hasPendingChanges
+                        ? 'Save pending tag changes'
+                        : 'No pending tag changes';
+            };
+
+            const rememberMountainName = (name: string) => {
+                if (!name.trim()) return;
+                if (!mountainCache.some((mountain) => mountain.name === name)) {
+                    mountainCache = [...mountainCache, { name, elevation: null, description: '' }]
+                        .sort((left, right) => left.name.localeCompare(right.name, 'zh-Hant'));
+                }
+            };
+
+            const readAlbumTagStateFromDom = () => {
+                const nextTagMap: Record<string, { name: string; x: number; y: number }[]> = {};
+
+                document.querySelectorAll('.photo-wrapper[data-item-key]').forEach((wrapper) => {
+                    const photoId = (wrapper as HTMLElement).dataset.itemKey;
+                    if (!photoId) return;
+
+                    const tags = Array.from(wrapper.querySelectorAll('.tag-name')).map((tagName) => {
+                        const el = tagName as HTMLElement;
+                        return {
+                            name: el.dataset.name || '',
+                            x: parseFloat(el.dataset.x || '0'),
+                            y: parseFloat(el.dataset.y || '0'),
+                        };
+                    }).filter((tag) => tag.name);
+
+                    if (tags.length > 0) {
+                        nextTagMap[getTagKeyFromPhotoId(photoId)] = tags;
+                    }
+                });
+
+                return normalizeTagMap(nextTagMap);
+            };
+
+            const syncAlbumTagStateFromDom = () => {
+                savedAlbumTagMap = readAlbumTagStateFromDom();
+                currentAlbumTagMap = normalizeTagMap(savedAlbumTagMap);
+                updateSaveButtonState();
+            };
+
+            const renderTagOverlay = (wrapper: HTMLElement) => {
+                const photoId = wrapper.dataset.itemKey;
+                if (!photoId) return;
+
+                wrapper.querySelector('.tags-overlay')?.remove();
+
+                const tags = currentAlbumTagMap[getTagKeyFromPhotoId(photoId)] || [];
+                if (tags.length === 0) return;
+
+                const overlay = document.createElement('div');
+                overlay.className = 'tags-overlay';
+                overlay.innerHTML = tags.map((tag) => `
+                    <div class="tag-marker" style="left: ${tag.x}%; top: ${tag.y}%;">
+                        <div class="tag-content">
+                            <div class="tag-line"></div>
+                            <a href="/tags/${encodeURIComponent(tag.name)}" class="tag-link">
+                                <span class="tag-name" data-name="${escapeHtml(tag.name)}" data-x="${tag.x}" data-y="${tag.y}">${escapeHtml(tag.name)}</span>
+                            </a>
+                        </div>
+                    </div>
+                `).join('');
+                wrapper.appendChild(overlay);
+            };
+
+            const renderTagOverlaysForPhoto = (photoId: string) => {
+                document.querySelectorAll(`.photo-wrapper[data-item-key="${CSS.escape(photoId)}"]`).forEach((wrapper) => {
+                    renderTagOverlay(wrapper as HTMLElement);
+                });
+                initTagEditButtons();
+                updateSaveButtonState();
+            };
+
+            const savePendingTagChanges = async () => {
+                const albumSlug = getAlbumSlug();
+                if (!albumSlug) {
+                    showToast('❌ Cannot identify album');
+                    return;
+                }
+
+                if (serializeTagMap(currentAlbumTagMap) === serializeTagMap(savedAlbumTagMap)) {
+                    showToast('ℹ️ 沒有待存的 tag 變更');
+                    return;
+                }
+
+                updateSaveButtonState(true);
+
+                try {
+                    const response = await fetch('/api/save-tags', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ albumSlug, tagsMap: currentAlbumTagMap }),
+                    });
+                    const data = await response.json().catch(() => ({}));
+
+                    if (!response.ok) {
+                        throw new Error(data.error || 'Save failed');
+                    }
+
+                    savedAlbumTagMap = normalizeTagMap(currentAlbumTagMap);
+                    collectTagNames(savedAlbumTagMap).forEach(rememberMountainName);
+                    updateSaveButtonState();
+                    showToast('✅ 已存檔，若 dev server 偵測到檔案變更會自動刷新');
+                } catch (error: any) {
+                    updateSaveButtonState();
+                    showToast(`❌ 存檔失敗：${error?.message || 'Unknown error'}`);
+                }
+            };
 
             // Tag Editing Dialog
             function createTagDialog() {
@@ -1787,43 +2025,15 @@
                 });
 
                 if (res.action === 'save' && res.name) {
-                    try {
-                        const response = await fetch("/api/edit-tag", {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ action: "update", photoId, tagName: res.name, x, y }),
-                        });
-                        if (response.ok) {
-                            showToast(`✅ 已新增「${res.name}」`);
-                            setTimeout(() => window.location.reload(), 1000); // Reload to reflect
-                        } else {
-                            showToast("❌ 新增失敗");
-                        }
-                    } catch (err) {
-                        showToast("❌ 網路錯誤");
-                    }
+                    const photoKey = getTagKeyFromPhotoId(photoId);
+                    currentAlbumTagMap = addOrUpdateTag(currentAlbumTagMap, photoKey, { name: res.name, x, y });
+                    rememberMountainName(res.name);
+                    renderTagOverlaysForPhoto(photoId);
+                    showToast(`📝 已暫存新增「${res.name}」`);
                 }
             };
 
-            const initToolbars = () => {
-                const blocks = Array.from(document.querySelectorAll('[data-dev-block]'));
-                const albumSlug = getAlbumSlug();
-
-                blocks.forEach((block, index) => {
-                    if (block.querySelector('.dev-block-toolbar')) return;
-
-                    block.classList.add('dev-block-overlay');
-
-                    const toolbar = document.createElement('div');
-                    toolbar.className = 'dev-block-toolbar';
-
-                    const hasCaption = !!(block as HTMLElement).dataset.devCaption;
-
-                    toolbar.innerHTML = ``;
-                    block.appendChild(toolbar);
-                });
-
-                // Setup edit buttons for existing tags
+            const initTagEditButtons = () => {
                 document.querySelectorAll('.tag-link').forEach((link) => {
                     const nameSpan = link.querySelector('.tag-name') as HTMLElement;
                     if (!nameSpan) return;
@@ -1853,43 +2063,51 @@
 
                         if (res.action === 'cancel') return;
 
+                        const photoKey = getTagKeyFromPhotoId(photoId);
+                        const previousTag = { name: oldName, x: oldX, y: oldY };
+
                         if (res.action === 'delete') {
-                            try {
-                                const response = await fetch("/api/edit-tag", {
-                                    method: "POST",
-                                    headers: { "Content-Type": "application/json" },
-                                    body: JSON.stringify({ action: "delete", photoId, tagName: oldName, x: oldX, y: oldY }),
-                                });
-                                if (response.ok) {
-                                    showToast(`✅ 已刪除「${oldName}」`);
-                                    link.closest('.tag-marker')?.remove();
-                                } else {
-                                    showToast("❌ 刪除失敗");
-                                }
-                            } catch {
-                                showToast("❌ 網路錯誤");
-                            }
-                        } else if (res.action === 'save' && res.name) {
-                            try {
-                                const response = await fetch("/api/edit-tag", {
-                                    method: "POST",
-                                    headers: { "Content-Type": "application/json" },
-                                    body: JSON.stringify({ action: "update", photoId, tagName: res.name, x: oldX, y: oldY }),
-                                });
-                                if (response.ok) {
-                                    showToast(`✅ 已更新為「${res.name}」`);
-                                    setTimeout(() => window.location.reload(), 1000);
-                                } else {
-                                    showToast("❌ 更新失敗");
-                                }
-                            } catch {
-                                showToast("❌ 網路錯誤");
-                            }
+                            currentAlbumTagMap = removeTagFromMap(currentAlbumTagMap, photoKey, previousTag);
+                            renderTagOverlaysForPhoto(photoId);
+                            showToast(`📝 已暫存刪除「${oldName}」`);
+                            return;
+                        }
+
+                        if (res.action === 'save' && res.name) {
+                            currentAlbumTagMap = addOrUpdateTag(
+                                currentAlbumTagMap,
+                                photoKey,
+                                { name: res.name, x: oldX, y: oldY },
+                                previousTag,
+                            );
+                            rememberMountainName(res.name);
+                            renderTagOverlaysForPhoto(photoId);
+                            showToast(`📝 已暫存更新為「${res.name}」`);
                         }
                     });
 
                     nameSpan.appendChild(editBtn);
                 });
+            };
+
+            const initToolbars = () => {
+                const blocks = Array.from(document.querySelectorAll('[data-dev-block]'));
+                const albumSlug = getAlbumSlug();
+
+                blocks.forEach((block, index) => {
+                    if (block.querySelector('.dev-block-toolbar')) return;
+
+                    block.classList.add('dev-block-overlay');
+
+                    const toolbar = document.createElement('div');
+                    toolbar.className = 'dev-block-toolbar';
+
+                    const hasCaption = !!(block as HTMLElement).dataset.devCaption;
+
+                    toolbar.innerHTML = ``;
+                    block.appendChild(toolbar);
+                });
+                initTagEditButtons();
             };
 
             // Block unwanted interactions in DEV mode
@@ -1939,6 +2157,7 @@
 
             const init = () => {
                 injectStyles();
+                syncAlbumTagStateFromDom();
                 initToolbars();
 
                 // Add Gear button
@@ -1965,6 +2184,27 @@
                         document.body.appendChild(gearBtn);
                     }
                 }
+
+                if (!isFolderPage() && !document.getElementById('dev-save-btn')) {
+                    const saveBtn = document.createElement('button');
+                    saveBtn.id = 'dev-save-btn';
+                    saveBtn.className = 'dev-save-btn';
+                    saveBtn.type = 'button';
+                    saveBtn.innerHTML = ICONS.cloudSync;
+                    saveBtn.title = 'No pending tag changes';
+                    saveBtn.disabled = true;
+                    saveBtn.addEventListener('click', savePendingTagChanges);
+
+                    const scrollContainer = document.querySelector('.fixed.bottom-8.right-8.flex-col');
+                    if (scrollContainer) {
+                        saveBtn.classList.add('in-container');
+                        scrollContainer.appendChild(saveBtn);
+                    } else {
+                        document.body.appendChild(saveBtn);
+                    }
+                }
+
+                updateSaveButtonState();
             };
 
             init();
