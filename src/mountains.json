@@ -180,6 +180,11 @@
     "description": ""
   },
   {
+    "name": "小基隆嶼",
+    "elevation": null,
+    "description": ""
+  },
+  {
     "name": "小遠見山",
     "elevation": null,
     "description": ""
@@ -596,6 +601,11 @@
   },
   {
     "name": "杓子岳",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "牡丹山",
     "elevation": null,
     "description": ""
   },
@@ -1236,6 +1246,11 @@
   },
   {
     "name": "龜山島",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "燦光寮山",
     "elevation": null,
     "description": ""
   },
