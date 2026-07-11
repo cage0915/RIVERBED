@@ -275,6 +275,11 @@
     "description": ""
   },
   {
+    "name": "天空堡壘",
+    "elevation": null,
+    "description": ""
+  },
+  {
     "name": "天雲山",
     "elevation": null,
     "description": ""
@@ -420,6 +425,11 @@
     "description": ""
   },
   {
+    "name": "布拉克桑山",
+    "elevation": null,
+    "description": ""
+  },
+  {
     "name": "本鄉山",
     "elevation": null,
     "description": ""
@@ -550,12 +560,22 @@
     "description": ""
   },
   {
+    "name": "向陽山北峰",
+    "elevation": null,
+    "description": ""
+  },
+  {
     "name": "安東軍山",
     "elevation": null,
     "description": ""
   },
   {
     "name": "安東軍山北峰",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "成廣澳山",
     "elevation": null,
     "description": ""
   },
@@ -646,6 +666,11 @@
   },
   {
     "name": "卑南主山",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "卑南主山北峰",
     "elevation": null,
     "description": ""
   },
@@ -780,6 +805,11 @@
     "description": ""
   },
   {
+    "name": "南大",
+    "elevation": null,
+    "description": ""
+  },
+  {
     "name": "南大武山",
     "elevation": null,
     "description": ""
@@ -801,6 +831,11 @@
   },
   {
     "name": "南湖大山",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "南雙頭山",
     "elevation": null,
     "description": ""
   },
@@ -965,6 +1000,11 @@
     "description": ""
   },
   {
+    "name": "連理山",
+    "elevation": null,
+    "description": ""
+  },
+  {
     "name": "都蘭山",
     "elevation": null,
     "description": ""
@@ -1085,6 +1125,16 @@
     "description": ""
   },
   {
+    "name": "雲峰中峰",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "雲峰東峰",
+    "elevation": null,
+    "description": ""
+  },
+  {
     "name": "塔山",
     "elevation": null,
     "description": ""
@@ -1100,12 +1150,32 @@
     "description": ""
   },
   {
+    "name": "新仙山",
+    "elevation": null,
+    "description": ""
+  },
+  {
     "name": "新望嶺",
     "elevation": null,
     "description": ""
   },
   {
+    "name": "新港山",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "溪頭山",
+    "elevation": null,
+    "description": ""
+  },
+  {
     "name": "爺ヶ岳",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "達芬尖山",
     "elevation": null,
     "description": ""
   },
@@ -1296,6 +1366,11 @@
   },
   {
     "name": "霧頭山",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "魔保來山",
     "elevation": null,
     "description": ""
   },
