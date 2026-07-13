@@ -144,6 +144,30 @@ const folderFooter = currentFolderSlug ? getFolderFooter(currentFolderSlug) : nu
 						RIVERBED
 					</a>
 				</div>
+
+				<a
+					href="/rss.xml"
+					class="absolute right-8 hidden h-7 w-7 items-center justify-center rounded-full border border-white/10 text-zinc-500 transition-colors hover:border-white/30 hover:text-white sm:flex"
+					aria-label="訂閱 RIVERBED RSS"
+					title="訂閱 RSS"
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="14"
+						height="14"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						aria-hidden="true"
+					>
+						<path d="M4 11a9 9 0 0 1 9 9"></path>
+						<path d="M4 4a16 16 0 0 1 16 16"></path>
+						<circle cx="5" cy="19" r="1"></circle>
+					</svg>
+				</a>
 			</div>
 
 				</div>
@@ -154,29 +178,54 @@ const folderFooter = currentFolderSlug ? getFolderFooter(currentFolderSlug) : nu
 				id="mobile-menu"
 				class="hidden sm:hidden border-t border-white/5 bg-[#121212]/95 backdrop-blur-xl overflow-hidden transition-all duration-300 ease-in-out max-h-0"
 			>
-				<div class="flex flex-row items-center p-4 gap-6 overflow-x-auto scrollbar-none mask-linear-right">
-					{
-						sortedFolders.map((folder) => {
-							const isActive = currentPath === `/${folder.id}` || currentPath.startsWith(`/${folder.id}/`);
-							return (
-								<a
-									href={`/${folder.id}`}
-									class={`text-base font-sans tracking-wide transition-all whitespace-nowrap relative py-1 ${
-										isActive
-											? "text-white"
-											: "text-zinc-400"
-									}`}
-								>
-									<span class={folder.id === 'dalin' ? 'condensed-kanji' : ''}>
-										{folder.title}
-									</span>
-									<span
-										class={`absolute bottom-0 left-0 right-0 h-0.5 bg-white rounded-full transition-opacity duration-300 ${isActive ? 'opacity-100' : 'opacity-0'} ${folder.id === 'dalin' ? 'condensed-kanji' : ''}`}
-									/>
-								</a>
-							);
-						})
-					}
+				<div class="flex items-center px-4">
+					<div class="flex min-w-0 flex-1 flex-row items-center gap-6 overflow-x-auto py-4 scrollbar-none mask-linear-right">
+						{
+							sortedFolders.map((folder) => {
+								const isActive = currentPath === `/${folder.id}` || currentPath.startsWith(`/${folder.id}/`);
+								return (
+									<a
+										href={`/${folder.id}`}
+										class={`text-base font-sans tracking-wide transition-all whitespace-nowrap relative py-1 ${
+											isActive
+												? "text-white"
+												: "text-zinc-400"
+										}`}
+									>
+										<span class={folder.id === 'dalin' ? 'condensed-kanji' : ''}>
+											{folder.title}
+										</span>
+										<span
+											class={`absolute bottom-0 left-0 right-0 h-0.5 bg-white rounded-full transition-opacity duration-300 ${isActive ? 'opacity-100' : 'opacity-0'} ${folder.id === 'dalin' ? 'condensed-kanji' : ''}`}
+										/>
+									</a>
+								);
+							})
+						}
+					</div>
+					<a
+						href="/rss.xml"
+						class="ml-4 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-white/10 text-zinc-500 transition-colors hover:border-white/30 hover:text-white"
+						aria-label="訂閱 RIVERBED RSS"
+						title="訂閱 RSS"
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="14"
+							height="14"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							aria-hidden="true"
+						>
+							<path d="M4 11a9 9 0 0 1 9 9"></path>
+							<path d="M4 4a16 16 0 0 1 16 16"></path>
+							<circle cx="5" cy="19" r="1"></circle>
+						</svg>
+					</a>
 				</div>
 			</div>
 		</nav>
