@@ -141,7 +141,10 @@ const titleSections = extractTitleSections(albumEntry.body);
         </button>
     </div>
 
-    <div class="relative py-4">
+    <div
+        class="album-page relative py-4"
+        data-has-breadcrumb={titleSections.length > 0 ? "true" : undefined}
+    >
         {titleSections.length > 0 && (
             <div class="pointer-events-none fixed left-8 top-28 z-30 hidden xl:block">
                 <nav
@@ -184,6 +187,22 @@ const titleSections = extractTitleSections(albumEntry.body);
 </Layout>
 
 <style>
+    /*
+     * Keep the fixed breadcrumb rail separate from album media. Near the xl
+     * breakpoint the centred layout reaches into that rail; browser zoom can
+     * put the page in exactly that range. Reserve only the space needed to
+     * keep album content to the right of the 10rem boundary.
+     */
+    @media (min-width: 1280px) {
+        .album-page[data-has-breadcrumb="true"] {
+            padding-left: clamp(
+                0px,
+                calc(42.375rem - 50vw),
+                2.5rem
+            );
+        }
+    }
+
     .album-content {
         width: 100%;
         display: flex;
