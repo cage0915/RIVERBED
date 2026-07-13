@@ -82,8 +82,15 @@ export async function processAlbum(folderSlug: string, albumSlug: string) {
 
     // Generate MDX content
     const albumTitle = albumSlug.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ');
+    const now = new Date();
+    const publishedAt = [
+        now.getFullYear(),
+        String(now.getMonth() + 1).padStart(2, '0'),
+        String(now.getDate()).padStart(2, '0'),
+    ].join('-');
     const frontmatter = `---
 title: "${albumTitle}"
+publishedAt: ${publishedAt}
 coverKey: "${sortedFiles[0]}"
 coverZoom: 1
 coverOffset: { x: 50, y: 50 }
