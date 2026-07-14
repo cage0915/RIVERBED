@@ -28,6 +28,10 @@
 13. 未來可由後端／部署設定在 `svg` 與 `google` provider 之間切換，訪客不負責選擇 provider。
 14. 山岳座標與初始視野繼續由本站資料維護，不保存到 Google 帳戶；Google 只負責底圖與互動渲染。
 15. `mapContext` 目前仍用來選擇 SVG source 與 default view；未來應維持為 provider-neutral 的顯示情境 ID，不直接代表 SVG 檔案或 Google Map ID。
+16. 位置圖與「從山頂眺望」共用右欄同一個 viewer 空間，由訪客切換「位置／視野」，不在頁面同時占用兩塊區域。
+17. 視野圖第一版使用 PeakFinder iframe，預設不載入；訪客首次切到「視野」時才送出第三方請求。
+18. PeakFinder 不作為山名、座標或高度的資料來源；它只消費本站已確認的 viewpoint 資料並渲染計算生成的 360° 地形視野。
+19. PeakFinder 受伺服器端 `PEAKFINDER_ENABLED` feature flag 控制；關閉時不輸出視野頁籤、iframe URL 或第三方請求，但保留 mountain entry 的 panorama 設定。
 
 ## Phase 1 完成後的介面修正
 
@@ -38,6 +42,7 @@
 - 移除 `MOUNTAIN` 與 `LOCATION` 字樣。
 - 山岳名稱字級調大為響應式 `1.75rem–2.5rem`；高度縮小為 `1.875rem–2.75rem`。
 - 訪客顯示／隱藏「登頂過／只看過」不納入第一版，但資料與 renderer 不應阻礙後續加入。
+- 大霸尖山與白馬岳加入 PeakFinder 測試設定；兩者可在同一 viewer 中切換位置圖與視野圖。
 
 ## 核心架構
 
@@ -82,6 +87,12 @@ Map Layer：極簡輪廓；未來可加入地形、等高線等
     "latitude": 36.7585,
     "longitude": 137.7586,
     "mapContext": "jp-northern-alps"
+  },
+  "panorama": {
+    "provider": "peakfinder",
+    "azimuth": 180,
+    "altitude": 0,
+    "fieldOfView": 45
   }
 }
 ```
@@ -95,6 +106,9 @@ Map Layer：極簡輪廓；未來可加入地形、等高線等
 - 第一階段不加入 `seen`。
 - 第一階段不處理 UUID migration；未來支援同名山時，必須同時讓照片 tag 保存 mountain ID，只有在 `mountains.json` 加 UUID 並不能解決歧義。
 - 第一階段的初始 viewport 由 `mapContext` 對應的 default view 寫死；Phase 2 再加入 mountain-level viewport override，由 DevTool 寫回編輯者調整後的 bounds。
+- `panorama` 是選填欄位；只有設定 provider 的山才顯示「視野」頁籤。
+- `azimuth`、`altitude`、`fieldOfView` 都是選填的初始視角；未設定時使用 PeakFinder 預設值，下一階段由 DevTool 編輯。
+- PeakFinder URL 每次由山岳既有經緯度、高度與 panorama 設定產生，不在資料中重複保存完整 iframe URL。
 
 ### Map Context
 
@@ -246,6 +260,24 @@ MountainMap（provider-neutral facade）
       └── GoogleMountainMap
 ```
 
+### MountainViewer.astro
+
+- 作為右欄共用顯示空間，預設顯示既有 `MountainMap`。
+- 有 `panorama.provider="peakfinder"` 時顯示「位置／視野」頁籤。
+- 首次切換到「視野」才把 URL 指派給 iframe，避免未觀看時載入 PeakFinder。
+- iframe 與位置圖使用相同 `16:10` 顯示比例；PeakFinder 失效時不影響位置圖與文字 profile。
+- 頁籤支援滑鼠及鍵盤方向鍵、Home／End 操作。
+- 只有伺服器端 feature flag 開啟且 mountain entry 設有 PeakFinder provider 時，才建立視野頁籤及 embed URL。
+
+PeakFinder feature flag：
+
+```text
+PEAKFINDER_ENABLED=true   # 開啟；未設定時亦維持開啟
+PEAKFINDER_ENABLED=false  # 關閉
+```
+
+`false`、`0`、`no`、`off` 均視為關閉；Cloudflare 使用 runtime environment binding，本機可使用環境變數。這是整站開關，不改寫 `mountains.json`，因此重新開啟後原有兩座測試山會恢復視野功能。
+
 ### Map 設定與投影 utility
 
 - 集中保存 contexts、views、sources 與 assets metadata。
@@ -301,7 +333,9 @@ Prototype 實作採用 geoBoundaries 的台灣／日本 ADM1 WGS84 邊界，底�
 3. 編輯者直接在預覽地圖使用滾輪與拖曳調整初始 viewport。
 4. 將目前 SVG viewBox 反算／轉存為 geographic bounds，作為該山的 viewport override；不保存 marker 圖片百分比。
 5. 提供重設為 context default view 的操作。
-6. 驗證並安全寫回 `mountains.json`。
+6. 提供 PeakFinder 視野預覽，讓編輯者旋轉／縮放後保存 `azimuth`、`altitude` 與 `fieldOfView`，不保存完整 iframe URL。
+7. 提供啟用／停用 PeakFinder 視野的選項；找不到合適視角時仍可只保留位置圖。
+8. 驗證並安全寫回 `mountains.json`。
 
 ### Phase 3：地形與總覽地圖
 
@@ -341,6 +375,8 @@ Prototype 實作採用 geoBoundaries 的台灣／日本 ADM1 WGS84 邊界，底�
 - 同時有資料時，桌面顯示雙欄，手機顯示上下排列。
 - 山岳名稱是左欄第一項；頁面上方不再重複置中顯示。
 - 不顯示 `MOUNTAIN`、`LOCATION` 或範圍下拉選單。
+- 設定 PeakFinder 的測試山可在右欄同一空間切換「位置／視野」，未設定的山只顯示位置圖。
+- PeakFinder iframe 只有在訪客首次切換到視野後才載入，切回位置圖不銷毀 iframe。
 - default view 在 SSR HTML 中可見。
 - 訪客可使用滾輪縮放、拖曳平移及鍵盤操作，且不重新載入頁面。
 - 縮放以游標位置為中心，拖曳方向符合直覺，並限制在 master source extent 附近。

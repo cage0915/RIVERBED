@@ -177,6 +177,9 @@
       "latitude": 24.458196,
       "longitude": 121.258157,
       "mapContext": "tw-dabajian"
+    },
+    "panorama": {
+      "provider": "peakfinder"
     }
   },
   {
@@ -532,6 +535,9 @@
       "latitude": 36.758611,
       "longitude": 137.758611,
       "mapContext": "jp-northern-alps"
+    },
+    "panorama": {
+      "provider": "peakfinder"
     }
   },
   {
