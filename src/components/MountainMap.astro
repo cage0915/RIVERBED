@@ -1,0 +1,352 @@
+---
+import {
+    MAP_CONTEXTS,
+    MAP_SOURCES,
+    MAP_VIEWS,
+    formatViewBox,
+    projectCoordinates,
+    type MapContextId,
+} from "../lib/mountain-map";
+
+interface Props {
+    latitude: number;
+    longitude: number;
+    contextId: MapContextId;
+    mountainName: string;
+}
+
+const { latitude, longitude, contextId, mountainName } = Astro.props;
+const context = MAP_CONTEXTS[contextId];
+const defaultView = MAP_VIEWS[context.defaultView];
+const source = MAP_SOURCES[defaultView.source];
+const marker = projectCoordinates(latitude, longitude);
+const initialViewBox = formatViewBox(defaultView.bounds);
+const initialViewBoxParts = initialViewBox.split(" ").map(Number);
+const initialMarkerRadius =
+    Math.min(initialViewBoxParts[2], initialViewBoxParts[3]) * 0.015;
+const interactionHelpId = `${contextId}-map-help`;
+---
+
+<section
+    class="mountain-map"
+    data-mountain-map
+    data-initialized="false"
+    data-source-view-box={source.extent.join(" ")}
+    aria-label={`${mountainName}位置圖`}
+>
+    <p id={interactionHelpId} class="sr-only">
+        使用滾輪縮放，拖曳移動地圖；方向鍵可平移，加號與減號可縮放，Home鍵可回到初始範圍。
+    </p>
+
+    <div class="mountain-map__frame">
+        <svg
+            class="mountain-map__canvas"
+            data-map-canvas
+            data-initial-view-box={initialViewBox}
+            viewBox={initialViewBox}
+            role="img"
+            tabindex="0"
+            aria-label={`${mountainName}的位置`}
+            aria-describedby={interactionHelpId}
+            preserveAspectRatio="xMidYMid meet"
+        >
+            <g aria-hidden="true">
+                {
+                    source.featureIds.map((featureId) => (
+                        <use
+                            href={`${source.asset}#${featureId}`}
+                            class="mountain-map__feature"
+                        />
+                    ))
+                }
+            </g>
+
+            <g
+                class="mountain-map__marker"
+                data-map-marker
+                transform={`translate(${marker.x} ${marker.y})`}
+            >
+                <circle
+                    class="mountain-map__marker-halo"
+                    data-map-marker-halo
+                    r={initialMarkerRadius * 2.35}
+                />
+                <circle
+                    class="mountain-map__marker-core"
+                    data-map-marker-core
+                    r={initialMarkerRadius}
+                />
+            </g>
+        </svg>
+    </div>
+
+    <div class="mountain-map__footer">
+        {
+            source.attribution.map((item, index) => (
+                <>
+                    {index > 0 && ", "}
+                    <a href={item.url} target="_blank" rel="noreferrer">
+                        {item.label}
+                    </a>
+                </>
+            ))
+        }
+    </div>
+</section>
+
+<style>
+    .mountain-map {
+        min-width: 0;
+    }
+
+    .mountain-map__frame {
+        overflow: hidden;
+        border: 1px solid rgb(255 255 255 / 0.07);
+        background:
+            radial-gradient(circle at center, rgb(255 255 255 / 0.035), transparent 68%),
+            rgb(255 255 255 / 0.012);
+    }
+
+    .mountain-map__canvas {
+        display: block;
+        width: 100%;
+        aspect-ratio: 16 / 10;
+        cursor: grab;
+        touch-action: none;
+        user-select: none;
+    }
+
+    .mountain-map__canvas[data-dragging="true"] {
+        cursor: grabbing;
+    }
+
+    .mountain-map__canvas:focus-visible {
+        outline: 1px solid rgb(255 255 255 / 0.55);
+        outline-offset: -3px;
+    }
+
+    .mountain-map__feature {
+        fill: rgb(39 39 42);
+        stroke: rgb(113 113 122 / 0.72);
+        stroke-width: 0.75;
+        vector-effect: non-scaling-stroke;
+    }
+
+    .mountain-map__marker-halo {
+        fill: rgb(250 250 250 / 0.2);
+    }
+
+    .mountain-map__marker-core {
+        fill: rgb(250 250 250);
+        stroke: rgb(24 24 27);
+        stroke-width: 1;
+        vector-effect: non-scaling-stroke;
+    }
+
+    .mountain-map__footer {
+        margin-top: 0.5rem;
+        color: rgb(82 82 91);
+        font-size: 0.5625rem;
+        letter-spacing: 0.04em;
+        text-align: right;
+    }
+
+    .mountain-map__footer a {
+        color: inherit;
+        transition: color 160ms ease;
+    }
+
+    .mountain-map__footer a:hover {
+        color: rgb(161 161 170);
+    }
+</style>
+
+<script>
+    import {
+        constrainMapViewBox,
+        zoomMapViewBoxAt,
+        type SvgViewBox,
+    } from "../lib/mountain-map";
+
+    const parseViewBox = (value: string | undefined): SvgViewBox | null => {
+        if (!value) return null;
+        const values = value.trim().split(/\s+/).map(Number);
+        if (values.length !== 4 || values.some((number) => !Number.isFinite(number))) {
+            return null;
+        }
+        return values as SvgViewBox;
+    };
+
+    function initMountainMaps() {
+        document.querySelectorAll<HTMLElement>("[data-mountain-map]").forEach((root) => {
+            if (root.dataset.initialized === "true") return;
+
+            const canvas = root.querySelector<SVGSVGElement>("[data-map-canvas]");
+            const markerHalo = root.querySelector<SVGCircleElement>("[data-map-marker-halo]");
+            const markerCore = root.querySelector<SVGCircleElement>("[data-map-marker-core]");
+            const initialViewBox = parseViewBox(canvas?.dataset.initialViewBox);
+            const sourceViewBox = parseViewBox(root.dataset.sourceViewBox);
+
+            if (!canvas || !markerHalo || !markerCore || !initialViewBox || !sourceViewBox) {
+                root.dataset.initialized = "true";
+                return;
+            }
+
+            let currentViewBox: SvgViewBox = [...initialViewBox];
+            let activePointerId: number | null = null;
+            let lastPointerPosition: { x: number; y: number } | null = null;
+            const renderViewBox = (nextViewBox: SvgViewBox) => {
+                currentViewBox = constrainMapViewBox(
+                    nextViewBox,
+                    initialViewBox,
+                    sourceViewBox,
+                );
+                canvas.setAttribute(
+                    "viewBox",
+                    currentViewBox.map((value) => Number(value.toFixed(4))).join(" "),
+                );
+
+                const radius = Math.min(currentViewBox[2], currentViewBox[3]) * 0.015;
+                markerHalo.setAttribute("r", String(radius * 2.35));
+                markerCore.setAttribute("r", String(radius));
+            };
+
+            const zoomAt = (factor: number, point: { x: number; y: number }) => {
+                currentViewBox = zoomMapViewBoxAt(
+                    currentViewBox,
+                    factor,
+                    point,
+                    initialViewBox,
+                    sourceViewBox,
+                );
+                renderViewBox(currentViewBox);
+            };
+
+            const centrePoint = () => ({
+                x: currentViewBox[0] + currentViewBox[2] / 2,
+                y: currentViewBox[1] + currentViewBox[3] / 2,
+            });
+
+            canvas.addEventListener(
+                "wheel",
+                (event) => {
+                    event.preventDefault();
+                    const matrix = canvas.getScreenCTM();
+                    if (!matrix) return;
+
+                    const point = new DOMPoint(event.clientX, event.clientY).matrixTransform(
+                        matrix.inverse(),
+                    );
+                    const delta = Math.max(-120, Math.min(120, event.deltaY));
+                    zoomAt(Math.exp(delta * 0.0025), point);
+                },
+                { passive: false },
+            );
+
+            canvas.addEventListener("pointerdown", (event) => {
+                if (event.button !== 0) return;
+                activePointerId = event.pointerId;
+                lastPointerPosition = { x: event.clientX, y: event.clientY };
+                canvas.setPointerCapture(event.pointerId);
+                canvas.dataset.dragging = "true";
+            });
+
+            canvas.addEventListener("pointermove", (event) => {
+                if (
+                    activePointerId !== event.pointerId ||
+                    !lastPointerPosition
+                ) return;
+
+                const matrix = canvas.getScreenCTM();
+                if (!matrix || matrix.a === 0 || matrix.d === 0) return;
+
+                const deltaX = event.clientX - lastPointerPosition.x;
+                const deltaY = event.clientY - lastPointerPosition.y;
+                renderViewBox([
+                    currentViewBox[0] - deltaX / matrix.a,
+                    currentViewBox[1] - deltaY / matrix.d,
+                    currentViewBox[2],
+                    currentViewBox[3],
+                ]);
+                lastPointerPosition = { x: event.clientX, y: event.clientY };
+            });
+
+            const finishDragging = (event: PointerEvent) => {
+                if (activePointerId !== event.pointerId) return;
+                activePointerId = null;
+                lastPointerPosition = null;
+                canvas.dataset.dragging = "false";
+                if (canvas.hasPointerCapture(event.pointerId)) {
+                    canvas.releasePointerCapture(event.pointerId);
+                }
+            };
+
+            canvas.addEventListener("pointerup", finishDragging);
+            canvas.addEventListener("pointercancel", finishDragging);
+
+            canvas.addEventListener("dblclick", () => {
+                renderViewBox([...initialViewBox]);
+            });
+
+            canvas.addEventListener("keydown", (event) => {
+                const panX = currentViewBox[2] * 0.08;
+                const panY = currentViewBox[3] * 0.08;
+
+                switch (event.key) {
+                    case "ArrowLeft":
+                        renderViewBox([
+                            currentViewBox[0] - panX,
+                            currentViewBox[1],
+                            currentViewBox[2],
+                            currentViewBox[3],
+                        ]);
+                        break;
+                    case "ArrowRight":
+                        renderViewBox([
+                            currentViewBox[0] + panX,
+                            currentViewBox[1],
+                            currentViewBox[2],
+                            currentViewBox[3],
+                        ]);
+                        break;
+                    case "ArrowUp":
+                        renderViewBox([
+                            currentViewBox[0],
+                            currentViewBox[1] - panY,
+                            currentViewBox[2],
+                            currentViewBox[3],
+                        ]);
+                        break;
+                    case "ArrowDown":
+                        renderViewBox([
+                            currentViewBox[0],
+                            currentViewBox[1] + panY,
+                            currentViewBox[2],
+                            currentViewBox[3],
+                        ]);
+                        break;
+                    case "+":
+                    case "=":
+                        zoomAt(0.8, centrePoint());
+                        break;
+                    case "-":
+                    case "_":
+                        zoomAt(1.25, centrePoint());
+                        break;
+                    case "Home":
+                    case "0":
+                        renderViewBox([...initialViewBox]);
+                        break;
+                    default:
+                        return;
+                }
+                event.preventDefault();
+            });
+
+            root.dataset.initialized = "true";
+        });
+    }
+
+    initMountainMaps();
+    document.addEventListener("astro:page-load", initMountainMaps);
+</script>

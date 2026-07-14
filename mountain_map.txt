@@ -1,0 +1,362 @@
+# Mountain profile and map plan
+
+## 目標
+
+在 `src/pages/tags/[tag].astro` 的照片列表上方加入山岳 profile：
+
+- 左欄顯示高度、描述等文字資訊。
+- 右欄顯示極簡底圖，並以山岳的經緯度標示位置。
+- 山岳名稱放在左欄第一項，不在 profile 上方另外置中顯示。
+- 每座山設定一個預設初始範圍；訪客使用滾輪縮放、拖曳平移，不使用範圍下拉選單。
+- 第一階段先使用極簡行政輪廓，但架構需保留未來切換地形底圖的能力。
+- 沒有任何山岳資料的 tag 頁必須維持目前版面，不顯示空 profile。
+
+## 已確認的產品決策
+
+1. 訪客以滾輪和拖曳自由探索同一份 master map，不提供北阿／長野／本州等範圍下拉選單。
+2. 地圖範圍不限於國家／縣市，也支援跨行政區的自訂區域，例如日本北阿爾卑斯。
+3. 台灣本島、日本本州等範圍可以透過行政區篩選與經緯度 bounds 裁切，不必顯示整個國家。
+4. 第一階段只做極簡輪廓；地形圖延後，但底圖 layer 不可與山岳資料耦合。
+5. 照片中出現 tag 即代表看過／拍過，不在 `mountains.json` 重複保存 `seen` 狀態。
+6. 登頂狀態與總覽地圖不屬於第一階段。
+7. 同一 coverage 的不同 views 共用一份 master SVG；縮放與裁切由動態 `viewBox` 完成，不為每個 view 重複產生 SVG。
+8. marker 在渲染時與底圖放進同一個外層 `<svg>` 座標空間，但山岳永久資料仍只保存經緯度，不保存 SVG `x/y`。
+9. 後續總覽地圖可切換「登頂過／只看過」，但這兩類應定義成互斥分類，避免同一座山同時屬於兩個開關而產生混淆。
+10. Profile 不顯示 `MOUNTAIN` 與 `LOCATION` 裝飾字樣。
+11. 山岳名稱移到左欄第一項並提高字級；高度字級縮小，讓資訊層級以山名為主。
+12. Google Maps 延後到下一階段評估；目前的 SVG 地圖保留，不以 Google 實作取代或耦合山岳資料。
+13. 未來可由後端／部署設定在 `svg` 與 `google` provider 之間切換，訪客不負責選擇 provider。
+14. 山岳座標與初始視野繼續由本站資料維護，不保存到 Google 帳戶；Google 只負責底圖與互動渲染。
+15. `mapContext` 目前仍用來選擇 SVG source 與 default view；未來應維持為 provider-neutral 的顯示情境 ID，不直接代表 SVG 檔案或 Google Map ID。
+
+## Phase 1 完成後的介面修正
+
+- 移除訪客範圍下拉選單，改成直接以滑鼠滾輪縮放、拖曳平移。
+- 每個 `mapContext` 提供寫死的 default view；之後由 DevTool 讓編輯者調整 mountain-level 初始範圍。
+- 滾輪縮放以游標位置為中心，marker 與底圖保持在同一個 SVG 座標空間。
+- 移除 profile 上方置中的山岳名稱，改放在左欄第一項。
+- 移除 `MOUNTAIN` 與 `LOCATION` 字樣。
+- 山岳名稱字級調大為響應式 `1.75rem–2.5rem`；高度縮小為 `1.875rem–2.75rem`。
+- 訪客顯示／隱藏「登頂過／只看過」不納入第一版，但資料與 renderer 不應阻礙後續加入。
+
+## 核心架構
+
+將地圖拆成以下獨立概念：
+
+```text
+山岳經緯度
+    ↓
+Map Context：這座山使用哪個 source 與哪個預設 view
+    ↓
+Map View：選擇 source、顯示範圍、行政區篩選
+    ↓
+Map Source：master asset、投影、座標範圍
+    ↓
+Map Layer：極簡輪廓；未來可加入地形、等高線等
+```
+
+重要原則：
+
+- `mountains.json` 永遠保存原始經緯度，不保存針對特定圖片算出的 `x/y %`。
+- marker 與底圖使用同一個投影函式。
+- 投影後的 SVG `cx/cy` 只是當次渲染的暫時結果，不寫回山岳資料。
+- Map View 與 Map Layer 分離；更換地形底圖不需修改山岳資料。
+- 第一階段統一使用 Web Mercator，方便日後對接常見地形圖或圖磚。
+- 地圖來源、授權與 attribution 記錄在 source/layer 設定，不分散到頁面中。
+- Map Source 提供完整 coverage 的 master SVG；Map View 提供 SSR 初始 geographic bounds，訪客操作後由前端動態更新 `viewBox`。
+- `MountainProfile` 只傳遞 provider-neutral props：經緯度、`mapContext` 與山名，不直接依賴 Google 或 SVG 專用欄位。
+- provider 的選擇屬於網站／後端設定，不屬於單一 mountain entry。
+
+## 資料結構
+
+### mountains.json
+
+第一階段沿用 `name` 查找，新增可選的 `location`：
+
+```json
+{
+  "name": "白馬岳",
+  "elevation": 2932,
+  "description": "",
+  "location": {
+    "latitude": 36.7585,
+    "longitude": 137.7586,
+    "mapContext": "jp-northern-alps"
+  }
+}
+```
+
+欄位規則：
+
+- `latitude`：-90 到 90。
+- `longitude`：-180 到 180。
+- `mapContext`：必須對應已定義的 context。
+- 缺少 `location` 時仍可只顯示文字資訊。
+- 第一階段不加入 `seen`。
+- 第一階段不處理 UUID migration；未來支援同名山時，必須同時讓照片 tag 保存 mountain ID，只有在 `mountains.json` 加 UUID 並不能解決歧義。
+- 第一階段的初始 viewport 由 `mapContext` 對應的 default view 寫死；Phase 2 再加入 mountain-level viewport override，由 DevTool 寫回編輯者調整後的 bounds。
+
+### Map Context
+
+Context 定義某一類山岳的預設 view。現有其他 views 可保留作為未來 DevTool 的編輯 preset，但不顯示給訪客：
+
+```ts
+{
+  id: "jp-northern-alps",
+  defaultView: "jp-northern-alps",
+  views: [
+    "jp-northern-alps",
+    "jp-nagano",
+    "jp-honshu",
+    "jp-japan"
+  ]
+}
+```
+
+山岳只保存 context ID；visitor map 只讀 `defaultView` 作為初始 viewport。
+
+目前 `mapContext` 仍是必要欄位，負責從 `MAP_CONTEXTS` 找到 SVG master source 與初始 view。未來加入 Google provider 後，context ID 保持不變，但其設定可按 provider 分開：
+
+```ts
+{
+  id: "tw-dabajian",
+  providers: {
+    svg: {
+      source: "taiwan",
+      defaultView: "tw-dabajian-area"
+    },
+    google: {
+      initialBounds: {
+        west: 120.8,
+        south: 24.2,
+        east: 121.5,
+        north: 24.8
+      },
+      defaultMapType: "terrain"
+    }
+  }
+}
+```
+
+這是下一階段的目標結構，不在第一階段先行改寫。Google 的 `center/zoom` 可在 runtime 由 geographic bounds 與容器尺寸算出，避免把初始視野綁死在 Google zoom 或 SVG `viewBox`。
+
+### Map View
+
+```ts
+type MapView = {
+  id: string;
+  label: string;
+  level: "country" | "admin1" | "region";
+  source: string;
+  bounds: {
+    west: number;
+    south: number;
+    east: number;
+    north: number;
+  };
+  visibleFeatures?: string[];
+};
+```
+
+`bounds` 會在 SSR 時投影成 master SVG 的初始 `viewBox`。互動地圖載入該 Map Source 的所有 features，讓訪客能拖曳到初始範圍以外；`visibleFeatures` 保留給未來靜態 view、總覽圖或 DevTool preset 使用：
+
+- 日本本州：只保留本州都府縣，排除北海道、四國、九州及沖繩。
+- 長野縣：只保留長野縣 polygon，bounds 貼合縣域。
+- 北阿爾卑斯：保留長野、富山、岐阜、新潟等周邊 polygon，再以 bounds 裁切到山域。
+- 台灣本島：排除不需要的離島，再以 bounds 保留本島及指定近海島嶼。
+
+不同初始範圍不需要建立額外 SVG 檔案。
+
+### Map Source
+
+Map Source 描述 master SVG、投影和來源資訊：
+
+```ts
+type MapSource = {
+  id: string;
+  asset: string;
+  projection: "web-mercator";
+  extent: [x: number, y: number, width: number, height: number];
+  attribution?: {
+    label: string;
+    url: string;
+  };
+};
+```
+
+第一階段預計至少有台灣與日本兩個 outline sources。Map View 引用 source；Mountain 不直接引用 SVG asset。
+
+## 地圖資產策略
+
+1. 使用 WGS84 GeoJSON 作為原始輪廓資料。
+2. 以我們控制的 Web Mercator 轉換，為每個 coverage/layer 產生一份精簡 master SVG，而不是每個 Map View 一份。
+3. master SVG 中的行政區 paths 需保留穩定 feature ID，供 `visibleFeatures` 選擇。
+4. 原始大型 GeoJSON 不送到訪客瀏覽器，也不在每個 tag request 重複處理。
+5. Map View 的 geographic bounds 會投影成動態 SVG `viewBox`，因此新增山域通常只需新增設定資料。
+6. 底圖 paths 與 marker 在渲染時放進同一個外層 `<svg>`，共同接受 `viewBox` 的裁切與縮放。
+7. marker 的 SVG `cx/cy` 每次都從原始經緯度計算，不保存成資料，也不嵌入 master SVG asset。
+8. marker 半徑需依目前 viewBox 計算，使全國與區域視圖中的視覺大小大致一致。
+9. master SVG 應以可快取的形式載入；prototype 可先 inline，確認後再決定使用外部 `<use>`、SVG fragment 或載入後注入。
+10. 所有資產需保留來源與授權資訊。
+11. 滾輪縮放以游標所在的 SVG 座標為中心；拖曳平移與縮放都限制在 Map Source extent 附近，避免迷失在無限空白中。
+
+預計資產形式：
+
+```text
+public/maps/
+├── taiwan-outline.svg
+└── japan-outline.svg
+```
+
+台灣本島、縣市、日本本州、長野與北阿等範圍由 views metadata 表達，不各自建立檔案。實際檔名與 SVG 引用方式在 prototype 時確認。
+
+## 元件與責任
+
+### MountainProfile.astro
+
+- 接收 mountain entry。
+- 在左欄使用 `<h1>` 顯示山岳名稱，接著才是高度與描述。
+- 不顯示 `MOUNTAIN` 裝飾文字。
+- 決定文字欄與地圖欄是否存在。
+- 桌面雙欄，手機改為上下排列。
+- 只有單欄有資料時使用完整寬度。
+- elevation 顯示單位為公尺。
+
+### MountainMap.astro
+
+- 接收經緯度與 `mapContext`。
+- SSR 顯示 default view，沒有 JavaScript 也看得到初始地圖。
+- 不顯示範圍 selector 與 `LOCATION` 裝飾文字。
+- 滾輪以指標位置為中心縮放；pointer drag 平移地圖。
+- 鍵盤方向鍵可平移，`+`／`-` 可縮放，`Home`／`0` 與雙擊可重設初始範圍。
+- 依 Map Source extent 限制最遠平移及縮放上下限。
+- 使用 Map Source 的投影重新計算 marker，並與底圖 paths 一起畫在同一個外層 `<svg>`。
+- master SVG 不包含山岳座標；`circle` 或 marker `<g>` 由頁面渲染器產生。
+- 經緯度落在 view 外時不顯示錯誤 marker，並提供可診斷的 fallback。
+- 預留 `layer="outline"` 介面；第一階段不顯示 layer 切換 UI。
+- attribution 使用低干擾但可辨識的方式呈現。
+
+目前 `MountainMap.astro` 是 SVG renderer。加入第二個 provider 時，將它調整為共用入口，再委派給 `SvgMountainMap` 或 `GoogleMountainMap`；兩者接收相同的 mountain props。
+
+```text
+MountainProfile
+      ↓
+MountainMap（provider-neutral facade）
+      ├── SvgMountainMap
+      └── GoogleMountainMap
+```
+
+### Map 設定與投影 utility
+
+- 集中保存 contexts、views、sources 與 assets metadata。
+- 提供 Web Mercator 經緯度轉 SVG 座標的純函式。
+- 驗證 context、view、bounds 及座標。
+- 投影函式應可單獨測試，不依賴 DOM。
+
+### tags/[tag].astro
+
+- 以 `decodedTag` 查找 `mountains.json`。
+- 找到 mountain 且至少有文字或位置資料時，才插入 `MountainProfile`。
+- 下方既有照片分組與空狀態不變。
+
+## 訪客地圖互動
+
+- 預設顯示最具有資訊價值的區域 view，例如白馬岳先顯示北阿爾卑斯。
+- 游標停在地圖上時，滾輪以游標位置為中心縮放。
+- 按住並拖曳可平移，地圖使用 grab/grabbing cursor 回饋狀態。
+- 同一 Map Source 的所有行政區共用已載入的 master SVG；互動只更新外層 `viewBox`。
+- marker 與底圖在同一 SVG 座標空間，因此縮放和平移時自然保持對齊。
+- 每次載入頁面都從該山的 default viewport 開始，不跨山岳保存訪客操作狀態。
+- 地圖可取得 keyboard focus，並提供螢幕閱讀器操作說明。
+
+## 分階段執行
+
+### Phase 0：資料與視覺 prototype
+
+1. 選定大霸尖山與白馬岳作為測試山岳。
+2. 手動加入兩座山的高度、描述、座標與 map context。
+3. 確認大霸群峰與日本北阿爾卑斯兩個初始 Map Views。
+4. 取得台灣、日本 WGS84 行政區資料，確認授權與 attribution。
+5. 各產生一份台灣、日本測試用 master SVG，人工核對不同 viewBox 下的 marker 位置。
+6. 確認深色頁面的底圖線條、marker、留白與兩欄比例。
+
+Prototype 實作採用 geoBoundaries 的台灣／日本 ADM1 WGS84 邊界，底層資料來自 OpenStreetMap 並依 ODbL 1.0 標示來源。若未來改回 Simplemaps 或其他來源，只替換 Map Source 與 master SVG，不修改山岳經緯度或 Map Views 的概念。
+
+### Phase 1：完成個別山岳 tag 頁
+
+1. 定義 Mountain、MapContext、MapView 型別與資料驗證。
+2. 建立 map contexts 與 views 設定。
+3. 建立 Web Mercator 投影 utility 及測試。
+4. 建立／整理台灣與日本的精簡 master SVG 資產，保留行政區 feature IDs。
+5. 實作 `MountainMap.astro` 的 default view、marker、滾輪縮放、拖曳平移、鍵盤操作與重設。
+6. 實作 `MountainProfile.astro` 的響應式兩欄 UI。
+7. 整合到 `src/pages/tags/[tag].astro`。
+8. 確認 Astro View Transitions 後地圖互動事件仍能正確初始化且不重複綁定。
+9. 執行型別檢查、build 與瀏覽器驗證。
+
+### Phase 2：開發工具與資料維護
+
+1. 在 dev 模式提供 mountain entry 編輯 UI。
+2. 編輯 elevation、description、latitude、longitude 與 map context。
+3. 編輯者直接在預覽地圖使用滾輪與拖曳調整初始 viewport。
+4. 將目前 SVG viewBox 反算／轉存為 geographic bounds，作為該山的 viewport override；不保存 marker 圖片百分比。
+5. 提供重設為 context default view 的操作。
+6. 驗證並安全寫回 `mountains.json`。
+
+### Phase 3：地形與總覽地圖
+
+1. 將 `MountainMap` 整理成 provider-neutral facade，保留既有 SVG renderer。
+2. 由後端／部署設定選擇 `svg` 或 `google`，例如 `MOUNTAIN_MAP_PROVIDER=svg|google`；provider 不寫進個別 mountain entry。
+3. 實作 Google Maps renderer，沿用本站保存的經緯度、`mapContext` 與 geographic bounds。
+4. Google renderer 提供 `terrain`／`satellite` 底圖切換；Google `terrain` 是一般地形底圖，不視為專業登山等高線圖。
+5. Google API key、billing、Map ID 與樣式設定放在 Google Cloud／部署環境，不放在 `mountains.json`；座標不需保存到 Google 帳戶。
+6. 限制 API key 的 HTTP referrer、設定 quota／預算通知，並延遲到地圖進入可視範圍後才載入，以控制 Dynamic Maps 成本。
+7. 若不採 Google，選擇具有合適授權的地形來源，以相同 Web Mercator 座標系建立 terrain Map Sources；既有 geographic bounds 可沿用。
+8. 視 provider 能力加入「極簡／地形」或「地形／衛星」layer 切換。
+9. 建立總覽地圖，使用目前啟用的 renderer 投影多座山的 markers。
+10. 由現有照片 tags 推導 `seen`，不寫入 `mountains.json`；只有具有效座標的山能出現在地圖上。
+11. 在 `mountains.json` 加入 `summited` 或 summit records，表示人工維護的登頂資料。
+12. 將總覽 marker 分成互斥類別：
+   - `summited`：登頂過，不論是否也有照片 tag。
+   - `seen-only`：有照片 tag，但沒有登頂紀錄。
+   - `unknown`：兩者皆無，預設不顯示。
+13. 提供兩個獨立開關「登頂過」與「只看過」；顯示結果是目前啟用類別的聯集。
+14. 使用不同 marker 樣式及圖例區分兩類，例如登頂為實心、只看過為空心。
+15. 在需要支援同名山以前，規劃 mountain ID、URL 與既有照片 tag 的完整 migration。
+
+### Google Maps 可行性與成本備註（2026-07）
+
+- Maps JavaScript API 原生支援 `terrain`、`satellite`、滾輪縮放與拖曳。
+- Dynamic Maps 以成功載入地圖計費；同一地圖實例內的平移、縮放與底圖切換不需要把座標保存到 Google，也不改變本站的 mountain schema。
+- 全球標準 PAYG 目前每個月前 10,000 次 Dynamic Maps 載入免費，其後第一級為每 1,000 次 US$7；價格可能調整，實作時須重新查閱官方表格。
+- Google Cloud 必須啟用 billing，即使用量落在免費額度內。
+- 官方價格：https://developers.google.com/maps/billing-and-pricing/pricing
+- SKU／計費事件：https://developers.google.com/maps/billing-and-pricing/sku-details
+
+## 第一階段驗收條件
+
+- 沒有 elevation、description、location 的 tag 頁與目前外觀一致。
+- 只有文字資料時，文字區使用完整寬度。
+- 只有位置資料時，地圖區使用完整寬度。
+- 同時有資料時，桌面顯示雙欄，手機顯示上下排列。
+- 山岳名稱是左欄第一項；頁面上方不再重複置中顯示。
+- 不顯示 `MOUNTAIN`、`LOCATION` 或範圍下拉選單。
+- default view 在 SSR HTML 中可見。
+- 訪客可使用滾輪縮放、拖曳平移及鍵盤操作，且不重新載入頁面。
+- 縮放以游標位置為中心，拖曳方向符合直覺，並限制在 master source extent 附近。
+- 每次互動後 marker 與底圖仍保持正確對齊，marker 視覺大小大致一致。
+- 不把大型 GeoJSON 傳到訪客瀏覽器；同一 source 的 views 共用一份 master SVG。
+- 無效座標、缺少 context 或載入失敗時不破壞整個 tag 頁。
+- attribution 正確呈現。
+- Astro 型別檢查與 production build 通過。
+
+## 第一階段明確不做
+
+- mountain dev 編輯工具。
+- 地形圖 layer 與 layer 切換 UI。
+- 所有山岳的總覽地圖。
+- 「登頂過／只看過」marker 篩選與圖例。
+- `seen` 欄位。
+- 登頂狀態 UI。
+- UUID／同名山 migration。
+- 圖磚、地名搜尋、路線、比例尺等完整 GIS 功能。

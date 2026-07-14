@@ -171,8 +171,13 @@
   },
   {
     "name": "大霸尖山",
-    "elevation": null,
-    "description": ""
+    "elevation": 3492,
+    "description": "位於雪山山脈北緣，山體四面峭壁，是聖稜線北端極具辨識度的山峰。",
+    "location": {
+      "latitude": 24.458196,
+      "longitude": 121.258157,
+      "mapContext": "tw-dabajian"
+    }
   },
   {
     "name": "小油坑",
@@ -521,8 +526,13 @@
   },
   {
     "name": "白馬岳",
-    "elevation": null,
-    "description": ""
+    "elevation": 2932,
+    "description": "位於飛驒山脈北部、富山縣與長野縣交界，是日本北阿爾卑斯北部的代表性山峰。",
+    "location": {
+      "latitude": 36.758611,
+      "longitude": 137.758611,
+      "mapContext": "jp-northern-alps"
+    }
   },
   {
     "name": "白馬鑓ヶ岳",

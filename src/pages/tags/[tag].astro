@@ -2,7 +2,12 @@
 import Layout from "../../layouts/Layout.astro";
 import Row from "../../components/Row.astro";
 import Photo from "../../components/Photo.astro";
+import MountainProfile, {
+    type Mountain,
+} from "../../components/MountainProfile.astro";
 import { getAllPhotosWithTags } from "../../utils/tags";
+import mountainsData from "../../mountains.json";
+import { isMapContextId } from "../../lib/mountain-map";
 
 export const prerender = false;
 
@@ -14,6 +19,18 @@ if (!tag) {
 
 const allPhotos = await getAllPhotosWithTags();
 const decodedTag = decodeURIComponent(tag);
+const mountain = (mountainsData as Mountain[]).find(
+    (entry) => entry.name === decodedTag,
+);
+const hasMountainProfile = Boolean(
+    mountain &&
+        (mountain.elevation !== null ||
+            mountain.description.trim() ||
+            (mountain.location &&
+                Number.isFinite(mountain.location.latitude) &&
+                Number.isFinite(mountain.location.longitude) &&
+                isMapContextId(mountain.location.mapContext))),
+);
 const matchingPhotos = allPhotos.filter((photo) =>
     photo.tags.some((t) => t.name === decodedTag),
 );
@@ -110,11 +127,15 @@ function chunkArray<T>(array: T[], size: number): T[][] {
     </div>
 
     <main class="container mx-auto px-4 py-4 max-w-5xl">
-        <h1
-            class="text-xl font-sans tracking-widest uppercase mb-6 text-center"
-        >
-            {decodedTag}
-        </h1>
+        {
+            hasMountainProfile && mountain ? (
+                <MountainProfile mountain={mountain} />
+            ) : (
+                <h1 class="text-xl font-sans tracking-widest uppercase mb-6 text-center">
+                    {decodedTag}
+                </h1>
+            )
+        }
 
         <div class="tag-photos space-y-12">
             {
