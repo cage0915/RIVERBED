@@ -4,7 +4,7 @@ import {
     buildPeakFinderEmbedUrl,
     type PeakFinderPanorama,
 } from "../lib/mountain-panorama";
-import type { MapContextId } from "../lib/mountain-map";
+import type { MapBounds, MapContextId } from "../lib/mountain-map";
 
 interface Props {
     latitude: number;
@@ -13,6 +13,7 @@ interface Props {
     mountainName: string;
     elevation: number | null;
     panorama?: PeakFinderPanorama;
+    initialBounds?: MapBounds;
     peakFinderEnabled?: boolean;
 }
 
@@ -23,6 +24,7 @@ const {
     mountainName,
     elevation,
     panorama,
+    initialBounds,
     peakFinderEnabled = true,
 } = Astro.props;
 const hasPanorama = peakFinderEnabled && panorama?.provider === "peakfinder";
@@ -94,6 +96,7 @@ const panoramaPanelId = `${viewerId}-panorama-panel`;
             longitude={longitude}
             contextId={contextId}
             mountainName={mountainName}
+            initialBounds={initialBounds}
         />
     </div>
 

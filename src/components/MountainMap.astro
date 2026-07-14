@@ -2,9 +2,10 @@
 import {
     MAP_CONTEXTS,
     MAP_SOURCES,
-    MAP_VIEWS,
     formatViewBox,
+    isValidMapBounds,
     projectCoordinates,
+    type MapBounds,
     type MapContextId,
 } from "../lib/mountain-map";
 
@@ -13,14 +14,17 @@ interface Props {
     longitude: number;
     contextId: MapContextId;
     mountainName: string;
+    initialBounds?: MapBounds;
 }
 
-const { latitude, longitude, contextId, mountainName } = Astro.props;
+const { latitude, longitude, contextId, mountainName, initialBounds } = Astro.props;
 const context = MAP_CONTEXTS[contextId];
-const defaultView = MAP_VIEWS[context.defaultView];
-const source = MAP_SOURCES[defaultView.source];
+const source = MAP_SOURCES[context.source];
 const marker = projectCoordinates(latitude, longitude);
-const initialViewBox = formatViewBox(defaultView.bounds);
+const effectiveBounds = isValidMapBounds(initialBounds)
+    ? initialBounds
+    : context.bounds;
+const initialViewBox = formatViewBox(effectiveBounds);
 const initialViewBoxParts = initialViewBox.split(" ").map(Number);
 const initialMarkerRadius =
     Math.min(initialViewBoxParts[2], initialViewBoxParts[3]) * 0.015;

@@ -27,3 +27,14 @@ node scripts/generate-mountain-map-svg.mjs \
 ```
 
 Required public attribution is rendered by `MountainMap.astro`.
+
+Map sources remain code-owned in `src/lib/mountain-map.ts`. Editable context
+metadata lives in `src/map-contexts.json`; each context directly stores its source,
+geographic bounds, level, and optional feature filter. The development-only mountain
+manager can update an existing context's ID, label and geographic bounds, or save
+the current viewport as a new shared context without rewriting TypeScript. Context
+ID changes migrate mountain references. The `tw-full` and `jp-full` contexts are
+code-owned creation bases and cannot be deleted through DevTool. Deleting another
+context preserves mountain coordinates and references; pages suppress the location
+map until a valid context is assigned. SVG `viewBox` values are runtime rendering
+details and are not persisted as mountain data.

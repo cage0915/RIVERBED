@@ -5,12 +5,12 @@ import test from "node:test";
 import {
     MAP_CONTEXTS,
     MAP_SOURCES,
-    MAP_VIEWS,
     boundsToViewBox,
     constrainMapViewBox,
     formatViewBox,
     isPointInsideBounds,
     projectCoordinates,
+    viewBoxToBounds,
     zoomMapViewBoxAt,
 } from "./mountain-map.ts";
 
@@ -23,7 +23,7 @@ test("Web Mercator projects the origin to the centre of the world", () => {
 test("view boxes use positive dimensions and contain their mountain point", () => {
     const testLocations = [
         {
-            context: "tw-dabajian",
+            context: "tw-mainland",
             latitude: 24.458196,
             longitude: 121.258157,
         },
@@ -36,21 +36,18 @@ test("view boxes use positive dimensions and contain their mountain point", () =
 
     for (const location of testLocations) {
         const context = MAP_CONTEXTS[location.context];
-        for (const viewId of context.views) {
-            const view = MAP_VIEWS[viewId];
-            const [, , width, height] = boundsToViewBox(view.bounds);
-            assert.ok(width > 0);
-            assert.ok(height > 0);
-            assert.ok(
-                isPointInsideBounds(
-                    location.latitude,
-                    location.longitude,
-                    view.bounds,
-                ),
-                `${location.context} should be inside ${viewId}`,
-            );
-            assert.equal(formatViewBox(view.bounds).split(" ").length, 4);
-        }
+        const [, , width, height] = boundsToViewBox(context.bounds);
+        assert.ok(width > 0);
+        assert.ok(height > 0);
+        assert.ok(
+            isPointInsideBounds(
+                location.latitude,
+                location.longitude,
+                context.bounds,
+            ),
+            `${location.context} should contain its mountain`,
+        );
+        assert.equal(formatViewBox(context.bounds).split(" ").length, 4);
     }
 });
 
@@ -60,10 +57,19 @@ test("invalid bounds are rejected", () => {
     );
 });
 
-test("views only reference features present in their source SVG", () => {
-    for (const view of Object.values(MAP_VIEWS)) {
-        const source = MAP_SOURCES[view.source];
-        const visibleFeatures = view.visibleFeatures ?? source.featureIds;
+test("geographic bounds survive a viewBox round trip", () => {
+    const bounds = MAP_CONTEXTS["tw-mainland"].bounds;
+    const roundTrip = viewBoxToBounds(boundsToViewBox(bounds));
+
+    for (const key of ["west", "south", "east", "north"]) {
+        assert.ok(Math.abs(roundTrip[key] - bounds[key]) < 1e-9);
+    }
+});
+
+test("contexts only reference features present in their source SVG", () => {
+    for (const context of Object.values(MAP_CONTEXTS)) {
+        const source = MAP_SOURCES[context.source];
+        const visibleFeatures = context.visibleFeatures ?? source.featureIds;
         const svgPath = new URL(`../../public${source.asset}`, import.meta.url);
         const svg = fs.readFileSync(svgPath, "utf8");
 
@@ -74,17 +80,37 @@ test("views only reference features present in their source SVG", () => {
     }
 });
 
-test("all views in a context share one master source", () => {
+test("every context references one existing master source", () => {
     for (const context of Object.values(MAP_CONTEXTS)) {
-        const sources = new Set(
-            context.views.map((viewId) => MAP_VIEWS[viewId].source),
+        assert.ok(MAP_SOURCES[context.source]);
+    }
+});
+
+test("code-owned full-map contexts cover every source feature", () => {
+    const protectedContexts = Object.values(MAP_CONTEXTS).filter(
+        (context) => context.protected,
+    );
+    assert.deepEqual(
+        protectedContexts.map((context) => context.id).sort(),
+        ["jp-full", "tw-full"],
+    );
+
+    for (const context of protectedContexts) {
+        const source = MAP_SOURCES[context.source];
+        assert.equal(context.level, "country");
+        assert.deepEqual(
+            [...context.visibleFeatures].sort(),
+            [...source.featureIds].sort(),
         );
-        assert.equal(sources.size, 1);
+        const viewBox = boundsToViewBox(context.bounds);
+        source.extent.forEach((value, index) => {
+            assert.ok(Math.abs(viewBox[index] - value) < 0.01);
+        });
     }
 });
 
 test("interactive zoom keeps the requested focal point stable", () => {
-    const initial = boundsToViewBox(MAP_VIEWS["jp-northern-alps"].bounds);
+    const initial = boundsToViewBox(MAP_CONTEXTS["jp-northern-alps"].bounds);
     const source = [...MAP_SOURCES.japan.extent];
     const focus = projectCoordinates(36.758611, 137.758611);
     const beforeXRatio = (focus.x - initial[0]) / initial[2];
@@ -98,7 +124,7 @@ test("interactive zoom keeps the requested focal point stable", () => {
 });
 
 test("interactive pan and zoom remain constrained to the map source", () => {
-    const initial = boundsToViewBox(MAP_VIEWS["tw-dabajian-area"].bounds);
+    const initial = boundsToViewBox(MAP_CONTEXTS["tw-mainland"].bounds);
     const source = [...MAP_SOURCES.taiwan.extent];
     const constrained = constrainMapViewBox(
         [-100_000, -100_000, initial[2] / 1000, initial[3] / 1000],

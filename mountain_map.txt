@@ -19,7 +19,7 @@
 4. 第一階段只做極簡輪廓；地形圖延後，但底圖 layer 不可與山岳資料耦合。
 5. 照片中出現 tag 即代表看過／拍過，不在 `mountains.json` 重複保存 `seen` 狀態。
 6. 登頂狀態與總覽地圖不屬於第一階段。
-7. 同一 coverage 的不同 views 共用一份 master SVG；縮放與裁切由動態 `viewBox` 完成，不為每個 view 重複產生 SVG。
+7. 同一 coverage 的不同 Context 共用一份 master SVG；縮放與裁切由動態 `viewBox` 完成，不為每個 Context 重複產生 SVG。
 8. marker 在渲染時與底圖放進同一個外層 `<svg>` 座標空間，但山岳永久資料仍只保存經緯度，不保存 SVG `x/y`。
 9. 後續總覽地圖可切換「登頂過／只看過」，但這兩類應定義成互斥分類，避免同一座山同時屬於兩個開關而產生混淆。
 10. Profile 不顯示 `MOUNTAIN` 與 `LOCATION` 裝飾字樣。
@@ -27,7 +27,7 @@
 12. Google Maps 延後到下一階段評估；目前的 SVG 地圖保留，不以 Google 實作取代或耦合山岳資料。
 13. 未來可由後端／部署設定在 `svg` 與 `google` provider 之間切換，訪客不負責選擇 provider。
 14. 山岳座標與初始視野繼續由本站資料維護，不保存到 Google 帳戶；Google 只負責底圖與互動渲染。
-15. `mapContext` 目前仍用來選擇 SVG source 與 default view；未來應維持為 provider-neutral 的顯示情境 ID，不直接代表 SVG 檔案或 Google Map ID。
+15. `mapContext` 用來選擇 SVG source 與初始 geographic bounds；未來應維持為 provider-neutral 的顯示情境 ID，不直接代表 SVG 檔案或 Google Map ID。
 16. 位置圖與「從山頂眺望」共用右欄同一個 viewer 空間，由訪客切換「位置／視野」，不在頁面同時占用兩塊區域。
 17. 視野圖第一版使用 PeakFinder iframe，預設不載入；訪客首次切到「視野」時才送出第三方請求。
 18. PeakFinder 不作為山名、座標或高度的資料來源；它只消費本站已確認的 viewpoint 資料並渲染計算生成的 360° 地形視野。
@@ -36,7 +36,7 @@
 ## Phase 1 完成後的介面修正
 
 - 移除訪客範圍下拉選單，改成直接以滑鼠滾輪縮放、拖曳平移。
-- 每個 `mapContext` 提供寫死的 default view；之後由 DevTool 讓編輯者調整 mountain-level 初始範圍。
+- 每個 `mapContext` 直接提供初始 bounds；DevTool 可編輯共享的 Context 範圍。
 - 滾輪縮放以游標位置為中心，marker 與底圖保持在同一個 SVG 座標空間。
 - 移除 profile 上方置中的山岳名稱，改放在左欄第一項。
 - 移除 `MOUNTAIN` 與 `LOCATION` 字樣。
@@ -51,9 +51,7 @@
 ```text
 山岳經緯度
     ↓
-Map Context：這座山使用哪個 source 與哪個預設 view
-    ↓
-Map View：選擇 source、顯示範圍、行政區篩選
+Map Context：選擇 source、顯示範圍、行政區篩選
     ↓
 Map Source：master asset、投影、座標範圍
     ↓
@@ -65,10 +63,10 @@ Map Layer：極簡輪廓；未來可加入地形、等高線等
 - `mountains.json` 永遠保存原始經緯度，不保存針對特定圖片算出的 `x/y %`。
 - marker 與底圖使用同一個投影函式。
 - 投影後的 SVG `cx/cy` 只是當次渲染的暫時結果，不寫回山岳資料。
-- Map View 與 Map Layer 分離；更換地形底圖不需修改山岳資料。
+- Map Context 與 Map Layer 分離；更換地形底圖不需修改山岳資料。
 - 第一階段統一使用 Web Mercator，方便日後對接常見地形圖或圖磚。
 - 地圖來源、授權與 attribution 記錄在 source/layer 設定，不分散到頁面中。
-- Map Source 提供完整 coverage 的 master SVG；Map View 提供 SSR 初始 geographic bounds，訪客操作後由前端動態更新 `viewBox`。
+- Map Source 提供完整 coverage 的 master SVG；Map Context 提供 SSR 初始 geographic bounds，訪客操作後由前端動態更新 `viewBox`。
 - `MountainProfile` 只傳遞 provider-neutral props：經緯度、`mapContext` 與山名，不直接依賴 Google 或 SVG 專用欄位。
 - provider 的選擇屬於網站／後端設定，不屬於單一 mountain entry。
 
@@ -86,13 +84,22 @@ Map Layer：極簡輪廓；未來可加入地形、等高線等
   "location": {
     "latitude": 36.7585,
     "longitude": 137.7586,
-    "mapContext": "jp-northern-alps"
+    "mapContext": "jp-northern-alps",
+    "initialBounds": {
+      "west": 137.2,
+      "south": 36.4,
+      "east": 138.1,
+      "north": 37.1
+    }
   },
   "panorama": {
     "provider": "peakfinder",
     "azimuth": 180,
     "altitude": 0,
     "fieldOfView": 45
+  },
+  "dataSource": {
+    "wikidataId": "Q200126"
   }
 }
 ```
@@ -105,31 +112,37 @@ Map Layer：極簡輪廓；未來可加入地形、等高線等
 - 缺少 `location` 時仍可只顯示文字資訊。
 - 第一階段不加入 `seen`。
 - 第一階段不處理 UUID migration；未來支援同名山時，必須同時讓照片 tag 保存 mountain ID，只有在 `mountains.json` 加 UUID 並不能解決歧義。
-- 第一階段的初始 viewport 由 `mapContext` 對應的 default view 寫死；Phase 2 再加入 mountain-level viewport override，由 DevTool 寫回編輯者調整後的 bounds。
+- 沒有 `initialBounds` 時使用 `mapContext` 的 bounds。
 - `panorama` 是選填欄位；只有設定 provider 的山才顯示「視野」頁籤。
-- `azimuth`、`altitude`、`fieldOfView` 都是選填的初始視角；未設定時使用 PeakFinder 預設值，下一階段由 DevTool 編輯。
+- `azimuth`、`altitude`、`fieldOfView` 都是選填的初始視角；未設定時使用 PeakFinder 預設值，可由 DevTool 編輯。
 - PeakFinder URL 每次由山岳既有經緯度、高度與 panorama 設定產生，不在資料中重複保存完整 iframe URL。
+- `dataSource` 只記錄自動查詢採用的 Wikidata QID，作為資料來源連結；查詢時間不影響顯示或更新流程，因此不保存 `retrievedAt`。自動填入後仍必須由編輯者確認。
 
 ### Map Context
 
-Context 定義某一類山岳的預設 view。現有其他 views 可保留作為未來 DevTool 的編輯 preset，但不顯示給訪客：
+Context 就是一個可由山岳共用的完整地圖情境，直接包含 source、初始範圍與行政區篩選：
 
-```ts
+```json
 {
-  id: "jp-northern-alps",
-  defaultView: "jp-northern-alps",
-  views: [
-    "jp-northern-alps",
-    "jp-nagano",
-    "jp-honshu",
-    "jp-japan"
-  ]
+  "id": "jp-northern-alps",
+  "label": "日本北阿爾卑斯",
+  "level": "region",
+  "source": "japan",
+  "bounds": {
+    "west": 136.95,
+    "south": 35.7,
+    "east": 138.4,
+    "north": 37.25
+  },
+  "visibleFeatures": ["JP-15", "JP-16", "JP-20", "JP-21"]
 }
 ```
 
-山岳只保存 context ID；visitor map 只讀 `defaultView` 作為初始 viewport。
+可編輯的 contexts 位於 `src/map-contexts.json`；Map Sources、投影、驗證與互動函式仍保留在 `src/lib/mountain-map.ts`。DevTool 的 Context 編輯與另存功能只寫 JSON，不直接改寫 TypeScript。
 
-目前 `mapContext` 仍是必要欄位，負責從 `MAP_CONTEXTS` 找到 SVG master source 與初始 view。未來加入 Google provider 後，context ID 保持不變，但其設定可按 provider 分開：
+山岳只保存 context ID；visitor map 直接讀該 Context 的 `source` 與 `bounds`。
+
+目前 `mapContext` 仍是必要欄位，負責從 `MAP_CONTEXTS` 找到 SVG master source 與初始範圍。未來加入 Google provider 後，context ID 保持不變，但其設定可按 provider 分開：
 
 ```ts
 {
@@ -137,7 +150,7 @@ Context 定義某一類山岳的預設 view。現有其他 views 可保留作為
   providers: {
     svg: {
       source: "taiwan",
-      defaultView: "tw-dabajian-area"
+      bounds: { west: 120.8, south: 24.2, east: 121.5, north: 24.8 }
     },
     google: {
       initialBounds: {
@@ -154,25 +167,7 @@ Context 定義某一類山岳的預設 view。現有其他 views 可保留作為
 
 這是下一階段的目標結構，不在第一階段先行改寫。Google 的 `center/zoom` 可在 runtime 由 geographic bounds 與容器尺寸算出，避免把初始視野綁死在 Google zoom 或 SVG `viewBox`。
 
-### Map View
-
-```ts
-type MapView = {
-  id: string;
-  label: string;
-  level: "country" | "admin1" | "region";
-  source: string;
-  bounds: {
-    west: number;
-    south: number;
-    east: number;
-    north: number;
-  };
-  visibleFeatures?: string[];
-};
-```
-
-`bounds` 會在 SSR 時投影成 master SVG 的初始 `viewBox`。互動地圖載入該 Map Source 的所有 features，讓訪客能拖曳到初始範圍以外；`visibleFeatures` 保留給未來靜態 view、總覽圖或 DevTool preset 使用：
+Context 的 `bounds` 會在 SSR 時投影成 master SVG 的初始 `viewBox`。互動地圖載入該 Map Source 的所有 features，讓訪客能拖曳到初始範圍以外；`visibleFeatures` 保留給未來靜態圖或總覽圖使用：
 
 - 日本本州：只保留本州都府縣，排除北海道、四國、九州及沖繩。
 - 長野縣：只保留長野縣 polygon，bounds 貼合縣域。
@@ -198,15 +193,15 @@ type MapSource = {
 };
 ```
 
-第一階段預計至少有台灣與日本兩個 outline sources。Map View 引用 source；Mountain 不直接引用 SVG asset。
+第一階段至少有台灣與日本兩個 outline sources。Map Context 引用 source；Mountain 不直接引用 SVG asset。
 
 ## 地圖資產策略
 
 1. 使用 WGS84 GeoJSON 作為原始輪廓資料。
-2. 以我們控制的 Web Mercator 轉換，為每個 coverage/layer 產生一份精簡 master SVG，而不是每個 Map View 一份。
+2. 以我們控制的 Web Mercator 轉換，為每個 coverage/layer 產生一份精簡 master SVG，而不是每個 Map Context 一份。
 3. master SVG 中的行政區 paths 需保留穩定 feature ID，供 `visibleFeatures` 選擇。
 4. 原始大型 GeoJSON 不送到訪客瀏覽器，也不在每個 tag request 重複處理。
-5. Map View 的 geographic bounds 會投影成動態 SVG `viewBox`，因此新增山域通常只需新增設定資料。
+5. Map Context 的 geographic bounds 會投影成動態 SVG `viewBox`，因此新增山域通常只需新增 Context。
 6. 底圖 paths 與 marker 在渲染時放進同一個外層 `<svg>`，共同接受 `viewBox` 的裁切與縮放。
 7. marker 的 SVG `cx/cy` 每次都從原始經緯度計算，不保存成資料，也不嵌入 master SVG asset。
 8. marker 半徑需依目前 viewBox 計算，使全國與區域視圖中的視覺大小大致一致。
@@ -222,7 +217,7 @@ public/maps/
 └── japan-outline.svg
 ```
 
-台灣本島、縣市、日本本州、長野與北阿等範圍由 views metadata 表達，不各自建立檔案。實際檔名與 SVG 引用方式在 prototype 時確認。
+台灣本島、縣市、日本本州、長野與北阿等範圍由 Context metadata 表達，不各自建立檔案。實際檔名與 SVG 引用方式在 prototype 時確認。
 
 ## 元件與責任
 
@@ -239,7 +234,7 @@ public/maps/
 ### MountainMap.astro
 
 - 接收經緯度與 `mapContext`。
-- SSR 顯示 default view，沒有 JavaScript 也看得到初始地圖。
+- SSR 顯示 Context 初始範圍，沒有 JavaScript 也看得到初始地圖。
 - 不顯示範圍 selector 與 `LOCATION` 裝飾文字。
 - 滾輪以指標位置為中心縮放；pointer drag 平移地圖。
 - 鍵盤方向鍵可平移，`+`／`-` 可縮放，`Home`／`0` 與雙擊可重設初始範圍。
@@ -280,9 +275,10 @@ PEAKFINDER_ENABLED=false  # 關閉
 
 ### Map 設定與投影 utility
 
-- 集中保存 contexts、views、sources 與 assets metadata。
+- `src/map-contexts.json` 集中保存可由 DevTool 編輯的 contexts；每個 Context 直接包含 source、bounds、level 與 `visibleFeatures`，TypeScript 集中保存 sources 與 assets metadata。
 - 提供 Web Mercator 經緯度轉 SVG 座標的純函式。
-- 驗證 context、view、bounds 及座標。
+- 提供 SVG viewBox 與 geographic bounds 的雙向轉換，讓編輯器保存 provider-neutral viewport。
+- 驗證 context、bounds 及座標。
 - 投影函式應可單獨測試，不依賴 DOM。
 
 ### tags/[tag].astro
@@ -293,12 +289,12 @@ PEAKFINDER_ENABLED=false  # 關閉
 
 ## 訪客地圖互動
 
-- 預設顯示最具有資訊價值的區域 view，例如白馬岳先顯示北阿爾卑斯。
+- 預設顯示 Context 定義的區域範圍，例如白馬岳先顯示北阿爾卑斯。
 - 游標停在地圖上時，滾輪以游標位置為中心縮放。
 - 按住並拖曳可平移，地圖使用 grab/grabbing cursor 回饋狀態。
 - 同一 Map Source 的所有行政區共用已載入的 master SVG；互動只更新外層 `viewBox`。
 - marker 與底圖在同一 SVG 座標空間，因此縮放和平移時自然保持對齊。
-- 每次載入頁面都從該山的 default viewport 開始，不跨山岳保存訪客操作狀態。
+- 每次載入頁面都從該山 Context 的 bounds 開始，不跨山岳保存訪客操作狀態。
 - 地圖可取得 keyboard focus，並提供螢幕閱讀器操作說明。
 
 ## 分階段執行
@@ -307,20 +303,20 @@ PEAKFINDER_ENABLED=false  # 關閉
 
 1. 選定大霸尖山與白馬岳作為測試山岳。
 2. 手動加入兩座山的高度、描述、座標與 map context。
-3. 確認大霸群峰與日本北阿爾卑斯兩個初始 Map Views。
+3. 確認台灣本島與日本北阿爾卑斯兩個初始 Map Contexts。
 4. 取得台灣、日本 WGS84 行政區資料，確認授權與 attribution。
-5. 各產生一份台灣、日本測試用 master SVG，人工核對不同 viewBox 下的 marker 位置。
+5. 各產生一份台灣、日本測試用 master SVG，人工核對不同 Context bounds 下的 marker 位置。
 6. 確認深色頁面的底圖線條、marker、留白與兩欄比例。
 
-Prototype 實作採用 geoBoundaries 的台灣／日本 ADM1 WGS84 邊界，底層資料來自 OpenStreetMap 並依 ODbL 1.0 標示來源。若未來改回 Simplemaps 或其他來源，只替換 Map Source 與 master SVG，不修改山岳經緯度或 Map Views 的概念。
+Prototype 實作採用 geoBoundaries 的台灣／日本 ADM1 WGS84 邊界，底層資料來自 OpenStreetMap 並依 ODbL 1.0 標示來源。若未來改回 Simplemaps 或其他來源，只替換 Map Source 與 master SVG，不修改山岳經緯度或 Map Context 的概念。
 
 ### Phase 1：完成個別山岳 tag 頁
 
-1. 定義 Mountain、MapContext、MapView 型別與資料驗證。
-2. 建立 map contexts 與 views 設定。
+1. 定義 Mountain、MapContext 型別與資料驗證。
+2. 建立 map contexts 設定。
 3. 建立 Web Mercator 投影 utility 及測試。
 4. 建立／整理台灣與日本的精簡 master SVG 資產，保留行政區 feature IDs。
-5. 實作 `MountainMap.astro` 的 default view、marker、滾輪縮放、拖曳平移、鍵盤操作與重設。
+5. 實作 `MountainMap.astro` 的 Context 初始範圍、marker、滾輪縮放、拖曳平移、鍵盤操作與重設。
 6. 實作 `MountainProfile.astro` 的響應式兩欄 UI。
 7. 整合到 `src/pages/tags/[tag].astro`。
 8. 確認 Astro View Transitions 後地圖互動事件仍能正確初始化且不重複綁定。
@@ -332,10 +328,33 @@ Prototype 實作採用 geoBoundaries 的台灣／日本 ADM1 WGS84 邊界，底�
 2. 編輯 elevation、description、latitude、longitude 與 map context。
 3. 編輯者直接在預覽地圖使用滾輪與拖曳調整初始 viewport。
 4. 將目前 SVG viewBox 反算／轉存為 geographic bounds，作為該山的 viewport override；不保存 marker 圖片百分比。
-5. 提供重設為 context default view 的操作。
-6. 提供 PeakFinder 視野預覽，讓編輯者旋轉／縮放後保存 `azimuth`、`altitude` 與 `fieldOfView`，不保存完整 iframe URL。
+5. 提供既有 Context 的 ID、名稱與 bounds 編輯，以及另存新 Context 的操作。
+6. 提供 PeakFinder iframe 視野預覽，以數值調整並保存 `azimuth`、`altitude` 與 `fieldOfView`，不保存完整 iframe URL；跨網域 iframe 內的拖曳方向無法自動讀回。
 7. 提供啟用／停用 PeakFinder 視野的選項；找不到合適視角時仍可只保留位置圖。
 8. 驗證並安全寫回 `mountains.json`。
+
+Phase 2 第一版已完成：
+
+- `MountainDevTool.astro` 以獨立 dev-only dialog 整合到全站 Layout，不修改既有照片 Tag／Page Manager 流程。
+- 可選擇既有山岳，編輯高度、描述、經緯度、Map Context 與 PeakFinder 設定；暫不支援改名，避免破壞照片 tags 與 URL。
+- Mountain 使用可操作的自製下拉清單；同時具備高度、有效經緯度與有效 Map Context 的山岳，在選項右側顯示綠色勾勾，方便辨識資料完整的項目。
+- 切換 Mountain 時同步導向 `/tags/{山名}` 對應頁面；頁面載入後自動重新開啟 Mountain Manager 並載入所選山岳。
+- 「自動查詢」透過本站 dev-only API 呼叫 Wikidata，合併中文、日文與英文搜尋候選，讀取 `P625` 座標及 `P2044` 高度。
+- 搜尋結果會排除同時缺少高度與座標的候選；套用候選後立即收起結果，若要改選可再次搜尋。
+- 查詢結果不直接自動保存；編輯者選擇候選後仍可覆寫所有欄位，查不到時完全手動輸入。
+- 套用具有座標的候選時，依包含該點且範圍最小的 bounds 建議 Map Context。
+- Context 編輯區固定顯示；`完整台灣` 與 `完整日本` 是 `protected` code-owned contexts，只有直接修改原始碼才能刪除。Context 使用可操作的自製下拉清單：完整底圖選項旁顯示新增 icon，新的範圍以該底圖為來源；其他 Context 選項旁顯示刪除 icon。
+- 刪除 Context 前顯示引用山數與確認視窗；即使仍有引用也允許刪除，但保留山岳座標及失效的 `mapContext` ID。DevTool 與 production 遇到不存在的 Context 時都不顯示 Location map，直到編輯者重新指定有效 Context。
+- Context 範圍儲存使用同行的 icon-only 按鈕，並以 tooltip／`aria-label` 區分 `Update Range` 與 `Save Range as New Context`。
+- `Update Range` 寫檔前顯示確認視窗，說明會立即更新 context 並保存目前山岳草稿；若修改 Context ID，也會提示所有山岳引用將同步遷移。取消時不寫入。
+- `Update Range`／`Save Range as New Context` 寫入 JSON 觸發 dev server HMR 時，DevTool 會以一次性的 session 狀態自動重新開啟，並還原當時的山岳與 Context，不中斷編輯流程。
+- 位置預覽支援游標中心縮放與拖曳；座標欄位旁的 refresh icon 可在存檔前切換相容 Map Source、將 viewport 置中到新座標並預覽 marker。範圍直接保存到 Context 的 bounds，不再由這個介面建立山岳專屬 `initialBounds`。
+- DevTool 的 Location 與 PeakFinder 共用一個 preview 空間，可用 tabs 手動切換；focus 進入 Basic Data／Map Context 時自動顯示 Location，focus 進入已啟用的 PeakFinder 設定時自動顯示 Panorama。Location bounds 以 `N / E / S / W` 單行摘要顯示。
+- Context 不再建立內部 View ID；新增時直接從完整台灣／日本 Context 繼承 source 與 `visibleFeatures`，並保存目前 bounds。建立 Context 與目前山岳資料在同一 request 保存，避免 JSON HMR 造成未存欄位遺失。
+- 修改既有 Context ID 時，後端同步遷移所有山岳的 `mapContext` 引用；名稱與 bounds 直接更新在 Context。
+- Mountain DevTool 的可見標籤、按鈕、提示與狀態訊息統一使用英文，與既有 DevTool 保持一致。
+- 所有山岳與 context 寫檔 API 僅在 `import.meta.env.DEV` 開放，production 回傳 403。
+- PeakFinder 預覽使用 iframe；調整數值後按同行的 refresh icon 更新視野預覽，完整 URL 不寫入資料。
 
 ### Phase 3：地形與總覽地圖
 
@@ -377,11 +396,11 @@ Prototype 實作採用 geoBoundaries 的台灣／日本 ADM1 WGS84 邊界，底�
 - 不顯示 `MOUNTAIN`、`LOCATION` 或範圍下拉選單。
 - 設定 PeakFinder 的測試山可在右欄同一空間切換「位置／視野」，未設定的山只顯示位置圖。
 - PeakFinder iframe 只有在訪客首次切換到視野後才載入，切回位置圖不銷毀 iframe。
-- default view 在 SSR HTML 中可見。
+- Context 初始 bounds 在 SSR HTML 中可見。
 - 訪客可使用滾輪縮放、拖曳平移及鍵盤操作，且不重新載入頁面。
 - 縮放以游標位置為中心，拖曳方向符合直覺，並限制在 master source extent 附近。
 - 每次互動後 marker 與底圖仍保持正確對齊，marker 視覺大小大致一致。
-- 不把大型 GeoJSON 傳到訪客瀏覽器；同一 source 的 views 共用一份 master SVG。
+- 不把大型 GeoJSON 傳到訪客瀏覽器；同一 source 的 Contexts 共用一份 master SVG。
 - 無效座標、缺少 context 或載入失敗時不破壞整個 tag 頁。
 - attribution 正確呈現。
 - Astro 型別檢查與 production build 通過。

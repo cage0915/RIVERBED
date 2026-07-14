@@ -12,13 +12,18 @@ import "@fontsource/noto-sans-tc/300.css";
 import "@fontsource/noto-sans-tc/500.css";
 import "@fontsource/noto-sans-tc/700.css";
 import "photoswipe/dist/photoswipe.css";
-import DevTool from "../components/DevTool.astro";
 
 interface Props {
 	title: string;
 }
 
 const { title } = Astro.props;
+const DevTool = import.meta.env.DEV
+    ? (await import("../components/DevTool.astro")).default
+    : null;
+const MountainDevTool = import.meta.env.DEV
+    ? (await import("../components/MountainDevTool.astro")).default
+    : null;
 
 // Use FOLDER_METADATA keys as the base for navigation
 const metadataSlugs = Object.keys(FOLDER_METADATA);
@@ -246,7 +251,12 @@ const folderFooter = currentFolderSlug ? getFolderFooter(currentFolderSlug) : nu
 			</footer>
 		)}
 
-        {import.meta.env.DEV && <DevTool />}
+        {DevTool && MountainDevTool && (
+            <>
+                <DevTool />
+                <MountainDevTool />
+            </>
+        )}
 
 		<script>
 			let lastScrollY = window.scrollY;

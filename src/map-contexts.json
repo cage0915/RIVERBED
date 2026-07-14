@@ -1,0 +1,138 @@
+{
+  "contexts": {
+    "jp-northern-alps": {
+      "id": "jp-northern-alps",
+      "label": "日本北阿爾卑斯",
+      "level": "region",
+      "source": "japan",
+      "bounds": {
+        "west": 136.95,
+        "south": 35.7,
+        "east": 138.4,
+        "north": 37.25
+      },
+      "visibleFeatures": [
+        "JP-15",
+        "JP-16",
+        "JP-20",
+        "JP-21"
+      ]
+    },
+    "tw-mainland": {
+      "id": "tw-mainland",
+      "label": "台灣本島",
+      "level": "region",
+      "source": "taiwan",
+      "bounds": {
+        "west": 118.79937,
+        "south": 21.824298,
+        "east": 122.388538,
+        "north": 25.373826
+      },
+      "visibleFeatures": [
+        "TW-HSQ",
+        "TW-MIA",
+        "TW-TXG"
+      ]
+    },
+    "tw-full": {
+      "id": "tw-full",
+      "label": "台灣",
+      "level": "country",
+      "source": "taiwan",
+      "bounds": {
+        "west": 116.58672,
+        "south": 20.581313,
+        "east": 122.13036,
+        "north": 26.49508
+      },
+      "visibleFeatures": [
+        "TW-CHA",
+        "TW-CYI",
+        "TW-CYQ",
+        "TW-HSQ",
+        "TW-HSZ",
+        "TW-HUA",
+        "TW-ILA",
+        "TW-KEE",
+        "TW-KHH",
+        "TW-KIN",
+        "TW-LIE",
+        "TW-MIA",
+        "TW-NAN",
+        "TW-NWT",
+        "TW-PEN",
+        "TW-PIF",
+        "TW-TAO",
+        "TW-TNN",
+        "TW-TPE",
+        "TW-TTT",
+        "TW-TXG",
+        "TW-YUN"
+      ],
+      "protected": true
+    },
+    "jp-full": {
+      "id": "jp-full",
+      "label": "日本",
+      "level": "country",
+      "source": "japan",
+      "bounds": {
+        "west": 122.31252,
+        "south": 23.477235,
+        "east": 154.6074,
+        "north": 45.956414
+      },
+      "visibleFeatures": [
+        "JP-01",
+        "JP-02",
+        "JP-03",
+        "JP-04",
+        "JP-05",
+        "JP-06",
+        "JP-07",
+        "JP-08",
+        "JP-09",
+        "JP-10",
+        "JP-11",
+        "JP-12",
+        "JP-13",
+        "JP-14",
+        "JP-15",
+        "JP-16",
+        "JP-17",
+        "JP-18",
+        "JP-19",
+        "JP-20",
+        "JP-21",
+        "JP-22",
+        "JP-23",
+        "JP-24",
+        "JP-25",
+        "JP-26",
+        "JP-27",
+        "JP-28",
+        "JP-29",
+        "JP-30",
+        "JP-31",
+        "JP-32",
+        "JP-33",
+        "JP-34",
+        "JP-35",
+        "JP-36",
+        "JP-37",
+        "JP-38",
+        "JP-39",
+        "JP-40",
+        "JP-41",
+        "JP-42",
+        "JP-43",
+        "JP-44",
+        "JP-45",
+        "JP-46",
+        "JP-47"
+      ],
+      "protected": true
+    }
+  }
+}

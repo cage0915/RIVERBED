@@ -1,3 +1,5 @@
+import mapConfig from "../map-contexts.json" with { type: "json" };
+
 export const MAP_WORLD_SIZE = 10_000;
 export const MAX_MERCATOR_LATITUDE = 85.05112878;
 
@@ -26,19 +28,14 @@ export type MapSource = {
     }>;
 };
 
-export type MapView = {
+export type MapContext = {
     id: string;
     label: string;
     level: "country" | "admin1" | "region";
     source: keyof typeof MAP_SOURCES;
     bounds: MapBounds;
     visibleFeatures?: string[];
-};
-
-export type MapContext = {
-    id: string;
-    defaultView: keyof typeof MAP_VIEWS;
-    views: Array<keyof typeof MAP_VIEWS>;
+    protected?: boolean;
 };
 
 const TAIWAN_FEATURE_IDS = [
@@ -66,18 +63,9 @@ const TAIWAN_FEATURE_IDS = [
     "TW-YUN",
 ];
 
-const TAIWAN_MAIN_ISLAND_FEATURE_IDS = TAIWAN_FEATURE_IDS.filter(
-    (id) => !["TW-KIN", "TW-LIE", "TW-PEN"].includes(id),
-);
-
 const JAPAN_FEATURE_IDS = Array.from(
     { length: 47 },
     (_, index) => `JP-${String(index + 1).padStart(2, "0")}`,
-);
-
-const HONSHU_FEATURE_IDS = Array.from(
-    { length: 34 },
-    (_, index) => `JP-${String(index + 2).padStart(2, "0")}`,
 );
 
 export const MAP_SOURCES = {
@@ -115,74 +103,12 @@ export const MAP_SOURCES = {
     },
 } as const satisfies Record<string, MapSource>;
 
-export const MAP_VIEWS = {
-    "tw-dabajian-area": {
-        id: "tw-dabajian-area",
-        label: "大霸群峰",
-        level: "region",
-        source: "taiwan",
-        bounds: { west: 120.9, south: 24.15, east: 121.48, north: 24.72 },
-        visibleFeatures: ["TW-HSQ", "TW-MIA", "TW-TXG"],
-    },
-    "tw-hsinchu-miaoli": {
-        id: "tw-hsinchu-miaoli",
-        label: "新竹・苗栗",
-        level: "region",
-        source: "taiwan",
-        bounds: { west: 120.52, south: 24.25, east: 121.48, north: 25.02 },
-        visibleFeatures: ["TW-HSQ", "TW-MIA"],
-    },
-    "tw-main-island": {
-        id: "tw-main-island",
-        label: "台灣本島",
-        level: "country",
-        source: "taiwan",
-        bounds: { west: 119.9, south: 21.7, east: 122.2, north: 25.5 },
-        visibleFeatures: TAIWAN_MAIN_ISLAND_FEATURE_IDS,
-    },
-    "jp-northern-alps": {
-        id: "jp-northern-alps",
-        label: "北阿爾卑斯",
-        level: "region",
-        source: "japan",
-        bounds: { west: 136.95, south: 35.7, east: 138.4, north: 37.25 },
-        visibleFeatures: ["JP-15", "JP-16", "JP-20", "JP-21"],
-    },
-    "jp-nagano": {
-        id: "jp-nagano",
-        label: "長野縣",
-        level: "admin1",
-        source: "japan",
-        bounds: { west: 137.25, south: 35.15, east: 138.85, north: 37.1 },
-        visibleFeatures: ["JP-20"],
-    },
-    "jp-honshu": {
-        id: "jp-honshu",
-        label: "日本本州",
-        level: "country",
-        source: "japan",
-        bounds: { west: 129.5, south: 32.5, east: 142.2, north: 41.7 },
-        visibleFeatures: HONSHU_FEATURE_IDS,
-    },
-} as const satisfies Record<string, Omit<MapView, "source"> & { source: keyof typeof MAP_SOURCES }>;
+export const MAP_CONTEXTS = mapConfig.contexts as Record<string, MapContext>;
 
-export const MAP_CONTEXTS = {
-    "tw-dabajian": {
-        id: "tw-dabajian",
-        defaultView: "tw-dabajian-area",
-        views: ["tw-dabajian-area", "tw-hsinchu-miaoli", "tw-main-island"],
-    },
-    "jp-northern-alps": {
-        id: "jp-northern-alps",
-        defaultView: "jp-northern-alps",
-        views: ["jp-northern-alps", "jp-nagano", "jp-honshu"],
-    },
-} as const satisfies Record<string, MapContext>;
-
-export type MapContextId = keyof typeof MAP_CONTEXTS;
+export type MapContextId = string;
 
 export function isMapContextId(value: string): value is MapContextId {
-    return value in MAP_CONTEXTS;
+    return Object.prototype.hasOwnProperty.call(MAP_CONTEXTS, value);
 }
 
 export function projectCoordinates(
@@ -207,15 +133,36 @@ export function projectCoordinates(
     return { x, y };
 }
 
-export function boundsToViewBox(bounds: MapBounds): [number, number, number, number] {
-    if (
-        bounds.west >= bounds.east ||
-        bounds.south >= bounds.north ||
-        bounds.west < -180 ||
-        bounds.east > 180 ||
-        bounds.south < -90 ||
-        bounds.north > 90
-    ) {
+export function unprojectCoordinates(point: MapPoint): {
+    latitude: number;
+    longitude: number;
+} {
+    const longitude = (point.x / MAP_WORLD_SIZE) * 360 - 180;
+    const mercatorY = Math.PI - (2 * Math.PI * point.y) / MAP_WORLD_SIZE;
+    const latitude = (Math.atan(Math.sinh(mercatorY)) * 180) / Math.PI;
+
+    return { latitude, longitude };
+}
+
+export function isValidMapBounds(bounds: unknown): bounds is MapBounds {
+    if (!bounds || typeof bounds !== "object") return false;
+    const candidate = bounds as Partial<MapBounds>;
+    return (
+        Number.isFinite(candidate.west) &&
+        Number.isFinite(candidate.south) &&
+        Number.isFinite(candidate.east) &&
+        Number.isFinite(candidate.north) &&
+        candidate.west! < candidate.east! &&
+        candidate.south! < candidate.north! &&
+        candidate.west! >= -180 &&
+        candidate.east! <= 180 &&
+        candidate.south! >= -90 &&
+        candidate.north! <= 90
+    );
+}
+
+export function boundsToViewBox(bounds: MapBounds): SvgViewBox {
+    if (!isValidMapBounds(bounds)) {
         throw new Error("Invalid map bounds");
     }
 
@@ -228,6 +175,34 @@ export function boundsToViewBox(bounds: MapBounds): [number, number, number, num
         southEast.x - northWest.x,
         southEast.y - northWest.y,
     ];
+}
+
+export function viewBoxToBounds(viewBox: SvgViewBox): MapBounds {
+    const [x, y, width, height] = viewBox;
+    if (
+        ![x, y, width, height].every(Number.isFinite) ||
+        width <= 0 ||
+        height <= 0
+    ) {
+        throw new Error("Invalid SVG viewBox");
+    }
+
+    const northWest = unprojectCoordinates({ x, y });
+    const southEast = unprojectCoordinates({ x: x + width, y: y + height });
+    const bounds = {
+        west: northWest.longitude,
+        south: southEast.latitude,
+        east: southEast.longitude,
+        north: northWest.latitude,
+    };
+
+    if (
+        !isValidMapBounds(bounds)
+    ) {
+        throw new Error("SVG viewBox falls outside valid geographic bounds");
+    }
+
+    return bounds;
 }
 
 export function formatViewBox(bounds: MapBounds): string {
