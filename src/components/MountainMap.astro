@@ -39,7 +39,7 @@ const interactionHelpId = `${contextId}-map-help`;
     aria-label={`${mountainName}位置圖`}
 >
     <p id={interactionHelpId} class="sr-only">
-        使用滾輪縮放，拖曳移動地圖；方向鍵可平移，加號與減號可縮放，Home鍵可回到初始範圍。
+        使用滾輪或雙指縮放，拖曳移動地圖；方向鍵可平移，加號與減號可縮放，Home鍵可回到初始範圍。
     </p>
 
     <div class="mountain-map__frame">
@@ -197,8 +197,9 @@ const interactionHelpId = `${contextId}-map-help`;
             }
 
             let currentViewBox: SvgViewBox = [...initialViewBox];
-            let activePointerId: number | null = null;
-            let lastPointerPosition: { x: number; y: number } | null = null;
+            const pointers = new Map<number, { x: number; y: number }>();
+            let lastPinchDistance: number | null = null;
+            let lastPinchCentre: { x: number; y: number } | null = null;
             const renderViewBox = (nextViewBox: SvgViewBox) => {
                 currentViewBox = constrainMapViewBox(
                     nextViewBox,
@@ -249,37 +250,70 @@ const interactionHelpId = `${contextId}-map-help`;
 
             canvas.addEventListener("pointerdown", (event) => {
                 if (event.button !== 0) return;
-                activePointerId = event.pointerId;
-                lastPointerPosition = { x: event.clientX, y: event.clientY };
+                pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
                 canvas.setPointerCapture(event.pointerId);
                 canvas.dataset.dragging = "true";
+                if (pointers.size === 2) {
+                    const [first, second] = [...pointers.values()];
+                    lastPinchDistance = Math.hypot(second.x - first.x, second.y - first.y);
+                    lastPinchCentre = {
+                        x: (first.x + second.x) / 2,
+                        y: (first.y + second.y) / 2,
+                    };
+                }
             });
 
             canvas.addEventListener("pointermove", (event) => {
-                if (
-                    activePointerId !== event.pointerId ||
-                    !lastPointerPosition
-                ) return;
+                const previousPosition = pointers.get(event.pointerId);
+                if (!previousPosition) return;
+                pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
 
                 const matrix = canvas.getScreenCTM();
                 if (!matrix || matrix.a === 0 || matrix.d === 0) return;
 
-                const deltaX = event.clientX - lastPointerPosition.x;
-                const deltaY = event.clientY - lastPointerPosition.y;
+                if (pointers.size >= 2) {
+                    const [first, second] = [...pointers.values()];
+                    const distance = Math.hypot(second.x - first.x, second.y - first.y);
+                    const centre = {
+                        x: (first.x + second.x) / 2,
+                        y: (first.y + second.y) / 2,
+                    };
+                    if (lastPinchDistance && lastPinchCentre && distance > 0) {
+                        renderViewBox([
+                            currentViewBox[0] - (centre.x - lastPinchCentre.x) / matrix.a,
+                            currentViewBox[1] - (centre.y - lastPinchCentre.y) / matrix.d,
+                            currentViewBox[2],
+                            currentViewBox[3],
+                        ]);
+                        const updatedMatrix = canvas.getScreenCTM();
+                        if (updatedMatrix) {
+                            const mapCentre = new DOMPoint(centre.x, centre.y).matrixTransform(
+                                updatedMatrix.inverse(),
+                            );
+                            zoomAt(lastPinchDistance / distance, mapCentre);
+                        }
+                    }
+                    lastPinchDistance = distance;
+                    lastPinchCentre = centre;
+                    return;
+                }
+
+                const deltaX = event.clientX - previousPosition.x;
+                const deltaY = event.clientY - previousPosition.y;
                 renderViewBox([
                     currentViewBox[0] - deltaX / matrix.a,
                     currentViewBox[1] - deltaY / matrix.d,
                     currentViewBox[2],
                     currentViewBox[3],
                 ]);
-                lastPointerPosition = { x: event.clientX, y: event.clientY };
             });
 
             const finishDragging = (event: PointerEvent) => {
-                if (activePointerId !== event.pointerId) return;
-                activePointerId = null;
-                lastPointerPosition = null;
-                canvas.dataset.dragging = "false";
+                if (!pointers.has(event.pointerId)) return;
+                pointers.delete(event.pointerId);
+                lastPinchDistance = null;
+                lastPinchCentre = null;
+                canvas.dataset.dragging = String(pointers.size > 0);
                 if (canvas.hasPointerCapture(event.pointerId)) {
                     canvas.releasePointerCapture(event.pointerId);
                 }

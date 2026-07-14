@@ -291,7 +291,8 @@ PEAKFINDER_ENABLED=false  # 關閉
 
 - 預設顯示 Context 定義的區域範圍，例如白馬岳先顯示北阿爾卑斯。
 - 游標停在地圖上時，滾輪以游標位置為中心縮放。
-- 按住並拖曳可平移，地圖使用 grab/grabbing cursor 回饋狀態。
+- 手機支援雙指縮放；雙指中心的移動同時平移地圖，縮放焦點保持在手勢中心。
+- 單指或滑鼠按住並拖曳可平移，地圖使用 grab/grabbing cursor 回饋狀態。
 - 同一 Map Source 的所有行政區共用已載入的 master SVG；互動只更新外層 `viewBox`。
 - marker 與底圖在同一 SVG 座標空間，因此縮放和平移時自然保持對齊。
 - 每次載入頁面都從該山 Context 的 bounds 開始，不跨山岳保存訪客操作狀態。

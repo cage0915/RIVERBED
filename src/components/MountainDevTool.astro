@@ -890,8 +890,9 @@
         let sourceViewBox: SvgViewBox = [0, 0, 100, 100];
         let lastExistingContextId = "";
         let isCreatingContext = false;
-        let activePointerId: number | null = null;
-        let lastPointerPosition: { x: number; y: number } | null = null;
+        const mapPointers = new Map<number, { x: number; y: number }>();
+        let lastPinchDistance: number | null = null;
+        let lastPinchCentre: { x: number; y: number } | null = null;
         let lookupCandidates: MountainLookupCandidate[] = [];
 
         const setStatus = (message: string, isError = false) => {
@@ -1666,28 +1667,71 @@
 
         map.addEventListener("pointerdown", (event) => {
             if (event.button !== 0) return;
-            activePointerId = event.pointerId;
-            lastPointerPosition = { x: event.clientX, y: event.clientY };
+            mapPointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
             map.setPointerCapture(event.pointerId);
             map.dataset.dragging = "true";
+            if (mapPointers.size === 2) {
+                const [first, second] = [...mapPointers.values()];
+                lastPinchDistance = Math.hypot(second.x - first.x, second.y - first.y);
+                lastPinchCentre = {
+                    x: (first.x + second.x) / 2,
+                    y: (first.y + second.y) / 2,
+                };
+            }
         });
         map.addEventListener("pointermove", (event) => {
-            if (event.pointerId !== activePointerId || !lastPointerPosition) return;
+            const previousPosition = mapPointers.get(event.pointerId);
+            if (!previousPosition) return;
+            mapPointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
             const matrix = map.getScreenCTM();
             if (!matrix || matrix.a === 0 || matrix.d === 0) return;
+
+            if (mapPointers.size >= 2) {
+                const [first, second] = [...mapPointers.values()];
+                const distance = Math.hypot(second.x - first.x, second.y - first.y);
+                const centre = {
+                    x: (first.x + second.x) / 2,
+                    y: (first.y + second.y) / 2,
+                };
+                if (lastPinchDistance && lastPinchCentre && distance > 0) {
+                    renderViewBox([
+                        currentViewBox[0] - (centre.x - lastPinchCentre.x) / matrix.a,
+                        currentViewBox[1] - (centre.y - lastPinchCentre.y) / matrix.d,
+                        currentViewBox[2],
+                        currentViewBox[3],
+                    ]);
+                    const updatedMatrix = map.getScreenCTM();
+                    if (updatedMatrix) {
+                        const mapCentre = new DOMPoint(centre.x, centre.y).matrixTransform(
+                            updatedMatrix.inverse(),
+                        );
+                        renderViewBox(zoomMapViewBoxAt(
+                            currentViewBox,
+                            lastPinchDistance / distance,
+                            mapCentre,
+                            initialConstraintViewBox,
+                            sourceViewBox,
+                        ));
+                    }
+                }
+                lastPinchDistance = distance;
+                lastPinchCentre = centre;
+                return;
+            }
+
             renderViewBox([
-                currentViewBox[0] - (event.clientX - lastPointerPosition.x) / matrix.a,
-                currentViewBox[1] - (event.clientY - lastPointerPosition.y) / matrix.d,
+                currentViewBox[0] - (event.clientX - previousPosition.x) / matrix.a,
+                currentViewBox[1] - (event.clientY - previousPosition.y) / matrix.d,
                 currentViewBox[2],
                 currentViewBox[3],
             ]);
-            lastPointerPosition = { x: event.clientX, y: event.clientY };
         });
         const finishDragging = (event: PointerEvent) => {
-            if (event.pointerId !== activePointerId) return;
-            activePointerId = null;
-            lastPointerPosition = null;
-            map.dataset.dragging = "false";
+            if (!mapPointers.has(event.pointerId)) return;
+            mapPointers.delete(event.pointerId);
+            lastPinchDistance = null;
+            lastPinchCentre = null;
+            map.dataset.dragging = String(mapPointers.size > 0);
             if (map.hasPointerCapture(event.pointerId)) map.releasePointerCapture(event.pointerId);
         };
         map.addEventListener("pointerup", finishDragging);
