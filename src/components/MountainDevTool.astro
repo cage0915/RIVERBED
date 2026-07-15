@@ -765,7 +765,13 @@
     }
 
     #dev-mountain-map[data-dragging="true"] { cursor: grabbing; }
-    #dev-mountain-map use { fill: #27272a; stroke: rgb(161 161 170 / 0.72); stroke-width: 0.75; vector-effect: non-scaling-stroke; }
+    #dev-mountain-map use {
+        fill: #27272a;
+        stroke: rgb(113 113 122 / 0.72);
+        stroke-width: var(--mountain-map-feature-stroke-width, 0.75);
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
     .dev-mountain-map-marker-halo { fill: rgb(255 255 255 / 0.2); }
     .dev-mountain-map-marker-core { fill: white; stroke: #18181b; stroke-width: 1; vector-effect: non-scaling-stroke; }
 
@@ -970,6 +976,14 @@
                 sourceViewBox,
             );
             map.setAttribute("viewBox", currentViewBox.map((value) => value.toFixed(4)).join(" "));
+            const unitsPerPixel = Math.max(
+                currentViewBox[2] / map.clientWidth,
+                currentViewBox[3] / map.clientHeight,
+            );
+            map.style.setProperty(
+                "--mountain-map-feature-stroke-width",
+                String(Math.min(0.75, 2 * unitsPerPixel)),
+            );
             const radius = Math.min(currentViewBox[2], currentViewBox[3]) * 0.015;
             markerHalo.setAttribute("r", String(radius * 2.35));
             markerCore.setAttribute("r", String(radius));
@@ -1393,6 +1407,8 @@
                 } catch (error) {
                     setStatus(error instanceof Error ? error.message : "Unable to load data", true);
                 }
+            } else {
+                renderViewBox(currentViewBox);
             }
         });
         closeButton.addEventListener("click", () => dialog.close());

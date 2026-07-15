@@ -132,8 +132,9 @@ const interactionHelpId = `${contextId}-map-help`;
     .mountain-map__feature {
         fill: rgb(39 39 42);
         stroke: rgb(113 113 122 / 0.72);
-        stroke-width: 0.75;
-        vector-effect: non-scaling-stroke;
+        stroke-width: var(--mountain-map-feature-stroke-width, 0.75);
+        stroke-linecap: round;
+        stroke-linejoin: round;
     }
 
     .mountain-map__marker-halo {
@@ -210,11 +211,21 @@ const interactionHelpId = `${contextId}-map-help`;
                     "viewBox",
                     currentViewBox.map((value) => Number(value.toFixed(4))).join(" "),
                 );
+                const unitsPerPixel = Math.max(
+                    currentViewBox[2] / canvas.clientWidth,
+                    currentViewBox[3] / canvas.clientHeight,
+                );
+                canvas.style.setProperty(
+                    "--mountain-map-feature-stroke-width",
+                    String(Math.min(0.75, 2 * unitsPerPixel)),
+                );
 
                 const radius = Math.min(currentViewBox[2], currentViewBox[3]) * 0.015;
                 markerHalo.setAttribute("r", String(radius * 2.35));
                 markerCore.setAttribute("r", String(radius));
             };
+
+            renderViewBox(currentViewBox);
 
             const zoomAt = (factor: number, point: { x: number; y: number }) => {
                 currentViewBox = zoomMapViewBoxAt(
