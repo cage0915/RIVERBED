@@ -1315,6 +1315,9 @@
                 name: currentMountain.name,
                 elevation: numberOrUndefined(elevationInput) ?? null,
                 description: descriptionInput.value.trim(),
+                ...(currentMountain.coverKey
+                    ? { coverKey: currentMountain.coverKey }
+                    : {}),
                 ...(currentMountain.dataSource
                     ? { dataSource: currentMountain.dataSource }
                     : {}),

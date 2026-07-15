@@ -10,6 +10,7 @@ export type EditableMountain = {
     name: string;
     elevation: number | null;
     description: string;
+    coverKey?: string;
     location?: {
         latitude: number;
         longitude: number;
@@ -55,6 +56,15 @@ export function sanitizeMountainEntry(
     }
 
     const result: EditableMountain = { name, elevation, description };
+
+    if (candidate.coverKey !== undefined && candidate.coverKey !== null) {
+        const coverKey =
+            typeof candidate.coverKey === "string" ? candidate.coverKey.trim() : "";
+        if (!/^yama\/[^/]+\/[^/]+$/.test(coverKey)) {
+            throw new Error("Invalid mountain cover key");
+        }
+        result.coverKey = coverKey;
+    }
 
     if (candidate.location !== undefined && candidate.location !== null) {
         if (typeof candidate.location !== "object") {

@@ -251,10 +251,12 @@ const folderFooter = currentFolderSlug ? getFolderFooter(currentFolderSlug) : nu
 			</footer>
 		)}
 
-        {DevTool && MountainDevTool && (
+        {DevTool && (
             <>
                 <DevTool />
-                <MountainDevTool />
+                {MountainDevTool && currentPath.startsWith("/tags/") && (
+                    <MountainDevTool />
+                )}
             </>
         )}
 

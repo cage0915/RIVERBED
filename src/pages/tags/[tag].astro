@@ -8,6 +8,7 @@ import MountainProfile, {
 import { getAllPhotosWithTags } from "../../utils/tags";
 import mountainsData from "../../mountains.json";
 import { isMapContextId } from "../../lib/mountain-map";
+import { getImageUrl, R2_DOMAIN } from "../../lib/constants";
 
 export const prerender = false;
 
@@ -34,6 +35,14 @@ const hasMountainProfile = Boolean(
 const matchingPhotos = allPhotos.filter((photo) =>
     photo.tags.some((t) => t.name === decodedTag),
 );
+const representativePhotoKey = mountain?.coverKey;
+const representativePhotoUrl = representativePhotoKey
+    ? getImageUrl(representativePhotoKey)
+    : undefined;
+const representativePhotoFallbackUrl = representativePhotoKey
+    ? `${R2_DOMAIN}/${representativePhotoKey}`
+    : undefined;
+const isDev = import.meta.env.DEV;
 
 const photosByAlbum = matchingPhotos.reduce(
     (acc, photo) => {
@@ -126,7 +135,10 @@ function chunkArray<T>(array: T[], size: number): T[][] {
         </button>
     </div>
 
-    <main class="container mx-auto px-4 py-4 max-w-5xl">
+    <main
+        class="tag-page container mx-auto px-4 py-4 max-w-5xl"
+        data-tag-name={decodedTag}
+    >
         {
             hasMountainProfile && mountain ? (
                 <MountainProfile mountain={mountain} />
@@ -136,6 +148,40 @@ function chunkArray<T>(array: T[], size: number): T[][] {
                 </h1>
             )
         }
+
+        {
+            mountain && representativePhotoUrl ? (
+                <figure class="mountain-representative-photo">
+                    <img
+                        src={representativePhotoUrl}
+                        alt={`${decodedTag}代表照片`}
+                        loading="eager"
+                        onerror={
+                            isDev && representativePhotoFallbackUrl
+                                ? `this.onerror=null; this.src='${representativePhotoFallbackUrl}';`
+                                : undefined
+                        }
+                    />
+                    {isDev && (
+                        <button
+                            class="mountain-cover-chooser"
+                            type="button"
+                        >
+                            更換封面照片
+                        </button>
+                    )}
+                </figure>
+            ) : mountain && isDev ? (
+                <div class="mountain-cover-empty">
+                    <button class="mountain-cover-chooser" type="button">
+                        選擇封面照片
+                    </button>
+                </div>
+            ) : null
+        }
+        {mountain && isDev && (
+            <p class="mountain-cover-status" aria-live="polite" />
+        )}
 
         <div class="tag-photos space-y-12">
             {
@@ -151,10 +197,23 @@ function chunkArray<T>(array: T[], size: number): T[][] {
                             {chunkArray(album.photos, 3).map((chunk) => (
                                 <Row cols={chunk.length}>
                                     {chunk.map((photo) => (
-                                        <Photo
-                                            itemKey={photo.itemKey}
-                                            caption={photo.caption}
-                                        />
+                                        <div
+                                            class="tag-photo-entry"
+                                            data-cover-key={photo.itemKey}
+                                        >
+                                            <Photo
+                                                itemKey={photo.itemKey}
+                                                caption={photo.caption}
+                                            />
+                                            {isDev && mountain && photo.folder === "yama" && (
+                                                <button
+                                                    class="mountain-cover-choice"
+                                                    type="button"
+                                                >
+                                                    設為封面
+                                                </button>
+                                            )}
+                                        </div>
                                     ))}
                                 </Row>
                             ))}
@@ -192,6 +251,87 @@ function chunkArray<T>(array: T[], size: number): T[][] {
 </Layout>
 
 <style>
+    .mountain-representative-photo {
+        position: relative;
+        width: 100%;
+        margin: -1.5rem 0 4rem;
+        overflow: hidden;
+        background: #1a1a1a;
+    }
+
+    .mountain-cover-empty {
+        display: grid;
+        min-height: 9rem;
+        place-items: center;
+        margin: -1.5rem 0 4rem;
+        border: 1px dashed rgb(255 255 255 / 0.14);
+    }
+
+    .mountain-cover-chooser,
+    .mountain-cover-choice {
+        border: 1px solid rgb(255 255 255 / 0.2);
+        border-radius: 999px;
+        background: rgb(18 18 18 / 0.82);
+        color: rgb(228 228 231);
+        font-size: 0.68rem;
+        letter-spacing: 0.08em;
+        transition: border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .mountain-cover-chooser {
+        padding: 0.55rem 0.9rem;
+    }
+
+    .mountain-representative-photo .mountain-cover-chooser {
+        position: absolute;
+        right: 1rem;
+        bottom: 1rem;
+    }
+
+    .mountain-cover-chooser:hover,
+    .mountain-cover-choice:hover {
+        border-color: rgb(255 255 255 / 0.45);
+        background: rgb(18 18 18 / 0.95);
+    }
+
+    .mountain-cover-status {
+        min-height: 1.25rem;
+        margin: -3rem 0 2rem;
+        color: rgb(161 161 170);
+        font-size: 0.72rem;
+        text-align: center;
+    }
+
+    .tag-photo-entry {
+        position: relative;
+        min-width: 0;
+    }
+
+    .mountain-cover-choice {
+        position: absolute;
+        top: 0.75rem;
+        right: 0.75rem;
+        z-index: 20;
+        display: none;
+        padding: 0.45rem 0.7rem;
+    }
+
+    .tag-page.is-choosing-cover .mountain-cover-choice {
+        display: block;
+    }
+
+    .tag-page.is-choosing-cover .tag-photo-entry:has(.mountain-cover-choice) {
+        outline: 1px solid rgb(255 255 255 / 0.22);
+        outline-offset: 2px;
+    }
+
+    .mountain-representative-photo img {
+        display: block;
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        object-fit: cover;
+    }
+
     .tag-photos {
         width: 100%;
     }
@@ -228,9 +368,80 @@ function chunkArray<T>(array: T[], size: number): T[][] {
     .tag-album-group:nth-child(5) {
         animation-delay: 0.5s;
     }
+
+    @media (max-width: 767px) {
+        .mountain-representative-photo {
+            margin-top: -1rem;
+            margin-bottom: 3rem;
+        }
+    }
 </style>
 
 <script>
+    const initMountainCoverChooser = () => {
+        const page = document.querySelector<HTMLElement>(".tag-page[data-tag-name]");
+        if (!page) return;
+
+        const status = page.querySelector<HTMLElement>(".mountain-cover-status");
+        const chooserButtons = page.querySelectorAll<HTMLButtonElement>(
+            ".mountain-cover-chooser",
+        );
+        const choiceButtons = page.querySelectorAll<HTMLButtonElement>(
+            ".mountain-cover-choice",
+        );
+
+        chooserButtons.forEach((button) => {
+            button.addEventListener("click", () => {
+                const isChoosing = page.classList.toggle("is-choosing-cover");
+                button.textContent = isChoosing ? "取消選擇" : "選擇封面照片";
+                if (status) {
+                    status.textContent = isChoosing
+                        ? "請從下方照片選擇這座山的代表封面。"
+                        : "";
+                }
+            });
+        });
+
+        choiceButtons.forEach((button) => {
+            button.addEventListener("click", async () => {
+                const entry = button.closest<HTMLElement>("[data-cover-key]");
+                const coverKey = entry?.dataset.coverKey;
+                const mountainName = page.dataset.tagName;
+                if (!coverKey || !mountainName) return;
+
+                choiceButtons.forEach((candidate) => (candidate.disabled = true));
+                if (status) status.textContent = "正在儲存封面…";
+
+                try {
+                    const response = await fetch("/api/mountain-cover", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ mountainName, coverKey }),
+                    });
+                    const result = await response.json();
+                    if (!response.ok) {
+                        throw new Error(result.error || "無法儲存封面");
+                    }
+                    if (status) status.textContent = "封面已儲存。";
+                    window.location.reload();
+                } catch (error) {
+                    choiceButtons.forEach(
+                        (candidate) => (candidate.disabled = false),
+                    );
+                    if (status) {
+                        status.textContent =
+                            error instanceof Error
+                                ? error.message
+                                : "無法儲存封面";
+                    }
+                }
+            });
+        });
+    };
+
+    initMountainCoverChooser();
+    document.addEventListener("astro:after-swap", initMountainCoverChooser);
+
     const backToTop = document.getElementById("back-to-top");
 
     const handleScroll = () => {

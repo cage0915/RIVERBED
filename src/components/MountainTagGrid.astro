@@ -1,0 +1,171 @@
+---
+import { getImageUrl, R2_DOMAIN } from "../lib/constants";
+
+interface MountainTagCard {
+    name: string;
+    elevation: number;
+    coverKey?: string;
+}
+
+interface Props {
+    mountains: MountainTagCard[];
+}
+
+const { mountains } = Astro.props;
+const isDev = import.meta.env.DEV;
+---
+
+<div class="mountain-tag-grid">
+    {
+        mountains.map((mountain) => {
+            const coverUrl = mountain.coverKey
+                ? getImageUrl(mountain.coverKey)
+                : undefined;
+            const fallbackUrl = mountain.coverKey
+                ? `${R2_DOMAIN}/${mountain.coverKey}`
+                : undefined;
+
+            return (
+                <article
+                    class:list={[
+                        "mountain-tag-card",
+                        !coverUrl && "mountain-tag-card--without-cover",
+                    ]}
+                >
+                    <a
+                        href={`/tags/${encodeURIComponent(mountain.name)}`}
+                        class="mountain-tag-card__link"
+                    >
+                        {coverUrl && (
+                            <img
+                                src={coverUrl}
+                                alt={`${mountain.name}代表照片`}
+                                loading="lazy"
+                                onerror={
+                                    isDev && fallbackUrl
+                                        ? `this.onerror=null; this.src='${fallbackUrl}';`
+                                        : undefined
+                                }
+                            />
+                        )}
+                        <div class="mountain-tag-card__overlay">
+                            <h2>{mountain.name}</h2>
+                            <p>
+                                {mountain.elevation.toLocaleString("en-US")}
+                                <span>m</span>
+                            </p>
+                        </div>
+                    </a>
+                </article>
+            );
+        })
+    }
+</div>
+
+<style>
+    .mountain-tag-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.5rem;
+    }
+
+    .mountain-tag-card {
+        position: relative;
+        min-width: 0;
+        background: #1a1a1a;
+    }
+
+    .mountain-tag-card__link {
+        position: relative;
+        display: block;
+        aspect-ratio: 177 / 100;
+        overflow: hidden;
+        color: inherit;
+        text-decoration: none;
+    }
+
+    .mountain-tag-card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .mountain-tag-card__overlay {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem;
+        background: rgb(255 255 255 / 0.68);
+        color: #111827;
+        opacity: 0;
+        transition: opacity 0.4s ease;
+    }
+
+    .mountain-tag-card__overlay h2 {
+        margin: 0;
+        font-family: "Noto Sans TC", "Noto Sans JP", sans-serif;
+        font-size: 1.25rem;
+        font-weight: 400;
+        letter-spacing: 0.08em;
+        text-align: center;
+    }
+
+    .mountain-tag-card__overlay p {
+        display: flex;
+        align-items: baseline;
+        gap: 0.3rem;
+        margin: 0.6rem 0 0;
+        font-family: "PT Sans", sans-serif;
+        font-size: 1rem;
+    }
+
+    .mountain-tag-card__overlay p span {
+        font-size: 0.65rem;
+        letter-spacing: 0.1em;
+    }
+
+    .mountain-tag-card--without-cover .mountain-tag-card__overlay {
+        opacity: 1;
+        background: #1a1a1a;
+        color: rgb(228 228 231);
+    }
+
+    @media (hover: hover) {
+        .mountain-tag-card:hover img {
+            transform: scale(1.05);
+        }
+
+        .mountain-tag-card:hover .mountain-tag-card__overlay {
+            opacity: 1;
+        }
+    }
+
+    @media (hover: none) {
+        .mountain-tag-card__overlay {
+            justify-content: flex-end;
+            background: linear-gradient(
+                to top,
+                rgb(0 0 0 / 0.72),
+                rgb(0 0 0 / 0) 70%
+            );
+            color: white;
+            opacity: 1;
+        }
+    }
+
+    @media (max-width: 1024px) {
+        .mountain-tag-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 640px) {
+        .mountain-tag-grid {
+            grid-template-columns: minmax(0, 1fr);
+        }
+    }
+</style>

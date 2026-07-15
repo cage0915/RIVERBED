@@ -1,7 +1,10 @@
 ---
 import { getCollection } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
+import MountainTagGrid from "../../components/MountainTagGrid.astro";
 import { getFolderTitle, getFolderCols, getImageUrl, R2_DOMAIN, FOLDER_METADATA } from "../../lib/constants";
+import mountainsData from "../../mountains.json";
+import type { Mountain } from "../../components/MountainProfile.astro";
 
 const { folder } = Astro.params;
 
@@ -40,10 +43,79 @@ if (!isExistentFolder) {
 const folderTitle = getFolderTitle(folder!);
 const folderCols = getFolderCols(folder!);
 const isDev = import.meta.env.DEV;
+const isYama = folder === "yama";
+const currentView =
+    isYama && Astro.url.searchParams.get("view") === "tags"
+        ? "tags"
+        : "posts";
+
+const mountainCards = (mountainsData as Mountain[])
+    .filter(
+        (mountain) =>
+            mountain.elevation !== null &&
+            mountain.location !== undefined &&
+            Number.isFinite(mountain.location.latitude) &&
+            Number.isFinite(mountain.location.longitude),
+    )
+    .map((mountain) => ({
+        name: mountain.name,
+        elevation: mountain.elevation as number,
+        coverKey: mountain.coverKey,
+    }));
 ---
 
 <Layout title={`${folderTitle} - RIVERBED`}>
     <div class="py-8">
+        {
+            isYama && (
+                <div class="fixed bottom-8 right-8 z-40">
+                    <a
+                        href={currentView === "posts" ? "/yama?view=tags" : "/yama"}
+                        title={currentView === "posts" ? "切換至山岳" : "切換至行程"}
+                        aria-label={currentView === "posts" ? "切換至山岳檢視" : "切換至行程檢視"}
+                        class="group text-zinc-500 hover:text-white transition-all duration-300"
+                    >
+                        <div class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center group-hover:border-white/30 transition-colors bg-white/20 backdrop-blur-sm">
+                            {currentView === "posts" ? (
+                                <svg
+                                    width="16"
+                                    height="16"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.8"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    aria-hidden="true"
+                                >
+                                    <circle cx="10" cy="4.5" r="2" />
+                                    <path d="m9 7-2.5 5 3 2 1.5 6M9 9l4 3 3-1M6.5 12 4 19M13 8l2 12M8 8H5.5" />
+                                </svg>
+                            ) : (
+                                <svg
+                                    width="16"
+                                    height="16"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.8"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    aria-hidden="true"
+                                >
+                                    <path d="m3 19 6.5-11 3.2 5.2L15.5 9 21 19Z" />
+                                    <path d="m7.7 11 1.8 1.5 1.3-1.1" />
+                                </svg>
+                            )}
+                        </div>
+                    </a>
+                </div>
+            )
+        }
+
+        {currentView === "tags" ? (
+            <MountainTagGrid mountains={mountainCards} />
+        ) : (
         <div class="albums-grid" style={`--cols: ${folderCols}`}>
             {
                 folderAlbums.length > 0 ? (
@@ -92,6 +164,7 @@ const isDev = import.meta.env.DEV;
                 )
             }
         </div>
+        )}
     </div>
 </Layout>
 

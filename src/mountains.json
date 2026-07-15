@@ -180,7 +180,8 @@
     },
     "panorama": {
       "provider": "peakfinder"
-    }
+    },
+    "coverKey": "yama/2023-da-xiao-bajianshan/08.jpg"
   },
   {
     "name": "小油坑",
@@ -538,7 +539,8 @@
     },
     "panorama": {
       "provider": "peakfinder"
-    }
+    },
+    "coverKey": "yama/2026-hakuba/KCS01420.jpg"
   },
   {
     "name": "白馬鑓ヶ岳",
