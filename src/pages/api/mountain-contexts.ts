@@ -2,6 +2,14 @@ import type { APIRoute } from "astro";
 
 import { sanitizeMountainEntry, type EditableMountain } from "../../lib/mountain-editor";
 import { isValidMapBounds, type MapBounds } from "../../lib/mountain-map";
+import {
+    isMountainSourceRegion,
+    readAllMountainRegions,
+    readMountainRegion,
+    writeAllMountainRegions,
+    writeMountainRegion,
+} from "../../lib/mountain-files";
+import type { MountainSourceRegion } from "../../lib/mountains";
 
 type ContextConfig = {
     id: string;
@@ -24,6 +32,7 @@ type ContextRequestBody = {
     originalId?: string;
     bounds?: unknown;
     originalName?: string;
+    region?: MountainSourceRegion;
     mountain?: unknown;
 };
 
@@ -59,21 +68,11 @@ const roundedBounds = (bounds: MapBounds): MapBounds => ({
     north: Number(bounds.north.toFixed(6)),
 });
 
-const writeJsonPair = async (
-    configFile: string,
-    config: MapConfigFile,
-    mountainsFile: string,
-    mountains: EditableMountain[],
-) => {
+const writeConfig = async (configFile: string, config: MapConfigFile) => {
     const fs = await import("node:fs/promises");
     const temporaryConfigFile = `${configFile}.${process.pid}.tmp`;
-    const temporaryMountainsFile = `${mountainsFile}.${process.pid}.tmp`;
-    await Promise.all([
-        fs.writeFile(temporaryConfigFile, `${JSON.stringify(config, null, 2)}\n`, "utf8"),
-        fs.writeFile(temporaryMountainsFile, `${JSON.stringify(mountains, null, 2)}\n`, "utf8"),
-    ]);
+    await fs.writeFile(temporaryConfigFile, `${JSON.stringify(config, null, 2)}\n`, "utf8");
     await fs.rename(temporaryConfigFile, configFile);
-    await fs.rename(temporaryMountainsFile, mountainsFile);
 };
 
 const saveMountainDraft = (
@@ -99,7 +98,6 @@ const getFiles = async () => {
     const path = await import("node:path");
     return {
         configFile: path.resolve(process.cwd(), "src/map-contexts.json"),
-        mountainsFile: path.resolve(process.cwd(), "src/mountains.json"),
     };
 };
 
@@ -113,11 +111,16 @@ export const POST: APIRoute = async ({ request }) => {
         const baseContextId = body.baseContextId?.trim();
         if (!baseContextId) return json({ error: "Missing base context" }, 400);
         const fs = await import("node:fs/promises");
-        const { configFile, mountainsFile } = await getFiles();
-        const [config, mountains] = await Promise.all([
-            fs.readFile(configFile, "utf8").then((value) => JSON.parse(value) as MapConfigFile),
-            fs.readFile(mountainsFile, "utf8").then((value) => JSON.parse(value) as EditableMountain[]),
-        ]);
+        if (body.mountain !== undefined && !isMountainSourceRegion(body.region)) {
+            return json({ error: "Missing mountain region" }, 400);
+        }
+        const { configFile } = await getFiles();
+        const config = await fs
+            .readFile(configFile, "utf8")
+            .then((value) => JSON.parse(value) as MapConfigFile);
+        const mountains = isMountainSourceRegion(body.region)
+            ? await readMountainRegion(body.region)
+            : [];
         if (config.contexts[fields.id]) {
             return json({ error: `Context ID "${fields.id}" already exists` }, 409);
         }
@@ -136,8 +139,17 @@ export const POST: APIRoute = async ({ request }) => {
         };
         config.contexts[fields.id] = context;
         const mountain = saveMountainDraft(body, config, mountains);
-        await writeJsonPair(configFile, config, mountainsFile, mountains);
-        return json({ success: true, context, ...(mountain ? { mountain } : {}) });
+        await Promise.all([
+            writeConfig(configFile, config),
+            ...(isMountainSourceRegion(body.region)
+                ? [writeMountainRegion(body.region, mountains)]
+                : []),
+        ]);
+        return json({
+            success: true,
+            context,
+            ...(mountain ? { mountain: { ...mountain, region: body.region } } : {}),
+        });
     } catch (error) {
         return json({ error: error instanceof Error ? error.message : "Unable to save context" }, 400);
     }
@@ -153,10 +165,13 @@ export const PUT: APIRoute = async ({ request }) => {
         const originalId = body.originalId?.trim();
         if (!originalId) return json({ error: "Missing original context ID" }, 400);
         const fs = await import("node:fs/promises");
-        const { configFile, mountainsFile } = await getFiles();
+        if (body.mountain !== undefined && !isMountainSourceRegion(body.region)) {
+            return json({ error: "Missing mountain region" }, 400);
+        }
+        const { configFile } = await getFiles();
         const [config, mountains] = await Promise.all([
             fs.readFile(configFile, "utf8").then((value) => JSON.parse(value) as MapConfigFile),
-            fs.readFile(mountainsFile, "utf8").then((value) => JSON.parse(value) as EditableMountain[]),
+            readAllMountainRegions(),
         ]);
         const context = config.contexts[originalId];
         if (!context) return json({ error: `Context ID "${originalId}" was not found` }, 404);
@@ -180,13 +195,28 @@ export const PUT: APIRoute = async ({ request }) => {
             delete mountain.location.initialBounds;
             affectedMountains += 1;
         }
-        const mountain = saveMountainDraft(body, config, mountains);
-        await writeJsonPair(configFile, config, mountainsFile, mountains);
+        let mountain: EditableMountain | undefined;
+        if (body.mountain !== undefined && body.region) {
+            const group = mountains.filter((entry) => entry.region === body.region);
+            mountain = saveMountainDraft(body, config, group);
+            if (mountain) {
+                const index = mountains.findIndex(
+                    (entry) =>
+                        entry.region === body.region &&
+                        entry.name === mountain?.name,
+                );
+                mountains[index] = { ...mountain, region: body.region };
+            }
+        }
+        await Promise.all([
+            writeConfig(configFile, config),
+            writeAllMountainRegions(mountains),
+        ]);
         return json({
             success: true,
             context: updatedContext,
             affectedMountains,
-            ...(mountain ? { mountain } : {}),
+            ...(mountain ? { mountain: { ...mountain, region: body.region } } : {}),
         });
     } catch (error) {
         return json({ error: error instanceof Error ? error.message : "Unable to update context" }, 400);
@@ -202,10 +232,10 @@ export const DELETE: APIRoute = async ({ request }) => {
 
     try {
         const fs = await import("node:fs/promises");
-        const { configFile, mountainsFile } = await getFiles();
+        const { configFile } = await getFiles();
         const [config, mountains] = await Promise.all([
             fs.readFile(configFile, "utf8").then((value) => JSON.parse(value) as MapConfigFile),
-            fs.readFile(mountainsFile, "utf8").then((value) => JSON.parse(value) as EditableMountain[]),
+            readAllMountainRegions(),
         ]);
         const context = config.contexts[id];
         if (!context) return json({ error: `Context ID "${id}" was not found` }, 404);
@@ -219,7 +249,7 @@ export const DELETE: APIRoute = async ({ request }) => {
 
         // Preserve coordinates and the now-missing context ID. Dev and production
         // both suppress the map until another valid context is assigned.
-        await writeJsonPair(configFile, config, mountainsFile, mountains);
+        await writeConfig(configFile, config);
         return json({
             success: true,
             deletedContextId: id,

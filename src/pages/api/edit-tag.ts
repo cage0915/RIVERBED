@@ -1,4 +1,11 @@
 import type { APIRoute } from 'astro';
+import {
+    findMountainRegion,
+    isMountainRegion,
+    readMountainRegion,
+    writeMountainRegion,
+} from '../../lib/mountain-files';
+import type { MountainRegion } from '../../lib/mountains';
 
 export const POST: APIRoute = async ({ request }) => {
     // Only allow in dev mode
@@ -9,7 +16,7 @@ export const POST: APIRoute = async ({ request }) => {
         });
     }
 
-    let body: { action: 'update' | 'delete'; photoId?: string; tagName?: string; x?: number; y?: number };
+    let body: { action: 'update' | 'delete'; photoId?: string; tagName?: string; x?: number; y?: number; region?: MountainRegion };
     try {
         body = await request.json();
     } catch {
@@ -57,6 +64,14 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     const tagKey = filename || photoId;
+    const existingMountain =
+        action === 'update' ? await findMountainRegion(tagName) : undefined;
+    if (action === 'update' && !existingMountain && !isMountainRegion(body.region)) {
+        return new Response(
+            JSON.stringify({ error: 'Choose a region for the new mountain' }),
+            { status: 400, headers: { 'Content-Type': 'application/json' } },
+        );
+    }
 
     if (action === 'delete') {
         if (tagsMap[tagKey]) {
@@ -76,18 +91,11 @@ export const POST: APIRoute = async ({ request }) => {
         tagsMap[tagKey].push({ name: tagName, x: Math.round(x * 100) / 100, y: Math.round(y * 100) / 100 });
         fs.writeFileSync(tagsFile, JSON.stringify(tagsMap, null, 2), 'utf-8');
 
-        // Update mountains.json
-        interface MountainEntry { name: string; elevation: number | null; description: string; }
-        const mountainsFile = path.resolve(cwd, 'src/mountains.json');
-        let mountains: MountainEntry[] = [];
-        if (fs.existsSync(mountainsFile)) {
-            try { mountains = JSON.parse(fs.readFileSync(mountainsFile, 'utf-8')); } catch { mountains = []; }
-        }
-        const alreadyExists = mountains.some((m) => m.name === tagName);
-        if (!alreadyExists) {
+        if (!existingMountain) {
+            if (!isMountainRegion(body.region)) throw new Error('Missing mountain region');
+            const mountains = await readMountainRegion(body.region);
             mountains.push({ name: tagName, elevation: null, description: '' });
-            mountains.sort((a, b) => a.name.localeCompare(b.name, 'zh-Hant'));
-            fs.writeFileSync(mountainsFile, JSON.stringify(mountains, null, 2), 'utf-8');
+            await writeMountainRegion(body.region, mountains);
         }
     }
 

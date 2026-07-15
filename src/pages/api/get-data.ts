@@ -1,5 +1,8 @@
 import type { APIRoute } from 'astro';
-import mountains from '../../mountains.json';
+import {
+    allMountains as mountains,
+    MOUNTAIN_REGION_DEFINITIONS as regions,
+} from '../../lib/mountains';
 const tagFiles = import.meta.glob('/src/album-tags/**/*.json', { eager: true });
 
 
@@ -15,11 +18,10 @@ export const GET: APIRoute = async () => {
     }
 
     return new Response(
-        JSON.stringify({ mountains, allTags }),
+        JSON.stringify({ mountains, regions, allTags }),
         {
             status: 200,
             headers: { 'Content-Type': 'application/json' },
         }
     );
 };
-

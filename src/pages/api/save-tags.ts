@@ -2,14 +2,18 @@ import type { APIRoute } from 'astro';
 
 import {
     collectTagNames,
-    mergeMountainEntries,
     normalizeTagMap,
 } from '../../lib/dev-tag-state.js';
+import {
+    isMountainRegion,
+    readAllMountainRegions,
+    readMountainRegion,
+    writeMountainRegion,
+} from '../../lib/mountain-files';
+import type { MountainRegion } from '../../lib/mountains';
 
 type Tag = { name: string; x: number; y: number };
 type TagMap = Record<string, Tag[]>;
-type MountainEntry = { name: string; elevation: number | null; description: string };
-
 export const POST: APIRoute = async ({ request }) => {
     if (!import.meta.env.DEV) {
         return new Response(JSON.stringify({ error: 'Not available in production' }), {
@@ -18,7 +22,11 @@ export const POST: APIRoute = async ({ request }) => {
         });
     }
 
-    let body: { albumSlug?: string; tagsMap?: TagMap };
+    let body: {
+        albumSlug?: string;
+        tagsMap?: TagMap;
+        newMountainRegions?: Record<string, MountainRegion>;
+    };
     try {
         body = await request.json();
     } catch {
@@ -53,22 +61,44 @@ export const POST: APIRoute = async ({ request }) => {
     const tagsFile = path.resolve(tagsDir, `${album}.json`);
     const normalizedTagMap = normalizeTagMap(tagsMap);
 
+    const allMountains = await readAllMountainRegions();
+    const existingNames = new Set(allMountains.map((mountain) => mountain.name));
+    const unknownNames = collectTagNames(normalizedTagMap).filter(
+        (name) => !existingNames.has(name),
+    );
+    const missingRegions = unknownNames.filter(
+        (name) => !isMountainRegion(body.newMountainRegions?.[name]),
+    );
+    if (missingRegions.length > 0) {
+        return new Response(
+            JSON.stringify({
+                error: `Choose a region for: ${missingRegions.join(', ')}`,
+                unknownMountains: missingRegions,
+            }),
+            { status: 400, headers: { 'Content-Type': 'application/json' } },
+        );
+    }
+
     fs.mkdirSync(tagsDir, { recursive: true });
     fs.writeFileSync(tagsFile, JSON.stringify(normalizedTagMap, null, 2), 'utf-8');
 
-    const mountainsFile = path.resolve(cwd, 'src/mountains.json');
-    let mountains: MountainEntry[] = [];
-    if (fs.existsSync(mountainsFile)) {
-        try {
-            mountains = JSON.parse(fs.readFileSync(mountainsFile, 'utf-8'));
-        } catch {
-            mountains = [];
-        }
-    }
-
-    const nextMountains = mergeMountainEntries(mountains, collectTagNames(normalizedTagMap));
-    if (JSON.stringify(nextMountains) !== JSON.stringify(mountains)) {
-        fs.writeFileSync(mountainsFile, JSON.stringify(nextMountains, null, 2), 'utf-8');
+    const targetRegions = [...new Set(
+        unknownNames.map((name) => body.newMountainRegions?.[name]),
+    )].filter(isMountainRegion);
+    for (const region of targetRegions) {
+        const names = unknownNames.filter(
+            (name) => body.newMountainRegions?.[name] === region,
+        );
+        if (names.length === 0) continue;
+        const mountains = await readMountainRegion(region);
+        mountains.push(
+            ...names.map((name) => ({
+                name,
+                elevation: null,
+                description: '',
+            })),
+        );
+        await writeMountainRegion(region, mountains);
     }
 
     return new Response(JSON.stringify({ success: true }), {

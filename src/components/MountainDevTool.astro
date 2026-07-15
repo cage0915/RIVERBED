@@ -18,12 +18,17 @@
 <dialog id="dev-mountain-manager" class="dev-mountain-manager">
     <form id="dev-mountain-form" class="dev-mountain-manager__surface">
         <header class="dev-mountain-manager__header">
-            <div>
-                <p class="dev-mountain-manager__eyebrow">RIVERBED DEVTOOL</p>
-                <h2>Mountain Manager</h2>
-            </div>
+            <h3>Mountain Manager</h3>
             <div class="dev-mountain-manager__header-actions">
-                <button id="dev-mountain-save" class="dev-mountain-primary-button" type="submit">Save</button>
+                <button
+                    id="dev-mountain-save"
+                    class="dev-mountain-icon-button dev-mountain-icon-button--save"
+                    type="submit"
+                    title="Save Mountain"
+                    aria-label="Save Mountain"
+                >
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"></path></svg>
+                </button>
                 <button id="dev-mountain-close" class="dev-mountain-icon-button" type="button" aria-label="Close">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"></path></svg>
                 </button>
@@ -35,6 +40,10 @@
                 <section class="dev-mountain-section" data-preview-target="location">
                     <h3>Basic Data</h3>
                     <div class="dev-mountain-grid dev-mountain-grid--lookup">
+                        <label class="dev-mountain-field">
+                            <span>Region</span>
+                            <select id="dev-mountain-region"></select>
+                        </label>
                         <div class="dev-mountain-field">
                             <span>Mountain</span>
                             <div id="dev-mountain-picker" class="dev-mountain-context-picker">
@@ -53,10 +62,6 @@
                                 <select id="dev-mountain-select" tabindex="-1" aria-hidden="true"></select>
                             </div>
                         </div>
-                        <label class="dev-mountain-field">
-                            <span>Wikidata Search</span>
-                            <input id="dev-mountain-lookup-query" type="search" placeholder="Mountain name" />
-                        </label>
                         <button
                             id="dev-mountain-lookup-button"
                             class="dev-mountain-secondary-button dev-mountain-grid-action"
@@ -104,7 +109,7 @@
                     </label>
                     <p id="dev-mountain-source" class="dev-mountain-help"></p>
                     <p class="dev-mountain-help">
-                        Refresh the location preview before saving. Click <strong>Save</strong> in the header to write elevation, coordinates, and description to mountains.json.
+                        Refresh the location preview before saving. Click <strong>Save</strong> in the header to write elevation, coordinates, and description to the selected region file.
                     </p>
                 </section>
 
@@ -338,7 +343,10 @@
         background: white;
     }
 
-    .dev-mountain-manager__header { border-bottom: 1px solid #e2e8f0; }
+    .dev-mountain-manager__header {
+        border-bottom: 1px solid #e2e8f0;
+        background: #fafafa;
+    }
     .dev-mountain-manager__footer { border-top: 1px solid #e2e8f0; }
 
     .dev-mountain-manager__header-actions {
@@ -347,13 +355,13 @@
         gap: 0.5rem;
     }
 
-    .dev-mountain-manager__header h2 {
-        margin: 0.15rem 0 0;
-        font-size: 1.05rem;
+    .dev-mountain-manager__header h3 {
+        margin: 0;
+        color: #333;
+        font-size: 1rem;
         font-weight: 600;
     }
 
-    .dev-mountain-manager__eyebrow,
     .dev-mountain-preview-card__header p {
         margin: 0;
         color: #94a3b8;
@@ -375,6 +383,18 @@
     }
 
     .dev-mountain-icon-button:hover { background: #f1f5f9; color: #0f172a; }
+
+    .dev-mountain-icon-button--save {
+        border: 1px solid #198754;
+        background: #198754;
+        color: #fff;
+    }
+
+    .dev-mountain-icon-button--save:hover {
+        border-color: #146c43;
+        background: #157347;
+        color: #fff;
+    }
 
     .dev-mountain-manager__body {
         display: grid;
@@ -430,7 +450,7 @@
         gap: 0.65rem;
     }
 
-    .dev-mountain-grid--lookup { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr) 2.25rem; }
+    .dev-mountain-grid--lookup { grid-template-columns: minmax(0, 0.65fr) minmax(0, 1.35fr) 2.25rem; }
     .dev-mountain-grid--location { grid-template-columns: minmax(0, 0.72fr) repeat(2, minmax(0, 1fr)) 2.25rem; }
     .dev-mountain-grid--context { grid-template-columns: repeat(2, minmax(0, 1fr)) 2.25rem; }
     .dev-mountain-grid--panorama { grid-template-columns: repeat(3, minmax(0, 1fr)) 2.25rem; }
@@ -775,6 +795,7 @@
 
 <script>
     import type { EditableMountain } from "../lib/mountain-editor";
+    import type { MountainWithRegion } from "../lib/mountains";
     import {
         boundsToViewBox,
         constrainMapViewBox,
@@ -803,7 +824,8 @@
         extent: SvgViewBox;
     };
     type ManagerData = {
-        mountains: EditableMountain[];
+        mountains: MountainWithRegion[];
+        regions: { id: string; label: string }[];
         contexts: Record<string, ContextConfig>;
         sources: Record<string, SourceConfig>;
     };
@@ -837,12 +859,12 @@
 
         const form = byId<HTMLFormElement>("dev-mountain-form")!;
         const closeButton = byId<HTMLButtonElement>("dev-mountain-close")!;
+        const regionSelect = byId<HTMLSelectElement>("dev-mountain-region")!;
         const mountainSelect = byId<HTMLSelectElement>("dev-mountain-select")!;
         const mountainPicker = byId<HTMLElement>("dev-mountain-picker")!;
         const mountainTrigger = byId<HTMLButtonElement>("dev-mountain-trigger")!;
         const mountainTriggerLabel = byId<HTMLElement>("dev-mountain-trigger-label")!;
         const mountainMenu = byId<HTMLElement>("dev-mountain-menu")!;
-        const lookupQuery = byId<HTMLInputElement>("dev-mountain-lookup-query")!;
         const lookupButton = byId<HTMLButtonElement>("dev-mountain-lookup-button")!;
         const lookupStatus = byId<HTMLElement>("dev-mountain-lookup-status")!;
         const candidatesRoot = byId<HTMLElement>("dev-mountain-candidates")!;
@@ -884,7 +906,7 @@
         const saveStatus = byId<HTMLElement>("dev-mountain-save-status")!;
 
         let managerData: ManagerData | null = null;
-        let currentMountain: EditableMountain | null = null;
+        let currentMountain: MountainWithRegion | null = null;
         let currentViewBox: SvgViewBox = [0, 0, 100, 100];
         let initialConstraintViewBox: SvgViewBox = [0, 0, 100, 100];
         let sourceViewBox: SvgViewBox = [0, 0, 100, 100];
@@ -980,7 +1002,9 @@
 
         const renderMountainMenu = () => {
             if (!managerData) return;
-            mountainMenu.innerHTML = managerData.mountains.map((mountain) => {
+            mountainMenu.innerHTML = managerData.mountains
+                .filter((mountain) => mountain.region === regionSelect.value)
+                .map((mountain) => {
                 const hasCompleteData = Boolean(
                     typeof mountain.elevation === "number" &&
                     Number.isFinite(mountain.elevation) &&
@@ -994,6 +1018,23 @@
                     : "<span></span>";
                 return `<div class="dev-mountain-context-option"><button class="dev-mountain-context-choice" type="button" role="option" aria-selected="${String(mountainSelect.value === mountain.name)}" data-mountain-name="${escapeHtml(mountain.name)}">${escapeHtml(mountain.name)}</button>${check}</div>`;
             }).join("");
+        };
+
+        const populateMountainSelect = (preferredName = "") => {
+            if (!managerData) return;
+            const mountains = managerData.mountains.filter(
+                (mountain) => mountain.region === regionSelect.value,
+            );
+            mountainSelect.innerHTML = mountains
+                .map(
+                    (mountain) =>
+                        `<option value="${escapeHtml(mountain.name)}">${escapeHtml(mountain.name)}</option>`,
+                )
+                .join("");
+            if (mountains.some((mountain) => mountain.name === preferredName)) {
+                mountainSelect.value = preferredName;
+            }
+            renderMountainMenu();
         };
 
         const renderContextMenu = () => {
@@ -1183,11 +1224,12 @@
             if (!managerData) return;
             const mountain = managerData.mountains.find((entry) => entry.name === name);
             if (!mountain) return;
+            regionSelect.value = mountain.region;
+            populateMountainSelect(mountain.name);
             mountainSelect.value = mountain.name;
             mountainTriggerLabel.textContent = mountain.name;
             renderMountainMenu();
             currentMountain = structuredClone(mountain);
-            lookupQuery.value = mountain.name;
             elevationInput.value = mountain.elevation === null ? "" : String(mountain.elevation);
             descriptionInput.value = mountain.description;
             latitudeInput.value = mountain.location ? String(mountain.location.latitude) : "";
@@ -1219,6 +1261,12 @@
             const data = await response.json();
             if (!response.ok) throw new Error(data.error || "Unable to load mountain data");
             managerData = data as ManagerData;
+            regionSelect.innerHTML = managerData.regions
+                .map(
+                    (region) =>
+                        `<option value="${escapeHtml(region.id)}">${escapeHtml(region.label)}</option>`,
+                )
+                .join("");
             let restoreState: { mountainName?: string; contextId?: string } | null = null;
             try {
                 const storedState = sessionStorage.getItem(RESTORE_MANAGER_KEY);
@@ -1227,10 +1275,6 @@
             } catch {
                 restoreState = null;
             }
-            mountainSelect.innerHTML = managerData.mountains
-                .map((mountain) => `<option value="${escapeHtml(mountain.name)}">${escapeHtml(mountain.name)}</option>`)
-                .join("");
-            renderMountainMenu();
             populateContextSelect();
             const pathParts = location.pathname.split("/").filter(Boolean);
             const tagName = pathParts[0] === "tags" && pathParts[1]
@@ -1241,7 +1285,8 @@
                 ?? managerData.mountains.find((mountain) => mountain.location)
                 ?? managerData.mountains[0];
             if (initialMountain) {
-                mountainSelect.value = initialMountain.name;
+                regionSelect.value = initialMountain.region;
+                populateMountainSelect(initialMountain.name);
                 loadMountain(initialMountain.name);
             }
             if (restoreState?.contextId && managerData.contexts[restoreState.contextId]) {
@@ -1406,6 +1451,16 @@
             location.assign(`/tags/${encodeURIComponent(mountainName)}`);
         });
 
+        regionSelect.addEventListener("change", () => {
+            populateMountainSelect();
+            const nextMountain = managerData?.mountains.find(
+                (mountain) =>
+                    mountain.region === regionSelect.value &&
+                    mountain.name === mountainSelect.value,
+            );
+            if (nextMountain) loadMountain(nextMountain.name);
+        });
+
         previewTabs.forEach((tab) => {
             tab.addEventListener("click", () => {
                 const mode = tab.dataset.previewTab as PreviewMode;
@@ -1443,7 +1498,7 @@
         });
 
         lookupButton.addEventListener("click", async () => {
-            const query = lookupQuery.value.trim();
+            const query = currentMountain?.name.trim() || mountainSelect.value.trim();
             if (!query) return;
             lookupButton.disabled = true;
             lookupStatus.textContent = "Searching Wikidata…";
@@ -1604,7 +1659,11 @@
                             : { originalId: originalContextId }),
                         bounds: viewBoxToBounds(currentViewBox),
                         ...(mountain.location
-                            ? { originalName: currentMountain?.name, mountain }
+                            ? {
+                                originalName: currentMountain?.name,
+                                region: currentMountain?.region,
+                                mountain,
+                            }
                             : {}),
                     }),
                 });
@@ -1621,7 +1680,7 @@
                     }
                     managerData.contexts[id] = data.context;
                     if (data.mountain) {
-                        const savedMountain = data.mountain as EditableMountain;
+                        const savedMountain = data.mountain as MountainWithRegion;
                         const mountainIndex = managerData.mountains.findIndex(
                             (entry) => entry.name === savedMountain.name,
                         );
@@ -1765,11 +1824,15 @@
                 const response = await fetch("/api/mountains", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ originalName: currentMountain.name, mountain }),
+                    body: JSON.stringify({
+                        originalName: currentMountain.name,
+                        region: currentMountain.region,
+                        mountain,
+                    }),
                 });
                 const data = await response.json();
                 if (!response.ok) throw new Error(data.error || "Save failed");
-                const savedMountain = data.mountain as EditableMountain;
+                const savedMountain = data.mountain as MountainWithRegion;
                 currentMountain = savedMountain;
                 if (managerData) {
                     const index = managerData.mountains.findIndex((entry) => entry.name === savedMountain.name);

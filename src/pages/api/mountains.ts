@@ -1,6 +1,16 @@
 import type { APIRoute } from "astro";
 
-import { sanitizeMountainEntry, type EditableMountain } from "../../lib/mountain-editor";
+import { sanitizeMountainEntry } from "../../lib/mountain-editor";
+import {
+    isMountainSourceRegion,
+    readAllMountainRegions,
+    readMountainRegion,
+    writeMountainRegion,
+} from "../../lib/mountain-files";
+import {
+    MOUNTAIN_REGION_DEFINITIONS,
+    type MountainSourceRegion,
+} from "../../lib/mountains";
 import { MAP_SOURCES } from "../../lib/mountain-map";
 
 const json = (body: unknown, status = 200) =>
@@ -17,21 +27,13 @@ const readJson = async <T>(file: string): Promise<T> => {
     return JSON.parse(await fs.readFile(file, "utf8")) as T;
 };
 
-const writeJson = async (file: string, value: unknown) => {
-    const fs = await import("node:fs/promises");
-    const temporaryFile = `${file}.${process.pid}.tmp`;
-    await fs.writeFile(temporaryFile, `${JSON.stringify(value, null, 2)}\n`, "utf8");
-    await fs.rename(temporaryFile, file);
-};
-
 export const GET: APIRoute = async () => {
     if (!import.meta.env.DEV) return json({ error: "Not available in production" }, 403);
 
     const path = await import("node:path");
-    const mountainsFile = path.resolve(process.cwd(), "src/mountains.json");
     const contextsFile = path.resolve(process.cwd(), "src/map-contexts.json");
     const [mountains, mapConfig] = await Promise.all([
-        readJson<EditableMountain[]>(mountainsFile),
+        readAllMountainRegions(),
         readJson<{
             contexts: Record<string, unknown>;
         }>(contextsFile),
@@ -39,6 +41,7 @@ export const GET: APIRoute = async () => {
 
     return json({
         mountains,
+        regions: MOUNTAIN_REGION_DEFINITIONS,
         contexts: mapConfig.contexts,
         sources: MAP_SOURCES,
     });
@@ -47,7 +50,11 @@ export const GET: APIRoute = async () => {
 export const POST: APIRoute = async ({ request }) => {
     if (!import.meta.env.DEV) return json({ error: "Not available in production" }, 403);
 
-    let body: { originalName?: string; mountain?: unknown };
+    let body: {
+        originalName?: string;
+        region?: MountainSourceRegion;
+        mountain?: unknown;
+    };
     try {
         body = await request.json();
     } catch {
@@ -55,17 +62,16 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     const originalName = body.originalName?.trim();
-    if (!originalName || !body.mountain) {
+    if (!originalName || !body.mountain || !isMountainSourceRegion(body.region)) {
         return json({ error: "Missing mountain data" }, 400);
     }
 
     const path = await import("node:path");
-    const mountainsFile = path.resolve(process.cwd(), "src/mountains.json");
     const contextsFile = path.resolve(process.cwd(), "src/map-contexts.json");
 
     try {
         const [mountains, mapConfig] = await Promise.all([
-            readJson<EditableMountain[]>(mountainsFile),
+            readMountainRegion(body.region),
             readJson<{ contexts: Record<string, unknown> }>(contextsFile),
         ]);
         const mountain = sanitizeMountainEntry(
@@ -79,8 +85,8 @@ export const POST: APIRoute = async ({ request }) => {
         const index = mountains.findIndex((entry) => entry.name === originalName);
         if (index < 0) return json({ error: "Mountain not found" }, 404);
         mountains[index] = mountain;
-        await writeJson(mountainsFile, mountains);
-        return json({ success: true, mountain });
+        await writeMountainRegion(body.region, mountains);
+        return json({ success: true, mountain: { ...mountain, region: body.region } });
     } catch (error) {
         return json(
             { error: error instanceof Error ? error.message : "Unable to save mountain" },

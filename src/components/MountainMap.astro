@@ -36,10 +36,10 @@ const interactionHelpId = `${contextId}-map-help`;
     data-mountain-map
     data-initialized="false"
     data-source-view-box={source.extent.join(" ")}
-    aria-label={`${mountainName}位置圖`}
+    aria-label={`${mountainName} location map`}
 >
     <p id={interactionHelpId} class="sr-only">
-        使用滾輪或雙指縮放，拖曳移動地圖；方向鍵可平移，加號與減號可縮放，Home鍵可回到初始範圍。
+        Use the mouse wheel or pinch to zoom, drag to pan, arrow keys to move, plus and minus to zoom, and Home to reset the view.
     </p>
 
     <div class="mountain-map__frame">
@@ -50,7 +50,7 @@ const interactionHelpId = `${contextId}-map-help`;
             viewBox={initialViewBox}
             role="img"
             tabindex="0"
-            aria-label={`${mountainName}的位置`}
+            aria-label={`${mountainName} location`}
             aria-describedby={interactionHelpId}
             preserveAspectRatio="xMidYMid meet"
         >

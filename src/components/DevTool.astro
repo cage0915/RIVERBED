@@ -13,7 +13,17 @@
     // Only run in development
     if (import.meta.env.DEV) {
         (async () => {
-            let mountainCache: { name: string; elevation: number | null; description: string }[] = [];
+            type MountainRegion = string;
+            type MountainRegionDefinition = { id: string; label: string };
+            type CachedMountain = {
+                name: string;
+                elevation: number | null;
+                description: string;
+                region: MountainRegion;
+            };
+            let mountainCache: CachedMountain[] = [];
+            let mountainRegions: MountainRegionDefinition[] = [];
+            let pendingMountainRegions: Record<string, MountainRegion> = {};
             let savedAlbumTagMap: Record<string, { name: string; x: number; y: number }[]> = {};
             let currentAlbumTagMap: Record<string, { name: string; x: number; y: number }[]> = {};
             const isLocalhost = ['localhost', '127.0.0.1'].includes(location.hostname);
@@ -24,6 +34,38 @@
                 const style = document.createElement('style');
                 style.id = 'dev-tool-styles';
                 style.textContent = `
+                    .dev-manager-header-actions {
+                        display: flex;
+                        align-items: center;
+                        gap: 0.25rem;
+                    }
+                    .dev-manager-header-button {
+                        display: flex;
+                        width: 2rem;
+                        height: 2rem;
+                        padding: 0;
+                        align-items: center;
+                        justify-content: center;
+                        border: 0;
+                        border-radius: 6px;
+                        background: transparent;
+                        color: #64748b;
+                        cursor: pointer;
+                    }
+                    .dev-manager-header-button:hover {
+                        background: #f1f5f9;
+                        color: #0f172a;
+                    }
+                    .dev-manager-header-button--save {
+                        border: 1px solid #198754;
+                        background: #198754;
+                        color: #fff;
+                    }
+                    .dev-manager-header-button--save:hover {
+                        border-color: #146c43;
+                        background: #157347;
+                        color: #fff;
+                    }
                     .dev-block-toolbar {
                         position: absolute;
                         top: 0.5rem;
@@ -495,6 +537,7 @@
                     if (res.ok) {
                         const data = await res.json();
                         mountainCache = data.mountains || [];
+                        mountainRegions = data.regions || [];
                     }
                 } catch {}
                 return mountainCache;
@@ -553,12 +596,20 @@
                         : 'No pending tag changes';
             };
 
-            const rememberMountainName = (name: string) => {
+            const rememberMountainName = (name: string, region?: MountainRegion) => {
                 if (!name.trim()) return;
-                if (!mountainCache.some((mountain) => mountain.name === name)) {
-                    mountainCache = [...mountainCache, { name, elevation: null, description: '' }]
+                const isNewMountain = !mountainCache.some((mountain) => mountain.name === name);
+                if (isNewMountain) {
+                    if (!region) return;
+                    mountainCache = [...mountainCache, {
+                        name,
+                        elevation: null,
+                        description: '',
+                        region,
+                    }]
                         .sort((left, right) => left.name.localeCompare(right.name, 'zh-Hant'));
                 }
+                if (isNewMountain && region) pendingMountainRegions[name] = region;
             };
 
             const readAlbumTagStateFromDom = () => {
@@ -631,7 +682,7 @@
                 }
 
                 if (serializeTagMap(currentAlbumTagMap) === serializeTagMap(savedAlbumTagMap)) {
-                    showToast('ℹ️ 沒有待存的 tag 變更');
+                    showToast('ℹ️ No pending tag changes');
                     return;
                 }
 
@@ -641,7 +692,11 @@
                     const response = await fetch('/api/save-tags', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ albumSlug, tagsMap: currentAlbumTagMap }),
+                        body: JSON.stringify({
+                            albumSlug,
+                            tagsMap: currentAlbumTagMap,
+                            newMountainRegions: pendingMountainRegions,
+                        }),
                     });
                     const data = await response.json().catch(() => ({}));
 
@@ -650,12 +705,15 @@
                     }
 
                     savedAlbumTagMap = normalizeTagMap(currentAlbumTagMap);
-                    collectTagNames(savedAlbumTagMap).forEach(rememberMountainName);
+                    collectTagNames(savedAlbumTagMap).forEach((name) => {
+                        rememberMountainName(name, pendingMountainRegions[name]);
+                        delete pendingMountainRegions[name];
+                    });
                     updateSaveButtonState();
-                    showToast('✅ 已存檔，若 dev server 偵測到檔案變更會自動刷新');
+                    showToast('✅ Saved. The dev server may refresh the page.');
                 } catch (error: any) {
                     updateSaveButtonState();
-                    showToast(`❌ 存檔失敗：${error?.message || 'Unknown error'}`);
+                    showToast(`❌ Save failed: ${error?.message || 'Unknown error'}`);
                 }
             };
 
@@ -669,15 +727,21 @@
                 dialog.innerHTML = `
                     <form method="dialog" id="dev-tag-form">
                         <h3 id="dev-tag-dialog-title" style="margin:0 0 0.75rem;font-size:0.95rem;font-family:sans-serif;color:#111">
-                            📍 新增標籤點
+                            Add Tag Point
                         </h3>
                         <p id="dev-tag-coords" style="font-size:0.75rem;color:#555;margin:0 0 0.5rem;font-family:monospace"></p>
+                        <label id="dev-tag-region-field" style="display:block;margin-top:0.65rem;font-size:0.75rem;color:#555;font-family:sans-serif">
+                            Region
+                            <select id="dev-tag-region" style="display:block;width:100%;margin-top:0.3rem;padding:0.4rem 0.5rem;border:1px solid #ccc;border-radius:4px;background:#fff;font-size:0.85rem;box-sizing:border-box">
+                                <option value="">Choose a region</option>
+                            </select>
+                        </label>
                         <input
                             id="dev-tag-input"
                             list="dev-tag-datalist"
-                            placeholder="山名（可選擇或輸入新名）"
+                            placeholder="Choose a region first"
                             autocomplete="off"
-                            style="width:100%;padding:0.4rem 0.5rem;border:1px solid #ccc;border-radius:4px;font-size:0.9rem;box-sizing:border-box"
+                            style="width:100%;margin-top:0.65rem;padding:0.4rem 0.5rem;border:1px solid #ccc;border-radius:4px;font-size:0.9rem;box-sizing:border-box"
                         />
                         <datalist id="dev-tag-datalist"></datalist>
                         <div style="display:flex;gap:0.5rem;margin-top:0.75rem;justify-content:flex-end">
@@ -715,7 +779,7 @@
 
             function showTagDialog(options: {
                 title: string; photoId: string; x: number; y: number; initialName?: string; showDelete?: boolean
-            }): Promise<{ action: 'save' | 'delete' | 'cancel', name?: string }> {
+            }): Promise<{ action: 'save' | 'delete' | 'cancel', name?: string, region?: MountainRegion }> {
                 return new Promise(async (resolve) => {
                     const mountains = await fetchMountains();
                     const dialog = createTagDialog();
@@ -723,6 +787,7 @@
                     const titleEl = dialog.querySelector("#dev-tag-dialog-title") as HTMLElement;
                     const input = dialog.querySelector("#dev-tag-input") as HTMLInputElement;
                     const datalist = dialog.querySelector("#dev-tag-datalist") as HTMLDataListElement;
+                    const regionSelect = dialog.querySelector("#dev-tag-region") as HTMLSelectElement;
                     const coordsEl = dialog.querySelector("#dev-tag-coords") as HTMLParagraphElement;
                     const cancelBtn = dialog.querySelector("#dev-tag-cancel") as HTMLButtonElement;
                     const deleteBtn = dialog.querySelector("#dev-tag-delete") as HTMLButtonElement;
@@ -732,8 +797,40 @@
                     titleEl.textContent = options.title;
                     coordsEl.textContent = `${options.photoId.split('/').pop()}  x:${options.x.toFixed(1)}%  y:${options.y.toFixed(1)}%`;
                     input.value = options.initialName || "";
+                    regionSelect.innerHTML = [
+                        '<option value="">Choose a region</option>',
+                        ...mountainRegions.map(
+                            (region) =>
+                                `<option value="${escapeHtml(region.id)}">${escapeHtml(region.label)}</option>`,
+                        ),
+                    ].join('');
 
-                    datalist.innerHTML = mountains.map((m) => `<option value="${m.name}"></option>`).join("");
+                    const initialMountain = mountains.find(
+                        (mountain) => mountain.name === input.value.trim(),
+                    );
+                    const savedRegion = localStorage.getItem('devTagRegion');
+                    regionSelect.value = initialMountain?.region && mountainRegions.some(
+                        (region) => region.id === initialMountain.region,
+                    )
+                        ? initialMountain.region
+                        : savedRegion && mountainRegions.some((region) => region.id === savedRegion)
+                            ? savedRegion
+                            : '';
+
+                    const renderRegionMountains = () => {
+                        const region = regionSelect.value;
+                        const regionMountains = mountains.filter(
+                            (mountain) => mountain.region === region,
+                        );
+                        datalist.innerHTML = regionMountains
+                            .map((mountain) => `<option value="${escapeHtml(mountain.name)}"></option>`)
+                            .join("");
+                        input.disabled = !region;
+                        input.placeholder = region
+                            ? 'Mountain name (choose or enter a new name)'
+                            : 'Choose a region first';
+                    };
+                    renderRegionMountains();
 
                     if (options.showDelete) {
                         deleteBtn.style.display = 'flex';
@@ -751,20 +848,42 @@
                         pasteBtn.style.display = 'none';
                     }
 
-                    const cleanup = (result: { action: 'save' | 'delete' | 'cancel', name?: string }) => {
+                    const cleanup = (result: { action: 'save' | 'delete' | 'cancel', name?: string, region?: MountainRegion }) => {
                         form.removeEventListener("submit", submitHandler);
                         cancelBtn.removeEventListener("click", cancelHandler);
                         deleteBtn.removeEventListener("click", deleteHandler);
                         copyBtn.removeEventListener("click", copyHandler);
                         pasteBtn.removeEventListener("click", pasteHandler);
+                        regionSelect.removeEventListener("change", regionChangeHandler);
                         resolve(result);
                     };
 
                     const submitHandler = (e: Event) => {
                         e.preventDefault();
                         const name = input.value.trim();
+                        const existing = mountains.some((mountain) => mountain.name === name);
+                        const region = regionSelect.value as MountainRegion | '';
+                        if (!region) {
+                            regionSelect.focus();
+                            return;
+                        }
+                        const existingMountain = mountains.find(
+                            (mountain) => mountain.name === name,
+                        );
+                        if (existingMountain && existingMountain.region !== region) {
+                            const existingRegionLabel = mountainRegions.find(
+                                (candidate) => candidate.id === existingMountain.region,
+                            )?.label ?? existingMountain.region;
+                            showToast(`❌ "${name}" belongs to the ${existingRegionLabel} region`);
+                            input.focus();
+                            return;
+                        }
                         dialog.close();
-                        cleanup({ action: 'save', name });
+                        cleanup({
+                            action: 'save',
+                            name,
+                            ...(!existing && region ? { region } : {}),
+                        });
                     };
 
                     const cancelHandler = () => {
@@ -781,7 +900,7 @@
                         const tagName = input.value.trim();
                         if (tagName) {
                             localStorage.setItem('devCopiedTagName', tagName);
-                            showToast(`📄 已複製 Tag: ${tagName}`);
+                            showToast(`📄 Copied tag: ${tagName}`);
                         }
                         dialog.close();
                         cleanup({ action: 'cancel' });
@@ -790,13 +909,42 @@
                     const pasteHandler = () => {
                         const copiedTag = localStorage.getItem('devCopiedTagName');
                         if (copiedTag) {
+                            const copiedMountain = mountains.find(
+                                (mountain) => mountain.name === copiedTag,
+                            );
+                            if (copiedMountain && mountainRegions.some(
+                                (region) => region.id === copiedMountain.region,
+                            )) {
+                                regionSelect.value = copiedMountain.region;
+                                localStorage.setItem('devTagRegion', copiedMountain.region);
+                                renderRegionMountains();
+                            }
                             input.value = copiedTag;
-                            showToast(`📋 已填入「${copiedTag}」`);
+                            showToast(`📋 Pasted "${copiedTag}"`);
                             pasteBtn.style.display = 'none';
                         }
                     };
 
+                    const regionChangeHandler = () => {
+                        const currentName = input.value.trim();
+                        const currentMountain = mountains.find(
+                            (mountain) => mountain.name === currentName,
+                        );
+                        if (
+                            currentMountain &&
+                            currentMountain.region !== regionSelect.value
+                        ) {
+                            input.value = '';
+                        }
+                        if (regionSelect.value) {
+                            localStorage.setItem('devTagRegion', regionSelect.value);
+                        }
+                        renderRegionMountains();
+                        input.focus();
+                    };
+
                     form.addEventListener("submit", submitHandler);
+                    regionSelect.addEventListener("change", regionChangeHandler);
                     cancelBtn.addEventListener("click", cancelHandler);
                     deleteBtn.addEventListener("click", deleteHandler);
                     copyBtn.addEventListener("click", copyHandler);
@@ -833,12 +981,13 @@
                     <div style="display: flex; flex-direction: column; height: 80vh; max-height: 800px; width: 600px; max-width: 90vw; background: white; border-radius: 12px; overflow: hidden; font-family: sans-serif;">
                         <div style="padding: 1rem 1.5rem; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; background: #fafafa;">
                             <h3 style="margin: 0; font-size: 1rem; color: #333;">Page Manager</h3>
-                            <div style="display:flex; align-items:center; gap:0.25rem;">
-                                <button id="dev-pm-sync-photos" title="Scan folder &amp; add new photos" style="background: none; border: none; cursor: pointer; color: #999; padding: 4px; display:flex; align-items:center;">${ICONS.cloudSync}</button>
-                                <button id="dev-pm-add-block" title="Add Block" style="background: none; border: none; cursor: pointer; color: #999; padding: 4px; display:flex; align-items:center; position:relative;">${ICONS.plus}</button>
-                                <button id="dev-pm-expand-all" title="Expand / Collapse All" style="background: none; border: none; cursor: pointer; color: #999; padding: 4px; display:flex; align-items:center;">${ICONS.expandAll}</button>
-                                <button id="dev-pm-rename" title="Rename photos by current order" style="background: none; border: none; cursor: pointer; color: #999; padding: 4px; display:flex; align-items:center;">${ICONS.rename}</button>
-                                <button id="dev-pm-close" style="background: none; border: none; cursor: pointer; color: #999; padding: 4px; display:flex; align-items:center;">${ICONS.close}</button>
+                            <div class="dev-manager-header-actions">
+                                <button id="dev-pm-sync-photos" class="dev-manager-header-button" type="button" title="Scan folder &amp; add new photos" aria-label="Scan folder and add new photos">${ICONS.cloudSync}</button>
+                                <button id="dev-pm-add-block" class="dev-manager-header-button" type="button" title="Add Block" aria-label="Add Block" style="position:relative;">${ICONS.plus}</button>
+                                <button id="dev-pm-expand-all" class="dev-manager-header-button" type="button" title="Expand / Collapse All" aria-label="Expand or collapse all">${ICONS.expandAll}</button>
+                                <button id="dev-pm-rename" class="dev-manager-header-button" type="button" title="Rename photos by current order" aria-label="Rename photos by current order">${ICONS.rename}</button>
+                                <button id="dev-pm-confirm" class="dev-manager-header-button dev-manager-header-button--save" type="button" title="Save Changes" aria-label="Save Changes">${ICONS.check}</button>
+                                <button id="dev-pm-close" class="dev-manager-header-button" type="button" title="Close" aria-label="Close">${ICONS.close}</button>
                             </div>
                         </div>
                         <div id="dev-pm-content" style="flex: 1; overflow-y: auto; padding: 1.5rem;">
@@ -890,11 +1039,6 @@
 
                             <div style="border-top: 1px dashed #eee; margin: 1.5rem 0;"></div>
                             <div id="dev-pm-tree" class="dev-pm-tree"></div>
-                        </div>
-                        <div style="padding: 1rem 1.5rem; border-top: 1px solid #eee; display: flex; justify-content: flex-end; gap: 1rem; background: #fafafa;">
-                            <button id="dev-pm-confirm" title="Confirm Changes" style="width:36px; height:36px; display:flex; align-items:center; justify-content:center; background: #2563eb; color: white; border: none; border-radius: 6px; cursor: pointer;">
-                                ${ICONS.check}
-                            </button>
                         </div>
                     </div>
                 `;
@@ -1761,6 +1905,174 @@
                 dialog.showModal();
             }
 
+            // Region Manager
+            async function openRegionManager() {
+                showToast("⌛ Loading regions...");
+                const response = await fetch("/api/mountain-regions", {
+                    cache: "no-store",
+                });
+                const data = await response.json().catch(() => ({}));
+                if (!response.ok) {
+                    return showToast(`❌ ${data.error || "Failed to load regions"}`);
+                }
+                const Sortable = (window as any).Sortable
+                    ? (window as any).Sortable
+                    : await loadSortable();
+
+                document.getElementById("dev-region-manager")?.remove();
+                const dialog = document.createElement("dialog");
+                dialog.id = "dev-region-manager";
+                dialog.style.cssText = `
+                    border:none;border-radius:12px;padding:0;
+                    box-shadow:0 20px 50px rgba(0,0,0,0.3);overflow:hidden;
+                `;
+                dialog.innerHTML = `
+                    <div style="display:flex;flex-direction:column;width:560px;max-width:92vw;max-height:80vh;background:#fff;font-family:sans-serif;">
+                        <header style="display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;border-bottom:1px solid #e5e7eb;background:#fafafa;">
+                            <h3 style="margin:0;color:#333;font-size:1rem;">Region Manager</h3>
+                            <div class="dev-manager-header-actions">
+                                <button type="button" data-region-action="add" class="dev-manager-header-button" title="Add Region" aria-label="Add Region">${ICONS.plus}</button>
+                                <button type="button" data-region-action="save" class="dev-manager-header-button dev-manager-header-button--save" title="Save Regions" aria-label="Save Regions">${ICONS.check}</button>
+                                <button type="button" data-region-action="close" class="dev-manager-header-button" title="Close" aria-label="Close">${ICONS.close}</button>
+                            </div>
+                        </header>
+                        <div data-region-list style="display:flex;flex-direction:column;gap:0.6rem;overflow-y:auto;padding:1.25rem;"></div>
+                    </div>
+                `;
+                document.body.appendChild(dialog);
+
+                const originalIds = new Set<string>(
+                    (data.regions || []).map((region: { id: string }) => region.id),
+                );
+                let regions: { id: string; label: string }[] = (data.regions || []).map(
+                    (region: { id: string; label: string }) => ({ ...region }),
+                );
+                let selectedRegion: number | null = null;
+                let didDragRegion = false;
+                const list = dialog.querySelector<HTMLElement>("[data-region-list]")!;
+
+                const render = () => {
+                    list.innerHTML = regions.map((region, index) => `
+                        <div data-region-index="${index}" style="display:grid;grid-template-columns:2.75rem minmax(0,1fr) 2rem;gap:0.5rem;align-items:center;padding:0.7rem;border:1px solid #e2e8f0;border-radius:8px;background:${selectedRegion === index ? "#eff6ff" : "#f8fafc"};outline:${selectedRegion === index ? "2px solid #2563eb" : "none"};outline-offset:1px;">
+                            ${selectedRegion === index
+                                ? `<button type="button" data-region-action="select" title="Cancel move" style="display:flex;height:2rem;align-items:center;justify-content:center;border:0;background:none;color:#2563eb;cursor:pointer;">${ICONS.drag}</button>`
+                                : selectedRegion !== null
+                                    ? `<div class="block-move-arrows">
+                                        <button type="button" class="block-insert-btn" data-region-action="insert-above" title="Insert above">${ICONS.arrowRight}</button>
+                                        <button type="button" class="block-insert-btn" data-region-action="insert-below" title="Insert below">${ICONS.arrowRight}</button>
+                                       </div>`
+                                    : `<button type="button" data-region-action="select" title="Click to move" style="display:flex;height:2rem;align-items:center;justify-content:center;border:0;background:none;color:#94a3b8;cursor:pointer;">${ICONS.drag}</button>`}
+                            <div style="display:grid;grid-template-columns:minmax(0,0.8fr) minmax(0,1.2fr);gap:0.5rem;min-width:0;">
+                                <input data-region-field="id" value="${escapeHtml(region.id)}" ${originalIds.has(region.id) ? "readonly" : ""} placeholder="Region ID" aria-label="Region ID" style="min-width:0;padding:0.45rem 0.55rem;border:1px solid #cbd5e1;border-radius:5px;background:${originalIds.has(region.id) ? "#f1f5f9" : "#fff"};color:#334155;" />
+                                <input data-region-field="label" value="${escapeHtml(region.label)}" placeholder="Region label" aria-label="Region label" style="min-width:0;padding:0.45rem 0.55rem;border:1px solid #cbd5e1;border-radius:5px;background:#fff;color:#334155;" />
+                            </div>
+                            <button type="button" data-region-action="delete" title="Delete region" style="display:flex;height:2rem;align-items:center;justify-content:center;border:0;border-radius:5px;background:#fee2e2;color:#dc2626;cursor:pointer;">${ICONS.trash}</button>
+                        </div>
+                    `).join("");
+                };
+
+                list.addEventListener("input", (event) => {
+                    const input = event.target as HTMLInputElement;
+                    const row = input.closest<HTMLElement>("[data-region-index]");
+                    const index = Number(row?.dataset.regionIndex);
+                    const field = input.dataset.regionField as "id" | "label" | undefined;
+                    if (!Number.isInteger(index) || !field) return;
+                    regions[index][field] = input.value;
+                });
+
+                dialog.addEventListener("click", async (event) => {
+                    const button = (event.target as Element).closest<HTMLButtonElement>(
+                        "button[data-region-action]",
+                    );
+                    const action = button?.dataset.regionAction;
+                    if (!action) return;
+                    if (action === "close") return dialog.close();
+                    if (action === "add") {
+                        regions.push({ id: "", label: "" });
+                        render();
+                        list.querySelector<HTMLInputElement>(
+                            '[data-region-index]:last-child input[data-region-field="id"]',
+                        )?.focus();
+                        return;
+                    }
+                    if (action === "save") {
+                        button!.disabled = true;
+                        const saveResponse = await fetch("/api/mountain-regions", {
+                            method: "PUT",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ regions }),
+                        });
+                        const result = await saveResponse.json().catch(() => ({}));
+                        if (!saveResponse.ok) {
+                            button!.disabled = false;
+                            return showToast(`❌ ${result.error || "Save failed"}`);
+                        }
+                        showToast("✅ Regions updated");
+                        dialog.close();
+                        window.setTimeout(() => window.location.reload(), 300);
+                        return;
+                    }
+
+                    const row = button?.closest<HTMLElement>("[data-region-index]");
+                    const index = Number(row?.dataset.regionIndex);
+                    if (!Number.isInteger(index)) return;
+                    if (action === "select") {
+                        if (didDragRegion) {
+                            didDragRegion = false;
+                            return;
+                        }
+                        selectedRegion = selectedRegion === index ? null : index;
+                    }
+                    if (action === "delete") {
+                        regions.splice(index, 1);
+                        selectedRegion = null;
+                    }
+                    if (
+                        (action === "insert-above" || action === "insert-below") &&
+                        selectedRegion !== null
+                    ) {
+                        const from = selectedRegion;
+                        const [moved] = regions.splice(from, 1);
+                        let target = action === "insert-above" ? index : index + 1;
+                        if (from < target) target -= 1;
+                        regions.splice(target, 0, moved);
+                        selectedRegion = null;
+                    }
+                    render();
+                });
+
+                const sortable = new (Sortable as any)(list, {
+                    animation: 150,
+                    ghostClass: "dev-pm-ghost",
+                    handle: '[data-region-action="select"]',
+                    onStart: () => {
+                        didDragRegion = true;
+                    },
+                    onEnd: (event: { oldIndex?: number; newIndex?: number }) => {
+                        const from = event.oldIndex;
+                        const to = event.newIndex;
+                        if (from === undefined || to === undefined || from === to) {
+                            didDragRegion = false;
+                            return;
+                        }
+                        const [moved] = regions.splice(from, 1);
+                        regions.splice(to, 0, moved);
+                        selectedRegion = null;
+                        window.setTimeout(() => {
+                            render();
+                            didDragRegion = false;
+                        }, 0);
+                    },
+                });
+
+                dialog.addEventListener("close", () => {
+                    sortable.destroy();
+                    dialog.remove();
+                }, { once: true });
+                render();
+                dialog.showModal();
+            }
+
             // Folder Manager
             function createFolderManagerDialog() {
                 let existing = document.getElementById("dev-fm-dialog") as HTMLDialogElement;
@@ -1772,7 +2084,10 @@
                     <div style="display: flex; flex-direction: column; height: 80vh; max-height: 800px; width: 600px; max-width: 90vw; background: white; border-radius: 12px; overflow: hidden; font-family: sans-serif;">
                         <div style="padding: 1rem 1.5rem; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; background: #fafafa;">
                             <h3 style="margin: 0; font-size: 1rem; color: #333;">Folder Manager</h3>
-                            <button id="dev-fm-close" style="background: none; border: none; cursor: pointer; color: #999;">${ICONS.close}</button>
+                            <div class="dev-manager-header-actions">
+                                <button id="dev-fm-confirm" class="dev-manager-header-button dev-manager-header-button--save" type="button" title="Save Order" aria-label="Save Order">${ICONS.check}</button>
+                                <button id="dev-fm-close" class="dev-manager-header-button" type="button" title="Close" aria-label="Close">${ICONS.close}</button>
+                            </div>
                         </div>
                         <div id="dev-fm-content" style="flex: 1; overflow-y: auto; padding: 1.5rem;">
                             <div id="dev-fm-tree" class="dev-pm-tree"></div>
@@ -1781,11 +2096,6 @@
                                 <h4 style="margin: 0 0 1rem; font-size: 0.85rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">Available Folders</h4>
                                 <div id="dev-fm-candidates" style="display: flex; flex-direction: column; gap: 0.5rem;"></div>
                             </div>
-                        </div>
-                        <div style="padding: 1rem 1.5rem; border-top: 1px solid #eee; display: flex; justify-content: flex-end; gap: 1rem; background: #fafafa;">
-                            <button id="dev-fm-confirm" title="Confirm Order" style="width:36px; height:36px; display:flex; align-items:center; justify-content:center; background: #2563eb; color: white; border: none; border-radius: 6px; cursor: pointer;">
-                                ${ICONS.check}
-                            </button>
                         </div>
                     </div>
                 `;
@@ -2082,6 +2392,13 @@
                 return pathParts.length === 1;
             };
 
+            const isMountainTagsView = () =>
+                window.location.pathname.replace(/\/$/, '') === '/yama' &&
+                new URLSearchParams(window.location.search).get('view') === 'tags';
+
+            const isTagPage = () =>
+                window.location.pathname.split('/').filter(Boolean)[0] === 'tags';
+
             const performTagging = async (e: MouseEvent, wrapper: HTMLElement) => {
                 const img = wrapper.querySelector('img');
                 if (!img) return;
@@ -2094,16 +2411,16 @@
                 if (!photoId) return;
 
                 const res = await showTagDialog({
-                    title: "📍 新增標籤點",
+                    title: "Add Tag Point",
                     photoId, x, y, showDelete: false
                 });
 
                 if (res.action === 'save' && res.name) {
                     const photoKey = getTagKeyFromPhotoId(photoId);
                     currentAlbumTagMap = addOrUpdateTag(currentAlbumTagMap, photoKey, { name: res.name, x, y });
-                    rememberMountainName(res.name);
+                    rememberMountainName(res.name, res.region);
                     renderTagOverlaysForPhoto(photoId);
-                    showToast(`📝 已暫存新增「${res.name}」`);
+                    showToast(`📝 Pending addition: "${res.name}"`);
                 }
             };
 
@@ -2143,7 +2460,7 @@
                         if (res.action === 'delete') {
                             currentAlbumTagMap = removeTagFromMap(currentAlbumTagMap, photoKey, previousTag);
                             renderTagOverlaysForPhoto(photoId);
-                            showToast(`📝 已暫存刪除「${oldName}」`);
+                            showToast(`📝 Pending deletion: "${oldName}"`);
                             return;
                         }
 
@@ -2154,9 +2471,9 @@
                                 { name: res.name, x: oldX, y: oldY },
                                 previousTag,
                             );
-                            rememberMountainName(res.name);
+                            rememberMountainName(res.name, res.region);
                             renderTagOverlaysForPhoto(photoId);
-                            showToast(`📝 已暫存更新為「${res.name}」`);
+                            showToast(`📝 Pending update: "${res.name}"`);
                         }
                     });
 
@@ -2187,6 +2504,7 @@
             // Block unwanted interactions in DEV mode
             const enforceDevInteractionModes = (e: MouseEvent | PointerEvent) => {
                 const target = e.target as HTMLElement;
+                if (isTagPage()) return;
 
                 // Allow our specific Dev UI buttons, tags, AND all interactions within dialogs
                 if (target.closest('.dev-block-toolbar') || target.closest('.dev-tag-edit-btn') || target.closest('.tag-link') || target.closest('dialog')) {
@@ -2217,6 +2535,7 @@
 
             // Native right-click context menu prevention to handle Tag Dialog
             window.addEventListener('contextmenu', (e) => {
+                if (isTagPage()) return;
                 const target = e.target as HTMLElement;
                 const wrapper = target.closest('.photo-wrapper');
                 // Ensure clicks on toolbar elements get native menus or nothing
@@ -2231,6 +2550,11 @@
 
             const init = () => {
                 injectStyles();
+                if (isTagPage()) {
+                    document.getElementById('dev-gear-btn')?.remove();
+                    document.getElementById('dev-save-btn')?.remove();
+                    return;
+                }
                 syncAlbumTagStateFromDom();
                 initToolbars();
 
@@ -2241,7 +2565,10 @@
                     gearBtn.className = 'dev-gear-btn';
                     gearBtn.innerHTML = ICONS.gear;
 
-                    if (isFolderPage()) {
+                    if (isMountainTagsView()) {
+                        gearBtn.title = 'Region Manager';
+                        gearBtn.addEventListener('click', openRegionManager);
+                    } else if (isFolderPage()) {
                         gearBtn.title = 'Folder Manager';
                         gearBtn.addEventListener('click', openFolderManager);
                     } else {

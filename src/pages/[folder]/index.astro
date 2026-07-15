@@ -3,8 +3,10 @@ import { getCollection } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 import MountainTagGrid from "../../components/MountainTagGrid.astro";
 import { getFolderTitle, getFolderCols, getImageUrl, R2_DOMAIN, FOLDER_METADATA } from "../../lib/constants";
-import mountainsData from "../../mountains.json";
-import type { Mountain } from "../../components/MountainProfile.astro";
+import {
+    allMountains as mountainsData,
+    MOUNTAIN_REGION_DEFINITIONS,
+} from "../../lib/mountains";
 
 const { folder } = Astro.params;
 
@@ -49,19 +51,23 @@ const currentView =
         ? "tags"
         : "posts";
 
-const mountainCards = (mountainsData as Mountain[])
-    .filter(
-        (mountain) =>
-            mountain.elevation !== null &&
-            mountain.location !== undefined &&
-            Number.isFinite(mountain.location.latitude) &&
-            Number.isFinite(mountain.location.longitude),
-    )
-    .map((mountain) => ({
-        name: mountain.name,
-        elevation: mountain.elevation as number,
-        coverKey: mountain.coverKey,
-    }));
+const mountainGroups = MOUNTAIN_REGION_DEFINITIONS.map((region) => ({
+    ...region,
+    mountains: mountainsData
+        .filter(
+            (mountain) =>
+                mountain.region === region.id &&
+                mountain.elevation !== null &&
+                mountain.location !== undefined &&
+                Number.isFinite(mountain.location.latitude) &&
+                Number.isFinite(mountain.location.longitude),
+        )
+        .map((mountain) => ({
+            name: mountain.name,
+            elevation: mountain.elevation as number,
+            coverKey: mountain.coverKey,
+        })),
+}));
 ---
 
 <Layout title={`${folderTitle} - RIVERBED`}>
@@ -71,8 +77,8 @@ const mountainCards = (mountainsData as Mountain[])
                 <div class="fixed bottom-8 right-8 z-40">
                     <a
                         href={currentView === "posts" ? "/yama?view=tags" : "/yama"}
-                        title={currentView === "posts" ? "切換至山岳" : "切換至行程"}
-                        aria-label={currentView === "posts" ? "切換至山岳檢視" : "切換至行程檢視"}
+                        title={currentView === "posts" ? "Switch to mountains" : "Switch to trips"}
+                        aria-label={currentView === "posts" ? "Switch to mountain view" : "Switch to trip view"}
                         class="group text-zinc-500 hover:text-white transition-all duration-300"
                     >
                         <div class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center group-hover:border-white/30 transition-colors bg-white/20 backdrop-blur-sm">
@@ -80,31 +86,21 @@ const mountainCards = (mountainsData as Mountain[])
                                 <svg
                                     width="16"
                                     height="16"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="1.8"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
+                                    viewBox="0 -960 960 960"
+                                    fill="currentColor"
                                     aria-hidden="true"
                                 >
-                                    <circle cx="10" cy="4.5" r="2" />
-                                    <path d="m9 7-2.5 5 3 2 1.5 6M9 9l4 3 3-1M6.5 12 4 19M13 8l2 12M8 8H5.5" />
+                                    <path d="M260-860q-52 0-86 51t-34 129q0 78 23 131.5t32 67.5l144-30q14-38 27.5-84t13.5-85q0-67-31.5-123.5T260-860Zm55 560q28 0 46.5-20.5T380-373q0-20-9-41.5T351-453l-131 27q-1 43 21.5 84.5T315-300Zm385-360q-57 0-88.5 56.5T580-480q0 40 14 85.5t28 83.5l143 29q10-15 32.5-68T820-480q0-78-34-129t-86-51Zm-55 560q51 0 73-42t22-85l-131-26q-10 17-19.5 38.5T580-173q0 32 18.5 52.5T645-100ZM315-240q-77 0-117-57t-38-128l-18-27q-11-17-36.5-77T80-680q0-103 51-171.5T260-920q85 0 132.5 75.5T440-680q0 58-16 107t-28 79l8 13q8 14 22 44.5t14 63.5q0 57-35.5 95T315-240ZM645-40q-54 0-89.5-38T520-173q0-33 14-63.5t22-44.5l8-13q-12-30-28-79t-16-107q0-89 47.5-164.5T700-720q78 0 129 68.5T880-480q0 91-25.5 150.5T818-253l-18 28q1 71-38.5 128T645-40Z" />
                                 </svg>
                             ) : (
                                 <svg
                                     width="16"
                                     height="16"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="1.8"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
+                                    viewBox="0 -960 960 960"
+                                    fill="currentColor"
                                     aria-hidden="true"
                                 >
-                                    <path d="m3 19 6.5-11 3.2 5.2L15.5 9 21 19Z" />
-                                    <path d="m7.7 11 1.8 1.5 1.3-1.1" />
+                                    <path d="m40-240 240-320 195 260h325L560-619 435-453l-38-50 163-217 360 480H40Zm510-60Zm-390 0h240L280-460 160-300Zm0 0h240-240Z" />
                                 </svg>
                             )}
                         </div>
@@ -114,7 +110,7 @@ const mountainCards = (mountainsData as Mountain[])
         }
 
         {currentView === "tags" ? (
-            <MountainTagGrid mountains={mountainCards} />
+            <MountainTagGrid groups={mountainGroups} />
         ) : (
         <div class="albums-grid" style={`--cols: ${folderCols}`}>
             {

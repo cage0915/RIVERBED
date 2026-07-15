@@ -6,7 +6,7 @@ import MountainProfile, {
     type Mountain,
 } from "../../components/MountainProfile.astro";
 import { getAllPhotosWithTags } from "../../utils/tags";
-import mountainsData from "../../mountains.json";
+import { allMountains as mountainsData } from "../../lib/mountains";
 import { isMapContextId } from "../../lib/mountain-map";
 import { getImageUrl, R2_DOMAIN } from "../../lib/constants";
 
@@ -108,16 +108,15 @@ function chunkArray<T>(array: T[], size: number): T[][] {
         </a>
     </div>
 
-    <div class="fixed bottom-8 right-8 z-40">
+    <div class="fixed bottom-8 right-8 z-40 flex flex-col gap-3">
         <button
             onclick="window.scrollTo({top: 0, behavior: 'smooth'})"
-            class="group flex items-center gap-2 text-zinc-500 hover:text-white transition-colors opacity-0 translate-y-4 pointer-events-none transition-all duration-300"
+            class="group text-zinc-500 hover:text-white transition-all duration-300 opacity-0 translate-y-4 pointer-events-none"
             id="back-to-top"
+            aria-label="Scroll to top"
         >
-            <span class="text-xs font-light tracking-widest uppercase">Top</span
-            >
             <div
-                class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center group-hover:border-white/30 transition-colors"
+                class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center group-hover:border-white/30 transition-colors bg-white/20 backdrop-blur-sm"
             >
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -130,6 +129,29 @@ function chunkArray<T>(array: T[], size: number): T[][] {
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     ><path d="m18 15-6-6-6 6"></path></svg
+                >
+            </div>
+        </button>
+        <button
+            onclick="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})"
+            class="group text-zinc-500 hover:text-white transition-all duration-300 opacity-0 translate-y-4 pointer-events-none"
+            id="scroll-to-bottom"
+            aria-label="Scroll to bottom"
+        >
+            <div
+                class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center group-hover:border-white/30 transition-colors bg-white/20 backdrop-blur-sm"
+            >
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    ><path d="m6 9 6 6 6-6"></path></svg
                 >
             </div>
         </button>
@@ -154,7 +176,7 @@ function chunkArray<T>(array: T[], size: number): T[][] {
                 <figure class="mountain-representative-photo">
                     <img
                         src={representativePhotoUrl}
-                        alt={`${decodedTag}代表照片`}
+                        alt={`${decodedTag} cover photo`}
                         loading="eager"
                         onerror={
                             isDev && representativePhotoFallbackUrl
@@ -167,14 +189,14 @@ function chunkArray<T>(array: T[], size: number): T[][] {
                             class="mountain-cover-chooser"
                             type="button"
                         >
-                            更換封面照片
+                            Change cover photo
                         </button>
                     )}
                 </figure>
             ) : mountain && isDev ? (
                 <div class="mountain-cover-empty">
                     <button class="mountain-cover-chooser" type="button">
-                        選擇封面照片
+                        Choose cover photo
                     </button>
                 </div>
             ) : null
@@ -210,7 +232,7 @@ function chunkArray<T>(array: T[], size: number): T[][] {
                                                     class="mountain-cover-choice"
                                                     type="button"
                                                 >
-                                                    設為封面
+                                                    Set as cover
                                                 </button>
                                             )}
                                         </div>
@@ -393,10 +415,10 @@ function chunkArray<T>(array: T[], size: number): T[][] {
         chooserButtons.forEach((button) => {
             button.addEventListener("click", () => {
                 const isChoosing = page.classList.toggle("is-choosing-cover");
-                button.textContent = isChoosing ? "取消選擇" : "選擇封面照片";
+                button.textContent = isChoosing ? "Cancel selection" : "Choose cover photo";
                 if (status) {
                     status.textContent = isChoosing
-                        ? "請從下方照片選擇這座山的代表封面。"
+                        ? "Choose a cover photo for this mountain below."
                         : "";
                 }
             });
@@ -410,7 +432,7 @@ function chunkArray<T>(array: T[], size: number): T[][] {
                 if (!coverKey || !mountainName) return;
 
                 choiceButtons.forEach((candidate) => (candidate.disabled = true));
-                if (status) status.textContent = "正在儲存封面…";
+                if (status) status.textContent = "Saving cover…";
 
                 try {
                     const response = await fetch("/api/mountain-cover", {
@@ -420,9 +442,9 @@ function chunkArray<T>(array: T[], size: number): T[][] {
                     });
                     const result = await response.json();
                     if (!response.ok) {
-                        throw new Error(result.error || "無法儲存封面");
+                        throw new Error(result.error || "Unable to save cover");
                     }
-                    if (status) status.textContent = "封面已儲存。";
+                    if (status) status.textContent = "Cover saved.";
                     window.location.reload();
                 } catch (error) {
                     choiceButtons.forEach(
@@ -432,7 +454,7 @@ function chunkArray<T>(array: T[], size: number): T[][] {
                         status.textContent =
                             error instanceof Error
                                 ? error.message
-                                : "無法儲存封面";
+                                : "Unable to save cover";
                     }
                 }
             });
@@ -442,35 +464,33 @@ function chunkArray<T>(array: T[], size: number): T[][] {
     initMountainCoverChooser();
     document.addEventListener("astro:after-swap", initMountainCoverChooser);
 
-    const backToTop = document.getElementById("back-to-top");
-
     const handleScroll = () => {
-        if (!backToTop) return;
-        if (window.scrollY > 300) {
-            backToTop.classList.remove(
-                "opacity-0",
-                "translate-y-4",
-                "pointer-events-none",
-            );
-            backToTop.classList.add(
-                "opacity-100",
-                "translate-y-0",
-                "pointer-events-auto",
-            );
-        } else {
-            backToTop.classList.add(
-                "opacity-0",
-                "translate-y-4",
-                "pointer-events-none",
-            );
-            backToTop.classList.remove(
-                "opacity-100",
-                "translate-y-0",
-                "pointer-events-auto",
-            );
+        const backToTop = document.getElementById("back-to-top");
+        const scrollToBottom = document.getElementById("scroll-to-bottom");
+
+        if (backToTop) {
+            if (window.scrollY > 300) {
+                backToTop.classList.remove("opacity-0", "translate-y-4", "pointer-events-none");
+                backToTop.classList.add("opacity-100", "translate-y-0", "pointer-events-auto");
+            } else {
+                backToTop.classList.add("opacity-0", "translate-y-4", "pointer-events-none");
+                backToTop.classList.remove("opacity-100", "translate-y-0", "pointer-events-auto");
+            }
+        }
+
+        if (scrollToBottom) {
+            const isNearBottom = (window.scrollY + window.innerHeight) >= (document.documentElement.scrollHeight - 300);
+            if (!isNearBottom) {
+                scrollToBottom.classList.remove("opacity-0", "translate-y-4", "pointer-events-none");
+                scrollToBottom.classList.add("opacity-100", "translate-y-0", "pointer-events-auto");
+            } else {
+                scrollToBottom.classList.add("opacity-0", "translate-y-4", "pointer-events-none");
+                scrollToBottom.classList.remove("opacity-100", "translate-y-0", "pointer-events-auto");
+            }
         }
     };
 
     window.addEventListener("scroll", handleScroll);
     document.addEventListener("astro:after-swap", handleScroll);
+    handleScroll();
 </script>

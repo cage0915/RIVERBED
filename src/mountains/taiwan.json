@@ -1,10 +1,5 @@
 [
   {
-    "name": "乙妻山",
-    "elevation": null,
-    "description": ""
-  },
-  {
     "name": "七星山",
     "elevation": null,
     "description": ""
@@ -16,11 +11,6 @@
   },
   {
     "name": "七星山南峰",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "七倉岳",
     "elevation": null,
     "description": ""
   },
@@ -50,42 +40,12 @@
     "description": ""
   },
   {
-    "name": "八ヶ岳連峰",
-    "elevation": null,
-    "description": ""
-  },
-  {
     "name": "三叉山",
     "elevation": null,
     "description": ""
   },
   {
-    "name": "三叉峰",
-    "elevation": null,
-    "description": ""
-  },
-  {
     "name": "三角錐山",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "三俣蓮華岳",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "三ツ岳",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "千丈沢",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "大天井岳",
     "elevation": null,
     "description": ""
   },
@@ -125,16 +85,6 @@
     "description": ""
   },
   {
-    "name": "大汝山",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "大林山",
-    "elevation": null,
-    "description": ""
-  },
-  {
     "name": "大油坑",
     "elevation": null,
     "description": ""
@@ -146,11 +96,6 @@
   },
   {
     "name": "大雪山北峰",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "大喰岳",
     "elevation": null,
     "description": ""
   },
@@ -194,11 +139,6 @@
     "description": ""
   },
   {
-    "name": "小遠見山",
-    "elevation": null,
-    "description": ""
-  },
-  {
     "name": "小關山",
     "elevation": null,
     "description": ""
@@ -229,21 +169,6 @@
     "description": ""
   },
   {
-    "name": "不帰一峰",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "不帰二峰",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "不動岳",
-    "elevation": null,
-    "description": ""
-  },
-  {
     "name": "中央尖山",
     "elevation": null,
     "description": ""
@@ -254,32 +179,12 @@
     "description": ""
   },
   {
-    "name": "中岳",
-    "elevation": null,
-    "description": ""
-  },
-  {
     "name": "中雪山",
     "elevation": null,
     "description": ""
   },
   {
     "name": "中霸尖山",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "五龍岳",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "双六岳",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "天狗岳",
     "elevation": null,
     "description": ""
   },
@@ -305,16 +210,6 @@
   },
   {
     "name": "水社大山",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "水晶岳",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "火打山",
     "elevation": null,
     "description": ""
   },
@@ -359,37 +254,12 @@
     "description": ""
   },
   {
-    "name": "北岳",
-    "elevation": null,
-    "description": ""
-  },
-  {
     "name": "北插天山",
     "elevation": null,
     "description": ""
   },
   {
     "name": "北稜角",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "北葛岳",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "北穂高岳",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "北鎌尾根",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "北鎌独標",
     "elevation": null,
     "description": ""
   },
@@ -415,11 +285,6 @@
   },
   {
     "name": "可樂可樂安山",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "四阿山",
     "elevation": null,
     "description": ""
   },
@@ -499,11 +364,6 @@
     "description": ""
   },
   {
-    "name": "甲斐駒ヶ岳",
-    "elevation": null,
-    "description": ""
-  },
-  {
     "name": "白毛山",
     "elevation": null,
     "description": ""
@@ -525,25 +385,6 @@
   },
   {
     "name": "白姑大山西峰",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "白馬岳",
-    "elevation": 2932,
-    "description": "位於飛驒山脈北部、富山縣與長野縣交界，是日本北阿爾卑斯北部的代表性山峰。",
-    "location": {
-      "latitude": 36.758611,
-      "longitude": 137.758611,
-      "mapContext": "jp-northern-alps"
-    },
-    "panorama": {
-      "provider": "peakfinder"
-    },
-    "coverKey": "yama/2026-hakuba/KCS01420.jpg"
-  },
-  {
-    "name": "白馬鑓ヶ岳",
     "elevation": null,
     "description": ""
   },
@@ -598,11 +439,6 @@
     "description": ""
   },
   {
-    "name": "有明山",
-    "elevation": null,
-    "description": ""
-  },
-  {
     "name": "池有山",
     "elevation": null,
     "description": ""
@@ -618,27 +454,12 @@
     "description": ""
   },
   {
-    "name": "西鎌尾根",
-    "elevation": null,
-    "description": ""
-  },
-  {
     "name": "西巒大山",
     "elevation": null,
     "description": ""
   },
   {
-    "name": "別山",
-    "elevation": null,
-    "description": ""
-  },
-  {
     "name": "志佳陽大山",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "杓子岳",
     "elevation": null,
     "description": ""
   },
@@ -654,26 +475,6 @@
   },
   {
     "name": "見晴山",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "赤牛岳",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "赤石山脈",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "赤岩岳",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "赤岳",
     "elevation": null,
     "description": ""
   },
@@ -728,17 +529,7 @@
     "description": ""
   },
   {
-    "name": "明神岳",
-    "elevation": null,
-    "description": ""
-  },
-  {
     "name": "東八仙山",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "東天井岳",
     "elevation": null,
     "description": ""
   },
@@ -803,26 +594,6 @@
     "description": ""
   },
   {
-    "name": "阿弥陀岳",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "乗鞍岳",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "前常念岳",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "前穂高岳",
-    "elevation": null,
-    "description": ""
-  },
-  {
     "name": "南大",
     "elevation": null,
     "description": ""
@@ -834,11 +605,6 @@
   },
   {
     "name": "南玉山",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "南岳",
     "elevation": null,
     "description": ""
   },
@@ -868,11 +634,6 @@
     "description": ""
   },
   {
-    "name": "浅間山",
-    "elevation": null,
-    "description": ""
-  },
-  {
     "name": "閂山",
     "elevation": null,
     "description": ""
@@ -883,22 +644,12 @@
     "description": ""
   },
   {
-    "name": "唐松岳",
-    "elevation": null,
-    "description": ""
-  },
-  {
     "name": "桃山",
     "elevation": null,
     "description": ""
   },
   {
     "name": "海諾南山",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "真砂岳",
     "elevation": null,
     "description": ""
   },
@@ -943,11 +694,6 @@
     "description": ""
   },
   {
-    "name": "針ノ木岳",
-    "elevation": null,
-    "description": ""
-  },
-  {
     "name": "馬西巴秀山",
     "elevation": null,
     "description": ""
@@ -968,16 +714,6 @@
     "description": ""
   },
   {
-    "name": "高妻山",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "剱岳",
-    "elevation": null,
-    "description": ""
-  },
-  {
     "name": "基隆山",
     "elevation": null,
     "description": ""
@@ -993,11 +729,6 @@
     "description": ""
   },
   {
-    "name": "常念岳",
-    "elevation": null,
-    "description": ""
-  },
-  {
     "name": "清水大山",
     "elevation": null,
     "description": ""
@@ -1008,27 +739,12 @@
     "description": ""
   },
   {
-    "name": "笠ヶ岳",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "経ヶ岳",
-    "elevation": null,
-    "description": ""
-  },
-  {
     "name": "連理山",
     "elevation": null,
     "description": ""
   },
   {
     "name": "都蘭山",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "野口五郎岳",
     "elevation": null,
     "description": ""
   },
@@ -1053,22 +769,12 @@
     "description": ""
   },
   {
-    "name": "鹿島槍ヶ岳",
-    "elevation": null,
-    "description": ""
-  },
-  {
     "name": "鹿場大山",
     "elevation": null,
     "description": ""
   },
   {
     "name": "麻留賀山",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "黒部五郎岳",
     "elevation": null,
     "description": ""
   },
@@ -1083,52 +789,12 @@
     "description": ""
   },
   {
-    "name": "奥穂高岳",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "富士山",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "富士ノ折立",
-    "elevation": null,
-    "description": ""
-  },
-  {
     "name": "無耳茶壺山",
     "elevation": null,
     "description": ""
   },
   {
     "name": "無明山",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "焼山",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "硫黃岳",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "硫黄岳",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "間ノ岳",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "雄山",
     "elevation": null,
     "description": ""
   },
@@ -1163,11 +829,6 @@
     "description": ""
   },
   {
-    "name": "塩見岳",
-    "elevation": null,
-    "description": ""
-  },
-  {
     "name": "新仙山",
     "elevation": null,
     "description": ""
@@ -1188,11 +849,6 @@
     "description": ""
   },
   {
-    "name": "爺ヶ岳",
-    "elevation": null,
-    "description": ""
-  },
-  {
     "name": "達芬尖山",
     "elevation": null,
     "description": ""
@@ -1209,11 +865,6 @@
   },
   {
     "name": "榛山",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "槍ヶ岳",
     "elevation": null,
     "description": ""
   },
@@ -1248,67 +899,12 @@
     "description": ""
   },
   {
-    "name": "樅沢岳",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "権現岳",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "横岳",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "横通岳",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "編笠山",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "蓮華岳",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "蓼科山",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "蝶槍",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "蝶ヶ岳",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "餓鬼岳",
-    "elevation": null,
-    "description": ""
-  },
-  {
     "name": "魯培山",
     "elevation": null,
     "description": ""
   },
   {
     "name": "曉星山",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "燕岳",
     "elevation": null,
     "description": ""
   },
@@ -1328,11 +924,6 @@
     "description": ""
   },
   {
-    "name": "龍王岳",
-    "elevation": null,
-    "description": ""
-  },
-  {
     "name": "龜山島",
     "elevation": null,
     "description": ""
@@ -1344,11 +935,6 @@
   },
   {
     "name": "磺嘴山",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "薬師岳",
     "elevation": null,
     "description": ""
   },
@@ -1398,16 +984,6 @@
     "description": ""
   },
   {
-    "name": "鷲羽岳",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "鷲岳",
-    "elevation": null,
-    "description": ""
-  },
-  {
     "name": "麟趾山",
     "elevation": null,
     "description": ""
@@ -1419,16 +995,6 @@
   },
   {
     "name": "觀音山",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "test",
-    "elevation": null,
-    "description": ""
-  },
-  {
-    "name": "ワリモ岳",
     "elevation": null,
     "description": ""
   }

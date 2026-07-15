@@ -7,62 +7,92 @@ interface MountainTagCard {
     coverKey?: string;
 }
 
-interface Props {
+interface MountainTagGroup {
+    id: string;
+    label: string;
     mountains: MountainTagCard[];
 }
 
-const { mountains } = Astro.props;
+interface Props {
+    groups: MountainTagGroup[];
+}
+
+const { groups } = Astro.props;
 const isDev = import.meta.env.DEV;
 ---
 
-<div class="mountain-tag-grid">
+<div class="mountain-tag-groups">
     {
-        mountains.map((mountain) => {
-            const coverUrl = mountain.coverKey
-                ? getImageUrl(mountain.coverKey)
-                : undefined;
-            const fallbackUrl = mountain.coverKey
-                ? `${R2_DOMAIN}/${mountain.coverKey}`
-                : undefined;
+        groups.filter((group) => group.mountains.length > 0).map((group) => (
+            <section class="mountain-tag-group" aria-labelledby={`mountain-region-${group.id}`}>
+                <h2 id={`mountain-region-${group.id}`} class="mountain-tag-group__title">
+                    {group.label}
+                </h2>
+                <div class="mountain-tag-grid">
+                    {group.mountains.map((mountain) => {
+                        const coverUrl = mountain.coverKey
+                            ? getImageUrl(mountain.coverKey)
+                            : undefined;
+                        const fallbackUrl = mountain.coverKey
+                            ? `${R2_DOMAIN}/${mountain.coverKey}`
+                            : undefined;
 
-            return (
-                <article
-                    class:list={[
-                        "mountain-tag-card",
-                        !coverUrl && "mountain-tag-card--without-cover",
-                    ]}
-                >
-                    <a
-                        href={`/tags/${encodeURIComponent(mountain.name)}`}
-                        class="mountain-tag-card__link"
-                    >
-                        {coverUrl && (
-                            <img
-                                src={coverUrl}
-                                alt={`${mountain.name}代表照片`}
-                                loading="lazy"
-                                onerror={
-                                    isDev && fallbackUrl
-                                        ? `this.onerror=null; this.src='${fallbackUrl}';`
-                                        : undefined
-                                }
-                            />
-                        )}
-                        <div class="mountain-tag-card__overlay">
-                            <h2>{mountain.name}</h2>
-                            <p>
-                                {mountain.elevation.toLocaleString("en-US")}
-                                <span>m</span>
-                            </p>
-                        </div>
-                    </a>
-                </article>
-            );
-        })
+                        return (
+                            <article
+                                class:list={[
+                                    "mountain-tag-card",
+                                    !coverUrl && "mountain-tag-card--without-cover",
+                                ]}
+                            >
+                                <a
+                                    href={`/tags/${encodeURIComponent(mountain.name)}`}
+                                    class="mountain-tag-card__link"
+                                >
+                                    {coverUrl && (
+                                        <img
+                                            src={coverUrl}
+                                            alt={`${mountain.name} cover photo`}
+                                            loading="lazy"
+                                            onerror={
+                                                isDev && fallbackUrl
+                                                    ? `this.onerror=null; this.src='${fallbackUrl}';`
+                                                    : undefined
+                                            }
+                                        />
+                                    )}
+                                    <div class="mountain-tag-card__overlay">
+                                        <h3>{mountain.name}</h3>
+                                        <p>
+                                            {mountain.elevation.toLocaleString("en-US")}
+                                            <span>m</span>
+                                        </p>
+                                    </div>
+                                </a>
+                            </article>
+                        );
+                    })}
+                </div>
+            </section>
+        ))
     }
 </div>
 
 <style>
+    .mountain-tag-groups {
+        display: flex;
+        flex-direction: column;
+        gap: 4rem;
+    }
+
+    .mountain-tag-group__title {
+        margin: 0 0 1rem;
+        color: rgb(161 161 170);
+        font-family: "Noto Sans TC", "Noto Sans JP", sans-serif;
+        font-size: 0.75rem;
+        font-weight: 400;
+        letter-spacing: 0.18em;
+    }
+
     .mountain-tag-grid {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -105,7 +135,7 @@ const isDev = import.meta.env.DEV;
         transition: opacity 0.4s ease;
     }
 
-    .mountain-tag-card__overlay h2 {
+    .mountain-tag-card__overlay h3 {
         margin: 0;
         font-family: "Noto Sans TC", "Noto Sans JP", sans-serif;
         font-size: 1.25rem;

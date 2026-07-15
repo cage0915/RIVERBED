@@ -48,14 +48,14 @@ const panoramaPanelId = `${viewerId}-panorama-panel`;
     class="mountain-viewer"
     data-mountain-viewer
     data-initialized="false"
-    aria-label={`${mountainName}位置與視野`}
+    aria-label={`${mountainName} location and panorama`}
 >
     {
         hasPanorama && (
             <div
                 class="mountain-viewer__tabs"
                 role="tablist"
-                aria-label={`${mountainName}顯示方式`}
+                aria-label={`${mountainName} view mode`}
             >
                 <button
                     id={locationTabId}
@@ -66,7 +66,7 @@ const panoramaPanelId = `${viewerId}-panorama-panel`;
                     aria-controls={locationPanelId}
                     data-viewer-tab="location"
                 >
-                    位置
+                    Location
                 </button>
                 <button
                     id={panoramaTabId}
@@ -78,7 +78,7 @@ const panoramaPanelId = `${viewerId}-panorama-panel`;
                     tabindex="-1"
                     data-viewer-tab="panorama"
                 >
-                    視野
+                    Panorama
                 </button>
             </div>
         )
@@ -114,7 +114,7 @@ const panoramaPanelId = `${viewerId}-panorama-panel`;
                     <iframe
                         class="mountain-viewer__panorama"
                         data-peakfinder-src={panoramaUrl}
-                        title={`從${mountainName}眺望的山岳全景`}
+                        title={`Mountain panorama viewed from ${mountainName}`}
                         loading="lazy"
                         allow="fullscreen"
                         allowfullscreen
