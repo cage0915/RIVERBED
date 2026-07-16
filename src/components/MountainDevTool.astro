@@ -100,6 +100,18 @@
                             <input id="dev-mountain-longitude" type="number" min="-180" max="180" step="0.000001" />
                         </label>
                         <button
+                            id="dev-mountain-paste-coordinates"
+                            class="dev-mountain-secondary-button dev-mountain-grid-action"
+                            type="button"
+                            title="Paste Coordinates"
+                            aria-label="Paste latitude and longitude from clipboard"
+                        >
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M9 5H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2"></path>
+                                <rect x="9" y="3" width="11" height="14" rx="2"></rect>
+                            </svg>
+                        </button>
+                        <button
                             id="dev-mountain-refresh-location"
                             class="dev-mountain-secondary-button dev-mountain-grid-action"
                             type="button"
@@ -425,7 +437,7 @@
     }
 
     .dev-mountain-grid--lookup { grid-template-columns: minmax(0, 0.65fr) minmax(0, 1.35fr) repeat(2, 2.25rem); }
-    .dev-mountain-grid--location { grid-template-columns: minmax(0, 0.72fr) repeat(2, minmax(0, 1fr)) 2.25rem; }
+    .dev-mountain-grid--location { grid-template-columns: minmax(0, 0.72fr) repeat(2, minmax(0, 1fr)) repeat(2, 2.25rem); }
     .dev-mountain-grid--context { grid-template-columns: repeat(2, minmax(0, 1fr)) 2.25rem; }
 
     .dev-mountain-field {
@@ -439,6 +451,7 @@
 
     .dev-mountain-field:first-child { margin-top: 0; }
     .dev-mountain-grid > .dev-mountain-field { margin-top: 0; }
+    .dev-mountain-grid--location > .dev-mountain-field > span { white-space: nowrap; }
 
     .dev-mountain-help strong { color: #64748b; font-weight: 600; }
 
@@ -785,6 +798,7 @@
         type SvgViewBox,
     } from "../lib/mountain-map";
     import { buildPeakFinderEmbedUrl } from "../lib/mountain-panorama";
+    import { parseDirectionalCoordinates } from "../lib/mountain-coordinates";
     import type { MountainLookupCandidate } from "../lib/wikidata-mountain";
 
     type ContextConfig = {
@@ -850,6 +864,7 @@
         const elevationInput = byId<HTMLInputElement>("dev-mountain-elevation")!;
         const latitudeInput = byId<HTMLInputElement>("dev-mountain-latitude")!;
         const longitudeInput = byId<HTMLInputElement>("dev-mountain-longitude")!;
+        const pasteCoordinatesButton = byId<HTMLButtonElement>("dev-mountain-paste-coordinates")!;
         const refreshLocationButton = byId<HTMLButtonElement>("dev-mountain-refresh-location")!;
         const descriptionInput = byId<HTMLTextAreaElement>("dev-mountain-description")!;
         const contextSelect = byId<HTMLSelectElement>("dev-mountain-context")!;
@@ -1492,6 +1507,28 @@
 
         latitudeInput.addEventListener("input", updateMapMarker);
         longitudeInput.addEventListener("input", updateMapMarker);
+        pasteCoordinatesButton.addEventListener("click", async () => {
+            if (!navigator.clipboard?.readText) {
+                setStatus("Clipboard access is unavailable in this browser", true);
+                return;
+            }
+
+            try {
+                const clipboardText = await navigator.clipboard.readText();
+                const coordinates = parseDirectionalCoordinates(clipboardText);
+                if (!coordinates) {
+                    setStatus("Clipboard coordinates must look like 24.36170°N, 121.43899°E", true);
+                    return;
+                }
+
+                latitudeInput.value = String(coordinates.latitude);
+                longitudeInput.value = String(coordinates.longitude);
+                updateMapMarker();
+                setStatus("Coordinates pasted. Changes are not saved yet.");
+            } catch {
+                setStatus("Unable to read the clipboard. Allow clipboard access and try again.", true);
+            }
+        });
         refreshLocationButton.addEventListener("click", refreshLocationPreview);
         newContextLabelInput.addEventListener("input", () => {
             mapLabel.textContent = newContextLabelInput.value.trim() ||
