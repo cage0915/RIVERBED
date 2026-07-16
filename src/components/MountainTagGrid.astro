@@ -1,10 +1,15 @@
 ---
 import { getImageUrl, R2_DOMAIN } from "../lib/constants";
+import {
+    DEFAULT_MOUNTAIN_TAG_SORT,
+    sortMountainTags,
+} from "../lib/mountain-tag-sort";
 import { DEFAULT_MOUNTAIN_VIEW_SETTINGS } from "../lib/mountain-view-settings";
 
 interface MountainTagCard {
     name: string;
     elevation: number;
+    latitude: number;
     coverKey?: string;
 }
 
@@ -24,14 +29,45 @@ const {
     tagColumns = DEFAULT_MOUNTAIN_VIEW_SETTINGS.tagColumns,
 } = Astro.props;
 const isDev = import.meta.env.DEV;
+const sortedGroups = groups.map((group) => ({
+    ...group,
+    mountains: sortMountainTags(group.mountains, DEFAULT_MOUNTAIN_TAG_SORT),
+}));
 ---
 
 <div
-    class="mountain-tag-groups"
+    class="mountain-tag-view"
+    data-mountain-tag-sort
     style={`--mountain-tag-columns: ${tagColumns}`}
 >
+    <div
+        class="mountain-tag-sort-toolbar"
+        role="group"
+        aria-label="Mountain tag sorting"
+    >
+        <button
+            class="mountain-tag-sort-badge is-active"
+            type="button"
+            data-sort-key="elevation"
+            aria-pressed="true"
+        >
+            <span>高度</span>
+            <span data-sort-icon aria-hidden="true">↓</span>
+        </button>
+        <button
+            class="mountain-tag-sort-badge"
+            type="button"
+            data-sort-key="latitude"
+            aria-pressed="false"
+        >
+            <span>緯度</span>
+            <span data-sort-icon aria-hidden="true">↕</span>
+        </button>
+    </div>
+
+    <div class="mountain-tag-groups">
     {
-        groups.filter((group) => group.mountains.length > 0).map((group) => (
+        sortedGroups.filter((group) => group.mountains.length > 0).map((group) => (
             <section class="mountain-tag-group" aria-labelledby={`mountain-region-${group.id}`}>
                 <h2 id={`mountain-region-${group.id}`} class="mountain-tag-group__title">
                     {group.label}
@@ -51,6 +87,9 @@ const isDev = import.meta.env.DEV;
                                     "mountain-tag-card",
                                     !coverUrl && "mountain-tag-card--without-cover",
                                 ]}
+                                data-mountain-name={mountain.name}
+                                data-mountain-elevation={mountain.elevation}
+                                data-mountain-latitude={mountain.latitude}
                             >
                                 <a
                                     href={`/tags/${encodeURIComponent(mountain.name)}`}
@@ -83,9 +122,131 @@ const isDev = import.meta.env.DEV;
             </section>
         ))
     }
+    </div>
 </div>
 
+<script>
+    import {
+        DEFAULT_MOUNTAIN_TAG_SORT,
+        nextMountainTagSort,
+        sortMountainTags,
+        type MountainTagSort,
+        type MountainTagSortKey,
+    } from "../lib/mountain-tag-sort";
+
+    const initMountainTagSort = () => {
+        document
+            .querySelectorAll<HTMLElement>("[data-mountain-tag-sort]")
+            .forEach((view) => {
+                if (view.dataset.sortReady) return;
+                view.dataset.sortReady = "true";
+
+                let currentSort: MountainTagSort | null = {
+                    ...DEFAULT_MOUNTAIN_TAG_SORT,
+                };
+                const buttons = Array.from(
+                    view.querySelectorAll<HTMLButtonElement>("[data-sort-key]"),
+                );
+
+                const updateButtons = () => {
+                    buttons.forEach((button) => {
+                        const key = button.dataset.sortKey as MountainTagSortKey;
+                        const isActive = currentSort?.key === key;
+                        button.classList.toggle("is-active", isActive);
+                        button.setAttribute("aria-pressed", String(isActive));
+                        const icon = button.querySelector<HTMLElement>(
+                            "[data-sort-icon]",
+                        );
+                        if (icon) {
+                            icon.textContent = isActive
+                                ? currentSort?.direction === "desc"
+                                    ? "↓"
+                                    : "↑"
+                                : "↕";
+                        }
+                    });
+                };
+
+                const sortGroups = () => {
+                    view.querySelectorAll<HTMLElement>(".mountain-tag-grid")
+                        .forEach((grid) => {
+                            const cards = Array.from(
+                                grid.querySelectorAll<HTMLElement>(
+                                    ":scope > .mountain-tag-card",
+                                ),
+                            ).map((element) => ({
+                                element,
+                                name: element.dataset.mountainName || "",
+                                elevation: Number(
+                                    element.dataset.mountainElevation,
+                                ),
+                                latitude: Number(
+                                    element.dataset.mountainLatitude,
+                                ),
+                            }));
+
+                            sortMountainTags(cards, currentSort).forEach(
+                                ({ element }) => grid.appendChild(element),
+                            );
+                        });
+                };
+
+                buttons.forEach((button) => {
+                    button.addEventListener("click", () => {
+                        currentSort = nextMountainTagSort(
+                            currentSort,
+                            button.dataset.sortKey as MountainTagSortKey,
+                        );
+                        sortGroups();
+                        updateButtons();
+                    });
+                });
+            });
+    };
+
+    initMountainTagSort();
+    document.addEventListener("astro:after-swap", initMountainTagSort);
+</script>
+
 <style>
+    .mountain-tag-sort-toolbar {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.45rem;
+        margin-bottom: 1rem;
+    }
+
+    .mountain-tag-sort-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.2rem 0.5rem;
+        border: 1px solid rgb(255 255 255 / 0.14);
+        border-radius: 999px;
+        background: rgb(255 255 255 / 0.04);
+        color: rgb(161 161 170);
+        font: inherit;
+        font-size: 0.65rem;
+        line-height: 1.2;
+        cursor: pointer;
+        transition:
+            border-color 0.18s ease,
+            background 0.18s ease,
+            color 0.18s ease;
+    }
+
+    .mountain-tag-sort-badge:hover {
+        border-color: rgb(255 255 255 / 0.3);
+        color: rgb(228 228 231);
+    }
+
+    .mountain-tag-sort-badge.is-active {
+        border-color: rgb(255 255 255 / 0.72);
+        background: rgb(255 255 255 / 0.2);
+        color: white;
+        backdrop-filter: blur(4px);
+    }
+
     .mountain-tag-groups {
         display: flex;
         flex-direction: column;

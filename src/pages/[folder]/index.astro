@@ -70,6 +70,7 @@ const mountainGroups = MOUNTAIN_REGION_DEFINITIONS.map((region) => ({
         .map((mountain) => ({
             name: mountain.name,
             elevation: mountain.elevation as number,
+            latitude: mountain.location!.latitude,
             coverKey: mountain.coverKey,
         })),
 }));
