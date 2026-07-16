@@ -66,15 +66,13 @@ test("geographic bounds survive a viewBox round trip", () => {
     }
 });
 
-test("contexts only reference features present in their source SVG", () => {
+test("map sources only reference features present in their SVG", () => {
     for (const context of Object.values(MAP_CONTEXTS)) {
         const source = MAP_SOURCES[context.source];
-        const visibleFeatures = context.visibleFeatures ?? source.featureIds;
         const svgPath = new URL(`../../public${source.asset}`, import.meta.url);
         const svg = fs.readFileSync(svgPath, "utf8");
 
-        for (const featureId of visibleFeatures) {
-            assert.ok(source.featureIds.includes(featureId));
+        for (const featureId of source.featureIds) {
             assert.match(svg, new RegExp(`id="${featureId}"`));
         }
     }
@@ -83,6 +81,7 @@ test("contexts only reference features present in their source SVG", () => {
 test("every context references one existing master source", () => {
     for (const context of Object.values(MAP_CONTEXTS)) {
         assert.ok(MAP_SOURCES[context.source]);
+        assert.equal("visibleFeatures" in context, false);
     }
 });
 
@@ -98,10 +97,6 @@ test("code-owned full-map contexts cover every source feature", () => {
     for (const context of protectedContexts) {
         const source = MAP_SOURCES[context.source];
         assert.equal(context.level, "country");
-        assert.deepEqual(
-            [...context.visibleFeatures].sort(),
-            [...source.featureIds].sort(),
-        );
         const viewBox = boundsToViewBox(context.bounds);
         source.extent.forEach((value, index) => {
             assert.ok(Math.abs(viewBox[index] - value) < 0.01);

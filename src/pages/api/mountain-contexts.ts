@@ -17,7 +17,6 @@ type ContextConfig = {
     level: "country" | "admin1" | "region";
     source: string;
     bounds: MapBounds;
-    visibleFeatures?: string[];
     protected?: boolean;
 };
 
@@ -133,9 +132,6 @@ export const POST: APIRoute = async ({ request }) => {
             level: "region",
             source: baseContext.source,
             bounds: fields.bounds,
-            ...(baseContext.visibleFeatures
-                ? { visibleFeatures: [...baseContext.visibleFeatures] }
-                : {}),
         };
         config.contexts[fields.id] = context;
         const mountain = saveMountainDraft(body, config, mountains);

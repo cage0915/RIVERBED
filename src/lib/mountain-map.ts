@@ -34,7 +34,6 @@ export type MapContext = {
     level: "country" | "admin1" | "region";
     source: keyof typeof MAP_SOURCES;
     bounds: MapBounds;
-    visibleFeatures?: string[];
     protected?: boolean;
 };
 
