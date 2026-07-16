@@ -7,6 +7,8 @@ import {
     allMountains as mountainsData,
     MOUNTAIN_REGION_DEFINITIONS,
 } from "../../lib/mountains";
+import { sanitizeMountainViewSettings } from "../../lib/mountain-view-settings";
+import mountainViewSettingsData from "../../mountain-view-settings.json";
 
 const { folder } = Astro.params;
 
@@ -50,6 +52,9 @@ const currentView =
     isYama && Astro.url.searchParams.get("view") === "tags"
         ? "tags"
         : "posts";
+const mountainViewSettings = sanitizeMountainViewSettings(
+    mountainViewSettingsData,
+);
 
 const mountainGroups = MOUNTAIN_REGION_DEFINITIONS.map((region) => ({
     ...region,
@@ -110,7 +115,10 @@ const mountainGroups = MOUNTAIN_REGION_DEFINITIONS.map((region) => ({
         }
 
         {currentView === "tags" ? (
-            <MountainTagGrid groups={mountainGroups} />
+            <MountainTagGrid
+                groups={mountainGroups}
+                tagColumns={mountainViewSettings.tagColumns}
+            />
         ) : (
         <div class="albums-grid" style={`--cols: ${folderCols}`}>
             {

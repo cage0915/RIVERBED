@@ -1,6 +1,10 @@
 import type { APIRoute } from "astro";
 
 import type { EditableMountain } from "../../lib/mountain-editor";
+import {
+    sanitizeMountainViewSettings,
+    type MountainViewSettings,
+} from "../../lib/mountain-view-settings";
 import type { MountainRegionDefinition } from "../../lib/mountains";
 
 const json = (body: unknown, status = 200) =>
@@ -16,6 +20,10 @@ const files = async () => {
     const path = await import("node:path");
     return {
         config: path.resolve(process.cwd(), "src/mountain-regions.json"),
+        viewSettings: path.resolve(
+            process.cwd(),
+            "src/mountain-view-settings.json",
+        ),
         directory: path.resolve(process.cwd(), "src/mountains"),
     };
 };
@@ -25,6 +33,14 @@ const readRegions = async () => {
     const { config } = await files();
     return JSON.parse(await fs.readFile(config, "utf8")) as
         MountainRegionDefinition[];
+};
+
+const readViewSettings = async () => {
+    const fs = await import("node:fs/promises");
+    const { viewSettings } = await files();
+    return sanitizeMountainViewSettings(
+        JSON.parse(await fs.readFile(viewSettings, "utf8")),
+    );
 };
 
 const sanitizeRegions = (input: unknown): MountainRegionDefinition[] => {
@@ -54,13 +70,17 @@ const sanitizeRegions = (input: unknown): MountainRegionDefinition[] => {
 
 export const GET: APIRoute = async () => {
     if (!import.meta.env.DEV) return json({ error: "Not available in production" }, 403);
-    return json({ regions: await readRegions() });
+    const [regions, settings] = await Promise.all([
+        readRegions(),
+        readViewSettings(),
+    ]);
+    return json({ regions, settings });
 };
 
 export const PUT: APIRoute = async ({ request }) => {
     if (!import.meta.env.DEV) return json({ error: "Not available in production" }, 403);
 
-    let body: { regions?: unknown };
+    let body: { regions?: unknown; settings?: unknown };
     try {
         body = await request.json();
     } catch {
@@ -69,14 +89,21 @@ export const PUT: APIRoute = async ({ request }) => {
 
     try {
         const nextRegions = sanitizeRegions(body.regions);
-        const currentRegions = await readRegions();
+        const [currentRegions, currentSettings] = await Promise.all([
+            readRegions(),
+            readViewSettings(),
+        ]);
+        const nextSettings: MountainViewSettings =
+            body.settings === undefined
+                ? currentSettings
+                : sanitizeMountainViewSettings(body.settings);
         const currentIds = new Set(currentRegions.map((region) => region.id));
         const nextIds = new Set(nextRegions.map((region) => region.id));
         const removedIds = [...currentIds].filter((id) => !nextIds.has(id));
         const addedIds = [...nextIds].filter((id) => !currentIds.has(id));
         const fs = await import("node:fs/promises");
         const path = await import("node:path");
-        const { config, directory } = await files();
+        const { config, viewSettings, directory } = await files();
 
         for (const id of removedIds) {
             const file = path.join(directory, `${id}.json`);
@@ -106,13 +133,24 @@ export const PUT: APIRoute = async ({ request }) => {
             `${JSON.stringify(nextRegions, null, 2)}\n`,
             "utf8",
         );
+        const temporarySettingsFile = `${viewSettings}.${process.pid}.tmp`;
+        await fs.writeFile(
+            temporarySettingsFile,
+            `${JSON.stringify(nextSettings, null, 2)}\n`,
+            "utf8",
+        );
         await fs.rename(temporaryFile, config);
+        await fs.rename(temporarySettingsFile, viewSettings);
 
         for (const id of removedIds) {
             await fs.unlink(path.join(directory, `${id}.json`));
         }
 
-        return json({ success: true, regions: nextRegions });
+        return json({
+            success: true,
+            regions: nextRegions,
+            settings: nextSettings,
+        });
     } catch (error) {
         return json(
             { error: error instanceof Error ? error.message : "Unable to save regions" },

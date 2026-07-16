@@ -163,7 +163,7 @@
 
                 <section class="dev-mountain-section" data-preview-target="panorama">
                     <label class="dev-mountain-check">
-                        <input id="dev-mountain-panorama-enabled" type="checkbox" />
+                        <input id="dev-mountain-panorama-enabled" type="checkbox" checked />
                         <span>Enable PeakFinder Panorama</span>
                     </label>
                     <div id="dev-mountain-panorama-fields" class="dev-mountain-panorama-fields" hidden>
@@ -1249,7 +1249,8 @@
             latitudeInput.value = mountain.location ? String(mountain.location.latitude) : "";
             longitudeInput.value = mountain.location ? String(mountain.location.longitude) : "";
             const contextId = mountain.location?.mapContext;
-            panoramaEnabled.checked = mountain.panorama?.provider === "peakfinder";
+            panoramaEnabled.checked =
+                !mountain.panorama || mountain.panorama.provider === "peakfinder";
             azimuthInput.value = mountain.panorama?.azimuth === undefined ? "" : String(mountain.panorama.azimuth);
             altitudeInput.value = mountain.panorama?.altitude === undefined ? "" : String(mountain.panorama.altitude);
             fovInput.value = mountain.panorama?.fieldOfView === undefined ? "" : String(mountain.panorama.fieldOfView);

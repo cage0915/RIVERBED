@@ -9,6 +9,10 @@
         deleteTag as removeTagFromMap,
         normalizeTagMap,
     } from "../lib/dev-tag-state.js";
+    import {
+        DEFAULT_MOUNTAIN_VIEW_SETTINGS,
+        type MountainViewSettings,
+    } from "../lib/mountain-view-settings";
 
     // Only run in development
     if (import.meta.env.DEV) {
@@ -1928,7 +1932,7 @@
                 `;
                 dialog.innerHTML = `
                     <div style="display:flex;flex-direction:column;width:560px;max-width:92vw;max-height:80vh;background:#fff;font-family:sans-serif;">
-                        <header style="display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;border-bottom:1px solid #e5e7eb;background:#fafafa;">
+                        <header style="display:flex;align-items:center;justify-content:space-between;padding:0.65rem 1rem;border-bottom:1px solid #e5e7eb;background:#fafafa;">
                             <h3 style="margin:0;color:#333;font-size:1rem;">Region Manager</h3>
                             <div class="dev-manager-header-actions">
                                 <button type="button" data-region-action="add" class="dev-manager-header-button" title="Add Region" aria-label="Add Region">${ICONS.plus}</button>
@@ -1936,7 +1940,11 @@
                                 <button type="button" data-region-action="close" class="dev-manager-header-button" title="Close" aria-label="Close">${ICONS.close}</button>
                             </div>
                         </header>
-                        <div data-region-list style="display:flex;flex-direction:column;gap:0.6rem;overflow-y:auto;padding:1.25rem;"></div>
+                        <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:0.55rem 1rem;border-bottom:1px solid #e5e7eb;background:#f8fafc;">
+                            <label for="dev-region-tag-columns" style="color:#475569;font-size:0.78rem;">Tags per row</label>
+                            <input id="dev-region-tag-columns" data-region-setting="tagColumns" type="number" min="1" max="8" step="1" value="${Number(data.settings?.tagColumns) || DEFAULT_MOUNTAIN_VIEW_SETTINGS.tagColumns}" style="width:5rem;padding:0.4rem 0.55rem;border:1px solid #cbd5e1;border-radius:5px;background:#fff;color:#334155;text-align:center;" />
+                        </div>
+                        <div data-region-list style="display:flex;flex-direction:column;gap:0.4rem;overflow-y:auto;padding:0.75rem 1rem;"></div>
                     </div>
                 `;
                 document.body.appendChild(dialog);
@@ -1947,13 +1955,18 @@
                 let regions: { id: string; label: string }[] = (data.regions || []).map(
                     (region: { id: string; label: string }) => ({ ...region }),
                 );
+                const settings: MountainViewSettings = {
+                    tagColumns:
+                        Number(data.settings?.tagColumns) ||
+                        DEFAULT_MOUNTAIN_VIEW_SETTINGS.tagColumns,
+                };
                 let selectedRegion: number | null = null;
                 let didDragRegion = false;
                 const list = dialog.querySelector<HTMLElement>("[data-region-list]")!;
 
                 const render = () => {
                     list.innerHTML = regions.map((region, index) => `
-                        <div data-region-index="${index}" style="display:grid;grid-template-columns:2.75rem minmax(0,1fr) 2rem;gap:0.5rem;align-items:center;padding:0.7rem;border:1px solid #e2e8f0;border-radius:8px;background:${selectedRegion === index ? "#eff6ff" : "#f8fafc"};outline:${selectedRegion === index ? "2px solid #2563eb" : "none"};outline-offset:1px;">
+                        <div data-region-index="${index}" style="display:grid;grid-template-columns:2.5rem minmax(0,1fr) 2rem;gap:0.45rem;align-items:center;padding:0.45rem;border:1px solid #e2e8f0;border-radius:8px;background:${selectedRegion === index ? "#eff6ff" : "#f8fafc"};outline:${selectedRegion === index ? "2px solid #2563eb" : "none"};outline-offset:1px;">
                             ${selectedRegion === index
                                 ? `<button type="button" data-region-action="select" title="Cancel move" style="display:flex;height:2rem;align-items:center;justify-content:center;border:0;background:none;color:#2563eb;cursor:pointer;">${ICONS.drag}</button>`
                                 : selectedRegion !== null
@@ -1963,8 +1976,8 @@
                                        </div>`
                                     : `<button type="button" data-region-action="select" title="Click to move" style="display:flex;height:2rem;align-items:center;justify-content:center;border:0;background:none;color:#94a3b8;cursor:pointer;">${ICONS.drag}</button>`}
                             <div style="display:grid;grid-template-columns:minmax(0,0.8fr) minmax(0,1.2fr);gap:0.5rem;min-width:0;">
-                                <input data-region-field="id" value="${escapeHtml(region.id)}" ${originalIds.has(region.id) ? "readonly" : ""} placeholder="Region ID" aria-label="Region ID" style="min-width:0;padding:0.45rem 0.55rem;border:1px solid #cbd5e1;border-radius:5px;background:${originalIds.has(region.id) ? "#f1f5f9" : "#fff"};color:#334155;" />
-                                <input data-region-field="label" value="${escapeHtml(region.label)}" placeholder="Region label" aria-label="Region label" style="min-width:0;padding:0.45rem 0.55rem;border:1px solid #cbd5e1;border-radius:5px;background:#fff;color:#334155;" />
+                                <input data-region-field="id" value="${escapeHtml(region.id)}" ${originalIds.has(region.id) ? "readonly" : ""} placeholder="Region ID" aria-label="Region ID" style="min-width:0;padding:0.35rem 0.5rem;border:1px solid #cbd5e1;border-radius:5px;background:${originalIds.has(region.id) ? "#f1f5f9" : "#fff"};color:#334155;" />
+                                <input data-region-field="label" value="${escapeHtml(region.label)}" placeholder="Region label" aria-label="Region label" style="min-width:0;padding:0.35rem 0.5rem;border:1px solid #cbd5e1;border-radius:5px;background:#fff;color:#334155;" />
                             </div>
                             <button type="button" data-region-action="delete" title="Delete region" style="display:flex;height:2rem;align-items:center;justify-content:center;border:0;border-radius:5px;background:#fee2e2;color:#dc2626;cursor:pointer;">${ICONS.trash}</button>
                         </div>
@@ -1979,6 +1992,13 @@
                     if (!Number.isInteger(index) || !field) return;
                     regions[index][field] = input.value;
                 });
+                dialog
+                    .querySelector<HTMLInputElement>("[data-region-setting='tagColumns']")
+                    ?.addEventListener("input", (event) => {
+                        settings.tagColumns = Number(
+                            (event.target as HTMLInputElement).value,
+                        );
+                    });
 
                 dialog.addEventListener("click", async (event) => {
                     const button = (event.target as Element).closest<HTMLButtonElement>(
@@ -2000,7 +2020,7 @@
                         const saveResponse = await fetch("/api/mountain-regions", {
                             method: "PUT",
                             headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ regions }),
+                            body: JSON.stringify({ regions, settings }),
                         });
                         const result = await saveResponse.json().catch(() => ({}));
                         if (!saveResponse.ok) {

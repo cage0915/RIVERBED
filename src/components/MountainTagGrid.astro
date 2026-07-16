@@ -1,5 +1,6 @@
 ---
 import { getImageUrl, R2_DOMAIN } from "../lib/constants";
+import { DEFAULT_MOUNTAIN_VIEW_SETTINGS } from "../lib/mountain-view-settings";
 
 interface MountainTagCard {
     name: string;
@@ -15,13 +16,20 @@ interface MountainTagGroup {
 
 interface Props {
     groups: MountainTagGroup[];
+    tagColumns?: number;
 }
 
-const { groups } = Astro.props;
+const {
+    groups,
+    tagColumns = DEFAULT_MOUNTAIN_VIEW_SETTINGS.tagColumns,
+} = Astro.props;
 const isDev = import.meta.env.DEV;
 ---
 
-<div class="mountain-tag-groups">
+<div
+    class="mountain-tag-groups"
+    style={`--mountain-tag-columns: ${tagColumns}`}
+>
     {
         groups.filter((group) => group.mountains.length > 0).map((group) => (
             <section class="mountain-tag-group" aria-labelledby={`mountain-region-${group.id}`}>
@@ -95,7 +103,10 @@ const isDev = import.meta.env.DEV;
 
     .mountain-tag-grid {
         display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: repeat(
+            var(--mountain-tag-columns, 5),
+            minmax(0, 1fr)
+        );
         gap: 0.5rem;
     }
 
