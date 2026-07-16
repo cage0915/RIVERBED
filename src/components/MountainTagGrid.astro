@@ -367,7 +367,37 @@ const sortedGroups = groups.map((group) => ({
 
     @media (max-width: 640px) {
         .mountain-tag-grid {
-            grid-template-columns: minmax(0, 1fr);
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 2px;
+        }
+
+        .mountain-tag-card__link {
+            aspect-ratio: 1;
+        }
+
+        .mountain-tag-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .mountain-tag-card:not(.mountain-tag-card--without-cover)
+            .mountain-tag-card__overlay {
+            display: none;
+        }
+
+        .mountain-tag-card--without-cover .mountain-tag-card__overlay {
+            padding: 0.35rem;
+        }
+
+        .mountain-tag-card--without-cover .mountain-tag-card__overlay h3 {
+            font-size: 0.65rem;
+            letter-spacing: 0.02em;
+        }
+
+        .mountain-tag-card--without-cover .mountain-tag-card__overlay p {
+            margin-top: 0.25rem;
+            font-size: 0.55rem;
         }
     }
 </style>
