@@ -1,7 +1,6 @@
 ---
 import MountainViewer from "./MountainViewer.astro";
 import { isMapContextId, type MapBounds } from "../lib/mountain-map";
-import type { PeakFinderPanorama } from "../lib/mountain-panorama";
 import { resolveFeatureFlag } from "../lib/feature-flags";
 
 export type MountainLocation = {
@@ -17,7 +16,7 @@ export type Mountain = {
     description: string;
     coverKey?: string;
     location?: MountainLocation;
-    panorama?: PeakFinderPanorama;
+    panorama?: boolean;
 };
 
 interface Props {

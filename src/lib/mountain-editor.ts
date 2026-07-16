@@ -1,10 +1,5 @@
 import type { MapBounds } from "./mountain-map.ts";
 import { isValidMapBounds } from "./mountain-map.ts";
-import type { PeakFinderPanorama } from "./mountain-panorama.ts";
-
-export type MountainDataSource = {
-    wikidataId?: string;
-};
 
 export type EditableMountain = {
     name: string;
@@ -17,8 +12,7 @@ export type EditableMountain = {
         mapContext: string;
         initialBounds?: MapBounds;
     };
-    panorama?: PeakFinderPanorama;
-    dataSource?: MountainDataSource;
+    panorama?: boolean;
 };
 
 export type MountainCoverKey = {
@@ -119,35 +113,13 @@ export function sanitizeMountainEntry(
     }
 
     if (candidate.panorama !== undefined && candidate.panorama !== null) {
-        if (!result.location) throw new Error("Panorama requires a mountain location");
-        if (typeof candidate.panorama !== "object") {
+        if (typeof candidate.panorama !== "boolean") {
             throw new Error("Invalid panorama settings");
         }
-        const panorama = candidate.panorama as Record<string, unknown>;
-        if (panorama.provider !== "peakfinder") {
-            throw new Error("Unsupported panorama provider");
+        if (candidate.panorama && !result.location) {
+            throw new Error("Panorama requires a mountain location");
         }
-
-        result.panorama = { provider: "peakfinder" };
-        const azimuth = optionalNumber(panorama.azimuth, 0, 360);
-        const altitude = optionalNumber(panorama.altitude, -25, 25);
-        const fieldOfView = optionalNumber(panorama.fieldOfView, 8, 90);
-        if (azimuth !== undefined) result.panorama.azimuth = azimuth;
-        if (altitude !== undefined) result.panorama.altitude = altitude;
-        if (fieldOfView !== undefined) result.panorama.fieldOfView = fieldOfView;
-    }
-
-    if (candidate.dataSource !== undefined && candidate.dataSource !== null) {
-        if (typeof candidate.dataSource !== "object") {
-            throw new Error("Invalid data source metadata");
-        }
-        const source = candidate.dataSource as Record<string, unknown>;
-        const wikidataId =
-            typeof source.wikidataId === "string" ? source.wikidataId.trim() : "";
-        if (wikidataId && !/^Q\d+$/.test(wikidataId)) {
-            throw new Error("Invalid Wikidata ID");
-        }
-        if (wikidataId) result.dataSource = { wikidataId };
+        result.panorama = candidate.panorama;
     }
 
     return result;

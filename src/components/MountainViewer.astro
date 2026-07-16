@@ -1,9 +1,6 @@
 ---
 import MountainMap from "./MountainMap.astro";
-import {
-    buildPeakFinderEmbedUrl,
-    type PeakFinderPanorama,
-} from "../lib/mountain-panorama";
+import { buildPeakFinderEmbedUrl } from "../lib/mountain-panorama";
 import type { MapBounds, MapContextId } from "../lib/mountain-map";
 
 interface Props {
@@ -12,7 +9,7 @@ interface Props {
     contextId: MapContextId;
     mountainName: string;
     elevation: number | null;
-    panorama?: PeakFinderPanorama;
+    panorama?: boolean;
     initialBounds?: MapBounds;
     peakFinderEnabled?: boolean;
 }
@@ -27,14 +24,13 @@ const {
     initialBounds,
     peakFinderEnabled = true,
 } = Astro.props;
-const hasPanorama = peakFinderEnabled && panorama?.provider === "peakfinder";
+const hasPanorama = peakFinderEnabled && panorama === true;
 const panoramaUrl = hasPanorama
     ? buildPeakFinderEmbedUrl({
           latitude,
           longitude,
           mountainName,
           elevation,
-          panorama,
       })
     : null;
 const viewerId = `mountain-viewer-${contextId}`;

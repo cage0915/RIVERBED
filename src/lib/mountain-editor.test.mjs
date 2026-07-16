@@ -5,7 +5,7 @@ import { sanitizeMountainEntry } from "./mountain-editor.ts";
 
 const contexts = new Set(["tw-dabajian"]);
 
-test("mountain editor sanitizes provider-neutral map and panorama settings", () => {
+test("mountain editor stores panorama as a boolean and omits lookup metadata", () => {
     assert.deepEqual(
         sanitizeMountainEntry(
             {
@@ -23,12 +23,7 @@ test("mountain editor sanitizes provider-neutral map and panorama settings", () 
                         north: 24.72,
                     },
                 },
-                panorama: {
-                    provider: "peakfinder",
-                    azimuth: "180",
-                    altitude: "0",
-                    fieldOfView: "45",
-                },
+                panorama: true,
                 dataSource: {
                     wikidataId: "Q706556",
                     retrievedAt: "2026-07-14T00:00:00.000Z",
@@ -51,15 +46,27 @@ test("mountain editor sanitizes provider-neutral map and panorama settings", () 
                     north: 24.72,
                 },
             },
-            panorama: {
-                provider: "peakfinder",
-                azimuth: 180,
-                altitude: 0,
-                fieldOfView: 45,
+            panorama: true,
+        },
+    );
+});
+
+test("mountain editor preserves an explicitly disabled panorama", () => {
+    assert.deepEqual(
+        sanitizeMountainEntry(
+            {
+                name: "山",
+                elevation: null,
+                description: "",
+                panorama: false,
             },
-            dataSource: {
-                wikidataId: "Q706556",
-            },
+            contexts,
+        ),
+        {
+            name: "山",
+            elevation: null,
+            description: "",
+            panorama: false,
         },
     );
 });

@@ -107,10 +107,10 @@
                         <span>Description</span>
                         <textarea id="dev-mountain-description" rows="4"></textarea>
                     </label>
-                    <p id="dev-mountain-source" class="dev-mountain-help"></p>
-                    <p class="dev-mountain-help">
-                        Refresh the location preview before saving. Click <strong>Save</strong> in the header to write elevation, coordinates, and description to the selected region file.
-                    </p>
+                    <label class="dev-mountain-check">
+                        <input id="dev-mountain-panorama-enabled" type="checkbox" checked />
+                        <span>Enable PeakFinder Panorama</span>
+                    </label>
                 </section>
 
                 <section class="dev-mountain-section" data-preview-target="location">
@@ -161,41 +161,6 @@
                     </div>
                 </section>
 
-                <section class="dev-mountain-section" data-preview-target="panorama">
-                    <label class="dev-mountain-check">
-                        <input id="dev-mountain-panorama-enabled" type="checkbox" checked />
-                        <span>Enable PeakFinder Panorama</span>
-                    </label>
-                    <div id="dev-mountain-panorama-fields" class="dev-mountain-panorama-fields" hidden>
-                        <div class="dev-mountain-grid dev-mountain-grid--panorama">
-                            <label class="dev-mountain-field">
-                                <span>Azimuth (azi)</span>
-                                <input id="dev-mountain-azimuth" type="number" min="0" max="360" step="1" placeholder="Default" />
-                            </label>
-                            <label class="dev-mountain-field">
-                                <span>Altitude (alt)</span>
-                                <input id="dev-mountain-altitude" type="number" min="-25" max="25" step="0.5" placeholder="Default" />
-                            </label>
-                            <label class="dev-mountain-field">
-                                <span>Field of View (fov)</span>
-                                <input id="dev-mountain-fov" type="number" min="8" max="90" step="1" placeholder="Default" />
-                            </label>
-                            <button
-                                id="dev-mountain-refresh-panorama"
-                                class="dev-mountain-secondary-button dev-mountain-grid-action"
-                                type="button"
-                                title="Refresh Panorama Preview"
-                                aria-label="Refresh Panorama Preview"
-                            >
-                                <svg viewBox="0 0 24 24" aria-hidden="true">
-                                    <path d="M20 6v5h-5M4 18v-5h5"></path>
-                                    <path d="M6.2 9a7 7 0 0 1 11.5-2.6L20 9M4 15l2.3 2.6A7 7 0 0 0 17.8 15"></path>
-                                </svg>
-                            </button>
-                        </div>
-                        <p class="dev-mountain-help">Changes made inside the iframe cannot be read back. Adjust the values above, then refresh the preview.</p>
-                    </div>
-                </section>
             </div>
 
             <div class="dev-mountain-manager__preview-column">
@@ -453,7 +418,6 @@
     .dev-mountain-grid--lookup { grid-template-columns: minmax(0, 0.65fr) minmax(0, 1.35fr) 2.25rem; }
     .dev-mountain-grid--location { grid-template-columns: minmax(0, 0.72fr) repeat(2, minmax(0, 1fr)) 2.25rem; }
     .dev-mountain-grid--context { grid-template-columns: repeat(2, minmax(0, 1fr)) 2.25rem; }
-    .dev-mountain-grid--panorama { grid-template-columns: repeat(3, minmax(0, 1fr)) 2.25rem; }
 
     .dev-mountain-field {
         display: flex;
@@ -673,9 +637,8 @@
 
     .dev-mountain-context-editor { margin-top: 0.75rem; padding: 0.75rem; border-radius: 6px; background: #f8fafc; }
 
-    .dev-mountain-check { gap: 0.55rem; color: #334155; font-size: 0.78rem; cursor: pointer; }
+    .dev-mountain-check { gap: 0.55rem; margin-top: 0.75rem; color: #334155; font-size: 0.78rem; cursor: pointer; }
     .dev-mountain-check input { width: 1rem; height: 1rem; }
-    .dev-mountain-panorama-fields { margin-top: 0.8rem; }
 
     .dev-mountain-candidates { display: grid; gap: 0.45rem; margin-top: 0.6rem; }
     .dev-mountain-candidate { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.7rem; padding: 0.65rem; border: 1px solid #e2e8f0; border-radius: 6px; }
@@ -793,8 +756,7 @@
         .dev-mountain-manager__form-column { border-right: 0; }
         .dev-mountain-grid--lookup,
         .dev-mountain-grid--location,
-        .dev-mountain-grid--context,
-        .dev-mountain-grid--panorama { grid-template-columns: minmax(0, 1fr); }
+        .dev-mountain-grid--context { grid-template-columns: minmax(0, 1fr); }
         .dev-mountain-grid-action { width: 100%; }
     }
 </style>
@@ -879,7 +841,6 @@
         const longitudeInput = byId<HTMLInputElement>("dev-mountain-longitude")!;
         const refreshLocationButton = byId<HTMLButtonElement>("dev-mountain-refresh-location")!;
         const descriptionInput = byId<HTMLTextAreaElement>("dev-mountain-description")!;
-        const sourceOutput = byId<HTMLElement>("dev-mountain-source")!;
         const contextSelect = byId<HTMLSelectElement>("dev-mountain-context")!;
         const contextPicker = byId<HTMLElement>("dev-mountain-context-picker")!;
         const contextTrigger = byId<HTMLButtonElement>("dev-mountain-context-trigger")!;
@@ -890,11 +851,6 @@
         const saveContextButton = byId<HTMLButtonElement>("dev-mountain-save-context")!;
         const contextHelp = byId<HTMLElement>("dev-mountain-context-help")!;
         const panoramaEnabled = byId<HTMLInputElement>("dev-mountain-panorama-enabled")!;
-        const panoramaFields = byId<HTMLElement>("dev-mountain-panorama-fields")!;
-        const azimuthInput = byId<HTMLInputElement>("dev-mountain-azimuth")!;
-        const altitudeInput = byId<HTMLInputElement>("dev-mountain-altitude")!;
-        const fovInput = byId<HTMLInputElement>("dev-mountain-fov")!;
-        const refreshPanoramaButton = byId<HTMLButtonElement>("dev-mountain-refresh-panorama")!;
         const panoramaFrame = byId<HTMLIFrameElement>("dev-mountain-panorama-preview")!;
         const previewTabs = Array.from(dialog.querySelectorAll<HTMLButtonElement>("[data-preview-tab]"));
         const previewPanels = Array.from(dialog.querySelectorAll<HTMLElement>("[data-preview-panel]"));
@@ -1203,7 +1159,6 @@
 
         const updatePanoramaVisibility = () => {
             const enabled = panoramaEnabled.checked;
-            panoramaFields.hidden = !enabled;
             panoramaTab.disabled = !enabled;
             if (!enabled) {
                 panoramaFrame.removeAttribute("src");
@@ -1224,12 +1179,6 @@
                 longitude,
                 mountainName: currentMountain.name,
                 elevation: numberOrUndefined(elevationInput) ?? null,
-                panorama: {
-                    provider: "peakfinder",
-                    azimuth: numberOrUndefined(azimuthInput),
-                    altitude: numberOrUndefined(altitudeInput),
-                    fieldOfView: numberOrUndefined(fovInput),
-                },
             });
             activatePreview("panorama");
         };
@@ -1249,14 +1198,7 @@
             latitudeInput.value = mountain.location ? String(mountain.location.latitude) : "";
             longitudeInput.value = mountain.location ? String(mountain.location.longitude) : "";
             const contextId = mountain.location?.mapContext;
-            panoramaEnabled.checked =
-                !mountain.panorama || mountain.panorama.provider === "peakfinder";
-            azimuthInput.value = mountain.panorama?.azimuth === undefined ? "" : String(mountain.panorama.azimuth);
-            altitudeInput.value = mountain.panorama?.altitude === undefined ? "" : String(mountain.panorama.altitude);
-            fovInput.value = mountain.panorama?.fieldOfView === undefined ? "" : String(mountain.panorama.fieldOfView);
-            sourceOutput.innerHTML = mountain.dataSource?.wikidataId
-                ? `Source: <a href="https://www.wikidata.org/wiki/${escapeHtml(mountain.dataSource.wikidataId)}" target="_blank" rel="noreferrer">${escapeHtml(mountain.dataSource.wikidataId)}</a>`
-                : "No lookup source recorded";
+            panoramaEnabled.checked = mountain.panorama === true;
             candidatesRoot.innerHTML = "";
             lookupStatus.textContent = "";
             panoramaFrame.removeAttribute("src");
@@ -1352,10 +1294,6 @@
                         suggestContext(candidate.latitude, candidate.longitude);
                         loadContextEditor(contextSelect.value);
                     }
-                    currentMountain.dataSource = {
-                        wikidataId: candidate.id,
-                    };
-                    sourceOutput.innerHTML = `Source: <a href="${escapeHtml(candidate.sourceUrl)}" target="_blank" rel="noreferrer">${escapeHtml(candidate.id)}</a> · Pending save`;
                     lookupStatus.textContent = `Applied ${candidate.name}. Review the values, then save.`;
                     lookupCandidates = [];
                     candidatesRoot.innerHTML = "";
@@ -1378,9 +1316,6 @@
                 ...(currentMountain.coverKey
                     ? { coverKey: currentMountain.coverKey }
                     : {}),
-                ...(currentMountain.dataSource
-                    ? { dataSource: currentMountain.dataSource }
-                    : {}),
             };
             if (latitude !== undefined && longitude !== undefined) {
                 mountain.location = {
@@ -1389,14 +1324,7 @@
                     mapContext,
                 };
             }
-            if (panoramaEnabled.checked) {
-                mountain.panorama = {
-                    provider: "peakfinder",
-                    azimuth: numberOrUndefined(azimuthInput),
-                    altitude: numberOrUndefined(altitudeInput),
-                    fieldOfView: numberOrUndefined(fovInput),
-                };
-            }
+            mountain.panorama = panoramaEnabled.checked;
             return mountain;
         };
 
@@ -1725,7 +1653,6 @@
             updatePanoramaVisibility();
             if (panoramaEnabled.checked) refreshPanorama();
         });
-        refreshPanoramaButton.addEventListener("click", refreshPanorama);
 
         map.addEventListener("wheel", (event) => {
             event.preventDefault();
