@@ -1,8 +1,15 @@
 [
   {
     "name": "七星山",
-    "elevation": null,
-    "description": ""
+    "elevation": 1120,
+    "description": "",
+    "location": {
+      "latitude": 25.17079,
+      "longitude": 121.55299,
+      "mapContext": "tw-mainland"
+    },
+    "panorama": true,
+    "coverKey": "yama/2026-yangmin-ten-peaks/KCS00986.jpg"
   },
   {
     "name": "七星山東峰",
@@ -41,28 +48,63 @@
   },
   {
     "name": "三叉山",
-    "elevation": null,
-    "description": ""
+    "elevation": 3257,
+    "description": "",
+    "location": {
+      "latitude": 23.29749,
+      "longitude": 121.02899,
+      "mapContext": "tw-mainland"
+    },
+    "panorama": true,
+    "coverKey": "yama/2026-jiaminghu-2/KCS04340.jpg"
   },
   {
     "name": "三角錐山",
-    "elevation": null,
-    "description": ""
+    "elevation": 2607,
+    "description": "",
+    "location": {
+      "latitude": 24.2097,
+      "longitude": 121.59099,
+      "mapContext": "tw-mainland"
+    },
+    "panorama": true,
+    "coverKey": "yama/2024-hehuanbei/KCS03831.jpg"
   },
   {
     "name": "大屯山",
-    "elevation": null,
-    "description": ""
+    "elevation": 1093,
+    "description": "",
+    "coverKey": "yama/2026-yangmin-ten-peaks/KCS01010.jpg",
+    "location": {
+      "latitude": 25.1786,
+      "longitude": 121.522,
+      "mapContext": "tw-mainland"
+    },
+    "panorama": true
   },
   {
     "name": "大屯山西峰",
-    "elevation": null,
-    "description": ""
+    "elevation": 985,
+    "description": "",
+    "coverKey": "yama/2026-yangmin-ten-peaks/KCS00976.jpg",
+    "location": {
+      "latitude": 25.1711,
+      "longitude": 121.51299,
+      "mapContext": "tw-mainland"
+    },
+    "panorama": true
   },
   {
     "name": "大屯山南峰",
-    "elevation": null,
-    "description": ""
+    "elevation": 959,
+    "description": "",
+    "coverKey": "yama/2025-datunshan/KCS01401.jpg",
+    "location": {
+      "latitude": 25.1697,
+      "longitude": 121.51799,
+      "mapContext": "tw-mainland"
+    },
+    "panorama": true
   },
   {
     "name": "大水窟山",
@@ -76,13 +118,27 @@
   },
   {
     "name": "大母母山",
-    "elevation": null,
-    "description": ""
+    "elevation": 2424,
+    "description": "",
+    "location": {
+      "latitude": 22.8258,
+      "longitude": 120.74899,
+      "mapContext": "tw-mainland"
+    },
+    "panorama": true,
+    "coverKey": "y/2018-on-two-wheels-w/049.jpg"
   },
   {
     "name": "大尖山",
-    "elevation": null,
-    "description": ""
+    "elevation": 1305,
+    "description": "",
+    "location": {
+      "latitude": 23.59,
+      "longitude": 120.62299,
+      "mapContext": "tw-mainland"
+    },
+    "panorama": true,
+    "coverKey": "dalin/dalin-2025/07.jpg"
   },
   {
     "name": "大油坑",
@@ -91,8 +147,15 @@
   },
   {
     "name": "大雪山",
-    "elevation": null,
-    "description": ""
+    "elevation": 3530,
+    "description": "",
+    "location": {
+      "latitude": 24.33109,
+      "longitude": 121.121,
+      "mapContext": "tw-mainland"
+    },
+    "panorama": true,
+    "coverKey": "yama/2026-daxueshan/KCS02985.jpg"
   },
   {
     "name": "大雪山北峰",
@@ -101,32 +164,51 @@
   },
   {
     "name": "大湖尖山",
-    "elevation": null,
-    "description": ""
+    "elevation": 1313,
+    "description": "",
+    "location": {
+      "latitude": 23.48719,
+      "longitude": 120.63799,
+      "mapContext": "tw-mainland"
+    },
+    "panorama": true,
+    "coverKey": "yama/2026-tataka/KCS00671.jpg"
   },
   {
     "name": "大塔山",
-    "elevation": null,
-    "description": ""
+    "elevation": 2663,
+    "description": "",
+    "location": {
+      "latitude": 23.53579,
+      "longitude": 120.808,
+      "mapContext": "tw-mainland"
+    },
+    "panorama": true,
+    "coverKey": "yama/2026-tataka/KCS00693.jpg"
   },
   {
     "name": "大劍山",
-    "elevation": null,
-    "description": ""
+    "elevation": 3594,
+    "description": "",
+    "location": {
+      "latitude": 24.3408,
+      "longitude": 121.19999,
+      "mapContext": "tw-mainland"
+    },
+    "panorama": true,
+    "coverKey": "yama/2024-dajian/KCS01587.jpg"
   },
   {
     "name": "大霸尖山",
     "elevation": 3492,
-    "description": "位於雪山山脈北緣，山體四面峭壁，是聖稜線北端極具辨識度的山峰。",
+    "description": "",
+    "coverKey": "yama/2023-da-xiao-bajianshan/08.jpg",
     "location": {
-      "latitude": 24.458196,
-      "longitude": 121.258157,
+      "latitude": 24.45721,
+      "longitude": 121.25799,
       "mapContext": "tw-mainland"
     },
-    "panorama": {
-      "provider": "peakfinder"
-    },
-    "coverKey": "yama/2023-da-xiao-bajianshan/08.jpg"
+    "panorama": true
   },
   {
     "name": "小油坑",
@@ -150,8 +232,15 @@
   },
   {
     "name": "小霸尖山",
-    "elevation": null,
-    "description": ""
+    "elevation": 3418,
+    "description": "",
+    "location": {
+      "latitude": 24.4556,
+      "longitude": 121.252,
+      "mapContext": "tw-mainland"
+    },
+    "panorama": true,
+    "coverKey": "yama/2023-da-xiao-bajianshan/09.jpg"
   },
   {
     "name": "小觀音山",
@@ -170,8 +259,15 @@
   },
   {
     "name": "中央尖山",
-    "elevation": null,
-    "description": ""
+    "elevation": 3703,
+    "description": "",
+    "location": {
+      "latitude": 24.3103,
+      "longitude": 121.41601,
+      "mapContext": "tw-mainland"
+    },
+    "panorama": true,
+    "coverKey": "yama/2024-hehuanbei/KCS03808.jpg"
   },
   {
     "name": "中央尖山東峰",
@@ -190,8 +286,15 @@
   },
   {
     "name": "天空堡壘",
-    "elevation": null,
-    "description": ""
+    "elevation": 3345,
+    "description": "",
+    "location": {
+      "latitude": 23.3161,
+      "longitude": 121.128,
+      "mapContext": "tw-mainland"
+    },
+    "panorama": true,
+    "coverKey": "yama/2026-jiaminghu-2/KCS03901.jpg"
   },
   {
     "name": "天雲山",
@@ -205,8 +308,15 @@
   },
   {
     "name": "巴紗拉雲山",
-    "elevation": null,
-    "description": ""
+    "elevation": 3407,
+    "description": "",
+    "location": {
+      "latitude": 24.4389,
+      "longitude": 121.25799,
+      "mapContext": "tw-mainland"
+    },
+    "panorama": true,
+    "coverKey": "yama/2025-da-xiao-bajianshan/KCS00550.jpg"
   },
   {
     "name": "水社大山",
@@ -220,8 +330,15 @@
   },
   {
     "name": "火炎山",
-    "elevation": null,
-    "description": ""
+    "elevation": 596,
+    "description": "",
+    "location": {
+      "latitude": 24.37732,
+      "longitude": 120.73097,
+      "mapContext": "tw-mainland"
+    },
+    "panorama": true,
+    "coverKey": "k/2022-wuxi-daanxi/000166010017.jpg"
   },
   {
     "name": "出雲山",
@@ -245,8 +362,15 @@
   },
   {
     "name": "北大武山",
-    "elevation": null,
-    "description": ""
+    "elevation": 3092,
+    "description": "",
+    "location": {
+      "latitude": 22.6269,
+      "longitude": 120.76098,
+      "mapContext": "tw-mainland"
+    },
+    "panorama": true,
+    "coverKey": "yama/2026-jiaminghu-1/KCS04425.jpg"
   },
   {
     "name": "北坑山",
@@ -255,8 +379,15 @@
   },
   {
     "name": "北插天山",
-    "elevation": null,
-    "description": ""
+    "elevation": 1727,
+    "description": "",
+    "coverKey": "yama/2025-beichatianshan/KCS00211.jpg",
+    "location": {
+      "latitude": 24.79189,
+      "longitude": 121.454,
+      "mapContext": "tw-mainland"
+    },
+    "panorama": true
   },
   {
     "name": "北稜角",
@@ -415,13 +546,27 @@
   },
   {
     "name": "向陽山",
-    "elevation": null,
-    "description": ""
+    "elevation": 3603,
+    "description": "",
+    "location": {
+      "latitude": 23.28441,
+      "longitude": 120.99299,
+      "mapContext": "tw-mainland"
+    },
+    "panorama": true,
+    "coverKey": "yama/2026-jiaminghu-2/KCS03965.jpg"
   },
   {
     "name": "向陽山北峰",
-    "elevation": null,
-    "description": ""
+    "elevation": 3458,
+    "description": "",
+    "location": {
+      "latitude": 23.2913,
+      "longitude": 121.00848,
+      "mapContext": "tw-mainland"
+    },
+    "panorama": true,
+    "coverKey": "yama/2026-jiaminghu-2/KCS04370.jpg"
   },
   {
     "name": "安東軍山",

@@ -142,16 +142,14 @@
   {
     "name": "白馬岳",
     "elevation": 2932,
-    "description": "位於飛驒山脈北部、富山縣與長野縣交界，是日本北阿爾卑斯北部的代表性山峰。",
+    "description": "",
+    "coverKey": "yama/2026-hakuba/KCS01420.jpg",
     "location": {
       "latitude": 36.758611,
       "longitude": 137.758611,
-      "mapContext": "jp-northern-alps"
+      "mapContext": "jp-honshu"
     },
-    "panorama": {
-      "provider": "peakfinder"
-    },
-    "coverKey": "yama/2026-hakuba/KCS01420.jpg"
+    "panorama": true
   },
   {
     "name": "白馬鑓ヶ岳",
