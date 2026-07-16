@@ -21,6 +21,30 @@ export type EditableMountain = {
     dataSource?: MountainDataSource;
 };
 
+export type MountainCoverKey = {
+    coverKey: string;
+    folder: string;
+    albumId: string;
+    photoKey: string;
+};
+
+export function parseMountainCoverKey(input: unknown): MountainCoverKey | null {
+    if (typeof input !== "string") return null;
+
+    const coverKey = input.trim();
+    const match = coverKey.match(
+        /^([a-z0-9][a-z0-9-]*)\/([a-z0-9][a-z0-9-]*)\/([^/]+)$/i,
+    );
+    if (!match || match[3] === "." || match[3] === "..") return null;
+
+    return {
+        coverKey,
+        folder: match[1],
+        albumId: match[2],
+        photoKey: match[3],
+    };
+}
+
 const optionalNumber = (
     value: unknown,
     minimum: number,
@@ -58,12 +82,11 @@ export function sanitizeMountainEntry(
     const result: EditableMountain = { name, elevation, description };
 
     if (candidate.coverKey !== undefined && candidate.coverKey !== null) {
-        const coverKey =
-            typeof candidate.coverKey === "string" ? candidate.coverKey.trim() : "";
-        if (!/^yama\/[^/]+\/[^/]+$/.test(coverKey)) {
+        const parsedCoverKey = parseMountainCoverKey(candidate.coverKey);
+        if (!parsedCoverKey) {
             throw new Error("Invalid mountain cover key");
         }
-        result.coverKey = coverKey;
+        result.coverKey = parsedCoverKey.coverKey;
     }
 
     if (candidate.location !== undefined && candidate.location !== null) {

@@ -88,3 +88,23 @@ test("mountain editor rejects unknown contexts and incomplete coordinates", () =
         ),
     );
 });
+
+test("mountain editor accepts cover photos from any album folder", () => {
+    assert.deepEqual(
+        sanitizeMountainEntry(
+            {
+                name: "山",
+                elevation: null,
+                description: "",
+                coverKey: "y/2026-keelungyu/KCS00128.jpg",
+            },
+            contexts,
+        ),
+        {
+            name: "山",
+            elevation: null,
+            description: "",
+            coverKey: "y/2026-keelungyu/KCS00128.jpg",
+        },
+    );
+});

@@ -1,5 +1,6 @@
 import type { APIRoute } from "astro";
 
+import { parseMountainCoverKey } from "../../lib/mountain-editor";
 import {
     findMountainRegion,
     readMountainRegion,
@@ -28,18 +29,18 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     const mountainName = body.mountainName?.trim();
-    const coverKey = body.coverKey?.trim();
-    const match = coverKey?.match(/^yama\/([^/]+)\/([^/]+)$/);
-    if (!mountainName || !coverKey || !match) {
+    const parsedCoverKey = parseMountainCoverKey(body.coverKey);
+    if (!mountainName || !parsedCoverKey) {
         return json({ error: "Invalid mountain or cover photo" }, 400);
     }
 
-    const [, albumId, photoKey] = match;
+    const { coverKey, folder, albumId, photoKey } = parsedCoverKey;
     const path = await import("node:path");
     const fs = await import("node:fs/promises");
     const tagsFile = path.resolve(
         process.cwd(),
-        "src/album-tags/yama",
+        "src/album-tags",
+        folder,
         `${albumId}.json`,
     );
 
