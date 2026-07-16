@@ -1197,7 +1197,7 @@
             latitudeInput.value = mountain.location ? String(mountain.location.latitude) : "";
             longitudeInput.value = mountain.location ? String(mountain.location.longitude) : "";
             const contextId = mountain.location?.mapContext;
-            panoramaEnabled.checked = mountain.panorama === true;
+            panoramaEnabled.checked = mountain.panorama !== false;
             candidatesRoot.innerHTML = "";
             lookupStatus.textContent = "";
             panoramaFrame.removeAttribute("src");

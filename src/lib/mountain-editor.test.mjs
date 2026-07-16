@@ -71,6 +71,26 @@ test("mountain editor preserves an explicitly disabled panorama", () => {
     );
 });
 
+test("mountain editor allows panorama to default on before location is added", () => {
+    assert.deepEqual(
+        sanitizeMountainEntry(
+            {
+                name: "山",
+                elevation: null,
+                description: "",
+                panorama: true,
+            },
+            contexts,
+        ),
+        {
+            name: "山",
+            elevation: null,
+            description: "",
+            panorama: true,
+        },
+    );
+});
+
 test("mountain editor rejects unknown contexts and incomplete coordinates", () => {
     assert.throws(() =>
         sanitizeMountainEntry(

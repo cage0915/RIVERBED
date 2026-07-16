@@ -24,7 +24,7 @@ const {
     initialBounds,
     peakFinderEnabled = true,
 } = Astro.props;
-const hasPanorama = peakFinderEnabled && panorama === true;
+const hasPanorama = peakFinderEnabled && panorama !== false;
 const panoramaUrl = hasPanorama
     ? buildPeakFinderEmbedUrl({
           latitude,

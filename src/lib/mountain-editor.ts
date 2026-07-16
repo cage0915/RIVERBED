@@ -116,9 +116,6 @@ export function sanitizeMountainEntry(
         if (typeof candidate.panorama !== "boolean") {
             throw new Error("Invalid panorama settings");
         }
-        if (candidate.panorama && !result.location) {
-            throw new Error("Panorama requires a mountain location");
-        }
         result.panorama = candidate.panorama;
     }
 
