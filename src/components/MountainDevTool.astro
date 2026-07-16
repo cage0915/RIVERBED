@@ -74,6 +74,15 @@
                                 <path d="m16 16 4 4"></path>
                             </svg>
                         </button>
+                        <button
+                            id="dev-mountain-google-button"
+                            class="dev-mountain-secondary-button dev-mountain-grid-action dev-mountain-google-button"
+                            type="button"
+                            title="Search Google"
+                            aria-label="Search mountain elevation and coordinates on Google"
+                        >
+                            <span aria-hidden="true">G</span>
+                        </button>
                     </div>
                     <div id="dev-mountain-lookup-status" class="dev-mountain-help"></div>
                     <div id="dev-mountain-candidates" class="dev-mountain-candidates"></div>
@@ -415,7 +424,7 @@
         gap: 0.65rem;
     }
 
-    .dev-mountain-grid--lookup { grid-template-columns: minmax(0, 0.65fr) minmax(0, 1.35fr) 2.25rem; }
+    .dev-mountain-grid--lookup { grid-template-columns: minmax(0, 0.65fr) minmax(0, 1.35fr) repeat(2, 2.25rem); }
     .dev-mountain-grid--location { grid-template-columns: minmax(0, 0.72fr) repeat(2, minmax(0, 1fr)) 2.25rem; }
     .dev-mountain-grid--context { grid-template-columns: repeat(2, minmax(0, 1fr)) 2.25rem; }
 
@@ -485,6 +494,8 @@
         stroke-linejoin: round;
         stroke-width: 1.7;
     }
+
+    .dev-mountain-google-button { font-weight: 700; }
 
     .dev-mountain-context-picker {
         position: relative;
@@ -833,6 +844,7 @@
         const mountainTriggerLabel = byId<HTMLElement>("dev-mountain-trigger-label")!;
         const mountainMenu = byId<HTMLElement>("dev-mountain-menu")!;
         const lookupButton = byId<HTMLButtonElement>("dev-mountain-lookup-button")!;
+        const googleSearchButton = byId<HTMLButtonElement>("dev-mountain-google-button")!;
         const lookupStatus = byId<HTMLElement>("dev-mountain-lookup-status")!;
         const candidatesRoot = byId<HTMLElement>("dev-mountain-candidates")!;
         const elevationInput = byId<HTMLInputElement>("dev-mountain-elevation")!;
@@ -1464,6 +1476,18 @@
             } finally {
                 lookupButton.disabled = false;
             }
+        });
+
+        googleSearchButton.addEventListener("click", () => {
+            const mountainName =
+                currentMountain?.name.trim() || mountainSelect.value.trim();
+            if (!mountainName) return;
+            const query = `${mountainName}的高度和經緯度(十進位)`;
+            window.open(
+                `https://www.google.com/search?q=${encodeURIComponent(query)}`,
+                "_blank",
+                "noopener,noreferrer",
+            );
         });
 
         latitudeInput.addEventListener("input", updateMapMarker);
