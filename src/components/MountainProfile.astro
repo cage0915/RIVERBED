@@ -104,14 +104,14 @@ const hasMap =
         display: grid;
         gap: 2rem;
         margin: 0 auto 4rem;
-        padding: 1.5rem;
+        padding: 1.5rem 0;
         border-top: 1px solid rgb(255 255 255 / 0.07);
         border-bottom: 1px solid rgb(255 255 255 / 0.07);
     }
 
     .mountain-profile--split {
         grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr);
-        align-items: center;
+        align-items: start;
     }
 
     .mountain-profile--single {
@@ -133,15 +133,34 @@ const hasMap =
 
     .mountain-profile__details {
         min-width: 0;
-        padding: 0.75rem 0;
+        padding: 0;
+    }
+
+    @media (min-width: 768px) {
+        .mountain-profile--split:not(.mountain-profile--empty-map)
+            .mountain-profile__details {
+            display: flex;
+            height: var(--mountain-details-height, auto);
+            box-sizing: border-box;
+            flex-direction: column;
+            padding-top: var(--mountain-details-offset, 0);
+        }
+
+        .mountain-profile--split:not(.mountain-profile--empty-map)
+            .mountain-profile__description {
+            min-height: 0;
+            max-height: none;
+            flex: 1;
+        }
     }
 
     .mountain-profile__name {
-        margin: 0 0 2.25rem;
+        margin: 0 0 1.5rem;
         color: rgb(244 244 245);
         font-family: "Noto Sans TC", "Noto Sans JP", sans-serif;
         font-size: clamp(1.75rem, 3.8vw, 2.5rem);
         font-weight: 400;
+        line-height: 1;
         letter-spacing: 0.1em;
     }
 
@@ -150,7 +169,7 @@ const hasMap =
     }
 
     .mountain-profile__alternate-name {
-        margin: 0 0 2.25rem 0.35rem;
+        margin: 0 0 1.5rem 0.35rem;
         color: rgb(113 113 122);
         font-family: "Noto Sans TC", "Noto Sans JP", sans-serif;
         font-size: 0.8125rem;
@@ -165,7 +184,7 @@ const hasMap =
         margin: 0;
         color: rgb(244 244 245);
         font-family: "PT Sans", sans-serif;
-        font-size: clamp(1.875rem, 3.5vw, 2.75rem);
+        font-size: clamp(1.25rem, 2.333vw, 1.833rem);
         font-weight: 400;
         line-height: 1;
         letter-spacing: -0.025em;
@@ -179,12 +198,27 @@ const hasMap =
 
     .mountain-profile__description {
         max-width: 32rem;
+        max-height: min(18rem, 40vh);
         margin: 1.5rem 0 0;
+        padding-right: 0.75rem;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        scrollbar-color: rgb(113 113 122 / 0.65) transparent;
+        scrollbar-width: thin;
         color: rgb(161 161 170);
         font-size: 0.8125rem;
         font-weight: 300;
         line-height: 1.9;
         letter-spacing: 0.035em;
+    }
+
+    .mountain-profile__description::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .mountain-profile__description::-webkit-scrollbar-thumb {
+        border-radius: 999px;
+        background: rgb(113 113 122 / 0.65);
     }
 
     @media (max-width: 767px) {
@@ -208,7 +242,7 @@ const hasMap =
         }
 
         .mountain-profile__name {
-            margin-bottom: 1.75rem;
+            margin-bottom: 1.25rem;
         }
 
         .mountain-profile__name--with-alternate {
@@ -216,7 +250,76 @@ const hasMap =
         }
 
         .mountain-profile__alternate-name {
-            margin-bottom: 1.75rem;
+            margin-bottom: 1.25rem;
         }
     }
 </style>
+
+<script>
+    const initMountainProfileSizing = () => {
+        document
+            .querySelectorAll<HTMLElement>(".mountain-profile--split")
+            .forEach((profile) => {
+                if (profile.dataset.sizingReady === "true") return;
+                profile.dataset.sizingReady = "true";
+
+                const details = profile.querySelector<HTMLElement>(
+                    ".mountain-profile__details",
+                );
+                const viewer = profile.querySelector<HTMLElement>(
+                    ".mountain-viewer",
+                );
+                if (!details || !viewer) return;
+
+                let animationFrame = 0;
+                const updateSizing = () => {
+                    cancelAnimationFrame(animationFrame);
+                    animationFrame = requestAnimationFrame(() => {
+                        if (!window.matchMedia("(min-width: 768px)").matches) {
+                            profile.style.removeProperty("--mountain-details-height");
+                            profile.style.removeProperty("--mountain-details-offset");
+                            return;
+                        }
+
+                        const frame = viewer.querySelector<HTMLElement>(
+                            ".mountain-viewer__panel:not([hidden]) .mountain-map__frame, .mountain-viewer__panel:not([hidden]) .mountain-viewer__panorama-shell",
+                        );
+                        if (!frame) return;
+
+                        const detailsRect = details.getBoundingClientRect();
+                        const frameRect = frame.getBoundingClientRect();
+                        const tabs = viewer.querySelector<HTMLElement>(
+                            ".mountain-viewer__tabs",
+                        );
+                        const contentTop = tabs
+                            ? tabs.getBoundingClientRect().bottom
+                            : frameRect.top;
+                        profile.style.setProperty(
+                            "--mountain-details-offset",
+                            `${Math.max(0, contentTop - detailsRect.top)}px`,
+                        );
+                        profile.style.setProperty(
+                            "--mountain-details-height",
+                            `${Math.max(0, frameRect.bottom - detailsRect.top)}px`,
+                        );
+                    });
+                };
+
+                const resizeObserver = new ResizeObserver(updateSizing);
+                resizeObserver.observe(profile);
+                resizeObserver.observe(viewer);
+
+                const panelObserver = new MutationObserver(updateSizing);
+                panelObserver.observe(viewer, {
+                    attributes: true,
+                    attributeFilter: ["hidden"],
+                    subtree: true,
+                });
+
+                updateSizing();
+            });
+    };
+
+    initMountainProfileSizing();
+    document.addEventListener("astro:after-swap", initMountainProfileSizing);
+</script>
