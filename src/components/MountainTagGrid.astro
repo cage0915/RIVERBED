@@ -147,6 +147,9 @@ const sortedGroups = groups.map((group) => ({
                 const buttons = Array.from(
                     view.querySelectorAll<HTMLButtonElement>("[data-sort-key]"),
                 );
+                const cards = Array.from(
+                    view.querySelectorAll<HTMLElement>(".mountain-tag-card"),
+                );
 
                 const updateButtons = () => {
                     buttons.forEach((button) => {
@@ -200,6 +203,35 @@ const sortedGroups = groups.map((group) => ({
                         sortGroups();
                         updateButtons();
                     });
+                });
+
+                cards.forEach((card) => {
+                    card.addEventListener("click", (event) => {
+                        const isMobile = window.matchMedia(
+                            "(max-width: 768px) and (hover: none)",
+                        ).matches;
+                        if (!isMobile || card.classList.contains("show-info")) {
+                            return;
+                        }
+
+                        event.preventDefault();
+                        cards.forEach((otherCard) =>
+                            otherCard.classList.remove("show-info"),
+                        );
+                        card.classList.add("show-info");
+                    });
+                });
+
+                document.addEventListener("click", (event) => {
+                    const target = event.target;
+                    if (
+                        target instanceof Element &&
+                        !target.closest(".mountain-tag-card")
+                    ) {
+                        cards.forEach((card) =>
+                            card.classList.remove("show-info"),
+                        );
+                    }
                 });
             });
     };
@@ -347,15 +379,12 @@ const sortedGroups = groups.map((group) => ({
         }
     }
 
-    @media (hover: none) {
-        .mountain-tag-card__overlay {
-            justify-content: flex-end;
-            background: linear-gradient(
-                to top,
-                rgb(0 0 0 / 0.72),
-                rgb(0 0 0 / 0) 70%
-            );
-            color: white;
+    @media (max-width: 768px) and (hover: none) {
+        .mountain-tag-card.show-info img {
+            transform: scale(1.05);
+        }
+
+        .mountain-tag-card.show-info .mountain-tag-card__overlay {
             opacity: 1;
         }
     }
@@ -385,6 +414,11 @@ const sortedGroups = groups.map((group) => ({
         .mountain-tag-card:not(.mountain-tag-card--without-cover)
             .mountain-tag-card__overlay {
             display: none;
+        }
+
+        .mountain-tag-card.show-info:not(.mountain-tag-card--without-cover)
+            .mountain-tag-card__overlay {
+            display: flex;
         }
 
         .mountain-tag-card--without-cover .mountain-tag-card__overlay {
