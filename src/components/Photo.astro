@@ -8,11 +8,12 @@ interface Tag {
 interface Props {
     itemKey: string; // R2 key or bare filename (relative to the album)
     caption?: string;
+    tags?: Tag[];
 }
 
 import { getImageUrl, R2_DOMAIN } from "../lib/constants";
 
-const { itemKey } = Astro.props;
+const { itemKey, tags: providedTags } = Astro.props;
 
 // Resolve full R2 key: if itemKey is a bare filename (no "/"), derive
 // the folder/album prefix from the current URL path (/folder/album/...).
@@ -37,7 +38,7 @@ const allTags = import.meta.glob("/src/album-tags/**/*.json", {
 const [folder, album] = fullItemKey.split("/");
 const jsonPath = `/src/album-tags/${folder}/${album}.json`;
 const albumTags = (allTags[jsonPath] as any)?.default || {};
-const tags: Tag[] = albumTags[tagLookupKey] || [];
+const tags: Tag[] = providedTags ?? albumTags[tagLookupKey] ?? [];
 const imageUrl = getImageUrl(fullItemKey);
 const isDev = import.meta.env.DEV;
 const fallbackUrl = `${R2_DOMAIN}/${fullItemKey}`;

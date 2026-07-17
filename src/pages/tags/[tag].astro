@@ -154,36 +154,20 @@ function chunkArray<T>(array: T[], size: number): T[][] {
             )
         }
 
-        {
-            mountain && representativePhotoUrl ? (
-                <figure class="mountain-representative-photo">
-                    <img
-                        src={representativePhotoUrl}
-                        alt={`${decodedTag} cover photo`}
-                        loading="eager"
-                        onerror={
-                            isDev && representativePhotoFallbackUrl
-                                ? `this.onerror=null; this.src='${representativePhotoFallbackUrl}';`
-                                : undefined
-                        }
-                    />
-                    {isDev && (
-                        <button
-                            class="mountain-cover-chooser"
-                            type="button"
-                        >
-                            Change cover photo
-                        </button>
-                    )}
-                </figure>
-            ) : mountain && isDev ? (
-                <div class="mountain-cover-empty">
-                    <button class="mountain-cover-chooser" type="button">
-                        Choose cover photo
-                    </button>
-                </div>
-            ) : null
-        }
+        {mountain && representativePhotoUrl && (
+            <figure class="mountain-representative-photo">
+                <img
+                    src={representativePhotoUrl}
+                    alt={`${decodedTag} cover photo`}
+                    loading="eager"
+                    onerror={
+                        isDev && representativePhotoFallbackUrl
+                            ? `this.onerror=null; this.src='${representativePhotoFallbackUrl}';`
+                            : undefined
+                    }
+                />
+            </figure>
+        )}
         {mountain && isDev && (
             <p class="mountain-cover-status" aria-live="polite" />
         )}
@@ -203,19 +187,27 @@ function chunkArray<T>(array: T[], size: number): T[][] {
                                 <Row cols={chunk.length}>
                                     {chunk.map((photo) => (
                                         <div
-                                            class="tag-photo-entry"
+                                            class:list={[
+                                                "tag-photo-entry",
+                                                photo.itemKey === representativePhotoKey &&
+                                                    "tag-photo-entry--cover",
+                                            ]}
                                             data-cover-key={photo.itemKey}
                                         >
                                             <Photo
                                                 itemKey={photo.itemKey}
                                                 caption={photo.caption}
+                                                tags={photo.tags}
                                             />
                                             {isDev && mountain && (
                                                 <button
                                                     class="mountain-cover-choice"
                                                     type="button"
+                                                    disabled={photo.itemKey === representativePhotoKey}
                                                 >
-                                                    Set as cover
+                                                    {photo.itemKey === representativePhotoKey
+                                                        ? "Cover photo"
+                                                        : "Set as cover"}
                                                 </button>
                                             )}
                                         </div>
@@ -264,15 +256,6 @@ function chunkArray<T>(array: T[], size: number): T[][] {
         background: #1a1a1a;
     }
 
-    .mountain-cover-empty {
-        display: grid;
-        min-height: 9rem;
-        place-items: center;
-        margin: -1.5rem 0 4rem;
-        border: 1px dashed rgb(255 255 255 / 0.14);
-    }
-
-    .mountain-cover-chooser,
     .mountain-cover-choice {
         border: 1px solid rgb(255 255 255 / 0.2);
         border-radius: 999px;
@@ -283,17 +266,6 @@ function chunkArray<T>(array: T[], size: number): T[][] {
         transition: border-color 0.2s ease, background 0.2s ease;
     }
 
-    .mountain-cover-chooser {
-        padding: 0.55rem 0.9rem;
-    }
-
-    .mountain-representative-photo .mountain-cover-chooser {
-        position: absolute;
-        right: 1rem;
-        bottom: 1rem;
-    }
-
-    .mountain-cover-chooser:hover,
     .mountain-cover-choice:hover {
         border-color: rgb(255 255 255 / 0.45);
         background: rgb(18 18 18 / 0.95);
@@ -307,6 +279,10 @@ function chunkArray<T>(array: T[], size: number): T[][] {
         text-align: center;
     }
 
+    .mountain-cover-status:empty {
+        display: none;
+    }
+
     .tag-photo-entry {
         position: relative;
         min-width: 0;
@@ -317,24 +293,21 @@ function chunkArray<T>(array: T[], size: number): T[][] {
         top: 0.75rem;
         right: 0.75rem;
         z-index: 20;
-        display: none;
+        display: block;
         padding: 0.45rem 0.7rem;
     }
 
-    .tag-page.is-choosing-cover .mountain-cover-choice {
-        display: block;
-    }
-
-    .tag-page.is-choosing-cover .tag-photo-entry:has(.mountain-cover-choice) {
-        outline: 1px solid rgb(255 255 255 / 0.22);
-        outline-offset: 2px;
+    .tag-photo-entry--cover .mountain-cover-choice {
+        border-color: rgb(212 175 55 / 0.95);
+        background: rgb(18 18 18 / 0.9);
+        color: rgb(254 240 138);
+        cursor: default;
     }
 
     .mountain-representative-photo img {
         display: block;
         width: 100%;
-        aspect-ratio: 16 / 9;
-        object-fit: cover;
+        height: auto;
     }
 
     .tag-photos {
@@ -383,29 +356,45 @@ function chunkArray<T>(array: T[], size: number): T[][] {
 </style>
 
 <script>
+    const COVER_SCROLL_RESET_KEY = "riverbed:mountain-cover:scroll-top";
+
+    const setCoverScrollReset = (enabled: boolean) => {
+        try {
+            if (enabled) sessionStorage.setItem(COVER_SCROLL_RESET_KEY, "true");
+            else sessionStorage.removeItem(COVER_SCROLL_RESET_KEY);
+        } catch {
+            // Cover selection still works if session storage is unavailable.
+        }
+    };
+
+    const resetCoverSaveScrollPosition = () => {
+        try {
+            if (sessionStorage.getItem(COVER_SCROLL_RESET_KEY) !== "true") return;
+        } catch {
+            return;
+        }
+
+        history.scrollRestoration = "manual";
+        const forcePageTop = () => window.scrollTo(0, 0);
+        forcePageTop();
+        window.addEventListener("pageshow", forcePageTop, { once: true });
+        requestAnimationFrame(forcePageTop);
+        window.setTimeout(forcePageTop, 100);
+        window.setTimeout(() => {
+            forcePageTop();
+            setCoverScrollReset(false);
+            history.scrollRestoration = "auto";
+        }, 500);
+    };
+
     const initMountainCoverChooser = () => {
         const page = document.querySelector<HTMLElement>(".tag-page[data-tag-name]");
         if (!page) return;
 
         const status = page.querySelector<HTMLElement>(".mountain-cover-status");
-        const chooserButtons = page.querySelectorAll<HTMLButtonElement>(
-            ".mountain-cover-chooser",
-        );
         const choiceButtons = page.querySelectorAll<HTMLButtonElement>(
             ".mountain-cover-choice",
         );
-
-        chooserButtons.forEach((button) => {
-            button.addEventListener("click", () => {
-                const isChoosing = page.classList.toggle("is-choosing-cover");
-                button.textContent = isChoosing ? "Cancel selection" : "Choose cover photo";
-                if (status) {
-                    status.textContent = isChoosing
-                        ? "Choose a cover photo for this mountain below."
-                        : "";
-                }
-            });
-        });
 
         choiceButtons.forEach((button) => {
             button.addEventListener("click", async () => {
@@ -416,6 +405,7 @@ function chunkArray<T>(array: T[], size: number): T[][] {
 
                 choiceButtons.forEach((candidate) => (candidate.disabled = true));
                 if (status) status.textContent = "Saving cover…";
+                setCoverScrollReset(true);
 
                 try {
                     const response = await fetch("/api/mountain-cover", {
@@ -428,11 +418,55 @@ function chunkArray<T>(array: T[], size: number): T[][] {
                         throw new Error(result.error || "Unable to save cover");
                     }
                     if (status) status.textContent = "Cover saved.";
-                    window.location.reload();
+
+                    choiceButtons.forEach((candidate) => {
+                        const candidateEntry = candidate.closest<HTMLElement>(
+                            ".tag-photo-entry",
+                        );
+                        const isCover = candidateEntry === entry;
+                        candidateEntry?.classList.toggle(
+                            "tag-photo-entry--cover",
+                            isCover,
+                        );
+                        candidate.disabled = isCover;
+                        candidate.textContent = isCover
+                            ? "Cover photo"
+                            : "Set as cover";
+                    });
+
+                    const sourceImage = entry.querySelector<HTMLImageElement>("img");
+                    const sourceUrl = sourceImage?.currentSrc || sourceImage?.src;
+                    if (sourceUrl) {
+                        let figure = page.querySelector<HTMLElement>(
+                            ".mountain-representative-photo",
+                        );
+                        if (!figure) {
+                            figure = document.createElement("figure");
+                            figure.className = "mountain-representative-photo";
+                            const image = document.createElement("img");
+                            image.alt = `${mountainName} cover photo`;
+                            image.loading = "eager";
+                            figure.append(image);
+                            status?.before(figure);
+                        }
+                        const coverImage = figure.querySelector<HTMLImageElement>("img");
+                        if (coverImage) coverImage.src = sourceUrl;
+                    }
+
+                    history.scrollRestoration = "manual";
+                    window.scrollTo(0, 0);
+                    requestAnimationFrame(() => window.scrollTo(0, 0));
+                    window.setTimeout(() => {
+                        setCoverScrollReset(false);
+                        history.scrollRestoration = "auto";
+                    }, 3_000);
                 } catch (error) {
-                    choiceButtons.forEach(
-                        (candidate) => (candidate.disabled = false),
-                    );
+                    setCoverScrollReset(false);
+                    choiceButtons.forEach((candidate) => {
+                        candidate.disabled = Boolean(
+                            candidate.closest(".tag-photo-entry--cover"),
+                        );
+                    });
                     if (status) {
                         status.textContent =
                             error instanceof Error
@@ -444,6 +478,7 @@ function chunkArray<T>(array: T[], size: number): T[][] {
         });
     };
 
+    resetCoverSaveScrollPosition();
     initMountainCoverChooser();
     document.addEventListener("astro:after-swap", initMountainCoverChooser);
 
