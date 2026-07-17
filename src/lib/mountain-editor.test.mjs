@@ -10,6 +10,7 @@ test("mountain editor stores panorama as a boolean and omits lookup metadata", (
         sanitizeMountainEntry(
             {
                 name: " 大霸尖山 ",
+                alternateName: " Papak Waqa ",
                 elevation: "3492",
                 description: " 測試描述 ",
                 location: {
@@ -33,6 +34,7 @@ test("mountain editor stores panorama as a boolean and omits lookup metadata", (
         ),
         {
             name: "大霸尖山",
+            alternateName: "Papak Waqa",
             elevation: 3492,
             description: "測試描述",
             location: {

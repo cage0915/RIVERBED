@@ -84,6 +84,14 @@
                             <span aria-hidden="true">G</span>
                         </button>
                     </div>
+                    <label class="dev-mountain-field">
+                        <span>Alternate Name / Kana</span>
+                        <input
+                            id="dev-mountain-alternate-name"
+                            type="text"
+                            maxlength="200"
+                        />
+                    </label>
                     <div id="dev-mountain-lookup-status" class="dev-mountain-help"></div>
                     <div id="dev-mountain-candidates" class="dev-mountain-candidates"></div>
                     <div class="dev-mountain-grid dev-mountain-grid--location">
@@ -896,6 +904,7 @@
         const googleSearchButton = byId<HTMLButtonElement>("dev-mountain-google-button")!;
         const lookupStatus = byId<HTMLElement>("dev-mountain-lookup-status")!;
         const candidatesRoot = byId<HTMLElement>("dev-mountain-candidates")!;
+        const alternateNameInput = byId<HTMLInputElement>("dev-mountain-alternate-name")!;
         const elevationInput = byId<HTMLInputElement>("dev-mountain-elevation")!;
         const latitudeInput = byId<HTMLInputElement>("dev-mountain-latitude")!;
         const longitudeInput = byId<HTMLInputElement>("dev-mountain-longitude")!;
@@ -1254,6 +1263,7 @@
             mountainTriggerLabel.textContent = mountain.name;
             renderMountainMenu();
             currentMountain = structuredClone(mountain);
+            alternateNameInput.value = mountain.alternateName ?? "";
             elevationInput.value = mountain.elevation === null ? "" : String(mountain.elevation);
             descriptionInput.value = mountain.description;
             latitudeInput.value = mountain.location ? String(mountain.location.latitude) : "";
@@ -1372,6 +1382,9 @@
 
             const mountain: EditableMountain = {
                 name: currentMountain.name,
+                ...(alternateNameInput.value.trim()
+                    ? { alternateName: alternateNameInput.value.trim() }
+                    : {}),
                 elevation: numberOrUndefined(elevationInput) ?? null,
                 description: descriptionInput.value.trim(),
                 ...(currentMountain.coverKey

@@ -12,6 +12,7 @@ export type MountainLocation = {
 
 export type Mountain = {
     name: string;
+    alternateName?: string;
     elevation: number | null;
     description: string;
     coverKey?: string;
@@ -54,7 +55,19 @@ const hasMap =
     aria-label={`${mountain.name} basic information`}
 >
     <div class="mountain-profile__details">
-        <h1 class="mountain-profile__name">{mountain.name}</h1>
+        <h1
+            class:list={[
+                "mountain-profile__name",
+                mountain.alternateName && "mountain-profile__name--with-alternate",
+            ]}
+        >
+            {mountain.name}
+        </h1>
+        {mountain.alternateName && (
+            <p class="mountain-profile__alternate-name">
+                {mountain.alternateName}
+            </p>
+        )}
         {mountain.elevation !== null && (
             <p class="mountain-profile__elevation">
                 <span>{mountain.elevation.toLocaleString("en-US")}</span>
@@ -129,6 +142,19 @@ const hasMap =
         letter-spacing: 0.1em;
     }
 
+    .mountain-profile__name--with-alternate {
+        margin-bottom: 0.45rem;
+    }
+
+    .mountain-profile__alternate-name {
+        margin: 0 0 2.25rem 0.35rem;
+        color: rgb(113 113 122);
+        font-family: "Noto Sans TC", "Noto Sans JP", sans-serif;
+        font-size: 0.8125rem;
+        font-weight: 300;
+        letter-spacing: 0.08em;
+    }
+
     .mountain-profile__elevation {
         display: flex;
         align-items: baseline;
@@ -179,6 +205,14 @@ const hasMap =
         }
 
         .mountain-profile__name {
+            margin-bottom: 1.75rem;
+        }
+
+        .mountain-profile__name--with-alternate {
+            margin-bottom: 0.4rem;
+        }
+
+        .mountain-profile__alternate-name {
             margin-bottom: 1.75rem;
         }
     }

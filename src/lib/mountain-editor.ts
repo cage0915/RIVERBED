@@ -3,6 +3,7 @@ import { isValidMapBounds } from "./mountain-map.ts";
 
 export type EditableMountain = {
     name: string;
+    alternateName?: string;
     elevation: number | null;
     description: string;
     coverKey?: string;
@@ -68,12 +69,25 @@ export function sanitizeMountainEntry(
         typeof candidate.description === "string" ? candidate.description.trim() : "";
     if (description.length > 5000) throw new Error("Description is too long");
 
+    const alternateName =
+        typeof candidate.alternateName === "string"
+            ? candidate.alternateName.trim()
+            : "";
+    if (alternateName.length > 200) {
+        throw new Error("Alternate mountain name is too long");
+    }
+
     let elevation: number | null = null;
     if (candidate.elevation !== null && candidate.elevation !== undefined && candidate.elevation !== "") {
         elevation = optionalNumber(candidate.elevation, -500, 9000) ?? null;
     }
 
-    const result: EditableMountain = { name, elevation, description };
+    const result: EditableMountain = {
+        name,
+        ...(alternateName ? { alternateName } : {}),
+        elevation,
+        description,
+    };
 
     if (candidate.coverKey !== undefined && candidate.coverKey !== null) {
         const parsedCoverKey = parseMountainCoverKey(candidate.coverKey);

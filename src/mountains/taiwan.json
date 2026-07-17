@@ -195,6 +195,7 @@
   },
   {
     "name": "大霸尖山",
+    "alternateName": "B'bu' Papak",
     "elevation": 3492,
     "description": "",
     "coverKey": "yama/2023-da-xiao-bajianshan/08.jpg",
@@ -357,15 +358,16 @@
   },
   {
     "name": "北大武山",
+    "alternateName": "Kavulungan",
     "elevation": 3092,
     "description": "",
+    "coverKey": "yama/2026-jiaminghu-1/KCS04425.jpg",
     "location": {
       "latitude": 22.6269,
       "longitude": 120.76098,
       "mapContext": "tw-mainland"
     },
-    "panorama": true,
-    "coverKey": "yama/2026-jiaminghu-1/KCS04425.jpg"
+    "panorama": true
   },
   {
     "name": "北坑山",
@@ -469,6 +471,7 @@
   },
   {
     "name": "玉山主峰",
+    "alternateName": "Patungkuonʉ",
     "elevation": 3952,
     "description": "台灣最高峰，東北亞第一高峰。",
     "coverKey": "yama/2024-alishan-yushan/KCS00743.jpg",
@@ -710,6 +713,7 @@
   },
   {
     "name": "秀姑巒山",
+    "alternateName": "Maqudas",
     "elevation": 3860,
     "description": "",
     "coverKey": "yama/2026-jiaminghu-2/KCS04256.jpg",
@@ -920,6 +924,7 @@
   },
   {
     "name": "南湖大山",
+    "alternateName": "B'bu' Topuk",
     "elevation": 3740,
     "description": "",
     "coverKey": "yama/2025-taoshan/KCS02915.jpg",
@@ -1154,6 +1159,7 @@
   },
   {
     "name": "雪山主峰",
+    "alternateName": "B'bu' Hagay",
     "elevation": 3886,
     "description": "",
     "coverKey": "yama/2024-dajian/KCS01495.jpg",
