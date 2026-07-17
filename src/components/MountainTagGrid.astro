@@ -1,5 +1,5 @@
 ---
-import { getImageUrl, R2_DOMAIN } from "../lib/constants";
+import { getThumbnailUrl, R2_DOMAIN } from "../lib/constants";
 import {
     DEFAULT_MOUNTAIN_TAG_SORT,
     sortMountainTags,
@@ -28,7 +28,6 @@ const {
     groups,
     tagColumns = DEFAULT_MOUNTAIN_VIEW_SETTINGS.tagColumns,
 } = Astro.props;
-const isDev = import.meta.env.DEV;
 const sortedGroups = groups.map((group) => ({
     ...group,
     mountains: sortMountainTags(group.mountains, DEFAULT_MOUNTAIN_TAG_SORT),
@@ -75,7 +74,7 @@ const sortedGroups = groups.map((group) => ({
                 <div class="mountain-tag-grid">
                     {group.mountains.map((mountain) => {
                         const coverUrl = mountain.coverKey
-                            ? getImageUrl(mountain.coverKey)
+                            ? getThumbnailUrl(mountain.coverKey, 480)
                             : undefined;
                         const fallbackUrl = mountain.coverKey
                             ? `${R2_DOMAIN}/${mountain.coverKey}`
@@ -100,8 +99,9 @@ const sortedGroups = groups.map((group) => ({
                                             src={coverUrl}
                                             alt={`${mountain.name} cover photo`}
                                             loading="lazy"
+                                            decoding="async"
                                             onerror={
-                                                isDev && fallbackUrl
+                                                fallbackUrl
                                                     ? `this.onerror=null; this.src='${fallbackUrl}';`
                                                     : undefined
                                             }

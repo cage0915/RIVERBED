@@ -30,3 +30,10 @@ export const getImageUrl = (itemKey: string) => {
         ? `/r2/${itemKey}`
         : `${R2_DOMAIN}/${itemKey}`;
 };
+
+export const getThumbnailUrl = (itemKey: string, width = 480) => {
+    if (import.meta.env.DEV) return `/r2/${itemKey}`;
+
+    const safeWidth = Math.max(1, Math.round(width));
+    return `${R2_DOMAIN}/cdn-cgi/image/width=${safeWidth},quality=75,format=auto,onerror=redirect/${itemKey}`;
+};
