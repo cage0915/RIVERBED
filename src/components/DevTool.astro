@@ -1196,7 +1196,9 @@
                     }
                     return b;
                 });
-                let collapsedBlocks = new Set(currentBlocks.map((_: any, i: number) => i)); // All collapsed by default
+                let collapsedBlocks: Set<number> = new Set(
+                    currentBlocks.map((_: any, i: number) => i),
+                ); // All collapsed by default
                 let captionOpenBlocks = new Set(); // Track open caption editors
                 let selectedPhoto: {bIdx: number, pIdx: number} | null = null;
                 let selectedBlock: number | null = null;
@@ -1715,7 +1717,7 @@
                             animation: 150,
                             ghostClass: 'dev-pm-ghost',
                             draggable: '.dev-pm-photo',
-                            onEnd: (evt) => {
+                            onEnd: (evt: any) => {
                                 const fromIdx = parseInt(evt.from.dataset.blockIdx);
                                 const toIdx = parseInt(evt.to.dataset.blockIdx);
                                 if (fromIdx === toIdx && evt.oldIndex === evt.newIndex) return;
@@ -1738,7 +1740,7 @@
                         ghostClass: 'dev-pm-ghost',
                         draggable: '.dev-pm-block',
                         handle: '.dev-pm-block-header',
-                        onEnd: (evt) => {
+                        onEnd: (evt: any) => {
                             const [moved] = currentBlocks.splice(evt.oldIndex, 1);
                             currentBlocks.splice(evt.newIndex, 0, moved);
                         }
@@ -2356,7 +2358,7 @@
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({
                                 folder,
-                                order: currentAlbums.map(a => a.slug),
+                                order: currentAlbums.map((album: any) => album.slug),
                                 albums: currentAlbums.map((album: any) => ({
                                     slug: album.slug,
                                     coverKey: album.coverKey || '',

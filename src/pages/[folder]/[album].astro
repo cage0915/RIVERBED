@@ -258,7 +258,7 @@ const titleSections = extractTitleSections(albumEntry.body);
     let breadcrumbObserver: IntersectionObserver | null = null;
     let areAllTagsVisible = false;
 
-    const slugifySectionTitle = (value) => value
+    const slugifySectionTitle = (value: string) => value
         .toLowerCase()
         .normalize("NFKD")
         .replace(/[\u0300-\u036f]/g, "")
@@ -285,7 +285,7 @@ const titleSections = extractTitleSections(albumEntry.body);
             node.id = nextCount === 1 ? baseSlug : `${baseSlug}-${nextCount}`;
         });
 
-        const updateActiveBreadcrumb = (activeId) => {
+        const updateActiveBreadcrumb = (activeId: string) => {
             breadcrumbLinks.forEach((link) => {
                 const isActive = link.getAttribute("data-album-breadcrumb") === activeId;
                 link.toggleAttribute("data-active", isActive);
