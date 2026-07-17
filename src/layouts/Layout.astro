@@ -336,6 +336,16 @@ const folderFooter = currentFolderSlug ? getFolderFooter(currentFolderSlug) : nu
 				)
 					return;
 
+				const eventTarget = e.target;
+				if (
+					eventTarget instanceof Element &&
+					eventTarget.closest(
+						"dialog, input, textarea, select, [contenteditable='true'], [role='textbox']",
+					)
+				) {
+					return;
+				}
+
 				const targets = Array.from(
 					document.querySelectorAll(
 						".photo-row, .album-card, .folder-card",

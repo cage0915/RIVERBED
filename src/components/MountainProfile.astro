@@ -45,43 +45,43 @@ const hasMap =
     isMapContextId(location.mapContext);
 ---
 
-{
-    (mountain.elevation !== null || description || hasMap) && (
-        <section
-            class:list={[
-                "mountain-profile",
-                hasMap ? "mountain-profile--split" : "mountain-profile--single",
-            ]}
-            aria-label={`${mountain.name} basic information`}
-        >
-            <div class="mountain-profile__details">
-                <h1 class="mountain-profile__name">{mountain.name}</h1>
-                {mountain.elevation !== null && (
-                    <p class="mountain-profile__elevation">
-                        <span>{mountain.elevation.toLocaleString("en-US")}</span>
-                        <span class="mountain-profile__unit">m</span>
-                    </p>
-                )}
-                {description && (
-                    <p class="mountain-profile__description">{description}</p>
-                )}
-            </div>
+<section
+    class:list={[
+        "mountain-profile",
+        "mountain-profile--split",
+        !hasMap && "mountain-profile--empty-map",
+    ]}
+    aria-label={`${mountain.name} basic information`}
+>
+    <div class="mountain-profile__details">
+        <h1 class="mountain-profile__name">{mountain.name}</h1>
+        {mountain.elevation !== null && (
+            <p class="mountain-profile__elevation">
+                <span>{mountain.elevation.toLocaleString("en-US")}</span>
+                <span class="mountain-profile__unit">m</span>
+            </p>
+        )}
+        {description && (
+            <p class="mountain-profile__description">{description}</p>
+        )}
+    </div>
 
-            {hasMap && location && isMapContextId(location.mapContext) && (
-                <MountainViewer
-                    latitude={location.latitude}
-                    longitude={location.longitude}
-                    contextId={location.mapContext}
-                    mountainName={mountain.name}
-                    elevation={mountain.elevation}
-                    panorama={mountain.panorama}
-                    initialBounds={location.initialBounds}
-                    peakFinderEnabled={peakFinderEnabled}
-                />
-            )}
-        </section>
-    )
-}
+    {hasMap && location && isMapContextId(location.mapContext) && (
+        <MountainViewer
+            latitude={location.latitude}
+            longitude={location.longitude}
+            contextId={location.mapContext}
+            mountainName={mountain.name}
+            elevation={mountain.elevation}
+            panorama={mountain.panorama}
+            initialBounds={location.initialBounds}
+            peakFinderEnabled={peakFinderEnabled}
+        />
+    )}
+    {!hasMap && (
+        <div class="mountain-profile__viewer-placeholder" aria-hidden="true" />
+    )}
+</section>
 
 <style>
     .mountain-profile {
@@ -100,6 +100,19 @@ const hasMap =
 
     .mountain-profile--single {
         grid-template-columns: minmax(0, 1fr);
+    }
+
+    .mountain-profile__viewer-placeholder {
+        min-width: 0;
+        padding-top: 2.25rem;
+        padding-bottom: 1rem;
+    }
+
+    .mountain-profile__viewer-placeholder::after {
+        display: block;
+        width: 100%;
+        aspect-ratio: 16 / 10;
+        content: "";
     }
 
     .mountain-profile__details {
@@ -159,6 +172,10 @@ const hasMap =
 
         .mountain-profile__details {
             padding: 0 0.25rem;
+        }
+
+        .mountain-profile__viewer-placeholder {
+            display: none;
         }
 
         .mountain-profile__name {

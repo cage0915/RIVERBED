@@ -7,7 +7,6 @@ import MountainProfile, {
 } from "../../components/MountainProfile.astro";
 import { getAllPhotosWithTags } from "../../utils/tags";
 import { allMountains as mountainsData } from "../../lib/mountains";
-import { isMapContextId } from "../../lib/mountain-map";
 import { getImageUrl, R2_DOMAIN } from "../../lib/constants";
 
 export const prerender = false;
@@ -22,15 +21,6 @@ const allPhotos = await getAllPhotosWithTags();
 const decodedTag = decodeURIComponent(tag);
 const mountain = (mountainsData as Mountain[]).find(
     (entry) => entry.name === decodedTag,
-);
-const hasMountainProfile = Boolean(
-    mountain &&
-        (mountain.elevation !== null ||
-            mountain.description.trim() ||
-            (mountain.location &&
-                Number.isFinite(mountain.location.latitude) &&
-                Number.isFinite(mountain.location.longitude) &&
-                isMapContextId(mountain.location.mapContext))),
 );
 const matchingPhotos = allPhotos.filter((photo) =>
     photo.tags.some((t) => t.name === decodedTag),
@@ -155,7 +145,7 @@ function chunkArray<T>(array: T[], size: number): T[][] {
         data-tag-name={decodedTag}
     >
         {
-            hasMountainProfile && mountain ? (
+            mountain ? (
                 <MountainProfile mountain={mountain} />
             ) : (
                 <h1 class="text-xl font-sans tracking-widest uppercase mb-6 text-center">

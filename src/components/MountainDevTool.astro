@@ -294,10 +294,6 @@
         left: 1.5rem;
     }
 
-    .mountain-profile--dev-manager .mountain-profile__details {
-        padding-left: 3rem;
-    }
-
     .dev-mountain-manager-button svg,
     .dev-mountain-icon-button svg {
         width: 1.1rem;
@@ -877,11 +873,13 @@
         const dialog = byId<HTMLDialogElement>("dev-mountain-manager");
         if (!button || !dialog) return;
 
-        const mountainProfile = document.querySelector<HTMLElement>(".mountain-profile");
-        if (mountainProfile && button.parentElement !== mountainProfile) {
-            mountainProfile.classList.add("mountain-profile--dev-manager");
+        const managerAnchor =
+            document.querySelector<HTMLElement>(".mountain-profile") ??
+            document.querySelector<HTMLElement>(".tag-page");
+        if (managerAnchor && button.parentElement !== managerAnchor) {
+            managerAnchor.classList.add("mountain-profile--dev-manager");
             button.classList.add("dev-mountain-manager-button--in-profile");
-            mountainProfile.append(button);
+            managerAnchor.append(button);
         }
 
         if (button.dataset.initialized === "true") return;
@@ -1443,19 +1441,31 @@
             if (!mountainMenu.hidden && !mountainPicker.contains(event.target as Node)) closeMountainMenu();
         });
 
-        mountainSelect.addEventListener("change", () => {
+        mountainSelect.addEventListener("change", async () => {
             const mountainName = mountainSelect.value;
             loadMountain(mountainName);
+            const copyMountainName = navigator.clipboard?.writeText
+                ? navigator.clipboard.writeText(mountainName).then(
+                    () => true,
+                    () => false,
+                )
+                : Promise.resolve(false);
             const pathParts = location.pathname.split("/").filter(Boolean);
             const currentTag = pathParts[0] === "tags" && pathParts[1]
                 ? decodeURIComponent(pathParts[1])
                 : "";
-            if (currentTag === mountainName) return;
-            try {
-                sessionStorage.setItem(REOPEN_MANAGER_KEY, "true");
-            } catch {
-                // Navigation still works if session storage is unavailable.
+            if (currentTag === mountainName) {
+                const copied = await copyMountainName;
+                setStatus(
+                    copied
+                        ? `Copied “${mountainName}” to the clipboard.`
+                        : `Selected “${mountainName}”. Clipboard access was unavailable.`,
+                    !copied,
+                );
+                return;
             }
+            clearPreservedManagerState();
+            await copyMountainName;
             location.assign(`/tags/${encodeURIComponent(mountainName)}`);
         });
 
