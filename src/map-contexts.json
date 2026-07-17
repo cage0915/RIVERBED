@@ -1,17 +1,5 @@
 {
   "contexts": {
-    "jp-northern-alps": {
-      "id": "jp-northern-alps",
-      "label": "日本北阿爾卑斯",
-      "level": "region",
-      "source": "japan",
-      "bounds": {
-        "west": 136.95,
-        "south": 35.7,
-        "east": 138.4,
-        "north": 37.25
-      }
-    },
     "tw-mainland": {
       "id": "tw-mainland",
       "label": "台灣本島",
