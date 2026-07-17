@@ -255,15 +255,16 @@
   },
   {
     "name": "中央尖山",
-    "elevation": 3703,
-    "description": "",
+    "alternateName": "B'bu Sgaga",
+    "elevation": 3705,
+    "description": "第一次注意到中央尖山是在2024年[志佳陽上雪山](/yama/2024-zhijiayang-xueshan)，第二天從飄簞山屋往志佳陽大山的路線上。當時將要日出，中央尖背著橘紅色天空的剪影很是醒目。從雪山山脈一帶看過去的山形形似鯊魚背鰭，從南北方向望去則是一座由石英砂岩和礫岩構成的金字塔。\n路線有挑戰性，是一座我想在更有經驗後才拜訪的一座山。",
+    "coverKey": "yama/2024-hehuanbei/KCS03808.jpg",
     "location": {
       "latitude": 24.3103,
       "longitude": 121.41601,
       "mapContext": "tw-mainland"
     },
-    "panorama": true,
-    "coverKey": "yama/2024-hehuanbei/KCS03808.jpg"
+    "panorama": true
   },
   {
     "name": "中央尖山東峰",
@@ -1486,7 +1487,7 @@
   {
     "name": "關山",
     "elevation": 3668,
-    "description": "",
+    "description": "典型的橫看成嶺側成峰。南北狹長，從北方的玉山、南方的海諾南山、卑南主山方向看來像金字塔，從東北方的向陽山、三叉山來看則是東緩西陡的單面山地形。\n期待有一天可以從海諾南山望向關山。",
     "coverKey": "yama/2026-jiaminghu-2/KCS04012.jpg",
     "location": {
       "latitude": 23.22861,
