@@ -21,6 +21,7 @@ const extractTitleSections = (body: string) => {
 
     for (const match of body.matchAll(titleBlockPattern)) {
         const label = match[1]
+            .replace(/\[([^\]\n]+)\]\([^)]+\)/g, "$1")
             .replace(/<[^>]+>/g, " ")
             .replace(/\s+/g, " ")
             .trim();

@@ -1,5 +1,6 @@
 ---
 import MountainViewer from "./MountainViewer.astro";
+import RichText from "./RichText.astro";
 import { isMapContextId, type MapBounds } from "../lib/mountain-map";
 import { resolveFeatureFlag } from "../lib/feature-flags";
 
@@ -75,7 +76,9 @@ const hasMap =
             </p>
         )}
         {description && (
-            <p class="mountain-profile__description">{description}</p>
+            <p class="mountain-profile__description">
+                <RichText text={description} />
+            </p>
         )}
     </div>
 

@@ -1,4 +1,6 @@
 ---
+import RichText from "./RichText.astro";
+
 interface Props {
     /** Optional gap between slides (CSS value, default "1rem") */
     gap?: string;
@@ -71,7 +73,7 @@ const slideWidthPercent = 100 - peekPercent;
 >
     {caption && parsedPos === 'top' && (
         <div class="photo-caption top" style={`text-align: ${parsedAlign};`}>
-            {caption}
+            <RichText text={caption} />
         </div>
     )}
 
@@ -88,7 +90,7 @@ const slideWidthPercent = 100 - peekPercent;
 
     {caption && parsedPos === 'bottom' && (
         <div class="photo-caption bottom" style={`text-align: ${parsedAlign};`}>
-            {caption}
+            <RichText text={caption} />
         </div>
     )}
 </section>

@@ -1282,7 +1282,7 @@
                                     const mb = block.props.mb || '';
                                     return `
                                         <div style="display: flex; flex-direction: column; gap: 0.5rem; padding: 0.5rem 0;">
-                                            <textarea class="text-block-content" placeholder="Enter text..." style="width: 100%; box-sizing: border-box; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 0.85rem; min-height: 60px; resize: vertical; font-family: inherit;">${block.text || ''}</textarea>
+                                            <textarea class="text-block-content" placeholder="Enter text... Links: [text](/path) or [text](https://example.com)" style="width: 100%; box-sizing: border-box; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 0.85rem; min-height: 60px; resize: vertical; font-family: inherit;">${block.text || ''}</textarea>
                                             <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
                                                 <select class="text-block-align" style="flex: 1; min-width: 80px; font-size: 0.75rem; padding: 4px; border: 1px solid #ddd; border-radius: 4px; background: white;">
                                                     <option value="left" ${align === 'left' ? 'selected' : ''}>Left</option>
@@ -1325,7 +1325,7 @@
                                     const renderEditor = (vpos: 'top' | 'bottom') => `
                                         <div class="dev-pm-caption-editor" style="padding: 0.75rem; background: #fdfdfd; border: 1px dashed #ddd; border-radius: 8px; margin: 0.5rem 0; display: flex; flex-direction: column; gap: 0.75rem; box-shadow: inset 0 1px 3px rgba(0,0,0,0.02);">
                                             <div style="display: flex; gap: 0.25rem; align-items: center;">
-                                                <input class="block-caption" type="text" placeholder="Add caption..." value="${block.props.caption || ''}" style="flex: 1; box-sizing:border-box; padding:6px; border:1px solid #ddd; border-radius:4px; font-size:0.85rem;" />
+                                                <input class="block-caption" type="text" placeholder="Caption or [text](link)..." value="${block.props.caption || ''}" style="flex: 1; box-sizing:border-box; padding:6px; border:1px solid #ddd; border-radius:4px; font-size:0.85rem;" />
                                                 <button class="caption-delete" title="Delete Caption" style="background: none; border: none; cursor: pointer; color: #ef4444; opacity: 0.6; display: flex; align-items: center;">${ICONS.trash}</button>
                                             </div>
 

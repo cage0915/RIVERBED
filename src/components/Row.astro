@@ -1,4 +1,6 @@
 ---
+import RichText from "./RichText.astro";
+
 interface Props {
     cols?: number; // Optional now, kept for backward compatibility with existing .mdx
     mb?: string; // technical override
@@ -55,7 +57,7 @@ if (finalMB) {
 >
     {caption && parsedPos === 'top' && (
         <div class="photo-caption top" style={`text-align: ${parsedAlign};`}>
-            {caption}
+            <RichText text={caption} />
         </div>
     )}
     <div class="photo-row">
@@ -63,7 +65,7 @@ if (finalMB) {
     </div>
     {caption && parsedPos === 'bottom' && (
         <div class="photo-caption bottom" style={`text-align: ${parsedAlign};`}>
-            {caption}
+            <RichText text={caption} />
         </div>
     )}
 </div>

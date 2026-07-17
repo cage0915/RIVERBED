@@ -40,4 +40,18 @@ const style = [
     letter-spacing: 0.05em;
     color: rgba(255, 255, 255, 0.72);
   }
+
+  .text-block :global(a) {
+    color: inherit;
+    text-decoration-line: underline;
+    text-decoration-color: rgba(161, 161, 170, 0.7);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+    transition: color 0.2s ease, text-decoration-color 0.2s ease;
+  }
+
+  .text-block :global(a:hover) {
+    color: rgb(244 244 245);
+    text-decoration-color: currentColor;
+  }
 </style>

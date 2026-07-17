@@ -1,0 +1,45 @@
+---
+import { parseRichText } from "../lib/rich-text";
+
+interface Props {
+    text: string;
+}
+
+const { text } = Astro.props;
+const tokens = parseRichText(text);
+---
+
+<span class="rich-text">
+    {
+        tokens.map((token) => {
+            if (token.type === "break") return <br />;
+            if (token.type === "text") return token.value;
+            return (
+                <a
+                    class="rich-text__link"
+                    href={token.href}
+                    target={token.external ? "_blank" : undefined}
+                    rel={token.external ? "noopener noreferrer" : undefined}
+                >
+                    {token.label}
+                </a>
+            );
+        })
+    }
+</span>
+
+<style>
+    .rich-text__link {
+        color: inherit;
+        text-decoration-line: underline;
+        text-decoration-color: rgb(161 161 170 / 0.7);
+        text-decoration-thickness: 1px;
+        text-underline-offset: 0.2em;
+        transition: color 0.2s ease, text-decoration-color 0.2s ease;
+    }
+
+    .rich-text__link:hover {
+        color: rgb(244 244 245);
+        text-decoration-color: currentColor;
+    }
+</style>
