@@ -5,11 +5,13 @@ import {
     sortMountainTags,
 } from "../lib/mountain-tag-sort";
 import { DEFAULT_MOUNTAIN_VIEW_SETTINGS } from "../lib/mountain-view-settings";
+import { getMountainContourAssetUrl } from "../lib/mountain-contours";
 
 interface MountainTagCard {
     name: string;
     elevation: number;
     latitude: number;
+    longitude: number;
     coverKey?: string;
 }
 
@@ -79,6 +81,10 @@ const sortedGroups = groups.map((group) => ({
                         const fallbackUrl = mountain.coverKey
                             ? `${R2_DOMAIN}/${mountain.coverKey}`
                             : undefined;
+                        const contourUrl = getMountainContourAssetUrl(
+                            group.id,
+                            mountain.name,
+                        );
 
                         return (
                             <article
@@ -89,6 +95,7 @@ const sortedGroups = groups.map((group) => ({
                                 data-mountain-name={mountain.name}
                                 data-mountain-elevation={mountain.elevation}
                                 data-mountain-latitude={mountain.latitude}
+                                data-mountain-longitude={mountain.longitude}
                             >
                                 <a
                                     href={`/tags/${encodeURIComponent(mountain.name)}`}
@@ -108,6 +115,13 @@ const sortedGroups = groups.map((group) => ({
                                         />
                                     )}
                                     <div class="mountain-tag-card__overlay">
+                                        <img
+                                            class="mountain-tag-card__contours"
+                                            data-contour-src={contourUrl}
+                                            alt=""
+                                            aria-hidden="true"
+                                            decoding="async"
+                                        />
                                         <h3>{mountain.name}</h3>
                                         <p>
                                             {mountain.elevation.toLocaleString("en-US")}
@@ -123,6 +137,11 @@ const sortedGroups = groups.map((group) => ({
         ))
     }
     </div>
+
+    <p class="mountain-contour-attribution">
+        等高線資料：<a href="https://data.gov.tw/dataset/35430/" target="_blank" rel="noreferrer">內政部 20m DTM</a>
+        ・<a href="https://maps.gsi.go.jp/development/ichiran.html#dem" target="_blank" rel="noreferrer">日本國土地理院標高圖磚</a>
+    </p>
 </div>
 
 <script>
@@ -150,6 +169,14 @@ const sortedGroups = groups.map((group) => ({
                 const cards = Array.from(
                     view.querySelectorAll<HTMLElement>(".mountain-tag-card"),
                 );
+
+                const loadContours = (card: HTMLElement) => {
+                    const image = card.querySelector<HTMLImageElement>(
+                        "img[data-contour-src]",
+                    );
+                    if (!image || image.src) return;
+                    image.src = image.dataset.contourSrc ?? "";
+                };
 
                 const updateButtons = () => {
                     buttons.forEach((button) => {
@@ -206,6 +233,10 @@ const sortedGroups = groups.map((group) => ({
                 });
 
                 cards.forEach((card) => {
+                    card.addEventListener("pointerenter", () =>
+                        loadContours(card),
+                    );
+                    card.addEventListener("focusin", () => loadContours(card));
                     card.addEventListener("click", (event) => {
                         const isMobile = window.matchMedia(
                             "(max-width: 768px) and (hover: none)",
@@ -215,6 +246,7 @@ const sortedGroups = groups.map((group) => ({
                         }
 
                         event.preventDefault();
+                        loadContours(card);
                         cards.forEach((otherCard) =>
                             otherCard.classList.remove("show-info"),
                         );
@@ -323,7 +355,21 @@ const sortedGroups = groups.map((group) => ({
         width: 100%;
         height: 100%;
         object-fit: cover;
-        transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        transition:
+            transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+            opacity 0.4s ease;
+    }
+
+    .mountain-tag-card .mountain-tag-card__contours {
+        position: absolute;
+        inset: 0;
+        z-index: 3;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0;
+        transform: none;
+        transition: opacity 0.4s ease;
     }
 
     .mountain-tag-card__overlay {
@@ -334,13 +380,16 @@ const sortedGroups = groups.map((group) => ({
         align-items: center;
         justify-content: center;
         padding: clamp(0.4rem, 8cqw, 1.5rem);
-        background: rgb(255 255 255 / 0.68);
+        z-index: 2;
+        background: rgb(255 255 255 / 0.74);
         color: #111827;
         opacity: 0;
         transition: opacity 0.4s ease;
     }
 
     .mountain-tag-card__overlay h3 {
+        position: relative;
+        z-index: 4;
         margin: 0;
         font-family: "Noto Sans TC", "Noto Sans JP", sans-serif;
         font-size: clamp(0.65rem, 9cqw, 1.25rem);
@@ -350,6 +399,8 @@ const sortedGroups = groups.map((group) => ({
     }
 
     .mountain-tag-card__overlay p {
+        position: relative;
+        z-index: 4;
         display: flex;
         align-items: baseline;
         gap: 0.3rem;
@@ -370,22 +421,69 @@ const sortedGroups = groups.map((group) => ({
     }
 
     @media (hover: hover) {
-        .mountain-tag-card:hover img {
+        .mountain-tag-card:hover img:not(.mountain-tag-card__contours),
+        .mountain-tag-card:focus-within img:not(.mountain-tag-card__contours) {
+            opacity: 0;
             transform: scale(1.05);
         }
 
-        .mountain-tag-card:hover .mountain-tag-card__overlay {
+        .mountain-tag-card:hover .mountain-tag-card__contours,
+        .mountain-tag-card:focus-within .mountain-tag-card__contours {
+            opacity: 0.82;
+        }
+
+        .mountain-tag-card:hover .mountain-tag-card__overlay,
+        .mountain-tag-card:focus-within .mountain-tag-card__overlay {
             opacity: 1;
+        }
+
+        .mountain-tag-card--without-cover:hover .mountain-tag-card__overlay,
+        .mountain-tag-card--without-cover:focus-within .mountain-tag-card__overlay {
+            background: rgb(255 255 255 / 0.92);
+            color: #111827;
         }
     }
 
     @media (max-width: 768px) and (hover: none) {
-        .mountain-tag-card.show-info img {
+        .mountain-tag-card.show-info img:not(.mountain-tag-card__contours) {
+            opacity: 0;
             transform: scale(1.05);
+        }
+
+        .mountain-tag-card.show-info .mountain-tag-card__contours {
+            opacity: 0.82;
         }
 
         .mountain-tag-card.show-info .mountain-tag-card__overlay {
             opacity: 1;
+        }
+
+        .mountain-tag-card--without-cover.show-info .mountain-tag-card__overlay {
+            background: rgb(255 255 255 / 0.92);
+            color: #111827;
+        }
+    }
+
+    .mountain-contour-attribution {
+        margin: 2rem 0 0;
+        color: rgb(82 82 91);
+        font-size: 0.5625rem;
+        letter-spacing: 0.03em;
+        text-align: right;
+    }
+
+    .mountain-contour-attribution a {
+        color: inherit;
+        transition: color 160ms ease;
+    }
+
+    .mountain-contour-attribution a:hover {
+        color: rgb(161 161 170);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .mountain-tag-card .mountain-tag-card__contours {
+            transition: none;
         }
     }
 

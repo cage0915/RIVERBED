@@ -1,7 +1,12 @@
 ---
 import MountainMap from "./MountainMap.astro";
 import { buildPeakFinderEmbedUrl } from "../lib/mountain-panorama";
-import type { MapBounds, MapContextId } from "../lib/mountain-map";
+import { getMountainContourAssetUrl } from "../lib/mountain-contours";
+import {
+    MAP_CONTEXTS,
+    type MapBounds,
+    type MapContextId,
+} from "../lib/mountain-map";
 
 interface Props {
     latitude: number;
@@ -38,32 +43,60 @@ const locationTabId = `${viewerId}-location-tab`;
 const locationPanelId = `${viewerId}-location-panel`;
 const panoramaTabId = `${viewerId}-panorama-tab`;
 const panoramaPanelId = `${viewerId}-panorama-panel`;
+const contourTabId = `${viewerId}-contour-tab`;
+const contourPanelId = `${viewerId}-contour-panel`;
+const contourUrl = getMountainContourAssetUrl(
+    MAP_CONTEXTS[contextId].source,
+    mountainName,
+);
+const contourRegion = MAP_CONTEXTS[contextId].source;
+const contourSource = contourRegion === "taiwan"
+    ? {
+          label: "Ministry of the Interior 20m DTM",
+          url: "https://data.gov.tw/dataset/35430/",
+      }
+    : {
+          label: "GSI DEM10B · resampled to 20m",
+          url: "https://maps.gsi.go.jp/development/ichiran.html#dem",
+      };
 ---
 
 <section
     class="mountain-viewer"
     data-mountain-viewer
     data-initialized="false"
-    aria-label={`${mountainName} location and panorama`}
+    aria-label={`${mountainName} location, panorama, and contour`}
 >
-    {
-        hasPanorama && (
-            <div
-                class="mountain-viewer__tabs"
-                role="tablist"
-                aria-label={`${mountainName} view mode`}
-            >
-                <button
-                    id={locationTabId}
-                    class="mountain-viewer__tab"
-                    type="button"
-                    role="tab"
-                    aria-selected="true"
-                    aria-controls={locationPanelId}
-                    data-viewer-tab="location"
-                >
-                    Location
-                </button>
+    <div
+        class="mountain-viewer__tabs"
+        role="tablist"
+        aria-label={`${mountainName} view mode`}
+    >
+        <button
+            id={locationTabId}
+            class="mountain-viewer__tab"
+            type="button"
+            role="tab"
+            aria-selected="true"
+            aria-controls={locationPanelId}
+            data-viewer-tab="location"
+        >
+            Location
+        </button>
+        <button
+            id={contourTabId}
+            class="mountain-viewer__tab"
+            type="button"
+            role="tab"
+            aria-selected="false"
+            aria-controls={contourPanelId}
+            tabindex="-1"
+            data-viewer-tab="contour"
+        >
+            Contour
+        </button>
+        {
+            hasPanorama && (
                 <button
                     id={panoramaTabId}
                     class="mountain-viewer__tab"
@@ -76,15 +109,15 @@ const panoramaPanelId = `${viewerId}-panorama-panel`;
                 >
                     Panorama
                 </button>
-            </div>
-        )
-    }
+            )
+        }
+    </div>
 
     <div
         id={locationPanelId}
         class="mountain-viewer__panel"
-        role={hasPanorama ? "tabpanel" : undefined}
-        aria-labelledby={hasPanorama ? locationTabId : undefined}
+        role="tabpanel"
+        aria-labelledby={locationTabId}
         data-viewer-panel="location"
     >
         <MountainMap
@@ -94,6 +127,30 @@ const panoramaPanelId = `${viewerId}-panorama-panel`;
             mountainName={mountainName}
             initialBounds={initialBounds}
         />
+    </div>
+
+    <div
+        id={contourPanelId}
+        class="mountain-viewer__panel"
+        role="tabpanel"
+        aria-labelledby={contourTabId}
+        data-viewer-panel="contour"
+        hidden
+    >
+        <div class="mountain-viewer__contour-shell">
+            <div
+                class="mountain-viewer__contour"
+                style={`--mountain-contour-image: url("${contourUrl}")`}
+                role="img"
+                aria-label={`${mountainName} contour map`}
+            ></div>
+            <span class="mountain-viewer__contour-marker" aria-hidden="true"></span>
+        </div>
+        <div class="mountain-viewer__footer">
+            Contour data · <a href={contourSource.url} target="_blank" rel="noreferrer">
+                {contourSource.label}
+            </a>
+        </div>
     </div>
 
     {
@@ -118,11 +175,7 @@ const panoramaPanelId = `${viewerId}-panorama-panel`;
                     ></iframe>
                 </div>
                 <div class="mountain-viewer__footer">
-                    <a
-                        href={panoramaUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                    >
+                    <a href={panoramaUrl} target="_blank" rel="noreferrer">
                         PeakFinder
                     </a>
                 </div>
@@ -193,6 +246,56 @@ const panoramaPanelId = `${viewerId}-panorama-panel`;
         background: rgb(255 255 255 / 0.012);
     }
 
+    .mountain-viewer__contour-shell {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgb(255 255 255 / 0.07);
+        background:
+            radial-gradient(circle at center, rgb(255 255 255 / 0.035), transparent 68%),
+            #18181b;
+    }
+
+    .mountain-viewer__contour-marker {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 1.05rem;
+        height: 1.05rem;
+        translate: -50% -50%;
+        pointer-events: none;
+    }
+
+    .mountain-viewer__contour-marker::before,
+    .mountain-viewer__contour-marker::after {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        width: 100%;
+        height: 1.5px;
+        border-radius: 999px;
+        background: rgb(113 113 122);
+        content: "";
+    }
+
+    .mountain-viewer__contour-marker::before {
+        rotate: 45deg;
+    }
+
+    .mountain-viewer__contour-marker::after {
+        rotate: -45deg;
+    }
+
+    .mountain-viewer__contour {
+        display: block;
+        width: 100%;
+        aspect-ratio: 16 / 10;
+        background: rgb(113 113 122);
+        -webkit-mask: var(--mountain-contour-image) center / 100% 100% no-repeat;
+        mask: var(--mountain-contour-image) center / 100% 100% no-repeat;
+        pointer-events: none;
+        user-select: none;
+    }
+
     .mountain-viewer__panorama {
         display: block;
         width: 100%;
@@ -220,7 +323,7 @@ const panoramaPanelId = `${viewerId}-panorama-panel`;
 </style>
 
 <script>
-    type ViewerMode = "location" | "panorama";
+    type ViewerMode = "location" | "panorama" | "contour";
 
     function initMountainViewers() {
         document

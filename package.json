@@ -6,6 +6,7 @@
     "dev": "astro dev",
     "dev:r2": "wrangler pages dev --r2 --persist-to=.wrangler/state -- npm run dev",
     "preview:r2": "wrangler pages dev dist --r2 --persist-to=.wrangler/state",
+    "contours:generate": "node scripts/generate-mountain-contours.mjs",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro"
@@ -27,6 +28,8 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
     "@cloudflare/workers-types": "^4.20260305.1",
+    "geotiff": "^2.1.3",
+    "sharp": "^0.33.5",
     "typescript": "^5.9.3",
     "wrangler": "^3.0.0"
   }

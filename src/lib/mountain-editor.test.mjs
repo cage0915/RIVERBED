@@ -73,6 +73,28 @@ test("mountain editor preserves an explicitly disabled panorama", () => {
     );
 });
 
+test("mountain editor rounds elevations and coordinates to storage precision", () => {
+    const mountain = sanitizeMountainEntry(
+        {
+            name: "山",
+            elevation: 1234.6,
+            description: "",
+            location: {
+                latitude: 24.1234567,
+                longitude: 121.7654326,
+                mapContext: "tw-dabajian",
+            },
+        },
+        contexts,
+    );
+    assert.equal(mountain.elevation, 1235);
+    assert.deepEqual(mountain.location, {
+        latitude: 24.123457,
+        longitude: 121.765433,
+        mapContext: "tw-dabajian",
+    });
+});
+
 test("mountain editor allows panorama to default on before location is added", () => {
     assert.deepEqual(
         sanitizeMountainEntry(

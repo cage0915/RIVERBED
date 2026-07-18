@@ -53,6 +53,15 @@ const optionalNumber = (
     return number;
 };
 
+const roundTo = (value: number, decimalPlaces: number) => {
+    const factor = 10 ** decimalPlaces;
+    return (
+        Math.sign(value) *
+        Math.round((Math.abs(value) + Number.EPSILON) * factor) /
+        factor
+    );
+};
+
 export function sanitizeMountainEntry(
     input: unknown,
     contextIds: ReadonlySet<string>,
@@ -79,7 +88,8 @@ export function sanitizeMountainEntry(
 
     let elevation: number | null = null;
     if (candidate.elevation !== null && candidate.elevation !== undefined && candidate.elevation !== "") {
-        elevation = optionalNumber(candidate.elevation, -500, 9000) ?? null;
+        const parsedElevation = optionalNumber(candidate.elevation, -500, 9000);
+        elevation = parsedElevation === undefined ? null : roundTo(parsedElevation, 0);
     }
 
     const result: EditableMountain = {
@@ -112,7 +122,11 @@ export function sanitizeMountainEntry(
         }
         if (!contextIds.has(mapContext)) throw new Error("Unknown map context");
 
-        result.location = { latitude, longitude, mapContext };
+        result.location = {
+            latitude: roundTo(latitude, 6),
+            longitude: roundTo(longitude, 6),
+            mapContext,
+        };
         if (location.initialBounds !== undefined) {
             if (!isValidMapBounds(location.initialBounds)) {
                 throw new Error("Invalid initial map bounds");

@@ -28,6 +28,7 @@
                     aria-label="Save Mountain"
                 >
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"></path></svg>
+                    <span id="dev-mountain-save-badge" class="dev-mountain-save-badge" hidden>0</span>
                 </button>
                 <button id="dev-mountain-close" class="dev-mountain-icon-button" type="button" aria-label="Close">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"></path></svg>
@@ -37,8 +38,7 @@
 
         <div class="dev-mountain-manager__body">
             <div class="dev-mountain-manager__form-column">
-                <section class="dev-mountain-section" data-preview-target="location">
-                    <h3>Basic Data</h3>
+                <section class="dev-mountain-section">
                     <div class="dev-mountain-grid dev-mountain-grid--lookup">
                         <label class="dev-mountain-field">
                             <span>Region</span>
@@ -97,15 +97,15 @@
                     <div class="dev-mountain-grid dev-mountain-grid--location">
                         <label class="dev-mountain-field">
                             <span>Elevation (m)</span>
-                            <input id="dev-mountain-elevation" type="number" min="-500" max="9000" step="1" />
+                            <input id="dev-mountain-elevation" type="number" min="-500" max="9000" step="any" />
                         </label>
                         <label class="dev-mountain-field">
                             <span>Latitude</span>
-                            <input id="dev-mountain-latitude" type="number" min="-90" max="90" step="0.000001" />
+                            <input id="dev-mountain-latitude" type="number" min="-90" max="90" step="any" />
                         </label>
                         <label class="dev-mountain-field">
                             <span>Longitude</span>
-                            <input id="dev-mountain-longitude" type="number" min="-180" max="180" step="0.000001" />
+                            <input id="dev-mountain-longitude" type="number" min="-180" max="180" step="any" />
                         </label>
                         <button
                             id="dev-mountain-paste-coordinates"
@@ -123,8 +123,8 @@
                             id="dev-mountain-refresh-location"
                             class="dev-mountain-secondary-button dev-mountain-grid-action"
                             type="button"
-                            title="Refresh Location Preview"
-                            aria-label="Refresh Location Preview"
+                            title="Refresh Location and Contour"
+                            aria-label="Refresh Location and Contour"
                         >
                             <svg viewBox="0 0 24 24" aria-hidden="true">
                                 <path d="M20 6v5h-5M4 18v-5h5"></path>
@@ -132,22 +132,6 @@
                             </svg>
                         </button>
                     </div>
-                    <label class="dev-mountain-field">
-                        <span>Description</span>
-                        <textarea
-                            id="dev-mountain-description"
-                            rows="4"
-                            placeholder="Links: [text](/internal-path) or [text](https://example.com)"
-                        ></textarea>
-                    </label>
-                    <label class="dev-mountain-check">
-                        <input id="dev-mountain-panorama-enabled" type="checkbox" checked />
-                        <span>Enable PeakFinder Panorama</span>
-                    </label>
-                </section>
-
-                <section class="dev-mountain-section" data-preview-target="location">
-                    <h3>Map Context</h3>
                     <div class="dev-mountain-field">
                         <span>Context</span>
                         <div id="dev-mountain-context-picker" class="dev-mountain-context-picker">
@@ -192,6 +176,14 @@
                             Edit the fields and map viewport, then update this context.
                         </p>
                     </div>
+                    <label class="dev-mountain-field">
+                        <span>Description</span>
+                        <textarea
+                            id="dev-mountain-description"
+                            rows="4"
+                            placeholder="Links: [text](/internal-path) or [text](https://example.com)"
+                        ></textarea>
+                    </label>
                 </section>
 
             </div>
@@ -210,6 +202,15 @@
                                 data-preview-tab="location"
                             >Location</button>
                             <button
+                                id="dev-mountain-contour-tab"
+                                type="button"
+                                role="tab"
+                                aria-selected="false"
+                                aria-controls="dev-mountain-contour-panel"
+                                data-preview-tab="contour"
+                                disabled
+                            >Contour</button>
+                            <button
                                 id="dev-mountain-panorama-tab"
                                 type="button"
                                 role="tab"
@@ -218,6 +219,27 @@
                                 data-preview-tab="panorama"
                                 disabled
                             >Panorama</button>
+                        </div>
+                    </div>
+
+                    <div
+                        id="dev-mountain-contour-panel"
+                        role="tabpanel"
+                        aria-labelledby="dev-mountain-contour-tab"
+                        data-preview-panel="contour"
+                        hidden
+                    >
+                        <div
+                            id="dev-mountain-contour-shell"
+                            class="dev-mountain-contour-shell"
+                            title="Click to use this point as the mountain centre"
+                        >
+                            <div
+                                id="dev-mountain-contour-preview"
+                                role="img"
+                                aria-label="Mountain contour preview"
+                            ></div>
+                            <span id="dev-mountain-contour-marker" class="dev-mountain-contour-marker" aria-hidden="true"></span>
                         </div>
                     </div>
 
@@ -240,7 +262,6 @@
                             <strong>No Map Context</strong>
                             <span>Choose a valid context to restore the location map.</span>
                         </div>
-                        <p id="dev-mountain-bounds-output" class="dev-mountain-bounds-output"></p>
                     </div>
 
                     <div
@@ -259,7 +280,20 @@
                             ></iframe>
                         </div>
                     </div>
+
+                    <p
+                        id="dev-mountain-bounds-output"
+                        class="dev-mountain-bounds-output"
+                        data-available="false"
+                        data-preview-visible="false"
+                    ></p>
                 </section>
+                <div class="dev-mountain-preview-options">
+                    <label class="dev-mountain-check dev-mountain-check--panorama">
+                        <input id="dev-mountain-panorama-enabled" type="checkbox" checked />
+                        <span>Enable PeakFinder Panorama</span>
+                    </label>
+                </div>
             </div>
         </div>
 
@@ -306,6 +340,14 @@
         left: 1.5rem;
     }
 
+    .dev-mountain-manager-button--beside-name {
+        position: absolute;
+        top: 1.5rem;
+        right: auto;
+        left: 0;
+        transform: translateX(calc(-100% - 0.75rem));
+    }
+
     .dev-mountain-manager-button svg,
     .dev-mountain-icon-button svg {
         width: 1.1rem;
@@ -317,15 +359,10 @@
     }
 
     @media (max-width: 767px) {
-        .dev-mountain-manager-button--in-profile {
+        .dev-mountain-manager-button--beside-name {
             top: 1.25rem;
             right: auto;
-            left: 0;
-        }
-
-        .mountain-profile--dev-manager .mountain-profile__details {
-            padding-right: 0.25rem;
-            padding-left: 3rem;
+            left: 0.25rem;
         }
     }
 
@@ -392,6 +429,7 @@
     }
 
     .dev-mountain-icon-button {
+        position: relative;
         display: grid;
         width: 2rem;
         height: 2rem;
@@ -406,17 +444,37 @@
 
     .dev-mountain-icon-button:hover { background: #f1f5f9; color: #0f172a; }
 
-    .dev-mountain-icon-button--save {
+    .dev-mountain-icon-button--save[data-dirty="true"] {
         border: 1px solid #198754;
         background: #198754;
         color: #fff;
     }
 
-    .dev-mountain-icon-button--save:hover {
+    .dev-mountain-icon-button--save[data-dirty="true"]:hover {
         border-color: #146c43;
         background: #157347;
         color: #fff;
     }
+
+    .dev-mountain-save-badge {
+        position: absolute;
+        top: -0.45rem;
+        right: -0.45rem;
+        min-width: 1.05rem;
+        height: 1.05rem;
+        box-sizing: border-box;
+        padding: 0 0.25rem;
+        border: 2px solid #fafafa;
+        border-radius: 999px;
+        background: #dc2626;
+        color: white;
+        font-size: 0.58rem;
+        font-weight: 700;
+        line-height: calc(1.05rem - 4px);
+        text-align: center;
+    }
+
+    .dev-mountain-save-badge[hidden] { display: none; }
 
     .dev-mountain-manager__body {
         display: grid;
@@ -700,6 +758,15 @@
     .dev-mountain-check { gap: 0.55rem; margin-top: 0.75rem; color: #334155; font-size: 0.78rem; cursor: pointer; }
     .dev-mountain-check input { width: 1rem; height: 1rem; }
 
+    .dev-mountain-preview-options {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 0.75rem;
+        padding-right: 0.25rem;
+    }
+
+    .dev-mountain-check--panorama { margin-top: 0; }
+
     .dev-mountain-candidates { display: grid; gap: 0.45rem; margin-top: 0.6rem; }
     .dev-mountain-candidate { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.7rem; padding: 0.65rem; border: 1px solid #e2e8f0; border-radius: 6px; }
     .dev-mountain-candidate strong { display: block; color: #1e293b; font-size: 0.75rem; }
@@ -756,12 +823,57 @@
     .dev-mountain-preview-viewer [data-preview-panel][hidden] { display: none; }
 
     .dev-mountain-map-shell,
+    .dev-mountain-contour-shell,
     .dev-mountain-panorama-shell {
         overflow: hidden;
         border: 1px solid #d7dee8;
         background: #18181b;
         aspect-ratio: 16 / 10;
     }
+
+    .dev-mountain-contour-shell {
+        position: relative;
+        cursor: crosshair;
+        border-color: rgb(255 255 255 / 0.07);
+        background:
+            radial-gradient(circle at center, rgb(255 255 255 / 0.035), transparent 68%),
+            #18181b;
+    }
+
+    #dev-mountain-contour-preview {
+        width: 100%;
+        height: 100%;
+        background: rgb(113 113 122);
+        -webkit-mask: var(--dev-mountain-contour-image) center / 100% 100% no-repeat;
+        mask: var(--dev-mountain-contour-image) center / 100% 100% no-repeat;
+        pointer-events: none;
+        user-select: none;
+    }
+
+    .dev-mountain-contour-marker {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 1.05rem;
+        height: 1.05rem;
+        translate: -50% -50%;
+        pointer-events: none;
+    }
+
+    .dev-mountain-contour-marker::before,
+    .dev-mountain-contour-marker::after {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        width: 100%;
+        height: 1.5px;
+        border-radius: 999px;
+        background: rgb(113 113 122);
+        content: "";
+    }
+
+    .dev-mountain-contour-marker::before { rotate: 45deg; }
+    .dev-mountain-contour-marker::after { rotate: -45deg; }
 
     .dev-mountain-no-map {
         display: grid;
@@ -799,12 +911,18 @@
     .dev-mountain-map-marker-core { fill: white; stroke: #18181b; stroke-width: 1; vector-effect: non-scaling-stroke; }
 
     .dev-mountain-bounds-output {
+        height: 1rem;
         margin: 0.65rem 0 0;
         overflow-x: auto;
         color: #64748b;
         font-family: ui-monospace, monospace;
         font-size: 0.62rem;
+        line-height: 1rem;
         white-space: nowrap;
+    }
+
+    .dev-mountain-bounds-output[data-preview-visible="false"] {
+        visibility: hidden;
     }
 
     #dev-mountain-panorama-preview { display: block; width: 100%; height: 100%; border: 0; background: white; }
@@ -834,6 +952,7 @@
         type SvgViewBox,
     } from "../lib/mountain-map";
     import { buildPeakFinderEmbedUrl } from "../lib/mountain-panorama";
+    import { getMountainContourAssetUrl } from "../lib/mountain-contours";
     import { parseDirectionalCoordinates } from "../lib/mountain-coordinates";
     import type { MountainLookupCandidate } from "../lib/wikidata-mountain";
 
@@ -857,7 +976,7 @@
         contexts: Record<string, ContextConfig>;
         sources: Record<string, SourceConfig>;
     };
-    type PreviewMode = "location" | "panorama";
+    type PreviewMode = "location" | "contour" | "panorama";
 
     const NEW_CONTEXT_VALUE = "__new_context__";
     const REOPEN_MANAGER_KEY = "riverbed:mountain-manager:reopen";
@@ -870,6 +989,26 @@
         if (!input.value.trim()) return undefined;
         const value = Number(input.value);
         return Number.isFinite(value) ? value : undefined;
+    };
+
+    const roundNumber = (value: number, decimalPlaces: number) => {
+        const factor = 10 ** decimalPlaces;
+        return (
+            Math.sign(value) *
+            Math.round((Math.abs(value) + Number.EPSILON) * factor) /
+            factor
+        );
+    };
+
+    const normalizeNumberInput = (
+        input: HTMLInputElement,
+        decimalPlaces: number,
+    ) => {
+        const value = numberOrUndefined(input);
+        if (value === undefined) return undefined;
+        const rounded = roundNumber(value, decimalPlaces);
+        input.value = String(rounded);
+        return rounded;
     };
 
     const escapeHtml = (value: string) =>
@@ -885,12 +1024,18 @@
         const dialog = byId<HTMLDialogElement>("dev-mountain-manager");
         if (!button || !dialog) return;
 
+        const mountainProfile =
+            document.querySelector<HTMLElement>(".mountain-profile");
         const managerAnchor =
-            document.querySelector<HTMLElement>(".mountain-profile") ??
+            mountainProfile ??
             document.querySelector<HTMLElement>(".tag-page");
         if (managerAnchor && button.parentElement !== managerAnchor) {
             managerAnchor.classList.add("mountain-profile--dev-manager");
-            button.classList.add("dev-mountain-manager-button--in-profile");
+            button.classList.add(
+                mountainProfile
+                    ? "dev-mountain-manager-button--beside-name"
+                    : "dev-mountain-manager-button--in-profile",
+            );
             managerAnchor.append(button);
         }
 
@@ -929,6 +1074,10 @@
         const previewTabs = Array.from(dialog.querySelectorAll<HTMLButtonElement>("[data-preview-tab]"));
         const previewPanels = Array.from(dialog.querySelectorAll<HTMLElement>("[data-preview-panel]"));
         const panoramaTab = byId<HTMLButtonElement>("dev-mountain-panorama-tab")!;
+        const contourTab = byId<HTMLButtonElement>("dev-mountain-contour-tab")!;
+        const contourPreview = byId<HTMLElement>("dev-mountain-contour-preview")!;
+        const contourShell = byId<HTMLElement>("dev-mountain-contour-shell")!;
+        const contourMarker = byId<HTMLElement>("dev-mountain-contour-marker")!;
         const map = byId<SVGSVGElement>("dev-mountain-map")!;
         const mapShell = byId<HTMLElement>("dev-mountain-map-shell")!;
         const noMapMessage = byId<HTMLElement>("dev-mountain-no-map")!;
@@ -939,6 +1088,7 @@
         const mapLabel = byId<HTMLElement>("dev-mountain-map-label")!;
         const boundsOutput = byId<HTMLElement>("dev-mountain-bounds-output")!;
         const saveButton = byId<HTMLButtonElement>("dev-mountain-save")!;
+        const saveBadge = byId<HTMLElement>("dev-mountain-save-badge")!;
         const saveStatus = byId<HTMLElement>("dev-mountain-save-status")!;
 
         let managerData: ManagerData | null = null;
@@ -952,18 +1102,112 @@
         let lastPinchDistance: number | null = null;
         let lastPinchCentre: { x: number; y: number } | null = null;
         let lookupCandidates: MountainLookupCandidate[] = [];
+        let contourPreviewCentre: { latitude: number; longitude: number } | null = null;
+        let contourPreviewObjectUrl: string | null = null;
+        let contourPreviewNeedsSave = false;
+        let savedMountainFormState = "";
+        let isLoadingMountain = false;
+        let pendingMountainNavigation: string | null = null;
+        let mountainSelectionChanged = false;
+        const pagePathParts = location.pathname.split("/").filter(Boolean);
+        const backgroundMountainName =
+            pagePathParts[0] === "tags" && pagePathParts[1]
+                ? decodeURIComponent(pagePathParts[1])
+                : "";
+
+        const queueMountainNavigation = (mountainName: string) => {
+            mountainSelectionChanged = true;
+            pendingMountainNavigation =
+                mountainName === backgroundMountainName ? null : mountainName;
+        };
+
+        const readMountainFormState = () => ({
+            alternateName: alternateNameInput.value.trim(),
+            elevation: numberOrUndefined(elevationInput) ?? null,
+            latitude: numberOrUndefined(latitudeInput) ?? null,
+            longitude: numberOrUndefined(longitudeInput) ?? null,
+            description: descriptionInput.value.trim(),
+            context: contextSelect.value,
+            panorama: panoramaEnabled.checked,
+        });
+
+        type MountainFormState = ReturnType<typeof readMountainFormState>;
+        type PendingMountainDraft = {
+            region: string;
+            name: string;
+            state: MountainFormState;
+            forceContour: boolean;
+        };
+
+        const pendingMountainDrafts = new Map<string, PendingMountainDraft>();
+        const mountainDraftKey = (region: string, name: string) =>
+            `${region}\u0000${name}`;
+        const getMountainFormState = () => JSON.stringify(readMountainFormState());
+
+        const updateSaveButtonState = () => {
+            if (currentMountain && !isLoadingMountain) {
+                const key = mountainDraftKey(
+                    currentMountain.region,
+                    currentMountain.name,
+                );
+                const dirty =
+                    contourPreviewNeedsSave ||
+                    getMountainFormState() !== savedMountainFormState;
+                if (dirty) {
+                    pendingMountainDrafts.set(key, {
+                        region: currentMountain.region,
+                        name: currentMountain.name,
+                        state: readMountainFormState(),
+                        forceContour: contourPreviewNeedsSave,
+                    });
+                } else {
+                    pendingMountainDrafts.delete(key);
+                }
+            }
+            const pendingCount = pendingMountainDrafts.size;
+            const dirty = pendingCount > 0;
+            saveButton.dataset.dirty = String(dirty);
+            saveBadge.hidden = !dirty;
+            saveBadge.textContent = pendingCount > 99 ? "99+" : String(pendingCount);
+            saveButton.title = dirty
+                ? `Save ${pendingCount} changed mountain${pendingCount === 1 ? "" : "s"}`
+                : "No unsaved changes";
+            saveButton.setAttribute(
+                "aria-label",
+                saveButton.title,
+            );
+        };
 
         const setStatus = (message: string, isError = false) => {
             saveStatus.textContent = message;
             saveStatus.style.color = isError ? "#dc2626" : "#64748b";
         };
 
-        const preserveManagerState = (contextId: string) => {
+        const preserveManagerState = (
+            contextId: string,
+            preserveOtherDrafts = false,
+        ) => {
             try {
+                const previewMode = previewTabs.find(
+                    (tab) => tab.getAttribute("aria-selected") === "true",
+                )?.dataset.previewTab;
                 sessionStorage.setItem(REOPEN_MANAGER_KEY, "true");
                 sessionStorage.setItem(RESTORE_MANAGER_KEY, JSON.stringify({
                     mountainName: currentMountain?.name,
+                    navigationMountainName: mountainSelectionChanged
+                        ? currentMountain?.name
+                        : undefined,
                     contextId,
+                    previewMode,
+                    ...(preserveOtherDrafts
+                        ? {
+                            pendingDrafts: [...pendingMountainDrafts.values()].filter(
+                                (draft) =>
+                                    draft.region !== currentMountain?.region ||
+                                    draft.name !== currentMountain?.name,
+                            ),
+                        }
+                        : {}),
                 }));
             } catch {
                 // Saving still works if session storage is unavailable.
@@ -1039,7 +1283,14 @@
             mapLabel.textContent = context.label;
             mapShell.hidden = false;
             noMapMessage.hidden = true;
-            boundsOutput.hidden = false;
+            boundsOutput.dataset.available = "true";
+            boundsOutput.dataset.previewVisible = String(
+                previewTabs.some(
+                    (tab) =>
+                        tab.dataset.previewTab === "location" &&
+                        tab.getAttribute("aria-selected") === "true",
+                ),
+            );
             updateMapMarker();
             renderViewBox(currentViewBox);
         };
@@ -1137,7 +1388,9 @@
             mapLabel.textContent = "No Map Context";
             mapShell.hidden = true;
             noMapMessage.hidden = false;
-            boundsOutput.hidden = true;
+            boundsOutput.textContent = "";
+            boundsOutput.dataset.available = "false";
+            boundsOutput.dataset.previewVisible = "false";
             contextHelp.textContent = "This context no longer exists. Choose a valid full or custom context to restore the map.";
             updateContextActionButtons();
         };
@@ -1185,7 +1438,7 @@
                 latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180
             ) {
                 setStatus("Enter valid latitude and longitude first", true);
-                return;
+                return false;
             }
 
             const marker = projectCoordinates(latitude, longitude);
@@ -1199,27 +1452,29 @@
                 if (!compatibleContext) {
                     updateMapMarker();
                     setStatus("No existing map source contains these coordinates", true);
-                    return;
+                    return false;
                 }
                 loadContextEditor(compatibleContext.id);
                 if (wasNewContext) loadContextEditor(NEW_CONTEXT_VALUE);
                 parts = getContextParts();
             }
-            if (!parts) return;
+            if (!parts) return false;
 
             updateMapMarker();
-            renderViewBox([
-                marker.x - currentViewBox[2] / 2,
-                marker.y - currentViewBox[3] / 2,
-                currentViewBox[2],
-                currentViewBox[3],
-            ]);
-            activatePreview("location");
-            setStatus("Location preview refreshed. Changes are not saved yet.");
+            if (!pointInsideViewBox(marker, currentViewBox)) {
+                renderViewBox([
+                    marker.x - currentViewBox[2] / 2,
+                    marker.y - currentViewBox[3] / 2,
+                    currentViewBox[2],
+                    currentViewBox[3],
+                ]);
+            }
+            return true;
         };
 
         const activatePreview = (mode: PreviewMode, moveFocus = false) => {
             if (mode === "panorama" && !panoramaEnabled.checked) return;
+            if (mode === "contour" && contourTab.disabled) return;
             previewTabs.forEach((tab) => {
                 const selected = tab.dataset.previewTab === mode;
                 tab.setAttribute("aria-selected", String(selected));
@@ -1229,12 +1484,15 @@
             previewPanels.forEach((panel) => {
                 panel.hidden = panel.dataset.previewPanel !== mode;
             });
+            boundsOutput.dataset.previewVisible = String(
+                mode === "location" && boundsOutput.dataset.available === "true",
+            );
         };
 
-        const updatePanoramaVisibility = () => {
+        const updatePanoramaVisibility = (preserveActiveView = false) => {
             const enabled = panoramaEnabled.checked;
             panoramaTab.disabled = !enabled;
-            if (!enabled) {
+            if (!enabled && !preserveActiveView) {
                 panoramaFrame.removeAttribute("src");
                 activatePreview("location");
             }
@@ -1257,10 +1515,161 @@
             activatePreview("panorama");
         };
 
+        const releaseContourPreviewObjectUrl = () => {
+            if (!contourPreviewObjectUrl) return;
+            URL.revokeObjectURL(contourPreviewObjectUrl);
+            contourPreviewObjectUrl = null;
+        };
+
+        const refreshContour = (
+            cacheBust = false,
+            preserveActiveView = false,
+        ) => {
+            releaseContourPreviewObjectUrl();
+            contourPreviewNeedsSave = false;
+            const hasCoordinates =
+                currentMountain?.location !== undefined &&
+                Number.isFinite(currentMountain.location.latitude) &&
+                Number.isFinite(currentMountain.location.longitude);
+            contourTab.disabled = !hasCoordinates;
+            if (!currentMountain || !hasCoordinates) {
+                contourPreviewCentre = null;
+                contourPreview.style.removeProperty("--dev-mountain-contour-image");
+                if (
+                    !preserveActiveView &&
+                    contourTab.getAttribute("aria-selected") === "true"
+                ) {
+                    activatePreview("location");
+                }
+                return;
+            }
+            const assetUrl = getMountainContourAssetUrl(
+                currentMountain.region,
+                currentMountain.name,
+            );
+            const url = cacheBust
+                ? `${assetUrl}?v=${Date.now()}`
+                : assetUrl;
+            contourPreview.style.setProperty(
+                "--dev-mountain-contour-image",
+                `url("${url}")`,
+            );
+            contourPreviewCentre = {
+                latitude: currentMountain.location!.latitude,
+                longitude: currentMountain.location!.longitude,
+            };
+            contourMarker.style.left = "50%";
+            contourMarker.style.top = "50%";
+            contourPreview.setAttribute(
+                "aria-label",
+                `${currentMountain.name} contour preview`,
+            );
+        };
+
+        const refreshLocationAndContourPreview = async () => {
+            if (!currentMountain || !refreshLocationPreview() || !form.reportValidity()) return;
+            const latitude = numberOrUndefined(latitudeInput);
+            const longitude = numberOrUndefined(longitudeInput);
+            if (latitude === undefined || longitude === undefined) return;
+
+            refreshLocationButton.disabled = true;
+            setStatus("Generating temporary contour preview…");
+            try {
+                const response = await fetch("/api/mountain-contour-preview", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        region: currentMountain.region,
+                        name: currentMountain.name,
+                        latitude,
+                        longitude,
+                    }),
+                });
+                if (!response.ok) {
+                    const data = await response.json().catch(() => null);
+                    throw new Error(data?.error || "Unable to generate contour preview");
+                }
+                const svg = await response.text();
+                releaseContourPreviewObjectUrl();
+                contourPreviewObjectUrl = URL.createObjectURL(
+                    new Blob([svg], { type: "image/svg+xml" }),
+                );
+                contourPreview.style.setProperty(
+                    "--dev-mountain-contour-image",
+                    `url("${contourPreviewObjectUrl}")`,
+                );
+                contourPreviewCentre = { latitude, longitude };
+                contourPreviewNeedsSave = true;
+                updateSaveButtonState();
+                contourTab.disabled = false;
+                contourMarker.style.left = "50%";
+                contourMarker.style.top = "50%";
+                contourPreview.setAttribute(
+                    "aria-label",
+                    `${currentMountain.name} temporary contour preview`,
+                );
+                setStatus("Temporary location and contour preview refreshed. Save to write the changes.");
+            } catch (error) {
+                setStatus(
+                    error instanceof Error ? error.message : "Unable to generate contour preview",
+                    true,
+                );
+            } finally {
+                refreshLocationButton.disabled = false;
+            }
+        };
+
+        const selectContourCentre = (event: MouseEvent) => {
+            if (!contourPreviewCentre || contourTab.disabled) return;
+            const bounds = contourShell.getBoundingClientRect();
+            if (bounds.width <= 0 || bounds.height <= 0) return;
+            const xRatio = Math.max(
+                0,
+                Math.min(1, (event.clientX - bounds.left) / bounds.width),
+            );
+            const yRatio = Math.max(
+                0,
+                Math.min(1, (event.clientY - bounds.top) / bounds.height),
+            );
+            const eastMetres = (xRatio - 0.5) * 400;
+            const northMetres = (0.5 - yRatio) * 400;
+            const earthRadius = 6_378_137;
+            const latitudeRadians =
+                (contourPreviewCentre.latitude * Math.PI) / 180;
+            const latitude = roundNumber(
+                contourPreviewCentre.latitude +
+                    (northMetres / earthRadius) * (180 / Math.PI),
+                6,
+            );
+            const longitude = roundNumber(
+                contourPreviewCentre.longitude +
+                    (eastMetres /
+                        (earthRadius * Math.max(0.000001, Math.cos(latitudeRadians)))) *
+                        (180 / Math.PI),
+                6,
+            );
+
+            latitudeInput.value = String(latitude);
+            longitudeInput.value = String(longitude);
+            contourMarker.style.left = `${xRatio * 100}%`;
+            contourMarker.style.top = `${yRatio * 100}%`;
+            panoramaFrame.removeAttribute("src");
+            updateMapMarker();
+            updateSaveButtonState();
+            setStatus(
+                "Contour centre updated. Save the mountain to regenerate its SVG.",
+            );
+        };
+
         const loadMountain = (name: string) => {
             if (!managerData) return;
             const mountain = managerData.mountains.find((entry) => entry.name === name);
             if (!mountain) return;
+            isLoadingMountain = true;
+            const activePreviewMode =
+                (previewTabs.find(
+                    (tab) => tab.getAttribute("aria-selected") === "true",
+                )?.dataset.previewTab as PreviewMode | undefined) ?? "location";
             regionSelect.value = mountain.region;
             populateMountainSelect(mountain.name);
             mountainSelect.value = mountain.name;
@@ -1277,13 +1686,45 @@
             candidatesRoot.innerHTML = "";
             lookupStatus.textContent = "";
             panoramaFrame.removeAttribute("src");
-            updatePanoramaVisibility();
+            updatePanoramaVisibility(true);
+            refreshContour(false, true);
             if (contextId && managerData.contexts[contextId]) {
                 loadContextEditor(contextId);
             } else {
                 renderMissingContext(contextId || "unassigned");
             }
-            activatePreview("location");
+            savedMountainFormState = getMountainFormState();
+            const pendingDraft = pendingMountainDrafts.get(
+                mountainDraftKey(mountain.region, mountain.name),
+            );
+            if (pendingDraft) {
+                const { state } = pendingDraft;
+                alternateNameInput.value = state.alternateName;
+                elevationInput.value = state.elevation === null
+                    ? ""
+                    : String(state.elevation);
+                latitudeInput.value = state.latitude === null
+                    ? ""
+                    : String(state.latitude);
+                longitudeInput.value = state.longitude === null
+                    ? ""
+                    : String(state.longitude);
+                descriptionInput.value = state.description;
+                panoramaEnabled.checked = state.panorama;
+                updatePanoramaVisibility(true);
+                if (managerData.contexts[state.context]) {
+                    loadContextEditor(state.context);
+                } else {
+                    renderMissingContext(state.context || "unassigned");
+                }
+                contourPreviewNeedsSave = pendingDraft.forceContour;
+                updateMapMarker();
+            }
+            if (activePreviewMode === "panorama" && panoramaEnabled.checked) {
+                refreshPanorama();
+            }
+            isLoadingMountain = false;
+            updateSaveButtonState();
             setStatus("");
         };
 
@@ -1299,13 +1740,28 @@
                         `<option value="${escapeHtml(region.id)}">${escapeHtml(region.label)}</option>`,
                 )
                 .join("");
-            let restoreState: { mountainName?: string; contextId?: string } | null = null;
+            let restoreState: {
+                mountainName?: string;
+                navigationMountainName?: string;
+                contextId?: string;
+                previewMode?: PreviewMode;
+                pendingDrafts?: PendingMountainDraft[];
+            } | null = null;
             try {
                 const storedState = sessionStorage.getItem(RESTORE_MANAGER_KEY);
                 restoreState = storedState ? JSON.parse(storedState) : null;
                 sessionStorage.removeItem(RESTORE_MANAGER_KEY);
             } catch {
                 restoreState = null;
+            }
+            if (Array.isArray(restoreState?.pendingDrafts)) {
+                for (const draft of restoreState.pendingDrafts) {
+                    if (!draft?.region || !draft?.name || !draft?.state) continue;
+                    pendingMountainDrafts.set(
+                        mountainDraftKey(draft.region, draft.name),
+                        draft,
+                    );
+                }
             }
             populateContextSelect();
             const pathParts = location.pathname.split("/").filter(Boolean);
@@ -1321,8 +1777,18 @@
                 populateMountainSelect(initialMountain.name);
                 loadMountain(initialMountain.name);
             }
+            if (restoreState?.navigationMountainName) {
+                mountainSelectionChanged = true;
+                pendingMountainNavigation =
+                    restoreState.navigationMountainName === backgroundMountainName
+                        ? null
+                        : restoreState.navigationMountainName;
+            }
             if (restoreState?.contextId && managerData.contexts[restoreState.contextId]) {
                 loadContextEditor(restoreState.contextId);
+            }
+            if (restoreState?.previewMode) {
+                activatePreview(restoreState.previewMode);
             }
             setStatus("");
         };
@@ -1369,6 +1835,7 @@
                         suggestContext(candidate.latitude, candidate.longitude);
                         loadContextEditor(contextSelect.value);
                     }
+                    updateSaveButtonState();
                     lookupStatus.textContent = `Applied ${candidate.name}. Review the values, then save.`;
                     lookupCandidates = [];
                     candidatesRoot.innerHTML = "";
@@ -1378,8 +1845,9 @@
 
         const collectMountainDraft = (mapContext = contextSelect.value): EditableMountain => {
             if (!currentMountain) throw new Error("No mountain selected");
-            const latitude = numberOrUndefined(latitudeInput);
-            const longitude = numberOrUndefined(longitudeInput);
+            const elevation = normalizeNumberInput(elevationInput, 0);
+            const latitude = normalizeNumberInput(latitudeInput, 6);
+            const longitude = normalizeNumberInput(longitudeInput, 6);
             if ((latitude === undefined) !== (longitude === undefined)) {
                 throw new Error("Latitude and longitude must be entered together");
             }
@@ -1389,7 +1857,7 @@
                 ...(alternateNameInput.value.trim()
                     ? { alternateName: alternateNameInput.value.trim() }
                     : {}),
-                elevation: numberOrUndefined(elevationInput) ?? null,
+                elevation: elevation ?? null,
                 description: descriptionInput.value.trim(),
                 ...(currentMountain.coverKey
                     ? { coverKey: currentMountain.coverKey }
@@ -1406,6 +1874,45 @@
             return mountain;
         };
 
+        const buildMountainDraftFromState = (
+            baseMountain: MountainWithRegion,
+            state: MountainFormState,
+        ): EditableMountain => {
+            if ((state.latitude === null) !== (state.longitude === null)) {
+                throw new Error(`${baseMountain.name}: latitude and longitude must be entered together`);
+            }
+            if (
+                state.latitude !== null &&
+                state.longitude !== null &&
+                !managerData?.contexts[state.context]
+            ) {
+                throw new Error(`${baseMountain.name}: choose a valid map context`);
+            }
+            const mountain: EditableMountain = {
+                name: baseMountain.name,
+                ...(state.alternateName
+                    ? { alternateName: state.alternateName }
+                    : {}),
+                elevation:
+                    state.elevation === null
+                        ? null
+                        : roundNumber(state.elevation, 0),
+                description: state.description,
+                ...(baseMountain.coverKey
+                    ? { coverKey: baseMountain.coverKey }
+                    : {}),
+                panorama: state.panorama,
+            };
+            if (state.latitude !== null && state.longitude !== null) {
+                mountain.location = {
+                    latitude: roundNumber(state.latitude, 6),
+                    longitude: roundNumber(state.longitude, 6),
+                    mapContext: state.context,
+                };
+            }
+            return mountain;
+        };
+
         button.addEventListener("click", async () => {
             dialog.showModal();
             if (!managerData) {
@@ -1418,9 +1925,48 @@
                 renderViewBox(currentViewBox);
             }
         });
-        closeButton.addEventListener("click", () => dialog.close());
+        const confirmDiscardPendingDrafts = () =>
+            pendingMountainDrafts.size === 0 ||
+            window.confirm(
+                `You have unsaved changes for ${pendingMountainDrafts.size} mountain${pendingMountainDrafts.size === 1 ? "" : "s"}. Close without saving and discard them?`,
+            );
+
+        const discardPendingDrafts = () => {
+            pendingMountainDrafts.clear();
+            contourPreviewNeedsSave = false;
+            if (currentMountain) loadMountain(currentMountain.name);
+            updateSaveButtonState();
+        };
+
+        closeButton.addEventListener("click", () => {
+            if (!confirmDiscardPendingDrafts()) return;
+            discardPendingDrafts();
+            dialog.close();
+            const mountainName =
+                mountainSelectionChanged && currentMountain?.name !== backgroundMountainName
+                    ? currentMountain?.name
+                    : null;
+            mountainSelectionChanged = false;
+            pendingMountainNavigation = null;
+            if (!mountainName) return;
+            clearPreservedManagerState();
+            location.assign(`/tags/${encodeURIComponent(mountainName)}`);
+        });
         dialog.addEventListener("click", (event) => {
-            if (event.target === dialog) dialog.close();
+            if (event.target !== dialog || !confirmDiscardPendingDrafts()) return;
+            discardPendingDrafts();
+            mountainSelectionChanged = false;
+            pendingMountainNavigation = null;
+            dialog.close();
+        });
+        dialog.addEventListener("cancel", (event) => {
+            if (!confirmDiscardPendingDrafts()) {
+                event.preventDefault();
+                return;
+            }
+            discardPendingDrafts();
+            mountainSelectionChanged = false;
+            pendingMountainNavigation = null;
         });
 
         const closeMountainMenu = (restoreFocus = false) => {
@@ -1461,29 +2007,23 @@
         mountainSelect.addEventListener("change", async () => {
             const mountainName = mountainSelect.value;
             loadMountain(mountainName);
+            queueMountainNavigation(mountainName);
             const copyMountainName = navigator.clipboard?.writeText
                 ? navigator.clipboard.writeText(mountainName).then(
                     () => true,
                     () => false,
                 )
                 : Promise.resolve(false);
-            const pathParts = location.pathname.split("/").filter(Boolean);
-            const currentTag = pathParts[0] === "tags" && pathParts[1]
-                ? decodeURIComponent(pathParts[1])
-                : "";
-            if (currentTag === mountainName) {
-                const copied = await copyMountainName;
-                setStatus(
-                    copied
-                        ? `Copied “${mountainName}” to the clipboard.`
-                        : `Selected “${mountainName}”. Clipboard access was unavailable.`,
-                    !copied,
-                );
-                return;
-            }
-            clearPreservedManagerState();
-            await copyMountainName;
-            location.assign(`/tags/${encodeURIComponent(mountainName)}`);
+            const copied = await copyMountainName;
+            const navigationHint = pendingMountainNavigation
+                ? "Close the manager to open its page."
+                : "Its page is already open in the background.";
+            setStatus(
+                copied
+                    ? `Selected “${mountainName}” and copied its name. ${navigationHint}`
+                    : `Selected “${mountainName}”. ${navigationHint}`,
+                false,
+            );
         });
 
         regionSelect.addEventListener("change", () => {
@@ -1493,7 +2033,10 @@
                     mountain.region === regionSelect.value &&
                     mountain.name === mountainSelect.value,
             );
-            if (nextMountain) loadMountain(nextMountain.name);
+            if (nextMountain) {
+                loadMountain(nextMountain.name);
+                queueMountainNavigation(nextMountain.name);
+            }
         });
 
         previewTabs.forEach((tab) => {
@@ -1518,17 +2061,6 @@
                     refreshPanorama();
                 }
                 activatePreview(mode, true);
-            });
-        });
-
-        dialog.querySelectorAll<HTMLElement>("[data-preview-target]").forEach((section) => {
-            section.addEventListener("focusin", () => {
-                const mode = section.dataset.previewTarget as PreviewMode;
-                if (mode === "panorama" && panoramaEnabled.checked && !panoramaFrame.hasAttribute("src")) {
-                    refreshPanorama();
-                    return;
-                }
-                activatePreview(mode);
             });
         });
 
@@ -1587,13 +2119,14 @@
 
                 latitudeInput.value = String(coordinates.latitude);
                 longitudeInput.value = String(coordinates.longitude);
-                updateMapMarker();
+                suggestContext(coordinates.latitude, coordinates.longitude);
+                loadContextEditor(contextSelect.value);
+                updateSaveButtonState();
                 setStatus("Coordinates pasted. Changes are not saved yet.");
             } catch {
                 setStatus("Unable to read the clipboard. Allow clipboard access and try again.", true);
             }
         });
-        refreshLocationButton.addEventListener("click", refreshLocationPreview);
         newContextLabelInput.addEventListener("input", () => {
             mapLabel.textContent = newContextLabelInput.value.trim() ||
                 (isCreatingContext ? "New Context" : "Untitled Context");
@@ -1679,6 +2212,7 @@
             }
             contextSelect.value = contextId;
             loadContextEditor(contextId);
+            updateSaveButtonState();
             closeContextMenu(true);
         });
 
@@ -1713,7 +2247,7 @@
                 }
             }
             saveContextButton.disabled = true;
-            preserveManagerState(id);
+            preserveManagerState(id, true);
             try {
                 const originalContextId = lastExistingContextId;
                 const mountain = collectMountainDraft(id);
@@ -1759,6 +2293,8 @@
                     lastExistingContextId = id;
                     populateContextSelect();
                     loadContextEditor(id);
+                    savedMountainFormState = getMountainFormState();
+                    updateSaveButtonState();
                 }
                 const affected = Number(data.affectedMountains) || 0;
                 setStatus(isNewContext
@@ -1775,7 +2311,30 @@
 
         panoramaEnabled.addEventListener("change", () => {
             updatePanoramaVisibility();
-            if (panoramaEnabled.checked) refreshPanorama();
+        });
+
+        [
+            alternateNameInput,
+            elevationInput,
+            latitudeInput,
+            longitudeInput,
+            descriptionInput,
+            panoramaEnabled,
+        ].forEach((control) => {
+            control.addEventListener("input", updateSaveButtonState);
+            control.addEventListener("change", updateSaveButtonState);
+        });
+
+        contourShell.addEventListener("click", selectContourCentre);
+
+        elevationInput.addEventListener("change", () => {
+            normalizeNumberInput(elevationInput, 0);
+        });
+        latitudeInput.addEventListener("change", () => {
+            normalizeNumberInput(latitudeInput, 6);
+        });
+        longitudeInput.addEventListener("change", () => {
+            normalizeNumberInput(longitudeInput, 6);
         });
 
         map.addEventListener("wheel", (event) => {
@@ -1867,18 +2426,45 @@
         map.addEventListener("pointerup", finishDragging);
         map.addEventListener("pointercancel", finishDragging);
 
-        form.addEventListener("submit", async (event) => {
-            event.preventDefault();
-            if (!currentMountain) return;
+        const saveMountain = async () => {
+            if (!currentMountain || !managerData) return;
             if (isCreatingContext) {
                 return setStatus("Save the new context before saving mountain data", true);
             }
-            if (!managerData?.contexts[contextSelect.value] && currentMountain.location) {
-                return setStatus("Choose a valid map context before saving mountain data", true);
+            updateSaveButtonState();
+            if (!pendingMountainDrafts.size) {
+                return setStatus("There are no unsaved mountain changes.");
             }
-            let mountain: EditableMountain;
+            let changes: Array<{
+                originalName: string;
+                region: string;
+                mountain: EditableMountain;
+                forceContour: boolean;
+            }>;
             try {
-                mountain = collectMountainDraft();
+                changes = [...pendingMountainDrafts.values()].map((pending) => {
+                    const baseMountain = managerData!.mountains.find(
+                        (entry) =>
+                            entry.region === pending.region &&
+                            entry.name === pending.name,
+                    );
+                    if (!baseMountain) {
+                        throw new Error(`${pending.name}: mountain no longer exists`);
+                    }
+                    const mountain = buildMountainDraftFromState(
+                        baseMountain,
+                        pending.state,
+                    );
+                    const coordinatesChanged =
+                        baseMountain.location?.latitude !== mountain.location?.latitude ||
+                        baseMountain.location?.longitude !== mountain.location?.longitude;
+                    return {
+                        originalName: baseMountain.name,
+                        region: baseMountain.region,
+                        mountain,
+                        forceContour: pending.forceContour || coordinatesChanged,
+                    };
+                });
             } catch (error) {
                 return setStatus(
                     error instanceof Error ? error.message : "Invalid field data",
@@ -1887,32 +2473,56 @@
             }
 
             saveButton.disabled = true;
-            setStatus("Saving…");
+            refreshLocationButton.disabled = true;
+            preserveManagerState(contextSelect.value);
+            setStatus(`Saving ${changes.length} mountain${changes.length === 1 ? "" : "s"}…`);
+            let saveSucceeded = false;
             try {
                 const response = await fetch("/api/mountains", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        originalName: currentMountain.name,
-                        region: currentMountain.region,
-                        mountain,
-                    }),
+                    body: JSON.stringify({ changes }),
                 });
                 const data = await response.json();
                 if (!response.ok) throw new Error(data.error || "Save failed");
-                const savedMountain = data.mountain as MountainWithRegion;
-                currentMountain = savedMountain;
-                if (managerData) {
-                    const index = managerData.mountains.findIndex((entry) => entry.name === savedMountain.name);
+                const savedMountains = data.mountains as MountainWithRegion[];
+                for (const savedMountain of savedMountains) {
+                    const index = managerData.mountains.findIndex(
+                        (entry) =>
+                            entry.region === savedMountain.region &&
+                            entry.name === savedMountain.name,
+                    );
                     if (index >= 0) managerData.mountains[index] = savedMountain;
-                    renderMountainMenu();
                 }
-                setStatus("Saved. The dev server may refresh the page.", false);
+                pendingMountainDrafts.clear();
+                loadMountain(currentMountain.name);
+                refreshContour(Number(data.contoursGenerated) > 0, true);
+                renderMountainMenu();
+                saveSucceeded = true;
+                setStatus(
+                    `Saved ${savedMountains.length} mountain${savedMountains.length === 1 ? "" : "s"}${data.contoursGenerated ? ` and regenerated ${data.contoursGenerated} contour SVG${data.contoursGenerated === 1 ? "" : "s"}` : ""}.`,
+                    false,
+                );
             } catch (error) {
                 setStatus(error instanceof Error ? error.message : "Save failed", true);
             } finally {
                 saveButton.disabled = false;
+                refreshLocationButton.disabled = false;
+                if (saveSucceeded) {
+                    window.setTimeout(clearPreservedManagerState, 3_000);
+                } else {
+                    clearPreservedManagerState();
+                }
             }
+        };
+
+        form.addEventListener("submit", (event) => {
+            event.preventDefault();
+            void saveMountain();
+        });
+
+        refreshLocationButton.addEventListener("click", () => {
+            void refreshLocationAndContourPreview();
         });
 
         button.dataset.initialized = "true";
