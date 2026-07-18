@@ -3,13 +3,13 @@
     "name": "七星山",
     "elevation": 1120,
     "description": "",
+    "coverKey": "yama/2026-yangmin-ten-peaks/KCS00986.jpg",
     "location": {
-      "latitude": 25.17079,
-      "longitude": 121.55299,
+      "latitude": 25.170725,
+      "longitude": 121.553454,
       "mapContext": "tw-mainland"
     },
-    "panorama": true,
-    "coverKey": "yama/2026-yangmin-ten-peaks/KCS00986.jpg"
+    "panorama": true
   },
   {
     "name": "七星山東峰",
@@ -50,25 +50,25 @@
     "name": "三叉山",
     "elevation": 3257,
     "description": "",
+    "coverKey": "yama/2026-jiaminghu-2/KCS04340.jpg",
     "location": {
-      "latitude": 23.29749,
-      "longitude": 121.02899,
+      "latitude": 23.297239,
+      "longitude": 121.028688,
       "mapContext": "tw-mainland"
     },
-    "panorama": true,
-    "coverKey": "yama/2026-jiaminghu-2/KCS04340.jpg"
+    "panorama": true
   },
   {
     "name": "三角錐山",
     "elevation": 2607,
     "description": "",
+    "coverKey": "yama/2024-hehuanbei/KCS03831.jpg",
     "location": {
-      "latitude": 24.2097,
-      "longitude": 121.59099,
+      "latitude": 24.209582,
+      "longitude": 121.590528,
       "mapContext": "tw-mainland"
     },
-    "panorama": true,
-    "coverKey": "yama/2024-hehuanbei/KCS03831.jpg"
+    "panorama": true
   },
   {
     "name": "大屯山",
@@ -88,8 +88,8 @@
     "description": "",
     "coverKey": "yama/2026-yangmin-ten-peaks/KCS00976.jpg",
     "location": {
-      "latitude": 25.1711,
-      "longitude": 121.51299,
+      "latitude": 25.171115,
+      "longitude": 121.513467,
       "mapContext": "tw-mainland"
     },
     "panorama": true
@@ -100,8 +100,8 @@
     "description": "",
     "coverKey": "yama/2025-datunshan/KCS01401.jpg",
     "location": {
-      "latitude": 25.1697,
-      "longitude": 121.51799,
+      "latitude": 25.169972,
+      "longitude": 121.517647,
       "mapContext": "tw-mainland"
     },
     "panorama": true
@@ -127,13 +127,13 @@
     "name": "大尖山",
     "elevation": 1305,
     "description": "",
+    "coverKey": "dalin/dalin-2025/07.jpg",
     "location": {
-      "latitude": 23.59,
-      "longitude": 120.62299,
+      "latitude": 23.589997,
+      "longitude": 120.623146,
       "mapContext": "tw-mainland"
     },
-    "panorama": true,
-    "coverKey": "dalin/dalin-2025/07.jpg"
+    "panorama": true
   },
   {
     "name": "大油坑",
@@ -144,13 +144,13 @@
     "name": "大雪山",
     "elevation": 3530,
     "description": "",
+    "coverKey": "yama/2026-daxueshan/KCS02985.jpg",
     "location": {
-      "latitude": 24.33109,
-      "longitude": 121.121,
+      "latitude": 24.330786,
+      "longitude": 121.121224,
       "mapContext": "tw-mainland"
     },
-    "panorama": true,
-    "coverKey": "yama/2026-daxueshan/KCS02985.jpg"
+    "panorama": true
   },
   {
     "name": "大雪山北峰",
@@ -161,13 +161,13 @@
     "name": "大湖尖山",
     "elevation": 1313,
     "description": "",
+    "coverKey": "yama/2026-tataka/KCS00671.jpg",
     "location": {
-      "latitude": 23.48719,
-      "longitude": 120.63799,
+      "latitude": 23.487134,
+      "longitude": 120.637259,
       "mapContext": "tw-mainland"
     },
-    "panorama": true,
-    "coverKey": "yama/2026-tataka/KCS00671.jpg"
+    "panorama": true
   },
   {
     "name": "大塔山",
@@ -185,13 +185,13 @@
     "name": "大劍山",
     "elevation": 3594,
     "description": "",
+    "coverKey": "yama/2024-dajian/KCS01587.jpg",
     "location": {
-      "latitude": 24.3408,
-      "longitude": 121.19999,
+      "latitude": 24.340966,
+      "longitude": 121.200445,
       "mapContext": "tw-mainland"
     },
-    "panorama": true,
-    "coverKey": "yama/2024-dajian/KCS01587.jpg"
+    "panorama": true
   },
   {
     "name": "大霸尖山",
@@ -200,8 +200,8 @@
     "description": "",
     "coverKey": "yama/2023-da-xiao-bajianshan/08.jpg",
     "location": {
-      "latitude": 24.45721,
-      "longitude": 121.25799,
+      "latitude": 24.457719,
+      "longitude": 121.258072,
       "mapContext": "tw-mainland"
     },
     "panorama": true
@@ -230,13 +230,13 @@
     "name": "小霸尖山",
     "elevation": 3418,
     "description": "",
+    "coverKey": "yama/2023-da-xiao-bajianshan/09.jpg",
     "location": {
-      "latitude": 24.4556,
-      "longitude": 121.252,
+      "latitude": 24.455544,
+      "longitude": 121.252218,
       "mapContext": "tw-mainland"
     },
-    "panorama": true,
-    "coverKey": "yama/2023-da-xiao-bajianshan/09.jpg"
+    "panorama": true
   },
   {
     "name": "小觀音山",
@@ -260,8 +260,8 @@
     "description": "第一次注意到中央尖山是在2024年[志佳陽上雪山](/yama/2024-zhijiayang-xueshan)，第二天從飄簞山屋往志佳陽大山的路線上。當時將要日出，中央尖背著橘紅色天空的剪影很是醒目。從雪山山脈一帶看過去的山形形似鯊魚背鰭，從南北方向望去則是一座由石英砂岩和礫岩構成的金字塔。\n路線有挑戰性，是一座我想在更有經驗後才拜訪的一座山。",
     "coverKey": "yama/2024-hehuanbei/KCS03808.jpg",
     "location": {
-      "latitude": 24.3103,
-      "longitude": 121.41601,
+      "latitude": 24.310175,
+      "longitude": 121.416257,
       "mapContext": "tw-mainland"
     },
     "panorama": true
@@ -285,13 +285,13 @@
     "name": "天空堡壘",
     "elevation": 3345,
     "description": "",
+    "coverKey": "yama/2026-jiaminghu-2/KCS03901.jpg",
     "location": {
-      "latitude": 23.3161,
-      "longitude": 121.128,
+      "latitude": 23.316461,
+      "longitude": 121.127403,
       "mapContext": "tw-mainland"
     },
-    "panorama": true,
-    "coverKey": "yama/2026-jiaminghu-2/KCS03901.jpg"
+    "panorama": true
   },
   {
     "name": "天雲山",
@@ -307,13 +307,13 @@
     "name": "巴紗拉雲山",
     "elevation": 3407,
     "description": "",
+    "coverKey": "yama/2025-da-xiao-bajianshan/KCS00550.jpg",
     "location": {
-      "latitude": 24.4389,
-      "longitude": 121.25799,
+      "latitude": 24.439004,
+      "longitude": 121.258111,
       "mapContext": "tw-mainland"
     },
-    "panorama": true,
-    "coverKey": "yama/2025-da-xiao-bajianshan/KCS00550.jpg"
+    "panorama": true
   },
   {
     "name": "水社大山",
@@ -361,11 +361,11 @@
     "name": "北大武山",
     "alternateName": "Kavulungan",
     "elevation": 3092,
-    "description": "",
+    "description": "記憶中最美的北大武山是在龍泉營區看見的，那時沒有相機甚至沒有手機，卻只是看著衪發呆就能讓人暫時忘記身體與精神上的不自由。",
     "coverKey": "yama/2026-jiaminghu-1/KCS04425.jpg",
     "location": {
-      "latitude": 22.6269,
-      "longitude": 120.76098,
+      "latitude": 22.626995,
+      "longitude": 120.761369,
       "mapContext": "tw-mainland"
     },
     "panorama": true
@@ -381,8 +381,8 @@
     "description": "",
     "coverKey": "yama/2025-beichatianshan/KCS00211.jpg",
     "location": {
-      "latitude": 24.79189,
-      "longitude": 121.454,
+      "latitude": 24.791941,
+      "longitude": 121.453774,
       "mapContext": "tw-mainland"
     },
     "panorama": true
@@ -403,13 +403,13 @@
     "name": "半屏山",
     "elevation": 713,
     "description": "",
+    "coverKey": "y/2025-shisunjian/KCS02292.jpg",
     "location": {
-      "latitude": 25.1017,
-      "longitude": 121.86799,
+      "latitude": 25.101653,
+      "longitude": 121.868448,
       "mapContext": "tw-mainland"
     },
-    "panorama": true,
-    "coverKey": "y/2025-shisunjian/KCS02292.jpg"
+    "panorama": true
   },
   {
     "name": "卡社大山",
@@ -449,8 +449,8 @@
     "description": "",
     "coverKey": "yama/2026-jiaminghu-2/KCS03892.jpg",
     "location": {
-      "latitude": 23.2331,
-      "longitude": 121.079,
+      "latitude": 23.233115,
+      "longitude": 121.078602,
       "mapContext": "tw-mainland"
     },
     "panorama": true
@@ -477,8 +477,8 @@
     "description": "台灣最高峰，東北亞第一高峰。",
     "coverKey": "yama/2024-alishan-yushan/KCS00743.jpg",
     "location": {
-      "latitude": 23.47031,
-      "longitude": 120.95701,
+      "latitude": 23.470022,
+      "longitude": 120.957247,
       "mapContext": "tw-mainland"
     },
     "panorama": true
@@ -489,8 +489,8 @@
     "description": "",
     "coverKey": "yama/2024-alishan-yushan/KCS00741.jpg",
     "location": {
-      "latitude": 23.4914,
-      "longitude": 120.959,
+      "latitude": 23.491229,
+      "longitude": 120.959072,
       "mapContext": "tw-mainland"
     },
     "panorama": true
@@ -501,8 +501,8 @@
     "description": "",
     "coverKey": "yama/2026-tataka/KCS00762.jpg",
     "location": {
-      "latitude": 23.4872,
-      "longitude": 120.959,
+      "latitude": 23.487401,
+      "longitude": 120.959416,
       "mapContext": "tw-mainland"
     },
     "panorama": true
@@ -523,8 +523,8 @@
     "description": "",
     "coverKey": "yama/2026-tataka/KCS00772.jpg",
     "location": {
-      "latitude": 23.4467,
-      "longitude": 120.959,
+      "latitude": 23.446556,
+      "longitude": 120.958824,
       "mapContext": "tw-mainland"
     },
     "panorama": true
@@ -611,8 +611,8 @@
     "description": "",
     "coverKey": "yama/2024-hehuanbei/KCS03866.jpg",
     "location": {
-      "latitude": 24.1811,
-      "longitude": 121.281,
+      "latitude": 24.181363,
+      "longitude": 121.281327,
       "mapContext": "tw-mainland"
     },
     "panorama": true
@@ -645,13 +645,13 @@
     "name": "向陽山",
     "elevation": 3603,
     "description": "",
+    "coverKey": "yama/2026-jiaminghu-2/KCS03965.jpg",
     "location": {
-      "latitude": 23.28441,
-      "longitude": 120.99299,
+      "latitude": 23.284301,
+      "longitude": 120.992489,
       "mapContext": "tw-mainland"
     },
-    "panorama": true,
-    "coverKey": "yama/2026-jiaminghu-2/KCS03965.jpg"
+    "panorama": true
   },
   {
     "name": "向陽山北峰",
@@ -691,8 +691,8 @@
     "description": "",
     "coverKey": "y/2023-fishroad/005.jpg",
     "location": {
-      "latitude": 25.2142,
-      "longitude": 121.563,
+      "latitude": 25.214109,
+      "longitude": 121.563397,
       "mapContext": "tw-mainland"
     },
     "panorama": true
@@ -719,8 +719,8 @@
     "description": "",
     "coverKey": "yama/2026-jiaminghu-2/KCS04256.jpg",
     "location": {
-      "latitude": 23.4969,
-      "longitude": 121.058,
+      "latitude": 23.497013,
+      "longitude": 121.057764,
       "mapContext": "tw-mainland"
     },
     "panorama": true
@@ -748,8 +748,8 @@
     "description": "",
     "coverKey": "yama/2026-jiaminghu-1/KCS04422.jpg",
     "location": {
-      "latitude": 23.0508,
-      "longitude": 120.874,
+      "latitude": 23.051099,
+      "longitude": 120.87421,
       "mapContext": "tw-mainland"
     },
     "panorama": true
@@ -775,8 +775,8 @@
     "description": "",
     "coverKey": "y/2025/019.jpg",
     "location": {
-      "latitude": 24.0864,
-      "longitude": 121.324,
+      "latitude": 24.086327,
+      "longitude": 121.323332,
       "mapContext": "tw-mainland"
     },
     "panorama": true
@@ -787,8 +787,8 @@
     "description": "",
     "coverKey": "yama/2024-hehuanbei/KCS03869.jpg",
     "location": {
-      "latitude": 24.1186,
-      "longitude": 121.336,
+      "latitude": 24.118527,
+      "longitude": 121.335854,
       "mapContext": "tw-mainland"
     },
     "panorama": true
@@ -858,8 +858,8 @@
     "description": "",
     "coverKey": "yama/2026-tataka/KCS00695.jpg",
     "location": {
-      "latitude": 23.56279,
-      "longitude": 120.81999,
+      "latitude": 23.562513,
+      "longitude": 120.820732,
       "mapContext": "tw-mainland"
     },
     "panorama": true
@@ -930,8 +930,8 @@
     "description": "",
     "coverKey": "yama/2025-taoshan/KCS02915.jpg",
     "location": {
-      "latitude": 24.3617,
-      "longitude": 121.439,
+      "latitude": 24.361795,
+      "longitude": 121.439461,
       "mapContext": "tw-mainland"
     },
     "panorama": true
@@ -942,8 +942,8 @@
     "description": "",
     "coverKey": "yama/2026-jiaminghu-2/KCS04231.jpg",
     "location": {
-      "latitude": 23.3458,
-      "longitude": 121.011,
+      "latitude": 23.345824,
+      "longitude": 121.010571,
       "mapContext": "tw-mainland"
     },
     "panorama": true
@@ -954,8 +954,8 @@
     "description": "",
     "coverKey": "yama/2024-zhijiayang-xueshan/KCS01724.jpg",
     "location": {
-      "latitude": 24.43,
-      "longitude": 121.27,
+      "latitude": 24.430077,
+      "longitude": 121.27037,
       "mapContext": "tw-mainland"
     },
     "panorama": true
@@ -988,8 +988,8 @@
     "description": "",
     "coverKey": "yama/2025-taoshan/KCS02978.jpg",
     "location": {
-      "latitude": 24.4328,
-      "longitude": 121.304,
+      "latitude": 24.432585,
+      "longitude": 121.304851,
       "mapContext": "tw-mainland"
     },
     "panorama": true
@@ -1000,8 +1000,8 @@
     "description": "",
     "coverKey": "yama/2026-jiaminghu-1/KCS04657.jpg",
     "location": {
-      "latitude": 23.1867,
-      "longitude": 120.912,
+      "latitude": 23.186396,
+      "longitude": 120.912054,
       "mapContext": "tw-mainland"
     },
     "panorama": true
@@ -1012,8 +1012,8 @@
     "description": "",
     "coverKey": "yama/2026-yangmin-ten-peaks/KCS00914.jpg",
     "location": {
-      "latitude": 25.1486,
-      "longitude": 121.543,
+      "latitude": 25.14842,
+      "longitude": 121.543287,
       "mapContext": "tw-mainland"
     },
     "panorama": true
@@ -1044,8 +1044,8 @@
     "description": "",
     "coverKey": "yama/2026-tataka/KCS00741.jpg",
     "location": {
-      "latitude": 23.5775,
-      "longitude": 120.963,
+      "latitude": 23.57732,
+      "longitude": 120.96274,
       "mapContext": "tw-mainland"
     },
     "panorama": true
@@ -1071,8 +1071,8 @@
     "description": "",
     "coverKey": "yama/2026-jiaminghu-1/KCS04394.jpg",
     "location": {
-      "latitude": 23.5222,
-      "longitude": 121.118,
+      "latitude": 23.521949,
+      "longitude": 121.11739,
       "mapContext": "tw-mainland"
     },
     "panorama": true
@@ -1091,13 +1091,13 @@
     "name": "基隆山",
     "elevation": 588,
     "description": "",
+    "coverKey": "y/2026-keelungyu/KCS03505.jpg",
     "location": {
-      "latitude": 25.1189,
-      "longitude": 121.849,
+      "latitude": 25.118889,
+      "longitude": 121.849189,
       "mapContext": "tw-mainland"
     },
-    "panorama": true,
-    "coverKey": "y/2026-keelungyu/KCS03505.jpg"
+    "panorama": true
   },
   {
     "name": "基隆山東峰",
@@ -1122,8 +1122,8 @@
     "description": "",
     "coverKey": "yama/2024-hehuanbei/KCS03830.jpg",
     "location": {
-      "latitude": 24.2356,
-      "longitude": 121.652,
+      "latitude": 24.235402,
+      "longitude": 121.651605,
       "mapContext": "tw-mainland"
     },
     "panorama": true
@@ -1134,8 +1134,8 @@
     "description": "",
     "coverKey": "yama/2024-dajian/KCS01314.jpg",
     "location": {
-      "latitude": 24.2139,
-      "longitude": 121.347,
+      "latitude": 24.213596,
+      "longitude": 121.3472,
       "mapContext": "tw-mainland"
     },
     "panorama": true
@@ -1152,8 +1152,8 @@
     "description": "",
     "coverKey": "y/2025-huadong/015.jpg",
     "location": {
-      "latitude": 22.895,
-      "longitude": 121.189,
+      "latitude": 22.895095,
+      "longitude": 121.188404,
       "mapContext": "tw-mainland"
     },
     "panorama": true
@@ -1165,8 +1165,8 @@
     "description": "",
     "coverKey": "yama/2024-dajian/KCS01495.jpg",
     "location": {
-      "latitude": 24.3836,
-      "longitude": 121.232,
+      "latitude": 24.383281,
+      "longitude": 121.231926,
       "mapContext": "tw-mainland"
     },
     "panorama": true
@@ -1177,8 +1177,8 @@
     "description": "",
     "coverKey": "yama/2025-da-xiao-bajianshan/KCS00456.jpg",
     "location": {
-      "latitude": 24.4147,
-      "longitude": 121.24,
+      "latitude": 24.414715,
+      "longitude": 121.240389,
       "mapContext": "tw-mainland"
     },
     "panorama": true
@@ -1204,8 +1204,8 @@
     "description": "",
     "coverKey": "y/2018-on-two-wheels-w/049.jpg",
     "location": {
-      "latitude": 22.8014,
-      "longitude": 120.76,
+      "latitude": 22.801309,
+      "longitude": 120.760396,
       "mapContext": "tw-mainland"
     },
     "panorama": true
@@ -1226,8 +1226,8 @@
     "description": "",
     "coverKey": "y/2025-shisunjian/KCS02290.jpg",
     "location": {
-      "latitude": 25.10636,
-      "longitude": 121.86594,
+      "latitude": 25.106393,
+      "longitude": 121.865823,
       "mapContext": "tw-mainland"
     },
     "panorama": true
@@ -1238,8 +1238,8 @@
     "description": "",
     "coverKey": "yama/2024-hehuanbei/KCS03820.jpg",
     "location": {
-      "latitude": 24.2547,
-      "longitude": 121.385,
+      "latitude": 24.255698,
+      "longitude": 121.384775,
       "mapContext": "tw-mainland"
     },
     "panorama": true
@@ -1255,8 +1255,8 @@
     "description": "",
     "coverKey": "yama/2026-jiaminghu-2/KCS04254.jpg",
     "location": {
-      "latitude": 23.3539,
-      "longitude": 120.97499,
+      "latitude": 23.353791,
+      "longitude": 120.975828,
       "mapContext": "tw-mainland"
     },
     "panorama": true
@@ -1297,13 +1297,13 @@
     "name": "新望嶺",
     "elevation": 2481,
     "description": "",
+    "coverKey": "yama/2026-tataka/KCS00737.jpg",
     "location": {
-      "latitude": 23.2958,
-      "longitude": 120.782,
+      "latitude": 23.296028,
+      "longitude": 120.782759,
       "mapContext": "tw-mainland"
     },
-    "panorama": true,
-    "coverKey": "yama/2026-tataka/KCS00737.jpg"
+    "panorama": true
   },
   {
     "name": "新港山",
@@ -1323,8 +1323,8 @@
     "description": "",
     "coverKey": "yama/2026-jiaminghu-1/KCS04508.jpg",
     "location": {
-      "latitude": 23.2775,
-      "longitude": 120.968,
+      "latitude": 23.27779,
+      "longitude": 120.968403,
       "mapContext": "tw-mainland"
     },
     "panorama": true
@@ -1367,8 +1367,8 @@
     "description": "",
     "coverKey": "yama/2024-dajian/KCS01320.jpg",
     "location": {
-      "latitude": 24.3794,
-      "longitude": 121.215,
+      "latitude": 24.379273,
+      "longitude": 121.21534,
       "mapContext": "tw-mainland"
     },
     "panorama": true
@@ -1391,8 +1391,8 @@
     "description": "",
     "coverKey": "yama/2026-daxueshan/KCS03212.jpg",
     "location": {
-      "latitude": 24.2411,
-      "longitude": 120.955,
+      "latitude": 24.241053,
+      "longitude": 120.954981,
       "mapContext": "tw-mainland"
     },
     "panorama": true
@@ -1403,8 +1403,8 @@
     "description": "",
     "coverKey": "yama/2026-daxueshan/KCS02968.jpg",
     "location": {
-      "latitude": 24.2958,
-      "longitude": 121.16999,
+      "latitude": 24.295523,
+      "longitude": 121.170062,
       "mapContext": "tw-mainland"
     },
     "panorama": true
@@ -1473,8 +1473,8 @@
     "description": "",
     "coverKey": "yama/2025-da-xiao-bajianshan/KCS00586.jpg",
     "location": {
-      "latitude": 24.61,
-      "longitude": 121.076,
+      "latitude": 24.610166,
+      "longitude": 121.075664,
       "mapContext": "tw-mainland"
     },
     "panorama": true
@@ -1490,8 +1490,8 @@
     "description": "典型的橫看成嶺側成峰。南北狹長，從北方的玉山、南方的海諾南山、卑南主山方向看來像金字塔，從東北方的向陽山、三叉山來看則是東緩西陡的單面山地形。\n期待有一天可以從海諾南山望向關山。",
     "coverKey": "yama/2026-jiaminghu-2/KCS04012.jpg",
     "location": {
-      "latitude": 23.22861,
-      "longitude": 120.91199,
+      "latitude": 23.228129,
+      "longitude": 120.91173,
       "mapContext": "tw-mainland"
     },
     "panorama": true
@@ -1512,8 +1512,8 @@
     "description": "",
     "coverKey": "yama/2024-beinandawu/KCS05125.jpg",
     "location": {
-      "latitude": 22.6958,
-      "longitude": 120.784,
+      "latitude": 22.695957,
+      "longitude": 120.784528,
       "mapContext": "tw-mainland"
     },
     "panorama": true
@@ -1546,8 +1546,8 @@
     "description": "",
     "coverKey": "yama/2026-jiaminghu-1/KCS04452.jpg",
     "location": {
-      "latitude": 23.2447,
-      "longitude": 120.938,
+      "latitude": 23.24491,
+      "longitude": 120.93768,
       "mapContext": "tw-mainland"
     },
     "panorama": true
@@ -1558,8 +1558,8 @@
     "description": "",
     "coverKey": "yama/2025-datunshan/KCS02374.jpg",
     "location": {
-      "latitude": 25.1358,
-      "longitude": 121.426,
+      "latitude": 25.135957,
+      "longitude": 121.426525,
       "mapContext": "tw-mainland"
     },
     "panorama": true

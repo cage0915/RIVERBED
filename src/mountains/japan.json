@@ -172,8 +172,8 @@
     "description": "",
     "coverKey": "yama/2026-matsumoto-suwa-azumino/KCS01798.jpg",
     "location": {
-      "latitude": 36.3908,
-      "longitude": 137.77,
+      "latitude": 36.391391,
+      "longitude": 137.770508,
       "mapContext": "jp-honshu"
     },
     "panorama": true
@@ -228,8 +228,8 @@
     "description": "",
     "coverKey": "yama/2025-omoteginza-d4/KCS08181.jpg",
     "location": {
-      "latitude": 36.2747,
-      "longitude": 137.66,
+      "latitude": 36.274697,
+      "longitude": 137.660295,
       "mapContext": "jp-honshu"
     },
     "panorama": true
@@ -251,8 +251,8 @@
     "description": "",
     "coverKey": "yama/2026-matsumoto-suwa-azumino/KCS01278.jpg",
     "location": {
-      "latitude": 36.1067,
-      "longitude": 137.554,
+      "latitude": 36.10652,
+      "longitude": 137.553602,
       "mapContext": "jp-honshu"
     },
     "panorama": true
@@ -300,8 +300,8 @@
     "description": "",
     "coverKey": "yama/2026-hakuba/KCS01424.jpg",
     "location": {
-      "latitude": 36.68724,
-      "longitude": 137.75468,
+      "latitude": 36.687158,
+      "longitude": 137.75461,
       "mapContext": "jp-honshu"
     },
     "panorama": true
@@ -318,8 +318,8 @@
     "description": "",
     "coverKey": "yama/2025-omoteginza-d2/KCS07142.jpg",
     "location": {
-      "latitude": 36.5378,
-      "longitude": 137.685,
+      "latitude": 36.53801,
+      "longitude": 137.684531,
       "mapContext": "jp-honshu"
     },
     "panorama": true
@@ -343,8 +343,8 @@
     "elevation": 2999,
     "description": "",
     "location": {
-      "latitude": 36.62352,
-      "longitude": 137.61732,
+      "latitude": 36.623322,
+      "longitude": 137.617119,
       "mapContext": "jp-honshu"
     },
     "panorama": true
@@ -356,8 +356,8 @@
     "description": "",
     "coverKey": "yama/2026-matsumoto-suwa-azumino/KCS01819.jpg",
     "location": {
-      "latitude": 36.3258,
-      "longitude": 137.72701,
+      "latitude": 36.325496,
+      "longitude": 137.727607,
       "mapContext": "jp-honshu"
     },
     "panorama": true
@@ -380,8 +380,8 @@
     "description": "",
     "coverKey": "yama/2025-omoteginza-d1/KCS06507.jpg",
     "location": {
-      "latitude": 36.4325,
-      "longitude": 137.63778,
+      "latitude": 36.432657,
+      "longitude": 137.637876,
       "mapContext": "jp-honshu"
     },
     "panorama": true
@@ -411,8 +411,8 @@
     "description": "",
     "coverKey": "yama/2025-omoteginza-d1/KCS06750.jpg",
     "location": {
-      "latitude": 36.2894,
-      "longitude": 137.64799,
+      "latitude": 36.289229,
+      "longitude": 137.648058,
       "mapContext": "jp-honshu"
     },
     "panorama": true
@@ -472,8 +472,8 @@
     "description": "",
     "coverKey": "yama/2026-shinano-omachi/KCS01776.jpg",
     "location": {
-      "latitude": 36.5881,
-      "longitude": 137.75101,
+      "latitude": 36.588292,
+      "longitude": 137.750885,
       "mapContext": "jp-honshu"
     },
     "panorama": true
@@ -572,8 +572,8 @@
     "description": "",
     "coverKey": "yama/2025-omoteginza-d1/KCS06727.jpg",
     "location": {
-      "latitude": 36.40694,
-      "longitude": 137.712778,
+      "latitude": 36.406796,
+      "longitude": 137.712784,
       "mapContext": "jp-honshu"
     },
     "panorama": true
