@@ -12,6 +12,11 @@ same fractional-pixel sampling before forming the 20 metre source lattice. Do
 not edit generated SVGs by hand.
 Assets use their NFC-normalized mountain names as filenames, for example
 `taiwan/玉山主峰.svg` and `japan/白馬岳.svg`.
+The production build creates temporary, reversible hexadecimal aliases under
+`/contour-assets` because Cloudflare Pages does not reliably index the Unicode
+filenames. Local development reads the named source files directly. The source
+files remain human-readable, and production cleanup removes the duplicate
+Unicode copies from `dist`.
 
 - Taiwan uses the Ministry of the Interior 20m DTM from
   <https://data.gov.tw/dataset/35430/>.

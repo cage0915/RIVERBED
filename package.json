@@ -7,7 +7,9 @@
     "dev:r2": "wrangler pages dev --r2 --persist-to=.wrangler/state -- npm run dev",
     "preview:r2": "wrangler pages dev dist --r2 --persist-to=.wrangler/state",
     "contours:generate": "node scripts/generate-mountain-contours.mjs",
+    "prebuild": "node scripts/prepare-contour-assets.mjs prepare",
     "build": "astro build",
+    "postbuild": "node scripts/prepare-contour-assets.mjs cleanup",
     "preview": "astro preview",
     "astro": "astro"
   },

@@ -12,6 +12,6 @@ test("contour asset names are stable and filesystem safe", () => {
   assert.equal(getMountainContourAssetName("A/B\\C"), "A／B＼C");
   assert.equal(
     getMountainContourAssetUrl("japan", "白馬岳"),
-    "/contours/japan/%E7%99%BD%E9%A6%AC%E5%B2%B3.svg",
+    "/contour-assets/japan/e799bde9a6ace5b2b3.svg",
   );
 });
