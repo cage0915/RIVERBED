@@ -174,9 +174,42 @@ const sortedGroups = groups.map((group) => ({
                     const image = card.querySelector<HTMLImageElement>(
                         "img[data-contour-src]",
                     );
-                    if (!image || image.src) return;
+                    if (!image || image.dataset.contourLoading) return;
+                    image.dataset.contourLoading = "true";
+
+                    const markReady = () => {
+                        image.classList.add("is-ready");
+                    };
+                    const decodeAndMarkReady = () => {
+                        image.decode().then(markReady).catch(() => {
+                            if (image.complete && image.naturalWidth > 0) {
+                                markReady();
+                            }
+                        });
+                    };
+                    image.addEventListener("load", decodeAndMarkReady, {
+                        once: true,
+                    });
                     image.src = image.dataset.contourSrc ?? "";
+                    decodeAndMarkReady();
                 };
+
+                if ("IntersectionObserver" in window) {
+                    const contourObserver = new IntersectionObserver(
+                        (entries) => {
+                            entries.forEach((entry) => {
+                                if (!entry.isIntersecting) return;
+                                const card = entry.target as HTMLElement;
+                                loadContours(card);
+                                contourObserver.unobserve(card);
+                            });
+                        },
+                        { rootMargin: "600px 0px" },
+                    );
+                    cards.forEach((card) => contourObserver.observe(card));
+                } else {
+                    cards.forEach(loadContours);
+                }
 
                 const updateButtons = () => {
                     buttons.forEach((button) => {
@@ -427,8 +460,8 @@ const sortedGroups = groups.map((group) => ({
             transform: scale(1.05);
         }
 
-        .mountain-tag-card:hover .mountain-tag-card__contours,
-        .mountain-tag-card:focus-within .mountain-tag-card__contours {
+        .mountain-tag-card:hover .mountain-tag-card__contours.is-ready,
+        .mountain-tag-card:focus-within .mountain-tag-card__contours.is-ready {
             opacity: 0.82;
         }
 
@@ -450,7 +483,7 @@ const sortedGroups = groups.map((group) => ({
             transform: scale(1.05);
         }
 
-        .mountain-tag-card.show-info .mountain-tag-card__contours {
+        .mountain-tag-card.show-info .mountain-tag-card__contours.is-ready {
             opacity: 0.82;
         }
 
