@@ -70,6 +70,104 @@
                         background: #157347;
                         color: #fff;
                     }
+                    .dev-manager-header-button--save[disabled] {
+                        border-color: transparent;
+                        background: transparent;
+                        color: #94a3b8;
+                        cursor: default;
+                        opacity: 0.6;
+                    }
+                    .dev-import-grid {
+                        display: grid;
+                        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+                        gap: 0.6rem;
+                        margin-top: 1rem;
+                    }
+                    .dev-import-photo {
+                        position: relative;
+                        padding: 0;
+                        overflow: hidden;
+                        border: 2px solid transparent;
+                        border-radius: 7px;
+                        background: #e2e8f0;
+                        cursor: default;
+                        aspect-ratio: 4 / 3;
+                    }
+                    .dev-import-photo img {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                    }
+                    .dev-import-photo:focus { outline: none; }
+                    .dev-import-photo.is-current { outline: 2px solid #2563eb; outline-offset: 2px; }
+                    .dev-import-photo.is-selected { border-color: #16a34a; }
+                    .dev-import-photo span {
+                        position: absolute;
+                        right: 0;
+                        bottom: 0;
+                        left: 0;
+                        overflow: hidden;
+                        padding: 0.25rem;
+                        background: rgba(15, 23, 42, 0.72);
+                        color: white;
+                        font-size: 0.62rem;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                    }
+                    .dev-import-photo-checkbox {
+                        position: absolute;
+                        top: 0.4rem;
+                        right: 0.4rem;
+                        width: 1.15rem;
+                        height: 1.15rem;
+                        margin: 0;
+                        accent-color: #16a34a;
+                        cursor: pointer;
+                        filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.55));
+                    }
+                    .dev-import-staged-grid {
+                        display: grid;
+                        grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+                        gap: 0.5rem;
+                        margin-top: 0.6rem;
+                    }
+                    .dev-import-staged-photo {
+                        position: relative;
+                        overflow: hidden;
+                        border-radius: 6px;
+                        background: #e2e8f0;
+                        aspect-ratio: 4 / 3;
+                    }
+                    .dev-import-staged-photo img { width: 100%; height: 100%; object-fit: cover; }
+                    .dev-import-staged-remove {
+                        position: absolute;
+                        top: 0.25rem;
+                        right: 0.25rem;
+                        display: flex;
+                        width: 1.4rem;
+                        height: 1.4rem;
+                        padding: 0;
+                        align-items: center;
+                        justify-content: center;
+                        border: 0;
+                        border-radius: 50%;
+                        background: rgba(220, 38, 38, 0.9);
+                        color: white;
+                        cursor: pointer;
+                    }
+                    .dev-import-preview {
+                        position: absolute;
+                        inset: 0;
+                        z-index: 20;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        padding: 1rem;
+                        background: rgba(2, 6, 23, 0.94);
+                    }
+                    .dev-import-preview[hidden] { display: none; }
+                    .dev-import-preview img { max-width: 100%; max-height: calc(100% - 3rem); object-fit: contain; }
                     .dev-block-toolbar {
                         position: absolute;
                         top: 0.5rem;
@@ -276,11 +374,48 @@
                         margin: 0;
                     }
                     .dev-pm-block {
+                        position: relative;
                         background: #f9f9f9;
                         border: 1px solid #eee;
                         border-radius: 8px;
                         margin-bottom: 1rem;
                         padding: 0.75rem;
+                    }
+                    .dev-pm-inline-add-zone {
+                        position: absolute;
+                        right: 0;
+                        bottom: -0.55rem;
+                        left: 0;
+                        z-index: 8;
+                        display: flex;
+                        height: 1.1rem;
+                        align-items: center;
+                        justify-content: center;
+                        opacity: 0;
+                        transition: opacity 120ms ease;
+                    }
+                    .dev-pm-inline-add-zone--before {
+                        top: -0.55rem;
+                        bottom: auto;
+                    }
+                    .dev-pm-inline-add-zone:hover,
+                    .dev-pm-inline-add-zone:focus-within,
+                    .dev-pm-inline-add-zone.is-active {
+                        opacity: 1;
+                        background: linear-gradient(transparent calc(50% - 0.5px), #93c5fd calc(50% - 0.5px), #93c5fd calc(50% + 0.5px), transparent calc(50% + 0.5px));
+                    }
+                    .dev-pm-inline-add-button {
+                        display: flex;
+                        width: 20px;
+                        height: 20px;
+                        padding: 0;
+                        align-items: center;
+                        justify-content: center;
+                        border: 1px solid #93c5fd;
+                        border-radius: 50%;
+                        background: white;
+                        color: #2563eb;
+                        cursor: pointer;
                     }
                     .dev-pm-block-header {
                         display: flex;
@@ -352,6 +487,31 @@
                     .dev-pm-photo-menu-btn:hover {
                         background: rgba(0,0,0,0.05);
                         color: #666;
+                    }
+                    .dev-pm-photo-action {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        padding: 4px;
+                        border: none;
+                        border-radius: 4px;
+                        background: none;
+                        color: #94a3b8;
+                        cursor: pointer;
+                    }
+                    .dev-pm-photo-action:hover {
+                        background: rgba(0,0,0,0.05);
+                        color: #475569;
+                    }
+                    .dev-pm-photo-action.is-cover {
+                        color: #f59e0b;
+                    }
+                    .dev-pm-photo-action.is-cover svg {
+                        fill: currentColor;
+                    }
+                    .dev-pm-photo-action.delete-btn:hover {
+                        background: #fef2f2;
+                        color: #ef4444;
                     }
                     .dev-pm-photo-menu {
                         position: absolute;
@@ -449,28 +609,6 @@
                         color: #2563eb;
                         background: #eff6ff;
                     }
-                    .block-move-arrows {
-                        display: flex;
-                        flex-direction: column;
-                        flex-shrink: 0;
-                        align-self: stretch;
-                    }
-                    .block-insert-btn {
-                        background: none;
-                        border: none;
-                        cursor: pointer;
-                        padding: 0 5px;
-                        flex: 1;
-                        display: flex;
-                        align-items: center;
-                        color: #94a3b8;
-                        border-radius: 3px;
-                        line-height: 1;
-                    }
-                    .block-insert-btn:hover {
-                        background: #eff6ff;
-                        color: #2563eb;
-                    }
                     /* Type badge (R / C) */
                     .block-type-badge {
                         width: 20px;
@@ -531,7 +669,8 @@
                 rename: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>`,
                 split: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3"/><path d="M16 3h3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-3"/><line x1="12" y1="3" x2="12" y2="21"/></svg>`,
                 arrowRight: `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg>`,
-                cloudSync: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="4" x2="19" y2="4"/><polyline points="12 8 12 20"/><polyline points="8 12 12 8 16 12"/></svg>`
+                cloudSync: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="4" x2="19" y2="4"/><polyline points="12 8 12 20"/><polyline points="8 12 12 8 16 12"/></svg>`,
+                download: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg>`
             };
 
             async function fetchMountains() {
@@ -975,6 +1114,151 @@
                 });
             }
 
+            async function openAlbumSyncDialog(albumSlug: string) {
+                showToast('⌛ Building R2 dry run...');
+                const response = await fetch(`/api/r2-album-plan?albumSlug=${encodeURIComponent(albumSlug)}`, { cache: 'no-store' });
+                const plan = await response.json().catch(() => ({}));
+                if (!response.ok) return showToast(`❌ ${plan.error || 'R2 audit failed'}`);
+
+                const dialog = document.createElement('dialog');
+                dialog.style.cssText = 'border:0;border-radius:12px;padding:0;box-shadow:0 20px 50px rgba(0,0,0,.3);';
+                const localKeys = new Set([
+                    ...(plan.required || []).filter((item: any) => item.local).map((item: any) => item.key),
+                    ...(plan.localCandidates || []).map((item: any) => item.key),
+                ]);
+                const remoteDownloadKeys = [...new Set([
+                    ...(plan.required || []).filter((item: any) => item.remote).map((item: any) => item.key),
+                    ...(plan.remoteExtras || []).map((item: any) => item.key),
+                ])].filter((key: any) => !localKeys.has(key));
+                const actionable = plan.remoteAvailable
+                    ? [
+                        ...(plan.required || []).filter((item: any) => ['upload', 'overwrite', 'unknown'].includes(item.action)).map((item: any) => ({
+                            key: item.key,
+                            action: item.action === 'unknown' ? 'overwrite' : item.action,
+                            etag: item.remote?.etag,
+                            label: item.action === 'unknown' ? 'Overwrite (legacy hash unknown)' : item.action,
+                            group: item.action,
+                            checked: item.action !== 'unknown',
+                        })),
+                        ...remoteDownloadKeys.map((key: any) => ({ key, action: 'download', label: 'Download', group: 'download', checked: false })),
+                        ...(plan.remoteExtras || []).filter((item: any) => item.action === 'trash').map((item: any) => ({ key: item.key, action: 'trash', label: 'Move to Trash', group: 'trash', checked: true })),
+                    ] : [];
+                const missing = (plan.required || []).filter((item: any) => item.action === 'missing');
+                const protectedItems = (plan.remoteExtras || []).filter((item: any) => item.action === 'protected');
+                const syncGroupDefinitions = [
+                    { id: 'download', label: 'Download' },
+                    { id: 'upload', label: 'Upload' },
+                    { id: 'overwrite', label: 'Overwrite' },
+                    { id: 'unknown', label: 'Overwrite (Legacy Hash Unknown)' },
+                    { id: 'trash', label: 'Move to Trash' },
+                ];
+                const rows = syncGroupDefinitions.map((group) => {
+                    const entries = actionable
+                        .map((item: any, index: number) => ({ item, index }))
+                        .filter(({ item }: any) => item.group === group.id);
+                    if (!entries.length) return '';
+                    return `
+                        <section data-sync-group-section="${group.id}" style="margin-bottom:.65rem;border:1px solid #e2e8f0;border-radius:7px;overflow:hidden;background:#fff;">
+                            <div style="display:flex;align-items:center;gap:.6rem;padding:.7rem .8rem;background:#f8fafc;color:#334155;font-weight:600;">
+                                <button data-sync-group-expand="${group.id}" type="button" aria-label="Expand ${group.label}" aria-expanded="false" style="display:flex;align-items:center;justify-content:center;padding:4px;border:0;background:none;color:#64748b;cursor:pointer;transition:transform .2s;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                </button>
+                                <input data-sync-group="${group.id}" type="checkbox" aria-label="Select all ${group.label}" style="margin:0;" />
+                                <button data-sync-group-label="${group.id}" type="button" style="display:flex;flex:1;align-items:center;padding:0;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer;">
+                                    <span style="flex:1;">${group.label}</span>
+                                    <span style="color:#94a3b8;font-size:.72rem;font-weight:400;">${entries.length}</span>
+                                </button>
+                            </div>
+                            <div data-sync-group-list="${group.id}" hidden>
+                                ${entries.map(({ item, index }: any) => `
+                                    <label style="display:flex;align-items:center;gap:.6rem;padding:.55rem .8rem;border-top:1px solid #edf2f7;cursor:pointer;">
+                                        <input data-sync-index="${index}" data-sync-entry-group="${group.id}" type="checkbox" ${item.checked ? 'checked' : ''} style="margin:0;" />
+                                        <code data-sync-name="${index}" style="min-width:0;overflow:hidden;color:#64748b;font-size:.72rem;text-overflow:ellipsis;white-space:nowrap;"></code>
+                                    </label>`).join('')}
+                            </div>
+                        </section>`;
+                }).join('');
+                dialog.innerHTML = `
+                    <div style="display:flex;flex-direction:column;width:min(720px,92vw);max-height:82vh;background:white;border-radius:12px;overflow:hidden;font-family:sans-serif;">
+                        <div style="display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;border-bottom:1px solid #e2e8f0;background:#fafafa;">
+                            <div><h3 style="margin:0;font-size:1rem;color:#334155;">R2 Sync Dry Run</h3><div style="font-size:.72rem;color:#64748b;margin-top:.2rem;">${albumSlug}</div></div>
+                            <div class="dev-manager-header-actions">
+                                <button data-sync-action="save" class="dev-manager-header-button dev-manager-header-button--save" type="button" disabled title="No selected actions">${ICONS.check}</button>
+                                <button data-sync-action="close" class="dev-manager-header-button" type="button">${ICONS.close}</button>
+                            </div>
+                        </div>
+                        <div style="overflow:auto;padding:1rem 1.25rem;">
+                            ${plan.remoteAvailable ? '' : `<p style="padding:.75rem;background:#fff7ed;color:#9a3412;border-radius:6px;">${plan.message || 'Remote R2 unavailable'}</p>`}
+                            ${missing.length ? `<p style="padding:.75rem;background:#fef2f2;color:#b91c1c;border-radius:6px;">${missing.length} source assets are missing from both local and R2.</p>` : ''}
+                            ${protectedItems.length ? `<p style="padding:.75rem;background:#eff6ff;color:#1d4ed8;border-radius:6px;">${protectedItems.length} remote extras remain protected by other source references.</p>` : ''}
+                            <div data-sync-rows>${rows || '<p style="color:#64748b;">No R2 changes proposed.</p>'}</div>
+                        </div>
+                    </div>`;
+                dialog.querySelectorAll<HTMLElement>('[data-sync-name]').forEach((name) => {
+                    const item = actionable[Number(name.dataset.syncName)];
+                    name.textContent = item.key.split('/').pop() || item.key;
+                    name.title = item.key;
+                });
+                document.body.appendChild(dialog);
+                const saveBtn = dialog.querySelector('[data-sync-action="save"]') as HTMLButtonElement;
+                const update = () => {
+                    const selected = Array.from(dialog.querySelectorAll<HTMLInputElement>('[data-sync-index]:checked'));
+                    saveBtn.disabled = selected.length === 0;
+                    saveBtn.title = selected.length ? `Execute ${selected.length} selected actions` : 'No selected actions';
+                    dialog.querySelectorAll<HTMLInputElement>('[data-sync-group]').forEach((groupInput) => {
+                        const entries = Array.from(dialog.querySelectorAll<HTMLInputElement>(`[data-sync-entry-group="${groupInput.dataset.syncGroup}"]`));
+                        const selectedCount = entries.filter((entry) => entry.checked).length;
+                        groupInput.checked = entries.length > 0 && selectedCount === entries.length;
+                        groupInput.indeterminate = selectedCount > 0 && selectedCount < entries.length;
+                    });
+                };
+                dialog.querySelectorAll('[data-sync-index]').forEach((input) => input.addEventListener('change', update));
+                dialog.querySelectorAll<HTMLInputElement>('[data-sync-group]').forEach((groupInput) => {
+                    groupInput.addEventListener('change', () => {
+                        dialog.querySelectorAll<HTMLInputElement>(`[data-sync-entry-group="${groupInput.dataset.syncGroup}"]`).forEach((entry) => {
+                            entry.checked = groupInput.checked;
+                        });
+                        update();
+                    });
+                });
+                const toggleSyncGroup = (groupId: string) => {
+                    const list = dialog.querySelector(`[data-sync-group-list="${groupId}"]`) as HTMLElement | null;
+                    const button = dialog.querySelector(`[data-sync-group-expand="${groupId}"]`) as HTMLButtonElement | null;
+                    if (!list || !button) return;
+                    const expanded = list.hidden;
+                    list.hidden = !expanded;
+                    button.style.transform = expanded ? 'rotate(90deg)' : 'rotate(0deg)';
+                    button.setAttribute('aria-expanded', String(expanded));
+                    button.setAttribute('aria-label', `${expanded ? 'Collapse' : 'Expand'} ${syncGroupDefinitions.find((group) => group.id === groupId)?.label || groupId}`);
+                };
+                dialog.querySelectorAll<HTMLElement>('[data-sync-group-expand], [data-sync-group-label]').forEach((control) => {
+                    control.addEventListener('click', () => toggleSyncGroup(control.dataset.syncGroupExpand || control.dataset.syncGroupLabel || ''));
+                });
+                dialog.querySelector('[data-sync-action="close"]')?.addEventListener('click', () => dialog.close());
+                saveBtn.addEventListener('click', async () => {
+                    const actions = Array.from(dialog.querySelectorAll<HTMLInputElement>('[data-sync-index]:checked')).map((input) => actionable[Number(input.dataset.syncIndex)]);
+                    if (!confirm(`Execute ${actions.length} R2 changes?`)) return;
+                    saveBtn.disabled = true;
+                    saveBtn.textContent = '…';
+                    const resultResponse = await fetch('/api/r2-sync-album', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ albumSlug, actions: actions.map(({ action, key, etag }: any) => ({ action, key, etag })) }),
+                    });
+                    const result = await resultResponse.json().catch(() => ({}));
+                    if (!resultResponse.ok) {
+                        saveBtn.innerHTML = ICONS.check;
+                        update();
+                        return showToast(`❌ ${result.error || 'R2 sync failed'}`);
+                    }
+                    showToast(`✅ ${result.results.length} R2 changes complete`);
+                    dialog.close();
+                });
+                dialog.addEventListener('close', () => dialog.remove(), { once: true });
+                update();
+                dialog.showModal();
+            }
+
             function createPageManagerDialog() {
                 let existing = document.getElementById("dev-pm-dialog") as HTMLDialogElement;
                 if (existing) return existing;
@@ -986,11 +1270,10 @@
                         <div style="padding: 1rem 1.5rem; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; background: #fafafa;">
                             <h3 style="margin: 0; font-size: 1rem; color: #333;">Page Manager</h3>
                             <div class="dev-manager-header-actions">
-                                <button id="dev-pm-sync-photos" class="dev-manager-header-button" type="button" title="Scan folder &amp; add new photos" aria-label="Scan folder and add new photos">${ICONS.cloudSync}</button>
-                                <button id="dev-pm-add-block" class="dev-manager-header-button" type="button" title="Add Block" aria-label="Add Block" style="position:relative;">${ICONS.plus}</button>
+                                <button id="dev-pm-r2-sync" class="dev-manager-header-button" type="button" title="Sync Current Album with R2" aria-label="Sync Current Album with R2">${ICONS.refresh}</button>
                                 <button id="dev-pm-expand-all" class="dev-manager-header-button" type="button" title="Expand / Collapse All" aria-label="Expand or collapse all">${ICONS.expandAll}</button>
                                 <button id="dev-pm-rename" class="dev-manager-header-button" type="button" title="Rename photos by current order" aria-label="Rename photos by current order">${ICONS.rename}</button>
-                                <button id="dev-pm-confirm" class="dev-manager-header-button dev-manager-header-button--save" type="button" title="Save Changes" aria-label="Save Changes">${ICONS.check}</button>
+                                <button id="dev-pm-confirm" class="dev-manager-header-button dev-manager-header-button--save" type="button" title="No pending changes" aria-label="Save Changes" disabled>${ICONS.check}</button>
                                 <button id="dev-pm-close" class="dev-manager-header-button" type="button" title="Close" aria-label="Close">${ICONS.close}</button>
                             </div>
                         </div>
@@ -1041,8 +1324,8 @@
                                 </div>
                             </div>
 
-                            <div style="border-top: 1px dashed #eee; margin: 1.5rem 0;"></div>
                             <div id="dev-pm-tree" class="dev-pm-tree"></div>
+                            <input id="dev-pm-native-photo-picker" type="file" accept="image/jpeg,image/png,image/webp,image/avif" multiple hidden />
                         </div>
                     </div>
                 `;
@@ -1070,10 +1353,12 @@
                 const treeContainer = dialog.querySelector("#dev-pm-tree") as HTMLElement;
                 const closeBtn = dialog.querySelector("#dev-pm-close") as HTMLButtonElement;
                 const confirmBtn = dialog.querySelector("#dev-pm-confirm") as HTMLButtonElement;
-                const addBlockBtn = dialog.querySelector("#dev-pm-add-block") as HTMLButtonElement;
-                const syncPhotosBtn = dialog.querySelector("#dev-pm-sync-photos") as HTMLButtonElement;
+                const nativePhotoPicker = dialog.querySelector("#dev-pm-native-photo-picker") as HTMLInputElement;
                 const expandAllBtn = dialog.querySelector("#dev-pm-expand-all") as HTMLButtonElement;
                 const renameBtn = dialog.querySelector("#dev-pm-rename") as HTMLButtonElement;
+                const r2SyncBtn = dialog.querySelector("#dev-pm-r2-sync") as HTMLButtonElement;
+
+                r2SyncBtn.addEventListener('click', () => openAlbumSyncDialog(albumSlug));
 
                 renameBtn.addEventListener('click', async () => {
                     const orderedKeys = currentBlocks.flatMap((b: any) => b.photos.map((p: any) => p.itemKey));
@@ -1202,7 +1487,72 @@
                 let captionOpenBlocks = new Set(); // Track open caption editors
                 let selectedPhoto: {bIdx: number, pIdx: number} | null = null;
                 let selectedBlock: number | null = null;
-                let pendingInsertType: string | null = null;
+                let pendingPageImports: File[] = [];
+                const pendingLocalRemovals = new Set<string>();
+                const localPhotos: Array<{ name: string; size: number; modified: string }> = data.localPhotos || [];
+                const importObjectUrls = new Map<File, string>();
+                const basename = (value: string) => value.replace(/^\/+/, '').split('/').pop() || value;
+                const photoPreviewUrl = (itemKey: string) => {
+                    const name = basename(itemKey);
+                    const stagedFile = pendingPageImports.find((file) => file.name === name);
+                    if (stagedFile) {
+                        let url = importObjectUrls.get(stagedFile);
+                        if (!url) {
+                            url = URL.createObjectURL(stagedFile);
+                            importObjectUrls.set(stagedFile, url);
+                        }
+                        return url;
+                    }
+                    const fullKey = itemKey.includes('/') ? itemKey : `${albumSlug}/${itemKey}`;
+                    return `/r2/${fullKey.split('/').map(encodeURIComponent).join('/')}`;
+                };
+                const referencedPhotoNames = () => new Set([
+                    ...currentBlocks.flatMap((block: any) => (block.photos || []).map((photo: any) => basename(photo.itemKey))),
+                    ...(fCover.value.trim() ? [basename(fCover.value.trim())] : []),
+                ]);
+                const initiallyReferencedNames = referencedPhotoNames();
+                const localPhotoNames = new Set(localPhotos.map((photo) => photo.name));
+                const reconcileRemovedPhotos = () => {
+                    const referenced = referencedPhotoNames();
+                    pendingLocalRemovals.clear();
+                    initiallyReferencedNames.forEach((name) => {
+                        if (localPhotoNames.has(name) && !referenced.has(name)) pendingLocalRemovals.add(name);
+                    });
+                    const retainedImports: File[] = [];
+                    for (const file of pendingPageImports) {
+                        if (referenced.has(file.name)) retainedImports.push(file);
+                        else {
+                            const url = importObjectUrls.get(file);
+                            if (url) URL.revokeObjectURL(url);
+                            importObjectUrls.delete(file);
+                        }
+                    }
+                    pendingPageImports = retainedImports;
+                };
+                const pageStateSnapshot = () => JSON.stringify({
+                    frontmatter: {
+                        title: fTitle.value.trim(),
+                        info: fInfo.value.trim(),
+                        coverKey: fCover.value.trim(),
+                        gap: fGap.value.trim(),
+                        zoom: fZoom.value,
+                        ox: fOX.value,
+                        oy: fOY.value,
+                    },
+                    blocks: currentBlocks,
+                    imports: pendingPageImports.map((file) => `${file.name}:${file.size}:${file.lastModified}`),
+                    removeLocal: [...pendingLocalRemovals].sort(),
+                });
+                let initialPageSnapshot = pageStateSnapshot();
+                const updatePageDirtyState = () => {
+                    const dirty = pageStateSnapshot() !== initialPageSnapshot;
+                    confirmBtn.disabled = !dirty;
+                    confirmBtn.title = dirty ? 'Save Changes' : 'No pending changes';
+                    r2SyncBtn.disabled = dirty;
+                    r2SyncBtn.title = dirty ? 'Save page changes before syncing R2' : 'Sync Current Album with R2';
+                };
+                dialog.addEventListener('input', updatePageDirtyState);
+                fCover.addEventListener('input', reconcileRemovedPhotos);
 
                 const handlePhotoClick = (bIdx: number, pIdx: number, insertAfter = false) => {
                     if (!selectedPhoto) {
@@ -1228,11 +1578,124 @@
                     renderTree();
                 };
 
+                const stageNewBlockFiles = (files: File[]) => {
+                    const referenced = referencedPhotoNames();
+                    const pendingNames = new Set(pendingPageImports.map((file) => file.name));
+                    const localNames = new Set(localPhotos.map((photo) => photo.name));
+                    const incomingNames = new Set<string>();
+                    const duplicate = files.find((file) => {
+                        const alreadySeen = incomingNames.has(file.name);
+                        incomingNames.add(file.name);
+                        return alreadySeen || referenced.has(file.name) || pendingNames.has(file.name) || localNames.has(file.name);
+                    });
+                    if (duplicate) {
+                        showToast(`❌ ${duplicate.name} already exists in this album; use its existing entry`);
+                        return false;
+                    }
+                    pendingPageImports.push(...files);
+                    return true;
+                };
+
+                const choosePhotosForBlock = (onFiles: (files: File[]) => void) => {
+                    nativePhotoPicker.value = '';
+                    nativePhotoPicker.onchange = () => {
+                        const files = Array.from(nativePhotoPicker.files || []);
+                        nativePhotoPicker.value = '';
+                        if (files.length) onFiles(files);
+                    };
+                    nativePhotoPicker.click();
+                };
+
+                const insertPreparedBlock = (newBlock: any, index: number) => {
+                    currentBlocks.splice(index, 0, newBlock);
+                    const shifted = new Set<number>();
+                    collapsedBlocks.forEach((item: number) => shifted.add(item >= index ? item + 1 : item));
+                    collapsedBlocks = shifted;
+                    selectedBlock = null;
+                    renderTree();
+                };
+
+                const insertBlockAt = (type: string, index: number) => {
+                    if (type === 'Text') {
+                        insertPreparedBlock({ type: 'Text', props: { align: 'left', size: 'title' }, text: '', photos: [] }, index);
+                        return;
+                    }
+                    choosePhotosForBlock((files) => {
+                        if (!stageNewBlockFiles(files)) return;
+                        insertPreparedBlock({ type, props: {}, photos: files.map((file) => ({ itemKey: file.name })) }, index);
+                    });
+                };
+
+                const moveSelectedBlockToGap = (gapIndex: number) => {
+                    if (selectedBlock === null) return;
+                    const from = selectedBlock;
+                    const collapsedFlags: boolean[] = currentBlocks.map((_: any, index: number) => collapsedBlocks.has(index));
+                    const captionFlags: boolean[] = currentBlocks.map((_: any, index: number) => captionOpenBlocks.has(index));
+                    const [movedBlock] = currentBlocks.splice(from, 1);
+                    const [movedCollapsed] = collapsedFlags.splice(from, 1);
+                    const [movedCaption] = captionFlags.splice(from, 1);
+                    const target = from < gapIndex ? gapIndex - 1 : gapIndex;
+                    currentBlocks.splice(target, 0, movedBlock);
+                    collapsedFlags.splice(target, 0, movedCollapsed);
+                    captionFlags.splice(target, 0, movedCaption);
+                    collapsedBlocks = new Set(collapsedFlags.flatMap((value: boolean, index: number) => value ? [index] : []));
+                    captionOpenBlocks = new Set(captionFlags.flatMap((value: boolean, index: number) => value ? [index] : []));
+                    selectedBlock = null;
+                    renderTree();
+                };
+
+                const openInlineBlockMenu = (anchor: HTMLElement, index: number) => {
+                    document.getElementById('dev-pm-inline-add-menu')?.remove();
+                    const host = anchor.parentElement as HTMLElement;
+                    host.style.position = host.classList.contains('dev-pm-inline-add-zone') ? 'absolute' : 'relative';
+                    const menu = document.createElement('div');
+                    menu.id = 'dev-pm-inline-add-menu';
+                    menu.style.cssText = 'position:absolute;top:calc(100% + .2rem);left:50%;transform:translateX(-50%);background:white;border:1px solid #e2e8f0;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.15);padding:.4rem;display:flex;gap:.25rem;z-index:220;white-space:nowrap;';
+                    [
+                        { label: 'Row', value: 'Row' },
+                        { label: 'Carousel', value: 'PhotoCarousel' },
+                        { label: 'Text', value: 'Text' },
+                    ].forEach(({ label, value }) => {
+                        const button = document.createElement('button');
+                        button.type = 'button';
+                        button.textContent = label;
+                        button.style.cssText = 'padding:.35rem .6rem;border:0;border-radius:4px;background:none;color:#334155;cursor:pointer;font-size:.75rem;';
+                        button.addEventListener('click', (event) => {
+                            event.stopPropagation();
+                            menu.remove();
+                            document.removeEventListener('click', closeMenu);
+                            insertBlockAt(value, index);
+                        });
+                        menu.appendChild(button);
+                    });
+                    host.appendChild(menu);
+                    const closeMenu = (event: MouseEvent) => {
+                        if (menu.contains(event.target as Node) || event.target === anchor) return;
+                        menu.remove();
+                        document.removeEventListener('click', closeMenu);
+                    };
+                    window.setTimeout(() => document.addEventListener('click', closeMenu), 0);
+                };
+
                 const renderTree = () => {
                     sortableInstances.forEach(s => s.destroy());
                     sortableInstances = [];
 
                     treeContainer.innerHTML = '';
+                    if (currentBlocks.length === 0) {
+                        const emptyAdd = document.createElement('div');
+                        emptyAdd.style.cssText = 'display:flex;justify-content:center;padding:1rem 0;';
+                        emptyAdd.innerHTML = `<button class="dev-manager-header-button" type="button" title="Add Block" aria-label="Add Block" style="position:relative;border:1px solid #cbd5e1;">${ICONS.plus}</button>`;
+                        const button = emptyAdd.querySelector('button') as HTMLElement;
+                        button.addEventListener('click', (event) => {
+                            event.stopPropagation();
+                            openInlineBlockMenu(button, 0);
+                        });
+                        treeContainer.appendChild(emptyAdd);
+                    }
+                    reconcileRemovedPhotos();
+                    const gapSelectionMode = selectedBlock !== null;
+                    const gapButtonIcon = gapSelectionMode ? ICONS.arrowRight : ICONS.plus;
                     currentBlocks.forEach((block: any, bIdx: number) => {
                         const isCollapsed = collapsedBlocks.has(bIdx);
                         const blockEl = document.createElement('div');
@@ -1245,17 +1708,7 @@
                                 </button>
                                 ${selectedBlock === bIdx
                                     ? `<button class="block-drag-handle selected" title="Cancel move">${ICONS.drag}</button>`
-                                    : selectedBlock !== null
-                                        ? `<div class="block-move-arrows">
-                                            <button class="block-insert-btn block-insert-above" title="Insert above">${ICONS.arrowRight}</button>
-                                            <button class="block-insert-btn block-insert-below" title="Insert below">${ICONS.arrowRight}</button>
-                                           </div>`
-                                        : pendingInsertType !== null
-                                            ? `<div class="block-move-arrows">
-                                                <button class="block-insert-btn block-insert-new-above" title="Insert before">${ICONS.arrowRight}</button>
-                                                <button class="block-insert-btn block-insert-new-below" title="Insert after">${ICONS.arrowRight}</button>
-                                               </div>`
-                                            : `<button class="block-drag-handle" title="Click to move / drag">${ICONS.drag}</button>`
+                                    : `<button class="block-drag-handle" title="Click to move / drag">${ICONS.drag}</button>`
                                 }
                                 <button class="block-toggle block-type-badge" title="Toggle Type (${block.type})" ${block.type === 'Text' ? 'disabled style="opacity:0.5;cursor:default;"' : ''}>${block.type === 'PhotoCarousel' ? 'C' : block.type === 'Text' ? 'T' : 'R'}</button>
                                 ${isCollapsed && block.type === 'Text' && block.text ? `
@@ -1263,13 +1716,13 @@
                                 ` : isCollapsed && block.type !== 'Text' && isLocalhost && block.photos.length > 0 ? `
                                 <div class="dev-pm-thumb-strip">
                                     ${block.photos.map((p: any, pIdx: number) => {
-                                        const fullKey = p.itemKey.includes('/') ? p.itemKey : `${albumSlug}/${p.itemKey}`;
                                         const isSel = selectedPhoto?.bIdx === bIdx && selectedPhoto?.pIdx === pIdx;
                                         const isTarget = selectedPhoto && !(selectedPhoto.bIdx === bIdx && selectedPhoto.pIdx === pIdx);
-                                        return `<img src="/r2/${fullKey}" loading="lazy" title="${p.itemKey.split('/').pop()}" data-bidx="${bIdx}" data-pidx="${pIdx}" class="pm-thumb-click${isSel ? ' pm-photo-selected' : ''}${isTarget ? ' pm-move-target' : ''}" style="cursor:${selectedPhoto ? 'copy' : 'pointer'};${isSel ? 'outline:2px solid #2563eb;outline-offset:1px;opacity:1;' : ''}" />`;
+                                        return `<img src="${photoPreviewUrl(p.itemKey)}" loading="lazy" title="${p.itemKey.split('/').pop()}" data-bidx="${bIdx}" data-pidx="${pIdx}" class="pm-thumb-click${isSel ? ' pm-photo-selected' : ''}${isTarget ? ' pm-move-target' : ''}" style="cursor:${selectedPhoto ? 'copy' : 'pointer'};${isSel ? 'outline:2px solid #2563eb;outline-offset:1px;opacity:1;' : ''}" />`;
                                     }).join('')}
                                 </div>` : '<div style="flex:1;"></div>'}
                                 <div style="display:flex; align-items:center; gap:0.25rem; flex-shrink:0;">
+                                    ${block.type !== 'Text' ? `<button class="block-add-photos" title="Add Photos" aria-label="Add Photos" style="background:none;border:none;cursor:pointer;color:#777;padding:4px;">${ICONS.plus}</button>` : ''}
                                     ${block.type !== 'Text' ? `<button class="block-caption-toggle ${block.props.caption ? 'has-data' : ''}" title="Edit Caption" style="background: none; border: none; cursor: pointer; color: ${captionOpenBlocks.has(bIdx) ? '#2563eb' : block.props.caption ? '#22c55e' : '#777'}; padding: 4px;">${ICONS.quote}</button>` : ''}
                                     <button class="block-delete" title="Delete Block" style="background: none; border: none; cursor: pointer; color: #ef4444; padding: 4px;">${ICONS.trash}</button>
                                 </div>
@@ -1365,16 +1818,13 @@
                                             ${block.photos.map((p: any, pIdx: number) => `
                                                 <div class="dev-pm-photo${selectedPhoto && !(selectedPhoto.bIdx === bIdx && selectedPhoto.pIdx === pIdx) ? ' pm-move-target' : ''}${selectedPhoto?.bIdx === bIdx && selectedPhoto?.pIdx === pIdx ? ' pm-photo-selected' : ''}" data-p-idx="${pIdx}">
                                                     <span style="color: #999;">${ICONS.drag}</span>
-                                                    ${isLocalhost ? (() => { const fk = p.itemKey.includes('/') ? p.itemKey : `${albumSlug}/${p.itemKey}`; return `<img src="/r2/${fk}" loading="lazy" style="width:40px;height:30px;object-fit:cover;border-radius:3px;flex-shrink:0;" />`; })() : ''}
+                                                    ${isLocalhost ? `<img src="${photoPreviewUrl(p.itemKey)}" loading="lazy" style="width:40px;height:30px;object-fit:cover;border-radius:3px;flex-shrink:0;" />` : ''}
                                                     <span style="flex: 1;">${p.itemKey.split('/').pop()}</span>
-                                                    ${p.itemKey === fCover.value.trim() ? `<span class="dev-star-golden" style="display: flex; align-items: center; margin-right: 4px;" title="Cover Photo">${ICONS.star}</span>` : ''}
                                                     ${block.type === 'PhotoCarousel' && pIdx === (block.props.initialSlide ?? 0) ? `<span style="display: flex; align-items: center; margin-right: 4px; color: #2563eb;" title="Initial Slide">${ICONS.slideOne}</span>` : ''}
-                                                    <div style="position: relative;">
+                                                    <button class="star-btn dev-pm-photo-action${p.itemKey === fCover.value.trim() ? ' is-cover' : ''}" type="button" title="${p.itemKey === fCover.value.trim() ? 'Current Cover' : 'Set as Cover'}" aria-label="Set ${p.itemKey.split('/').pop()} as cover">${ICONS.star}</button>
+                                                    ${block.type === 'PhotoCarousel' || block.photos.length > 1 ? `<div style="position: relative;">
                                                         <button class="photo-menu-trigger dev-pm-photo-menu-btn" title="Options">${ICONS.dots}</button>
                                                         <div class="dev-pm-photo-menu">
-                                                            <div class="dev-pm-photo-menu-item star-btn">
-                                                                ${ICONS.star} Set as Cover
-                                                            </div>
                                                             ${block.type === 'PhotoCarousel' ? `
                                                             <div class="dev-pm-photo-menu-item initial-slide-btn">
                                                                 ${ICONS.slideOne} Set as Initial Slide
@@ -1384,14 +1834,11 @@
                                                             <div class="dev-pm-photo-menu-item split-btn">
                                                                 ${ICONS.split} Extract to own block
                                                             </div>` : ''}
-                                                            <div class="dev-pm-photo-menu-item delete-btn delete">
-                                                                ${ICONS.trash} Delete Photo
-                                                            </div>
                                                         </div>
-                                                    </div>
+                                                    </div>` : ''}
+                                                    <button class="delete-btn dev-pm-photo-action" type="button" title="Delete Photo" aria-label="Delete ${p.itemKey.split('/').pop()}">${ICONS.trash}</button>
                                                 </div>
                                             `).join('')}
-                                            <button class="photo-add" title="Add Photo" style="background: #f0f0f0; border: none; border-radius: 4px; padding: 0.2rem 0.5rem; cursor: pointer; font-size: 0.75rem; color: #666;">${ICONS.plus}</button>
                                         </div>
                                         ${captionAreaBottom}
 
@@ -1405,6 +1852,8 @@
                                     `;
                                 })()}
                             </div>
+                            ${bIdx === 0 ? `<div class="dev-pm-inline-add-zone dev-pm-inline-add-zone--before${gapSelectionMode ? ' is-active' : ''}"><button class="dev-pm-inline-add-button" type="button" data-page-gap-index="0" title="${gapSelectionMode ? 'Move here' : 'Add block before'}">${gapButtonIcon}</button></div>` : ''}
+                            <div class="dev-pm-inline-add-zone${gapSelectionMode ? ' is-active' : ''}"><button class="dev-pm-inline-add-button" type="button" data-page-gap-index="${bIdx + 1}" title="${gapSelectionMode ? 'Move here' : 'Add block here'}">${gapButtonIcon}</button></div>
                         `;
 
                         // Block events
@@ -1412,6 +1861,15 @@
                         const alignSel = blockEl.querySelector('.block-align') as HTMLSelectElement;
                         const vposSel = blockEl.querySelector('.block-vpos') as HTMLSelectElement;
                         const captionToggle = blockEl.querySelector('.block-caption-toggle');
+
+                        blockEl.querySelectorAll<HTMLElement>('[data-page-gap-index]').forEach((button) => {
+                            button.addEventListener('click', (event) => {
+                                event.stopPropagation();
+                                const gapIndex = Number(button.dataset.pageGapIndex);
+                                if (selectedBlock !== null) moveSelectedBlockToGap(gapIndex);
+                                else openInlineBlockMenu(button, gapIndex);
+                            });
+                        });
 
                         captionToggle?.addEventListener('click', (e) => {
                             e.stopPropagation();
@@ -1511,54 +1969,6 @@
                             renderTree();
                         });
 
-                        blockEl.querySelector('.block-insert-above')?.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            const from = selectedBlock!;
-                            selectedBlock = null;
-                            const [moved] = currentBlocks.splice(from, 1);
-                            let target = bIdx;
-                            if (from < bIdx) target--;
-                            currentBlocks.splice(target, 0, moved);
-                            renderTree();
-                        });
-
-                        blockEl.querySelector('.block-insert-below')?.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            const from = selectedBlock!;
-                            selectedBlock = null;
-                            const [moved] = currentBlocks.splice(from, 1);
-                            let target = bIdx + 1;
-                            if (from < bIdx) target--;
-                            currentBlocks.splice(target, 0, moved);
-                            renderTree();
-                        });
-
-                        blockEl.querySelector('.block-insert-new-above')?.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            const type = pendingInsertType!;
-                            pendingInsertType = null;
-                            const newBlock = type === 'Text' ? { type: 'Text', props: { align: 'left', size: 'title' }, text: '', photos: [] } : { type, props: {}, photos: [] };
-                            currentBlocks.splice(bIdx, 0, newBlock);
-                            // shift existing indices up by 1, keep new block expanded
-                            const newCollapsed = new Set<number>();
-                            collapsedBlocks.forEach((i: number) => { if (i >= bIdx) newCollapsed.add(i + 1); else newCollapsed.add(i); });
-                            collapsedBlocks = newCollapsed;
-                            renderTree();
-                        });
-
-                        blockEl.querySelector('.block-insert-new-below')?.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            const type = pendingInsertType!;
-                            pendingInsertType = null;
-                            const newBlock = type === 'Text' ? { type: 'Text', props: { align: 'left', size: 'title' }, text: '', photos: [] } : { type, props: {}, photos: [] };
-                            currentBlocks.splice(bIdx + 1, 0, newBlock);
-                            // shift existing indices above insertion point, keep new block expanded
-                            const newCollapsed = new Set<number>();
-                            collapsedBlocks.forEach((i: number) => { if (i > bIdx) newCollapsed.add(i + 1); else newCollapsed.add(i); });
-                            collapsedBlocks = newCollapsed;
-                            renderTree();
-                        });
-
                         blockEl.querySelector('.block-expander')?.addEventListener('click', (e) => {
                             e.stopPropagation();
                             if (collapsedBlocks.has(bIdx)) collapsedBlocks.delete(bIdx);
@@ -1582,12 +1992,6 @@
                                 }
                                 renderTree();
                             };
-                            // Highlight add-block button when in insert mode
-                            const addBtn = dialog.querySelector('#dev-pm-add-block') as HTMLElement;
-                            if (addBtn) {
-                                addBtn.style.color = pendingInsertType ? '#2563eb' : '#999';
-                                addBtn.title = pendingInsertType ? `Click to cancel (inserting ${pendingInsertType})` : 'Add Block';
-                            }
                         }
                         blockEl.querySelector('.block-toggle')?.addEventListener('click', (e) => {
                             e.stopPropagation();
@@ -1596,7 +2000,7 @@
                             renderTree();
                         });
                         blockEl.querySelector('.block-delete')?.addEventListener('click', () => {
-                            if (confirm("Delete this block?")) {
+                            if (confirm("Delete this block? Any local photos no longer referenced by this page will move to the system Trash when you save.")) {
                                 currentBlocks.splice(bIdx, 1);
                                 renderTree();
                             }
@@ -1615,12 +2019,13 @@
                             mtInput?.addEventListener('change', () => { block.props.mt = mtInput.value.trim(); });
                             mbInput?.addEventListener('change', () => { block.props.mb = mbInput.value.trim(); });
                         }
-                        blockEl.querySelector('.photo-add')?.addEventListener('click', () => {
-                            const key = prompt("Enter photo itemKey (e.g. KCS01234.jpg):");
-                            if (key) {
-                                block.photos.push({ itemKey: key.trim() });
+                        blockEl.querySelector('.block-add-photos')?.addEventListener('click', (event) => {
+                            event.stopPropagation();
+                            choosePhotosForBlock((files) => {
+                                if (!stageNewBlockFiles(files)) return;
+                                block.photos.push(...files.map((file) => ({ itemKey: file.name })));
                                 renderTree();
-                            }
+                            });
                         });
                         blockEl.querySelectorAll('.dev-pm-photo').forEach((photoEl, pIdx) => {
                             const pMenuTrigger = photoEl.querySelector('.photo-menu-trigger');
@@ -1628,7 +2033,7 @@
                             const photo = block.photos[pIdx];
 
                             photoEl.addEventListener('click', (e) => {
-                                if ((e.target as HTMLElement).closest('.photo-menu-trigger, .dev-pm-photo-menu')) return;
+                                if ((e.target as HTMLElement).closest('.photo-menu-trigger, .dev-pm-photo-menu, .dev-pm-photo-action')) return;
                                 e.stopPropagation();
                                 handlePhotoClick(bIdx, pIdx, false);
                             });
@@ -1675,7 +2080,7 @@
 
                             photoEl.querySelector('.delete-btn')?.addEventListener('click', (e) => {
                                 e.stopPropagation();
-                                if (confirm(`Delete photo: ${photo.itemKey}?`)) {
+                                if (confirm(`Delete photo from this page: ${photo.itemKey}?\n\nIf its local copy is no longer referenced, it will move to the system Trash when you save.`)) {
                                     block.photos.splice(pIdx, 1);
                                     if (block.photos.length === 0) {
                                         currentBlocks.splice(bIdx, 1);
@@ -1741,11 +2146,14 @@
                         draggable: '.dev-pm-block',
                         handle: '.dev-pm-block-header',
                         onEnd: (evt: any) => {
+                            if (evt.from !== treeContainer || evt.to !== treeContainer) return;
                             const [moved] = currentBlocks.splice(evt.oldIndex, 1);
                             currentBlocks.splice(evt.newIndex, 0, moved);
+                            updatePageDirtyState();
                         }
                     });
                     sortableInstances.push(sBlocks);
+                    updatePageDirtyState();
                 };
 
                 const globalClickHandler = (e: MouseEvent) => {
@@ -1762,49 +2170,58 @@
                     if (e.key === 'Escape') {
                         if (selectedPhoto) { selectedPhoto = null; renderTree(); }
                         else if (selectedBlock !== null) { selectedBlock = null; renderTree(); }
-                        else if (pendingInsertType !== null) { pendingInsertType = null; renderTree(); }
                     }
                 });
                 document.addEventListener('click', globalClickHandler);
 
                 const closeHandler = () => {
+                    if (!confirmBtn.disabled && !confirm('Discard unsaved Page Manager changes?')) return;
                     dialog.close();
                     document.removeEventListener('click', globalClickHandler);
                     closeBtn.removeEventListener('click', closeHandler);
                     confirmBtn.removeEventListener('click', confirmHandler);
-                    addBlockBtn.removeEventListener('click', addBlockHandler);
+                    importObjectUrls.forEach((url) => URL.revokeObjectURL(url));
+                    importObjectUrls.clear();
                 };
 
                 const confirmHandler = async () => {
-                    const newFM = [
-                        `title: "${fTitle.value.trim()}"`,
-                        `info: "${fInfo.value.trim()}"`,
-                        `coverKey: "${fCover.value.trim()}"`
-                    ];
-                    if (fGap.value.trim()) newFM.push(`gap: "${fGap.value.trim()}"`);
-                    if (fZoom.value) newFM.push(`coverZoom: ${parseFloat(fZoom.value)}`);
-                    if (fOX.value || fOY.value) {
-                        newFM.push(`coverOffset: { x: ${parseFloat(fOX.value || '50')}, y: ${parseFloat(fOY.value || '50')} }`);
-                    }
+                    const escaped = (value: string) => value.replaceAll('\\', '\\\\').replaceAll('"', '\\"');
+                    const setFrontmatter = (source: string, key: string, value: string | null) => {
+                        const pattern = new RegExp(`^${key}:\\s*.*$`, 'm');
+                        if (value === null) return source.replace(new RegExp(`^${key}:\\s*.*$\\n?`, 'm'), '');
+                        return pattern.test(source) ? source.replace(pattern, `${key}: ${value}`) : `${source.trimEnd()}\n${key}: ${value}`;
+                    };
+                    let newFM = data.frontmatter || '';
+                    newFM = setFrontmatter(newFM, 'title', `"${escaped(fTitle.value.trim())}"`);
+                    newFM = setFrontmatter(newFM, 'info', fInfo.value.trim() ? `"${escaped(fInfo.value.trim())}"` : null);
+                    newFM = setFrontmatter(newFM, 'coverKey', `"${escaped(fCover.value.trim())}"`);
+                    newFM = setFrontmatter(newFM, 'gap', fGap.value.trim() ? `"${escaped(fGap.value.trim())}"` : null);
+                    newFM = setFrontmatter(newFM, 'coverZoom', String(parseFloat(fZoom.value || '1')));
+                    newFM = setFrontmatter(newFM, 'coverOffset', `{ x: ${parseFloat(fOX.value || '50')}, y: ${parseFloat(fOY.value || '50')} }`);
 
                     confirmBtn.disabled = true;
                     confirmBtn.innerHTML = '...';
+                    reconcileRemovedPhotos();
                     const blocksToSave = currentBlocks.filter((b: any) => b.type !== 'Text' || b.text?.trim());
                     try {
-                        const res = await fetch("/api/save-page-structure", {
+                        const form = new FormData();
+                        form.set('albumSlug', albumSlug);
+                        form.set('draft', JSON.stringify({
+                            blocks: blocksToSave,
+                            frontmatter: newFM,
+                            removeLocal: [...pendingLocalRemovals],
+                        }));
+                        pendingPageImports.forEach((file) => form.append('photos', file, file.name));
+                        const res = await fetch("/api/save-page-manager", {
                             method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({
-                                albumSlug,
-                                blocks: blocksToSave,
-                                frontmatter: newFM.join('\n')
-                            }),
+                            body: form,
                         });
                         if (res.ok) {
                             showToast("✅ Page structure updated!");
                             setTimeout(() => window.location.reload(), 1000);
                         } else {
-                            showToast("❌ Save failed");
+                            const result = await res.json().catch(() => ({}));
+                            showToast(`❌ ${result.error || 'Save failed'}`);
                             confirmBtn.disabled = false;
                             confirmBtn.innerHTML = ICONS.check;
                         }
@@ -1815,97 +2232,8 @@
                     }
                 };
 
-                const addBlockHandler = () => {
-                    // If already in insert mode, cancel it
-                    if (pendingInsertType !== null) {
-                        pendingInsertType = null;
-                        renderTree();
-                        return;
-                    }
-                    // Show a small popup to choose block type
-                    let menu = document.getElementById('dev-pm-add-menu');
-                    if (menu) { menu.remove(); return; }
-                    menu = document.createElement('div');
-                    menu.id = 'dev-pm-add-menu';
-                    menu.style.cssText = 'position:absolute; top: calc(100% + 0.25rem); right: 0; background: white; border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.15); padding: 0.4rem; display: flex; flex-direction: column; gap: 0.25rem; z-index: 200; min-width: 140px;';
-                    const types = [
-                        { label: 'Row', value: 'Row' },
-                        { label: 'Carousel', value: 'PhotoCarousel' },
-                        { label: 'Text', value: 'Text' },
-                    ];
-                    types.forEach(({ label, value }) => {
-                        const btn = document.createElement('button');
-                        btn.textContent = label;
-                        btn.style.cssText = 'padding: 0.4rem 0.75rem; border: none; border-radius: 4px; background: none; cursor: pointer; font-size: 0.85rem; text-align: left; color: #333;';
-                        btn.onmouseenter = () => btn.style.background = '#f1f5f9';
-                        btn.onmouseleave = () => btn.style.background = 'none';
-                        btn.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            menu!.remove();
-                            if (currentBlocks.length === 0) {
-                                // No blocks yet — just append directly
-                                const newBlock = value === 'Text' ? { type: 'Text', props: { align: 'left', size: 'title' }, text: '', photos: [] } : { type: value, props: {}, photos: [] };
-                                currentBlocks.push(newBlock);
-                                renderTree();
-                            } else {
-                                // Enter insert-position mode
-                                pendingInsertType = value;
-                                renderTree();
-                            }
-                        });
-                        menu!.appendChild(btn);
-                    });
-                    // Position relative to the add-block button
-                    const addBtn = dialog.querySelector('#dev-pm-add-block') as HTMLElement;
-                    addBtn.style.position = 'relative';
-                    addBtn.appendChild(menu);
-                    const closeMenu = (e: MouseEvent) => {
-                        if (!menu!.contains(e.target as Node) && e.target !== addBtn) {
-                            menu!.remove();
-                            document.removeEventListener('click', closeMenu);
-                        }
-                    };
-                    setTimeout(() => document.addEventListener('click', closeMenu), 0);
-                };
-
                 closeBtn.addEventListener('click', closeHandler);
                 confirmBtn.addEventListener('click', confirmHandler);
-                addBlockBtn.addEventListener('click', addBlockHandler);
-
-                syncPhotosBtn.addEventListener('click', async () => {
-                    const folder = getFolderSlug();
-                    const pathParts = window.location.pathname.split('/').filter(Boolean);
-                    const album = pathParts[1];
-                    if (!folder || !album) return showToast('❌ Cannot identify album');
-                    syncPhotosBtn.style.opacity = '0.4';
-                    syncPhotosBtn.style.pointerEvents = 'none';
-                    try {
-                        const res = await fetch('/api/sync-new-photos', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ folder, albumSlug: album }),
-                        });
-                        const json = await res.json();
-                        if (!res.ok) throw new Error(json.error || 'Unknown error');
-                        if (json.added === 0) {
-                            showToast('✨ No new photos found');
-                        } else {
-                            showToast(`✅ Added ${json.added} new photo${json.added > 1 ? 's' : ''}`);
-                            // Re-fetch page structure and re-render
-                            const r2 = await fetch(`/api/get-page-structure?albumSlug=${albumSlug}`);
-                            if (r2.ok) {
-                                const d2 = await r2.json();
-                                currentBlocks = d2.blocks || [];
-                                renderTree();
-                            }
-                        }
-                    } catch (err: any) {
-                        showToast(`❌ ${err.message}`);
-                    } finally {
-                        syncPhotosBtn.style.opacity = '';
-                        syncPhotosBtn.style.pointerEvents = '';
-                    }
-                });
 
                 renderTree();
                 dialog.showModal();
@@ -1938,7 +2266,7 @@
                             <h3 style="margin:0;color:#333;font-size:1rem;">Region Manager</h3>
                             <div class="dev-manager-header-actions">
                                 <button type="button" data-region-action="add" class="dev-manager-header-button" title="Add Region" aria-label="Add Region">${ICONS.plus}</button>
-                                <button type="button" data-region-action="save" class="dev-manager-header-button dev-manager-header-button--save" title="Save Regions" aria-label="Save Regions">${ICONS.check}</button>
+                                <button type="button" data-region-action="save" class="dev-manager-header-button dev-manager-header-button--save" title="No pending changes" aria-label="Save Regions" disabled>${ICONS.check}</button>
                                 <button type="button" data-region-action="close" class="dev-manager-header-button" title="Close" aria-label="Close">${ICONS.close}</button>
                             </div>
                         </header>
@@ -1965,25 +2293,30 @@
                 let selectedRegion: number | null = null;
                 let didDragRegion = false;
                 const list = dialog.querySelector<HTMLElement>("[data-region-list]")!;
+                const saveRegionBtn = dialog.querySelector<HTMLButtonElement>('[data-region-action="save"]')!;
+                const initialRegionSnapshot = JSON.stringify({ regions, settings });
+                const updateRegionDirtyState = () => {
+                    const dirty = JSON.stringify({ regions, settings }) !== initialRegionSnapshot;
+                    saveRegionBtn.disabled = !dirty;
+                    saveRegionBtn.title = dirty ? 'Save Regions' : 'No pending changes';
+                };
 
                 const render = () => {
                     list.innerHTML = regions.map((region, index) => `
-                        <div data-region-index="${index}" style="display:grid;grid-template-columns:2.5rem minmax(0,1fr) 2rem;gap:0.45rem;align-items:center;padding:0.45rem;border:1px solid #e2e8f0;border-radius:8px;background:${selectedRegion === index ? "#eff6ff" : "#f8fafc"};outline:${selectedRegion === index ? "2px solid #2563eb" : "none"};outline-offset:1px;">
+                        <div data-region-index="${index}" style="position:relative;display:grid;grid-template-columns:2.5rem minmax(0,1fr) 2rem;gap:0.45rem;align-items:center;padding:0.45rem;border:1px solid #e2e8f0;border-radius:8px;background:${selectedRegion === index ? "#eff6ff" : "#f8fafc"};outline:${selectedRegion === index ? "2px solid #2563eb" : "none"};outline-offset:1px;">
                             ${selectedRegion === index
                                 ? `<button type="button" data-region-action="select" title="Cancel move" style="display:flex;height:2rem;align-items:center;justify-content:center;border:0;background:none;color:#2563eb;cursor:pointer;">${ICONS.drag}</button>`
-                                : selectedRegion !== null
-                                    ? `<div class="block-move-arrows">
-                                        <button type="button" class="block-insert-btn" data-region-action="insert-above" title="Insert above">${ICONS.arrowRight}</button>
-                                        <button type="button" class="block-insert-btn" data-region-action="insert-below" title="Insert below">${ICONS.arrowRight}</button>
-                                       </div>`
-                                    : `<button type="button" data-region-action="select" title="Click to move" style="display:flex;height:2rem;align-items:center;justify-content:center;border:0;background:none;color:#94a3b8;cursor:pointer;">${ICONS.drag}</button>`}
+                                : `<button type="button" data-region-action="select" title="Click to move" style="display:flex;height:2rem;align-items:center;justify-content:center;border:0;background:none;color:#94a3b8;cursor:pointer;">${ICONS.drag}</button>`}
                             <div style="display:grid;grid-template-columns:minmax(0,0.8fr) minmax(0,1.2fr);gap:0.5rem;min-width:0;">
                                 <input data-region-field="id" value="${escapeHtml(region.id)}" ${originalIds.has(region.id) ? "readonly" : ""} placeholder="Region ID" aria-label="Region ID" style="min-width:0;padding:0.35rem 0.5rem;border:1px solid #cbd5e1;border-radius:5px;background:${originalIds.has(region.id) ? "#f1f5f9" : "#fff"};color:#334155;" />
                                 <input data-region-field="label" value="${escapeHtml(region.label)}" placeholder="Region label" aria-label="Region label" style="min-width:0;padding:0.35rem 0.5rem;border:1px solid #cbd5e1;border-radius:5px;background:#fff;color:#334155;" />
                             </div>
                             <button type="button" data-region-action="delete" title="Delete region" style="display:flex;height:2rem;align-items:center;justify-content:center;border:0;border-radius:5px;background:#fee2e2;color:#dc2626;cursor:pointer;">${ICONS.trash}</button>
+                            ${selectedRegion !== null && index === 0 ? `<div class="dev-pm-inline-add-zone dev-pm-inline-add-zone--before is-active"><button type="button" class="dev-pm-inline-add-button" data-region-action="move-gap" data-region-gap-index="0" title="Move here">${ICONS.arrowRight}</button></div>` : ''}
+                            ${selectedRegion !== null ? `<div class="dev-pm-inline-add-zone is-active"><button type="button" class="dev-pm-inline-add-button" data-region-action="move-gap" data-region-gap-index="${index + 1}" title="Move here">${ICONS.arrowRight}</button></div>` : ''}
                         </div>
                     `).join("");
+                    updateRegionDirtyState();
                 };
 
                 list.addEventListener("input", (event) => {
@@ -1993,6 +2326,7 @@
                     const field = input.dataset.regionField as "id" | "label" | undefined;
                     if (!Number.isInteger(index) || !field) return;
                     regions[index][field] = input.value;
+                    updateRegionDirtyState();
                 });
                 dialog
                     .querySelector<HTMLInputElement>("[data-region-setting='tagColumns']")
@@ -2000,6 +2334,7 @@
                         settings.tagColumns = Number(
                             (event.target as HTMLInputElement).value,
                         );
+                        updateRegionDirtyState();
                     });
 
                 dialog.addEventListener("click", async (event) => {
@@ -2008,7 +2343,10 @@
                     );
                     const action = button?.dataset.regionAction;
                     if (!action) return;
-                    if (action === "close") return dialog.close();
+                    if (action === "close") {
+                        if (!saveRegionBtn.disabled && !confirm('Discard unsaved Region Manager changes?')) return;
+                        return dialog.close();
+                    }
                     if (action === "add") {
                         regions.push({ id: "", label: "" });
                         render();
@@ -2035,6 +2373,18 @@
                         return;
                     }
 
+                    if (action === "move-gap" && selectedRegion !== null) {
+                        const gapIndex = Number(button?.dataset.regionGapIndex);
+                        if (!Number.isInteger(gapIndex)) return;
+                        const from = selectedRegion;
+                        const [moved] = regions.splice(from, 1);
+                        const target = from < gapIndex ? gapIndex - 1 : gapIndex;
+                        regions.splice(target, 0, moved);
+                        selectedRegion = null;
+                        render();
+                        return;
+                    }
+
                     const row = button?.closest<HTMLElement>("[data-region-index]");
                     const index = Number(row?.dataset.regionIndex);
                     if (!Number.isInteger(index)) return;
@@ -2047,17 +2397,6 @@
                     }
                     if (action === "delete") {
                         regions.splice(index, 1);
-                        selectedRegion = null;
-                    }
-                    if (
-                        (action === "insert-above" || action === "insert-below") &&
-                        selectedRegion !== null
-                    ) {
-                        const from = selectedRegion;
-                        const [moved] = regions.splice(from, 1);
-                        let target = action === "insert-above" ? index : index + 1;
-                        if (from < target) target -= 1;
-                        regions.splice(target, 0, moved);
                         selectedRegion = null;
                     }
                     render();
@@ -2095,6 +2434,292 @@
                 dialog.showModal();
             }
 
+            type PendingPhotoImport = {
+                albumSlug: string;
+                title: string;
+                createPage: boolean;
+                files: File[];
+                replaceExisting?: boolean;
+            };
+
+            function openPhotoImportDialog(options: {
+                folder: string;
+                albumSlug?: string;
+                title?: string;
+                createPage: boolean;
+                stagedFiles?: File[];
+                onStage: (pending: PendingPhotoImport) => void;
+            }) {
+                const dialog = document.createElement('dialog');
+                dialog.style.cssText = 'border:0;border-radius:12px;padding:0;box-shadow:0 20px 50px rgba(0,0,0,.3);';
+                dialog.innerHTML = `
+                    <div style="position:relative;display:flex;flex-direction:column;width:min(900px,92vw);height:min(760px,86vh);background:white;border-radius:12px;overflow:hidden;font-family:sans-serif;">
+                        <div style="display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;border-bottom:1px solid #e2e8f0;background:#fafafa;">
+                            <h3 style="margin:0;font-size:1rem;color:#334155;">${options.createPage ? 'Add Page & Add Photos' : 'Add Photos'}</h3>
+                            <div class="dev-manager-header-actions">
+                                <button data-import-action="stage" class="dev-manager-header-button dev-manager-header-button--save" type="button" disabled title="Stage selected photos">${ICONS.check}</button>
+                                <button data-import-action="close" class="dev-manager-header-button" type="button" title="Close">${ICONS.close}</button>
+                            </div>
+                        </div>
+                        <div style="flex:1;overflow:auto;padding:1.25rem;">
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
+                                <label style="display:flex;flex-direction:column;gap:.3rem;font-size:.75rem;color:#64748b;">Page slug
+                                    <input data-import-field="slug" value="${options.albumSlug || ''}" ${options.createPage ? '' : 'readonly'} placeholder="2026-new-page" style="padding:.55rem;border:1px solid #cbd5e1;border-radius:5px;" />
+                                </label>
+                                <label style="display:flex;flex-direction:column;gap:.3rem;font-size:.75rem;color:#64748b;">Title
+                                    <input data-import-field="title" value="${options.title || ''}" ${options.createPage ? '' : 'readonly'} placeholder="New Page" style="padding:.55rem;border:1px solid #cbd5e1;border-radius:5px;" />
+                                </label>
+                            </div>
+                            <label style="display:block;margin-top:.9rem;padding:.7rem;border:1px dashed #94a3b8;border-radius:7px;text-align:center;color:#475569;cursor:pointer;">
+                                Browse / add another photo folder
+                                <input data-import-field="files" type="file" accept="image/jpeg,image/png,image/webp,image/avif" multiple webkitdirectory style="display:none;" />
+                            </label>
+                            <div style="display:flex;justify-content:space-between;margin-top:.65rem;color:#64748b;font-size:.75rem;">
+                                <span>Z: toggle selection · Arrow keys: navigate</span>
+                                <span data-import-count>0 selected · 0 photos</span>
+                            </div>
+                            <div class="dev-import-grid" data-import-grid></div>
+                            <section data-import-staged-section style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid #e2e8f0;" hidden>
+                                <div style="display:flex;align-items:center;justify-content:space-between;color:#475569;font-size:.78rem;font-weight:600;">
+                                    <span>Staged photos</span><span data-import-staged-count></span>
+                                </div>
+                                <div class="dev-import-staged-grid" data-import-staged-grid></div>
+                            </section>
+                        </div>
+                        <div class="dev-import-preview" data-import-preview hidden tabindex="-1">
+                            <button data-import-preview-close type="button" style="position:absolute;top:1rem;right:1rem;display:flex;width:2rem;height:2rem;align-items:center;justify-content:center;border:0;border-radius:50%;background:rgba(255,255,255,.15);color:white;cursor:pointer;">${ICONS.close}</button>
+                            <img data-import-preview-image alt="" />
+                            <div style="display:flex;align-items:center;gap:.65rem;margin-top:.7rem;color:white;font-size:.78rem;"><input data-import-preview-checkbox type="checkbox" style="width:1.1rem;height:1.1rem;accent-color:#16a34a;" /><span data-import-preview-name></span></div>
+                        </div>
+                    </div>`;
+                document.body.appendChild(dialog);
+
+                const slugInput = dialog.querySelector('[data-import-field="slug"]') as HTMLInputElement;
+                const titleInput = dialog.querySelector('[data-import-field="title"]') as HTMLInputElement;
+                const fileInput = dialog.querySelector('[data-import-field="files"]') as HTMLInputElement;
+                const grid = dialog.querySelector('[data-import-grid]') as HTMLElement;
+                const stagedSection = dialog.querySelector('[data-import-staged-section]') as HTMLElement;
+                const stagedGrid = dialog.querySelector('[data-import-staged-grid]') as HTMLElement;
+                const stagedCount = dialog.querySelector('[data-import-staged-count]') as HTMLElement;
+                const count = dialog.querySelector('[data-import-count]') as HTMLElement;
+                const stageBtn = dialog.querySelector('[data-import-action="stage"]') as HTMLButtonElement;
+                const preview = dialog.querySelector('[data-import-preview]') as HTMLElement;
+                const previewImage = dialog.querySelector('[data-import-preview-image]') as HTMLImageElement;
+                const previewName = dialog.querySelector('[data-import-preview-name]') as HTMLElement;
+                const previewCheckbox = dialog.querySelector('[data-import-preview-checkbox]') as HTMLInputElement;
+                let files: File[] = [];
+                const stagedFiles: File[] = [...(options.stagedFiles || [])];
+                let currentIndex = 0;
+                const selected = new Set<number>();
+                const objectUrls: string[] = [];
+                const stagedObjectUrls: string[] = [];
+
+                const selectedFiles = () => [
+                    ...stagedFiles,
+                    ...[...selected].sort((a, b) => a - b).map((index) => files[index]),
+                ];
+                const duplicateNames = () => {
+                    const counts = new Map<string, number>();
+                    selectedFiles().forEach((file) => counts.set(file.name, (counts.get(file.name) || 0) + 1));
+                    return [...counts.entries()].filter(([, total]) => total > 1).map(([name]) => name);
+                };
+                const canStage = () => selectedFiles().length > 0 && duplicateNames().length === 0 && /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/.test(slugInput.value.trim()) && titleInput.value.trim().length > 0;
+                const updatePreview = () => {
+                    if (preview.hidden || !files[currentIndex] || !objectUrls[currentIndex]) return;
+                    previewImage.src = objectUrls[currentIndex];
+                    previewName.textContent = files[currentIndex].webkitRelativePath || files[currentIndex].name;
+                    previewCheckbox.checked = selected.has(currentIndex);
+                };
+                const updateState = () => {
+                    const duplicates = duplicateNames();
+                    const chosenFiles = selectedFiles();
+                    const sourceFolders = new Set(chosenFiles.map((file) => file.webkitRelativePath?.split('/')[0]).filter(Boolean));
+                    const sourceLabel = sourceFolders.size ? ` · ${sourceFolders.size} folder${sourceFolders.size > 1 ? 's' : ''}` : '';
+                    count.textContent = duplicates.length
+                        ? `${duplicates.length} duplicate filename${duplicates.length > 1 ? 's' : ''}`
+                        : `${chosenFiles.length} selected · ${files.length} in current folder${stagedFiles.length ? ` · ${stagedFiles.length} staged` : ''}${sourceLabel}`;
+                    count.style.color = duplicates.length ? '#dc2626' : '#64748b';
+                    stageBtn.disabled = !canStage();
+                    grid.querySelectorAll('.dev-import-photo').forEach((element, index) => {
+                        element.classList.toggle('is-current', index === currentIndex);
+                        element.classList.toggle('is-selected', selected.has(index));
+                        const checkbox = element.querySelector<HTMLInputElement>('.dev-import-photo-checkbox');
+                        if (checkbox) checkbox.checked = selected.has(index);
+                    });
+                    updatePreview();
+                };
+                const renderStaged = () => {
+                    stagedObjectUrls.splice(0).forEach(URL.revokeObjectURL);
+                    stagedGrid.innerHTML = '';
+                    stagedSection.hidden = stagedFiles.length === 0;
+                    stagedCount.textContent = `${stagedFiles.length}`;
+                    stagedFiles.forEach((file, index) => {
+                        const url = URL.createObjectURL(file);
+                        stagedObjectUrls.push(url);
+                        const card = document.createElement('div');
+                        card.className = 'dev-import-staged-photo';
+                        card.innerHTML = `<img alt="" loading="lazy" /><button class="dev-import-staged-remove" type="button" title="Remove staged photo" aria-label="Remove staged photo">${ICONS.close}</button>`;
+                        (card.querySelector('img') as HTMLImageElement).src = url;
+                        card.title = file.webkitRelativePath || file.name;
+                        card.querySelector('.dev-import-staged-remove')?.addEventListener('click', () => {
+                            stagedFiles.splice(index, 1);
+                            renderStaged();
+                            updateState();
+                        });
+                        stagedGrid.appendChild(card);
+                    });
+                };
+                const renderFiles = () => {
+                    objectUrls.splice(0).forEach(URL.revokeObjectURL);
+                    grid.innerHTML = '';
+                    files.forEach((file, index) => {
+                        const url = URL.createObjectURL(file);
+                        objectUrls.push(url);
+                        const card = document.createElement('div');
+                        card.className = 'dev-import-photo';
+                        card.tabIndex = 0;
+                        card.innerHTML = `<img src="${url}" alt="" loading="lazy" /><input class="dev-import-photo-checkbox" type="checkbox" aria-label="Select photo" /><span></span>`;
+                        (card.querySelector('span') as HTMLElement).textContent = file.name;
+                        const checkbox = card.querySelector('.dev-import-photo-checkbox') as HTMLInputElement;
+                        const toggle = (next: boolean) => {
+                            currentIndex = index;
+                            if (next) selected.add(index);
+                            else selected.delete(index);
+                            updateState();
+                        };
+                        card.addEventListener('click', (event) => {
+                            if (event.target === checkbox) return;
+                            currentIndex = index;
+                            card.focus({ preventScroll: true });
+                            updateState();
+                        });
+                        card.addEventListener('dblclick', (event) => {
+                            if (event.target === checkbox) return;
+                            currentIndex = index;
+                            preview.hidden = false;
+                            updateState();
+                            preview.focus({ preventScroll: true });
+                        });
+                        checkbox.addEventListener('change', () => toggle(checkbox.checked));
+                        grid.appendChild(card);
+                    });
+                    updateState();
+                };
+                fileInput.addEventListener('change', () => {
+                    const added = Array.from(fileInput.files || []).filter((file) => /\.(jpe?g|png|webp|avif)$/i.test(file.name));
+                    if (added.length === 0) return;
+                    stagedFiles.push(...[...selected].sort((a, b) => a - b).map((index) => files[index]));
+                    files = added;
+                    selected.clear();
+                    currentIndex = 0;
+                    fileInput.value = '';
+                    renderStaged();
+                    renderFiles();
+                });
+                slugInput.addEventListener('input', updateState);
+                titleInput.addEventListener('input', updateState);
+
+                const getGridColumnCount = () => {
+                    const cards = Array.from(grid.children) as HTMLElement[];
+                    if (cards.length < 2) return 1;
+                    const firstRowTop = cards[0].offsetTop;
+                    const firstNextRow = cards.findIndex((card) => card.offsetTop > firstRowTop);
+                    return firstNextRow === -1 ? cards.length : Math.max(1, firstNextRow);
+                };
+                const keyHandler = (event: KeyboardEvent) => {
+                    if (event.key === 'Escape' && !preview.hidden) {
+                        event.preventDefault();
+                        preview.hidden = true;
+                        (grid.children[currentIndex] as HTMLElement | undefined)?.focus({ preventScroll: true });
+                        return;
+                    }
+                    if (!files.length || (event.target instanceof HTMLInputElement && !event.target.classList.contains('dev-import-photo-checkbox') && event.target !== previewCheckbox)) return;
+                    const columns = getGridColumnCount();
+                    if (event.key === 'ArrowRight') currentIndex = Math.min(files.length - 1, currentIndex + 1);
+                    else if (event.key === 'ArrowLeft') currentIndex = Math.max(0, currentIndex - 1);
+                    else if (event.key === 'ArrowDown') currentIndex = Math.min(files.length - 1, currentIndex + columns);
+                    else if (event.key === 'ArrowUp') currentIndex = Math.max(0, currentIndex - columns);
+                    else if (event.key.toLowerCase() === 'z') {
+                        if (selected.has(currentIndex)) selected.delete(currentIndex);
+                        else selected.add(currentIndex);
+                    }
+                    else return;
+                    event.preventDefault();
+                    updateState();
+                    const currentCard = grid.children[currentIndex] as HTMLElement | undefined;
+                    if (preview.hidden) currentCard?.focus({ preventScroll: true });
+                    else preview.focus({ preventScroll: true });
+                    currentCard?.scrollIntoView({ block: 'nearest' });
+                };
+                dialog.addEventListener('keydown', keyHandler);
+                previewCheckbox.addEventListener('change', () => {
+                    if (previewCheckbox.checked) selected.add(currentIndex);
+                    else selected.delete(currentIndex);
+                    updateState();
+                });
+                dialog.querySelector('[data-import-preview-close]')?.addEventListener('click', () => {
+                    preview.hidden = true;
+                    (grid.children[currentIndex] as HTMLElement | undefined)?.focus({ preventScroll: true });
+                });
+                const cleanup = () => {
+                    objectUrls.forEach(URL.revokeObjectURL);
+                    stagedObjectUrls.forEach(URL.revokeObjectURL);
+                    dialog.remove();
+                };
+                dialog.querySelector('[data-import-action="close"]')?.addEventListener('click', () => dialog.close());
+                stageBtn.addEventListener('click', () => {
+                    if (!canStage()) return;
+                    options.onStage({
+                        albumSlug: slugInput.value.trim(),
+                        title: titleInput.value.trim(),
+                        createPage: options.createPage,
+                        files: selectedFiles(),
+                        replaceExisting: Boolean(options.stagedFiles),
+                    });
+                    dialog.close();
+                });
+                dialog.addEventListener('close', cleanup, { once: true });
+                renderStaged();
+                updateState();
+                dialog.showModal();
+            }
+
+            function confirmPagePathDeletion(pagePath: string) {
+                return new Promise<boolean>((resolve) => {
+                    const dialog = document.createElement('dialog');
+                    dialog.style.cssText = 'border:0;border-radius:12px;padding:0;box-shadow:0 20px 50px rgba(0,0,0,.3);';
+                    dialog.innerHTML = `
+                        <div style="width:min(520px,90vw);background:white;border-radius:12px;overflow:hidden;font-family:sans-serif;">
+                            <header style="display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;border-bottom:1px solid #fee2e2;background:#fff7f7;">
+                                <h3 style="margin:0;color:#991b1b;font-size:1rem;">Delete Page</h3>
+                                <button data-delete-page-close class="dev-manager-header-button" type="button">${ICONS.close}</button>
+                            </header>
+                            <div style="padding:1.25rem;">
+                                <p style="margin:0;color:#475569;font-size:.85rem;line-height:1.5;">Type the complete page path to continue:</p>
+                                <code data-delete-page-path style="display:block;margin:.75rem 0;padding:.65rem;background:#f1f5f9;border-radius:5px;color:#0f172a;"></code>
+                                <input data-delete-page-input type="text" autocomplete="off" spellcheck="false" style="width:100%;box-sizing:border-box;padding:.6rem;border:1px solid #cbd5e1;border-radius:5px;font:13px monospace;" />
+                                <div style="display:flex;justify-content:flex-end;gap:.5rem;margin-top:1rem;"><button data-delete-page-cancel type="button" style="padding:.5rem .8rem;border:1px solid #cbd5e1;border-radius:5px;background:white;cursor:pointer;">Cancel</button><button data-delete-page-confirm type="button" disabled style="padding:.5rem .8rem;border:0;border-radius:5px;background:#dc2626;color:white;cursor:pointer;">Stage deletion</button></div>
+                            </div>
+                        </div>`;
+                    document.body.appendChild(dialog);
+                    const input = dialog.querySelector('[data-delete-page-input]') as HTMLInputElement;
+                    const confirmButton = dialog.querySelector('[data-delete-page-confirm]') as HTMLButtonElement;
+                    (dialog.querySelector('[data-delete-page-path]') as HTMLElement).textContent = pagePath;
+                    const finish = (result: boolean) => {
+                        resolve(result);
+                        dialog.close();
+                    };
+                    input.addEventListener('input', () => { confirmButton.disabled = input.value.trim() !== pagePath; });
+                    confirmButton.addEventListener('click', () => { if (!confirmButton.disabled) finish(true); });
+                    dialog.querySelector('[data-delete-page-cancel]')?.addEventListener('click', () => finish(false));
+                    dialog.querySelector('[data-delete-page-close]')?.addEventListener('click', () => finish(false));
+                    dialog.addEventListener('cancel', (event) => { event.preventDefault(); finish(false); });
+                    dialog.addEventListener('close', () => dialog.remove(), { once: true });
+                    dialog.showModal();
+                    input.focus();
+                });
+            }
+
             // Folder Manager
             function createFolderManagerDialog() {
                 let existing = document.getElementById("dev-fm-dialog") as HTMLDialogElement;
@@ -2107,12 +2732,12 @@
                         <div style="padding: 1rem 1.5rem; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; background: #fafafa;">
                             <h3 style="margin: 0; font-size: 1rem; color: #333;">Folder Manager</h3>
                             <div class="dev-manager-header-actions">
-                                <button id="dev-fm-confirm" class="dev-manager-header-button dev-manager-header-button--save" type="button" title="Save Order" aria-label="Save Order">${ICONS.check}</button>
+                                <button id="dev-fm-add-page" class="dev-manager-header-button" type="button" title="Add Page" aria-label="Add Page">${ICONS.plus}</button>
+                                <button id="dev-fm-confirm" class="dev-manager-header-button dev-manager-header-button--save" type="button" title="No pending changes" aria-label="Save Changes" disabled>${ICONS.check}</button>
                                 <button id="dev-fm-close" class="dev-manager-header-button" type="button" title="Close" aria-label="Close">${ICONS.close}</button>
                             </div>
                         </div>
                         <div id="dev-fm-content" style="flex: 1; overflow-y: auto; padding: 1.5rem;">
-                            <div id="dev-fm-candidates"></div>
                             <div id="dev-fm-tree" class="dev-pm-tree"></div>
                         </div>
                     </div>
@@ -2139,9 +2764,9 @@
 
                 const dialog = createFolderManagerDialog();
                 const treeContainer = dialog.querySelector("#dev-fm-tree") as HTMLElement;
-                const candidatesContainer = dialog.querySelector("#dev-fm-candidates") as HTMLElement;
                 const closeBtn = dialog.querySelector("#dev-fm-close") as HTMLButtonElement;
                 const confirmBtn = dialog.querySelector("#dev-fm-confirm") as HTMLButtonElement;
+                const addPageBtn = dialog.querySelector("#dev-fm-add-page") as HTMLButtonElement;
 
                 let currentAlbums = data.albums.map((album: any) => ({
                     ...album,
@@ -2150,6 +2775,91 @@
                 }));
                 let selectedAlbum: number | null = null;
                 let expandedAlbums = new Set<number>();
+                const pendingImports: PendingPhotoImport[] = [];
+                const initialSnapshot = JSON.stringify(currentAlbums);
+                const draftSnapshot = () => JSON.stringify({
+                    albums: currentAlbums,
+                    imports: pendingImports.map((item) => ({
+                        albumSlug: item.albumSlug,
+                        title: item.title,
+                        createPage: item.createPage,
+                        files: item.files.map((file) => `${file.name}:${file.size}:${file.lastModified}`),
+                    })),
+                });
+                const baselineSnapshot = JSON.stringify({ albums: JSON.parse(initialSnapshot), imports: [] });
+                const updateFolderDirtyState = () => {
+                    const dirty = draftSnapshot() !== baselineSnapshot;
+                    confirmBtn.disabled = !dirty;
+                    confirmBtn.title = dirty ? 'Save Changes' : 'No pending changes';
+                };
+
+                const stageImport = (pending: PendingPhotoImport) => {
+                    if (pending.createPage && currentAlbums.some((album: any) => album.slug === `${folder}/${pending.albumSlug}`)) {
+                        showToast('❌ Page path already exists');
+                        return;
+                    }
+                    const existingPending = pendingImports.findIndex((item) => item.albumSlug === pending.albumSlug);
+                    if (existingPending >= 0) {
+                        const existing = pendingImports[existingPending];
+                        if (pending.replaceExisting) {
+                            pendingImports.splice(existingPending, 1, {
+                                ...pending,
+                                createPage: existing.createPage,
+                                replaceExisting: false,
+                            });
+                        } else {
+                            const combined = [...existing.files];
+                            for (const file of pending.files) {
+                                const duplicate = combined.find((candidate) => candidate.name === file.name);
+                                if (duplicate) {
+                                    showToast(`❌ Duplicate filename: ${file.name}`);
+                                    return;
+                                }
+                                combined.push(file);
+                            }
+                            pendingImports.splice(existingPending, 1, { ...existing, files: combined });
+                        }
+                    } else pendingImports.push(pending);
+                    if (pending.createPage) {
+                        currentAlbums.unshift({
+                            slug: `${folder}/${pending.albumSlug}`,
+                            title: pending.title,
+                            info: '',
+                            coverKey: pending.files[0]?.name || '',
+                            coverZoom: 1,
+                            coverOffset: { x: 50, y: 50 },
+                            pending: true,
+                        });
+                    } else {
+                        const targetAlbum = currentAlbums.find((album: any) => album.slug === `${folder}/${pending.albumSlug}`);
+                        if (targetAlbum?.pending && !targetAlbum.coverKey) targetAlbum.coverKey = pending.files[0]?.name || targetAlbum.coverKey;
+                        else if (targetAlbum) targetAlbum.hasPendingImport = true;
+                    }
+                    updateFolderDirtyState();
+                    renderView();
+                };
+
+                addPageBtn.addEventListener('click', () => {
+                    openPhotoImportDialog({ folder, createPage: true, onStage: stageImport });
+                });
+
+                const moveAlbum = (from: number, target: number) => {
+                    const expandedFlags: boolean[] = currentAlbums.map((_: any, index: number) => expandedAlbums.has(index));
+                    const [moved] = currentAlbums.splice(from, 1);
+                    const [movedExpanded] = expandedFlags.splice(from, 1);
+                    currentAlbums.splice(target, 0, moved);
+                    expandedFlags.splice(target, 0, movedExpanded);
+                    expandedAlbums = new Set(expandedFlags.flatMap((value: boolean, index: number) => value ? [index] : []));
+                    selectedAlbum = null;
+                    updateFolderDirtyState();
+                };
+
+                const moveSelectedAlbumToGap = (gapIndex: number) => {
+                    if (selectedAlbum === null) return;
+                    const from = selectedAlbum;
+                    moveAlbum(from, from < gapIndex ? gapIndex - 1 : gapIndex);
+                    renderView();
+                };
 
                 const renderView = () => {
                     sortableInstances.forEach(s => s.destroy());
@@ -2162,7 +2872,7 @@
                         el.className = 'dev-pm-block';
                         el.style.padding = '0.75rem';
                         el.style.marginBottom = '0.5rem';
-                        el.style.background = selectedAlbum === idx ? '#eff6ff' : '#f8fafc';
+                        el.style.background = album.pendingDeletion ? '#fef2f2' : selectedAlbum === idx ? '#eff6ff' : '#f8fafc';
                         el.style.outline = selectedAlbum === idx ? '2px solid #2563eb' : 'none';
                         el.style.outlineOffset = '1px';
                         el.style.borderRadius = '6px';
@@ -2171,22 +2881,20 @@
                             <div style="display:flex;align-items:center;gap:0.75rem;">
                                 ${selectedAlbum === idx
                                     ? `<button class="fm-drag-handle fm-selected" style="background:none;border:none;cursor:pointer;color:#2563eb;padding:4px;display:flex;align-items:center;" title="Cancel move">${ICONS.drag}</button>`
-                                    : selectedAlbum !== null
-                                        ? `<div class="block-move-arrows">
-                                            <button class="block-insert-btn fm-insert-above" title="Insert above">${ICONS.arrowRight}</button>
-                                            <button class="block-insert-btn fm-insert-below" title="Insert below">${ICONS.arrowRight}</button>
-                                           </div>`
-                                        : `<button class="fm-drag-handle" style="background:none;border:none;cursor:pointer;color:#94a3b8;padding:4px;display:flex;align-items:center;" title="Click to move">${ICONS.drag}</button>`
+                                    : `<button class="fm-drag-handle" style="background:none;border:none;cursor:pointer;color:#94a3b8;padding:4px;display:flex;align-items:center;" title="Click to move">${ICONS.drag}</button>`
                                 }
                                 <button class="fm-expand" type="button" style="background:none;border:none;cursor:pointer;color:#64748b;padding:4px;display:flex;align-items:center;transform:${isExpanded ? 'rotate(90deg)' : 'rotate(0deg)'};transition:transform 0.2s;">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
                                 </button>
                                 <div class="fm-main" style="flex:1;min-width:0;cursor:pointer;">
                                     <div style="font-weight:500;color:#334155;">${album.title || album.slug.split('/').pop()}</div>
-                                    <div style="font-size:0.7rem;color:#94a3b8;font-family:monospace;">${album.slug}</div>
+                                    <div style="font-size:0.7rem;color:${album.pendingDeletion ? '#dc2626' : '#94a3b8'};font-family:monospace;">${album.slug}${album.pendingDeletion ? ' · pending deletion' : album.pending ? ' · pending page' : album.hasPendingImport ? ' · pending photos' : ''}</div>
                                 </div>
+                                ${album.pendingDeletion
+                                    ? `<button class="fm-undo-delete dev-manager-header-button" type="button" title="Undo page deletion">${ICONS.refresh}</button>`
+                                    : `${album.pending ? `<button class="fm-import-photos dev-manager-header-button" type="button" title="Add more photos to pending page" aria-label="Add Photos">${ICONS.plus}</button>` : ''}<button class="fm-delete-page dev-manager-header-button" type="button" title="Delete Page" aria-label="Delete ${album.slug}" style="color:#dc2626;">${ICONS.trash}</button>`}
                             </div>
-                            <div class="fm-settings" style="display:${isExpanded ? 'grid' : 'none'};grid-template-columns:2.5fr 1fr 1fr 1fr;gap:0.75rem;margin-top:0.85rem;padding-top:0.85rem;border-top:1px dashed #dbe4ee;">
+                            <div class="fm-settings" style="display:${isExpanded && !album.pendingDeletion ? 'grid' : 'none'};grid-template-columns:2.5fr 1fr 1fr 1fr;gap:0.75rem;margin-top:0.85rem;padding-top:0.85rem;border-top:1px dashed #dbe4ee;">
                                 <label style="display:flex;flex-direction:column;gap:0.25rem;font-size:0.75rem;color:#64748b;">
                                     Cover Image
                                     <input class="fm-cover-key" type="text" value="${album.coverKey || ''}" style="width:100%;box-sizing:border-box;padding:0.4rem 0.6rem;border:1px solid #cbd5e1;border-radius:4px;font-size:0.85rem;" />
@@ -2204,6 +2912,8 @@
                                     <input class="fm-cover-oy" type="number" step="0.1" value="${album.coverOffset?.y ?? 50}" style="width:100%;box-sizing:border-box;padding:0.4rem 0.6rem;border:1px solid #cbd5e1;border-radius:4px;font-size:0.85rem;" />
                                 </label>
                             </div>
+                            ${selectedAlbum !== null && idx === 0 ? `<div class="dev-pm-inline-add-zone dev-pm-inline-add-zone--before is-active"><button class="dev-pm-inline-add-button fm-move-gap" type="button" data-fm-gap-index="0" title="Move here">${ICONS.arrowRight}</button></div>` : ''}
+                            ${selectedAlbum !== null ? `<div class="dev-pm-inline-add-zone is-active"><button class="dev-pm-inline-add-button fm-move-gap" type="button" data-fm-gap-index="${idx + 1}" title="Move here">${ICONS.arrowRight}</button></div>` : ''}
                         `;
 
                         const toggleExpanded = (e?: Event) => {
@@ -2215,6 +2925,35 @@
 
                         el.querySelector('.fm-expand')?.addEventListener('click', toggleExpanded);
                         el.querySelector('.fm-main')?.addEventListener('click', toggleExpanded);
+                        el.querySelector('.fm-import-photos')?.addEventListener('click', (event) => {
+                            event.stopPropagation();
+                            openPhotoImportDialog({
+                                folder,
+                                albumSlug: album.slug.split('/').pop(),
+                                title: album.title || album.slug.split('/').pop(),
+                                createPage: false,
+                                stagedFiles: pendingImports.find((item) => item.albumSlug === album.slug.split('/').pop())?.files,
+                                onStage: stageImport,
+                            });
+                        });
+                        el.querySelector('.fm-delete-page')?.addEventListener('click', async (event) => {
+                            event.stopPropagation();
+                            if (!await confirmPagePathDeletion(album.slug)) return;
+                            if (album.pending) {
+                                const pendingIndex = pendingImports.findIndex((item) => `${folder}/${item.albumSlug}` === album.slug);
+                                if (pendingIndex >= 0) pendingImports.splice(pendingIndex, 1);
+                                currentAlbums.splice(idx, 1);
+                            } else album.pendingDeletion = true;
+                            selectedAlbum = null;
+                            updateFolderDirtyState();
+                            renderView();
+                        });
+                        el.querySelector('.fm-undo-delete')?.addEventListener('click', (event) => {
+                            event.stopPropagation();
+                            album.pendingDeletion = false;
+                            updateFolderDirtyState();
+                            renderView();
+                        });
 
                         el.querySelector('.fm-drag-handle')?.addEventListener('click', (e) => {
                             e.stopPropagation();
@@ -2222,26 +2961,9 @@
                             renderView();
                         });
 
-                        el.querySelector('.fm-insert-above')?.addEventListener('click', (e) => {
+                        el.querySelector('.fm-move-gap')?.addEventListener('click', (e) => {
                             e.stopPropagation();
-                            const from = selectedAlbum!;
-                            selectedAlbum = null;
-                            const [moved] = currentAlbums.splice(from, 1);
-                            let target = idx;
-                            if (from < idx) target--;
-                            currentAlbums.splice(target, 0, moved);
-                            renderView();
-                        });
-
-                        el.querySelector('.fm-insert-below')?.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            const from = selectedAlbum!;
-                            selectedAlbum = null;
-                            const [moved] = currentAlbums.splice(from, 1);
-                            let target = idx + 1;
-                            if (from < idx) target--;
-                            currentAlbums.splice(target, 0, moved);
-                            renderView();
+                            moveSelectedAlbumToGap(Number((e.currentTarget as HTMLElement).dataset.fmGapIndex));
                         });
 
                         const coverKeyInput = el.querySelector('.fm-cover-key') as HTMLInputElement | null;
@@ -2251,21 +2973,25 @@
 
                         coverKeyInput?.addEventListener('input', () => {
                             album.coverKey = coverKeyInput.value.trim();
+                            updateFolderDirtyState();
                         });
                         coverZoomInput?.addEventListener('input', () => {
                             album.coverZoom = parseFloat(coverZoomInput.value || '1');
+                            updateFolderDirtyState();
                         });
                         coverOXInput?.addEventListener('input', () => {
                             album.coverOffset = {
                                 x: parseFloat(coverOXInput.value || '50'),
                                 y: album.coverOffset?.y ?? 50,
                             };
+                            updateFolderDirtyState();
                         });
                         coverOYInput?.addEventListener('input', () => {
                             album.coverOffset = {
                                 x: album.coverOffset?.x ?? 50,
                                 y: parseFloat(coverOYInput.value || '50'),
                             };
+                            updateFolderDirtyState();
                         });
 
                         treeContainer.appendChild(el);
@@ -2284,63 +3010,15 @@
                         ghostClass: 'dev-pm-ghost',
                         handle: '.fm-drag-handle',
                         onEnd: (evt: any) => {
-                            const [moved] = currentAlbums.splice(evt.oldIndex, 1);
-                            currentAlbums.splice(evt.newIndex, 0, moved);
-                            selectedAlbum = null;
+                            moveAlbum(evt.oldIndex, evt.newIndex);
+                            window.setTimeout(renderView, 0);
                         }
                     }));
 
-                    candidatesContainer.innerHTML = '';
-                    if (data.availableFolders.length > 0) {
-                        data.availableFolders.forEach((slug: string) => {
-                            const el = document.createElement('div');
-                            el.className = 'dev-pm-block';
-                            el.style.padding = '0.75rem';
-                            el.style.marginBottom = '0.5rem';
-                            el.style.background = '#f8fafc';
-                            el.style.borderRadius = '6px';
-                            el.innerHTML = `
-                                <div style="display:flex;align-items:center;gap:0.75rem;">
-                                    <div style="flex:1;min-width:0;">
-                                        <div style="font-weight:500;color:#334155;">${slug}</div>
-                                        <div style="font-size:0.7rem;color:#94a3b8;font-family:monospace;">${folder}/${slug}</div>
-                                    </div>
-                                    <button class="create-btn dev-manager-header-button dev-manager-header-button--save" type="button" title="Create album" aria-label="Create ${slug} album">
-                                        ${ICONS.plus}
-                                    </button>
-                                </div>
-                            `;
-                            el.querySelector('.create-btn')?.addEventListener('click', async (e) => {
-                                const btn = e.currentTarget as HTMLButtonElement;
-                                btn.disabled = true;
-                                btn.textContent = '…';
-                                try {
-                                    const cres = await fetch('/api/create-album', {
-                                        method: 'POST',
-                                        headers: { 'Content-Type': 'application/json' },
-                                        body: JSON.stringify({ folder, albumSlug: slug })
-                                    });
-                                    if (cres.ok) {
-                                        const cdata = await cres.json();
-                                        showToast('✅ Album created! Redirecting...');
-                                        setTimeout(() => window.location.href = cdata.redirectUrl, 1000);
-                                    } else {
-                                        showToast('❌ Creation failed');
-                                        btn.disabled = false;
-                                        btn.innerHTML = ICONS.plus;
-                                    }
-                                } catch {
-                                    showToast('❌ Network error');
-                                    btn.disabled = false;
-                                    btn.innerHTML = ICONS.plus;
-                                }
-                            });
-                            candidatesContainer.appendChild(el);
-                        });
-                    }
                 };
 
                 const closeHandler = () => {
+                    if (!confirmBtn.disabled && !confirm('Discard unsaved Folder Manager changes?')) return;
                     dialog.close();
                     closeBtn.removeEventListener('click', closeHandler);
                     confirmBtn.removeEventListener('click', confirmHandler);
@@ -2350,13 +3028,36 @@
                     confirmBtn.disabled = true;
                     confirmBtn.innerHTML = '...';
                     try {
+                        const pageDeletions = currentAlbums.filter((album: any) => album.pendingDeletion);
+                        for (const pending of pendingImports) {
+                            const form = new FormData();
+                            form.set('folder', folder);
+                            form.set('albumSlug', pending.albumSlug);
+                            form.set('title', pending.title);
+                            form.set('createPage', String(pending.createPage));
+                            pending.files.forEach((file) => form.append('photos', file, file.name));
+                            const importResponse = await fetch('/api/import-album-photos', { method: 'POST', body: form });
+                            const importResult = await importResponse.json().catch(() => ({}));
+                            if (!importResponse.ok) throw new Error(importResult.error || 'Photo import failed');
+                            pending.createPage = false;
+                        }
+                        for (const album of pageDeletions) {
+                            const deleteResponse = await fetch('/api/delete-album-page', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ pagePath: album.slug }),
+                            });
+                            const deleteResult = await deleteResponse.json().catch(() => ({}));
+                            if (!deleteResponse.ok) throw new Error(deleteResult.error || `Failed to delete ${album.slug}`);
+                        }
+                        const activeAlbums = currentAlbums.filter((album: any) => !album.pendingDeletion);
                         const res = await fetch("/api/save-folder-order", {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({
                                 folder,
-                                order: currentAlbums.map((album: any) => album.slug),
-                                albums: currentAlbums.map((album: any) => ({
+                                order: activeAlbums.map((album: any) => album.slug),
+                                albums: activeAlbums.map((album: any) => ({
                                     slug: album.slug,
                                     coverKey: album.coverKey || '',
                                     coverZoom: parseFloat(String(album.coverZoom || 1)),
@@ -2368,15 +3069,15 @@
                             }),
                         });
                         if (res.ok) {
-                            showToast("✅ Order updated!");
+                            showToast("✅ Folder changes saved!");
                             setTimeout(() => window.location.reload(), 1000);
                         } else {
                             showToast("❌ Save failed");
                             confirmBtn.disabled = false;
                             confirmBtn.innerHTML = ICONS.check;
                         }
-                    } catch {
-                        showToast("❌ Network error");
+                    } catch (error: any) {
+                        showToast(`❌ ${error?.message || 'Save failed'}`);
                         confirmBtn.disabled = false;
                         confirmBtn.innerHTML = ICONS.check;
                     }
@@ -2386,6 +3087,7 @@
                 confirmBtn.addEventListener('click', confirmHandler);
 
                 renderView();
+                updateFolderDirtyState();
                 dialog.showModal();
             }
 
@@ -2420,6 +3122,149 @@
 
             const isTagPage = () =>
                 window.location.pathname.split('/').filter(Boolean)[0] === 'tags';
+
+            async function openR2Manager() {
+                showToast('⌛ Auditing source and R2...');
+                const response = await fetch('/api/r2-global-plan', { cache: 'no-store' });
+                const plan = await response.json().catch(() => ({}));
+                if (!response.ok) return showToast(`❌ ${plan.error || 'R2 audit failed'}`);
+                const dialog = document.createElement('dialog');
+                dialog.style.cssText = 'border:0;border-radius:12px;padding:0;box-shadow:0 20px 50px rgba(0,0,0,.3);';
+                const formatBytes = (bytes: number) => bytes < 1024 * 1024 * 1024
+                    ? `${(bytes / 1024 / 1024).toFixed(1)} MB`
+                    : `${(bytes / 1024 / 1024 / 1024).toFixed(2)} GB`;
+                const readonlyList = (title: string, items: any[], color: string, group: string) => `
+                    <details style="margin-top:.75rem;border:1px solid #e2e8f0;border-radius:7px;overflow:hidden;" ${items.length ? '' : 'open'}>
+                        <summary style="padding:.7rem;cursor:pointer;color:${color};font-weight:600;">${title} (${items.length})</summary>
+                        <div style="max-height:240px;overflow:auto;border-top:1px solid #e2e8f0;">${items.length ? items.map((_: any, index: number) => `<div data-r2-group="${group}" data-r2-index="${index}" style="padding:.5rem .7rem;border-bottom:1px solid #f1f5f9;font:12px monospace;word-break:break-all;"></div>`).join('') : '<div style="padding:.7rem;color:#64748b;">None</div>'}</div>
+                    </details>`;
+                const orphanRows = (plan.orphans || []).map((_: any, index: number) => `
+                    <label style="display:flex;align-items:flex-start;gap:.6rem;padding:.6rem .7rem;border-bottom:1px solid #f1f5f9;cursor:pointer;">
+                        <input data-r2-orphan-index="${index}" type="checkbox" style="margin-top:.15rem;accent-color:#16a34a;" />
+                        <code style="min-width:0;font-size:.72rem;word-break:break-all;color:#475569;"></code>
+                    </label>`).join('');
+                const orphanList = `
+                    <details style="margin-top:.75rem;border:1px solid #e2e8f0;border-radius:7px;overflow:hidden;" ${(plan.orphans || []).length ? 'open' : ''}>
+                        <summary style="padding:.7rem;cursor:pointer;color:#b45309;font-weight:600;">Unreferenced remote objects (${(plan.orphans || []).length})</summary>
+                        <div style="max-height:240px;overflow:auto;border-top:1px solid #e2e8f0;">${orphanRows || '<div style="padding:.7rem;color:#64748b;">None</div>'}</div>
+                    </details>`;
+                const markerRows = (plan.directoryMarkers || []).map((_: any, index: number) => `
+                    <label style="display:flex;align-items:flex-start;gap:.6rem;padding:.6rem .7rem;border-bottom:1px solid #f1f5f9;cursor:pointer;">
+                        <input data-r2-marker-index="${index}" type="checkbox" style="margin-top:.15rem;accent-color:#16a34a;" />
+                        <span style="min-width:0;"><code style="display:block;font-size:.72rem;word-break:break-all;color:#475569;"></code><small style="color:#94a3b8;">Delete marker only; prefixed photos remain.</small></span>
+                    </label>`).join('');
+                const markerList = (plan.directoryMarkers || []).length ? `
+                    <details style="margin-top:.75rem;border:1px solid #e2e8f0;border-radius:7px;overflow:hidden;">
+                        <summary style="padding:.7rem;cursor:pointer;color:#64748b;font-weight:600;">Empty folder markers (${plan.directoryMarkers.length})</summary>
+                        <div style="max-height:240px;overflow:auto;border-top:1px solid #e2e8f0;">${markerRows}</div>
+                    </details>` : '';
+                dialog.innerHTML = `
+                    <div style="display:flex;flex-direction:column;width:min(780px,92vw);max-height:84vh;background:white;border-radius:12px;overflow:hidden;font-family:sans-serif;">
+                        <div style="display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;border-bottom:1px solid #e2e8f0;background:#fafafa;">
+                            <h3 style="margin:0;font-size:1rem;color:#334155;">R2 Manager</h3>
+                            <div class="dev-manager-header-actions">
+                                <button data-r2-save class="dev-manager-header-button dev-manager-header-button--save" type="button" disabled title="No staged objects">${ICONS.check}</button>
+                                <button data-r2-close class="dev-manager-header-button" type="button">${ICONS.close}</button>
+                            </div>
+                        </div>
+                        <div style="overflow:auto;padding:1rem 1.25rem;">
+                            ${plan.remoteAvailable ? `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;"><div>Source<br><strong>${plan.sourceCount}</strong></div><div>Remote<br><strong>${plan.remoteCount}</strong></div><div>Storage<br><strong>${formatBytes(plan.remoteBytes)}</strong></div></div>` : `<p style="padding:.75rem;background:#fff7ed;color:#9a3412;border-radius:6px;">${plan.message}</p>`}
+                            ${plan.remoteAvailable ? readonlyList('Source missing in R2', plan.sourceMissing || [], '#b91c1c', 'missing') + orphanList + markerList + readonlyList('Trash', plan.trash || [], '#475569', 'trash') : ''}
+                        </div>
+                    </div>`;
+                if (plan.remoteAvailable) {
+                    const groups: Record<string, any[]> = { missing: plan.sourceMissing || [], trash: plan.trash || [] };
+                    dialog.querySelectorAll('[data-r2-group]').forEach((row) => {
+                        const element = row as HTMLElement;
+                        const item = groups[element.dataset.r2Group || '']?.[Number(element.dataset.r2Index)];
+                        if (item) row.textContent = item.key;
+                    });
+                    dialog.querySelectorAll('[data-r2-orphan-index]').forEach((input) => {
+                        const index = Number((input as HTMLInputElement).dataset.r2OrphanIndex);
+                        const code = input.parentElement?.querySelector('code');
+                        if (code) code.textContent = plan.orphans[index].key;
+                    });
+                    dialog.querySelectorAll('[data-r2-marker-index]').forEach((input) => {
+                        const index = Number((input as HTMLInputElement).dataset.r2MarkerIndex);
+                        const code = input.parentElement?.querySelector('code');
+                        if (code) code.textContent = plan.directoryMarkers[index].key;
+                    });
+                }
+                document.body.appendChild(dialog);
+                const saveBtn = dialog.querySelector('[data-r2-save]') as HTMLButtonElement;
+                const closeBtn = dialog.querySelector('[data-r2-close]') as HTMLButtonElement;
+                const selected = new Set<number>();
+                const selectedMarkers = new Set<number>();
+                const updateDirtyState = () => {
+                    const count = selected.size + selectedMarkers.size;
+                    saveBtn.disabled = count === 0;
+                    saveBtn.title = count ? `Apply ${count} staged R2 cleanup action(s)` : 'No staged objects';
+                };
+                dialog.querySelectorAll('[data-r2-orphan-index]').forEach((input) => {
+                    input.addEventListener('change', () => {
+                        const checkbox = input as HTMLInputElement;
+                        const index = Number(checkbox.dataset.r2OrphanIndex);
+                        if (checkbox.checked) selected.add(index);
+                        else selected.delete(index);
+                        updateDirtyState();
+                    });
+                });
+                dialog.querySelectorAll('[data-r2-marker-index]').forEach((input) => {
+                    input.addEventListener('change', () => {
+                        const checkbox = input as HTMLInputElement;
+                        const index = Number(checkbox.dataset.r2MarkerIndex);
+                        if (checkbox.checked) selectedMarkers.add(index);
+                        else selectedMarkers.delete(index);
+                        updateDirtyState();
+                    });
+                });
+                closeBtn.addEventListener('click', () => {
+                    if ((selected.size || selectedMarkers.size) && !confirm('Discard staged R2 cleanup changes?')) return;
+                    dialog.close();
+                });
+                saveBtn.addEventListener('click', async () => {
+                    if (!selected.size && !selectedMarkers.size) return;
+                    saveBtn.disabled = true;
+                    saveBtn.textContent = '…';
+                    const controller = new AbortController();
+                    const timeout = window.setTimeout(() => controller.abort(), 45_000);
+                    try {
+                        const objects = [...selected].map((index) => ({
+                            key: plan.orphans[index].key,
+                            etag: plan.orphans[index].etag,
+                        }));
+                        const markers = [...selectedMarkers].map((index) => ({
+                            key: plan.directoryMarkers[index].key,
+                            etag: plan.directoryMarkers[index].etag,
+                        }));
+                        const trashResponse = await fetch('/api/r2-trash-objects', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ objects, markers }),
+                            signal: controller.signal,
+                        });
+                        const result = await trashResponse.json().catch(() => ({}));
+                        if (!trashResponse.ok) throw new Error(result.error || 'R2 Trash operation failed');
+                        dialog.close();
+                        showToast(`✅ Applied ${result.results?.length || objects.length + markers.length} R2 cleanup action(s)`);
+                        void openR2Manager();
+                    } catch (error: any) {
+                        if (error?.name === 'AbortError') {
+                            dialog.close();
+                            showToast('⌛ R2 response timed out; refreshing the remote audit…');
+                            window.setTimeout(() => void openR2Manager(), 1500);
+                            return;
+                        }
+                        showToast(`❌ ${error?.message || 'R2 Trash operation failed'}`);
+                        saveBtn.innerHTML = ICONS.check;
+                        updateDirtyState();
+                    } finally {
+                        window.clearTimeout(timeout);
+                    }
+                });
+                dialog.addEventListener('close', () => dialog.remove(), { once: true });
+                dialog.showModal();
+            }
 
             const performTagging = async (e: MouseEvent, wrapper: HTMLElement) => {
                 const img = wrapper.querySelector('img');
@@ -2572,7 +3417,7 @@
 
             const init = () => {
                 injectStyles();
-                if (isRootPage() || isTagPage()) {
+                if (isTagPage()) {
                     document.getElementById('dev-gear-btn')?.remove();
                     document.getElementById('dev-save-btn')?.remove();
                     return;
@@ -2587,7 +3432,10 @@
                     gearBtn.className = 'dev-gear-btn';
                     gearBtn.innerHTML = ICONS.gear;
 
-                    if (isMountainTagsView()) {
+                    if (isRootPage()) {
+                        gearBtn.title = 'R2 Manager';
+                        gearBtn.addEventListener('click', openR2Manager);
+                    } else if (isMountainTagsView()) {
                         gearBtn.title = 'Region Manager';
                         gearBtn.addEventListener('click', openRegionManager);
                     } else if (isFolderPage()) {
@@ -2608,7 +3456,7 @@
                     }
                 }
 
-                if (!isFolderPage() && !document.getElementById('dev-save-btn')) {
+                if (!isRootPage() && !isFolderPage() && !document.getElementById('dev-save-btn')) {
                     const saveBtn = document.createElement('button');
                     saveBtn.id = 'dev-save-btn';
                     saveBtn.className = 'dev-save-btn';

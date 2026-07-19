@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro';
+import { createPageContent } from '../../lib/page-structure';
 
 export const POST: APIRoute = async ({ request }) => {
     if (!import.meta.env.DEV) {
@@ -31,51 +32,7 @@ export const POST: APIRoute = async ({ request }) => {
     const fmMatch = originalContent.match(/^---\n([\s\S]*?)\n---/);
     const originalFrontmatter = fmMatch ? fmMatch[0] : '';
 
-    let newBody = '';
-    blocks.forEach((block: any) => {
-        const { type, props, photos } = block;
-
-        // Handle Text blocks
-        if (type === 'Text') {
-            let propsStr = '';
-            if (props.align && props.align !== 'center') propsStr += `\n  align="${props.align}"`;
-            if (props.size && props.size !== 'caption') propsStr += `\n  size="${props.size}"`;
-            if (props.mt && props.mt !== '2rem') propsStr += `\n  mt="${props.mt}"`;
-            if (props.mb && props.mb !== '0.5rem') propsStr += `\n  mb="${props.mb}"`;
-            newBody += `<Text${propsStr}>\n  ${block.text || ''}\n</Text>\n\n`;
-            return;
-        }
-
-        let propsStr = '';
-        if (props.caption) propsStr += `\n  caption="${props.caption}"`;
-        if (props.captionPosition && props.captionPosition !== 'center bottom') {
-            propsStr += `\n  captionPosition="${props.captionPosition}"`;
-        }
-        if (props.captionMargin) propsStr += `\n  captionMargin="${props.captionMargin}"`;
-        if (props.blockMargin) propsStr += `\n  blockMargin="${props.blockMargin}"`;
-        if (type === 'PhotoCarousel' && props.initialSlide) propsStr += `\n  initialSlide={${props.initialSlide}}`;
-        // mt/mb are legacy and will be migrated to the above if they exist in state but the above don't
-        if (!props.captionMargin && props.caption && props.mt) propsStr += `\n  captionMargin="${props.mt}"`;
-        if (!props.blockMargin && !props.captionMargin && props.mb) propsStr += `\n  blockMargin="${props.mb}"`;
-
-        newBody += `<${type}${propsStr}>\n`;
-        photos.forEach((photo: any) => {
-            newBody += `  <Photo itemKey="${photo.itemKey}" />\n`;
-        });
-        newBody += `</${type}>\n\n`;
-    });
-
-    let finalFrontmatter = newFrontmatter || originalFrontmatter;
-    if (finalFrontmatter && !finalFrontmatter.startsWith('---')) {
-        finalFrontmatter = `---\n${finalFrontmatter}\n---`;
-    }
-
-    // Actively strip 'order: ...' from frontmatter to fulfill external ordering goal
-    if (finalFrontmatter) {
-        finalFrontmatter = finalFrontmatter.replace(/^order:\s*.*$\n?/m, '');
-    }
-
-    const newContent = `${finalFrontmatter}\n\n${newBody.trim()}\n`;
+    const newContent = createPageContent(originalContent, blocks, newFrontmatter || originalFrontmatter);
     fs.writeFileSync(mdxFile, newContent, 'utf-8');
 
     return new Response(JSON.stringify({ success: true }), {

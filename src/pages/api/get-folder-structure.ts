@@ -1,6 +1,5 @@
 import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
-import { getAvailableFolders } from '../../lib/album-utils';
 
 export const GET: APIRoute = async ({ url }) => {
     if (!import.meta.env.DEV) {
@@ -13,7 +12,7 @@ export const GET: APIRoute = async ({ url }) => {
     const path = await import('node:path');
 
     const folder = url.searchParams.get('folder');
-    if (!folder) {
+    if (!folder || !/^[a-z0-9-]+$/.test(folder)) {
         return new Response(JSON.stringify({ error: 'Missing folder parameter' }), { status: 400 });
     }
 
@@ -57,12 +56,8 @@ export const GET: APIRoute = async ({ url }) => {
             coverOffset: a.data.coverOffset ?? { x: 50, y: 50 },
         }));
 
-        // 4. Get available folders for new albums
-        const candidates = await getAvailableFolders(folder);
-
         return new Response(JSON.stringify({
-            albums: sortedAlbums,
-            availableFolders: candidates
+            albums: sortedAlbums
         }), {
             status: 200,
             headers: { 'Content-Type': 'application/json' },
