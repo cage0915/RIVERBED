@@ -503,12 +503,6 @@
                         background: rgba(0,0,0,0.05);
                         color: #475569;
                     }
-                    .dev-pm-photo-action.is-cover {
-                        color: #f59e0b;
-                    }
-                    .dev-pm-photo-action.is-cover svg {
-                        fill: currentColor;
-                    }
                     .dev-pm-photo-action.delete-btn:hover {
                         background: #fef2f2;
                         color: #ef4444;
@@ -564,12 +558,6 @@
                     .pm-move-target:hover {
                         outline: 2px dashed #93c5fd !important;
                         outline-offset: -2px;
-                    }
-                    .dev-star-golden {
-                        color: #f59e0b;
-                    }
-                    .dev-star-golden svg {
-                        fill: #f59e0b;
                     }
                     /* Collapsed thumbnail strip */
                     .dev-pm-thumb-strip {
@@ -641,6 +629,100 @@
                     input[type=number] {
                         -moz-appearance: textfield;
                     }
+                    .dev-folder-cover-actions {
+                        position: absolute;
+                        top: 0.5rem;
+                        right: 0.5rem;
+                        z-index: 30;
+                        display: flex;
+                        gap: 0.35rem;
+                        opacity: 0;
+                        transform: translateY(-4px);
+                        transition: opacity 150ms ease, transform 150ms ease;
+                    }
+                    .album-card:hover .dev-folder-cover-actions,
+                    .album-card:focus-within .dev-folder-cover-actions,
+                    .album-card.dev-cover-editing .dev-folder-cover-actions {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                    .dev-folder-cover-button {
+                        display: flex;
+                        width: 2rem;
+                        height: 2rem;
+                        padding: 0;
+                        align-items: center;
+                        justify-content: center;
+                        border: 1px solid rgba(255,255,255,.55);
+                        border-radius: 50%;
+                        background: rgba(15,23,42,.72);
+                        color: white;
+                        cursor: pointer;
+                        box-shadow: 0 2px 8px rgba(15,23,42,.22);
+                        backdrop-filter: blur(6px);
+                    }
+                    .dev-folder-cover-button:hover,
+                    .dev-folder-cover-button.is-active {
+                        background: #2563eb;
+                    }
+                    .dev-folder-cover-button svg { width: 16px; height: 16px; }
+                    .album-card.dev-cover-editing .album-link { cursor: grab; }
+                    .album-card.dev-cover-editing.is-dragging .album-link { cursor: grabbing; }
+                    .album-card.dev-cover-editing .album-overlay { display: none; }
+                    .album-card.dev-cover-editing .album-cover {
+                        outline: 2px solid #3b82f6;
+                        outline-offset: -2px;
+                        touch-action: none;
+                    }
+                    .album-card.dev-cover-editing .album-cover img { transition: none !important; }
+                    .album-card.dev-cover-editing:hover .album-cover img {
+                        transform: scale(var(--zoom)) !important;
+                    }
+                    .dev-cover-edit-hint {
+                        position: absolute;
+                        bottom: 0.55rem;
+                        left: 50%;
+                        z-index: 30;
+                        padding: 0.3rem 0.55rem;
+                        border-radius: 999px;
+                        background: rgba(15,23,42,.78);
+                        color: white;
+                        font: 11px/1.2 sans-serif;
+                        white-space: nowrap;
+                        pointer-events: none;
+                        transform: translateX(-50%);
+                    }
+                    .dev-cover-picker-grid {
+                        display: grid;
+                        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                        gap: 0.6rem;
+                    }
+                    .dev-cover-picker-photo {
+                        position: relative;
+                        padding: 0;
+                        overflow: hidden;
+                        border: 2px solid transparent;
+                        border-radius: 7px;
+                        background: #e2e8f0;
+                        cursor: pointer;
+                        aspect-ratio: 4 / 3;
+                    }
+                    .dev-cover-picker-photo:hover { border-color: #60a5fa; }
+                    .dev-cover-picker-photo.is-current { border-color: #2563eb; }
+                    .dev-cover-picker-photo img { width: 100%; height: 100%; object-fit: cover; }
+                    .dev-cover-picker-photo span {
+                        position: absolute;
+                        right: 0;
+                        bottom: 0;
+                        left: 0;
+                        overflow: hidden;
+                        padding: 0.3rem;
+                        background: rgba(15,23,42,.72);
+                        color: white;
+                        font: 10px/1.2 monospace;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                    }
                 `;
                 document.head.appendChild(style);
             };
@@ -663,7 +745,7 @@
                 minus: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>`,
                 dots: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.5"></circle><circle cx="19" cy="12" r="1.5"></circle><circle cx="5" cy="12" r="1.5"></circle></svg>`,
                 slideOne: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M10 10l2-2"/></svg>`,
-                star: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`,
+                image: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>`,
                 expandAll: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>`,
                 collapseAll: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 20 5-5 5 5"/><path d="m7 4 5 5 5-5"/></svg>`,
                 rename: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>`,
@@ -1299,24 +1381,6 @@
                                             <input type="text" id="dev-pm-info" style="width: 100%; box-sizing: border-box; padding: 0.4rem 0.6rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;" />
                                         </label>
                                     </div>
-                                    <div style="display: grid; grid-template-columns: 3fr 1fr 1fr 1fr; gap: 0.75rem;">
-                                        <label style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.75rem; color: #64748b;">
-                                            Cover Image
-                                            <input type="text" id="dev-pm-cover" style="width: 100%; box-sizing: border-box; padding: 0.4rem 0.6rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;" />
-                                        </label>
-                                        <label style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.75rem; color: #64748b;">
-                                            Zoom
-                                            <input type="number" step="0.1" id="dev-pm-zoom" style="width: 100%; box-sizing: border-box; padding: 0.4rem 0.6rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;" />
-                                        </label>
-                                        <label style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.75rem; color: #64748b;">
-                                            Offset X
-                                            <input type="number" step="0.1" id="dev-pm-ox" style="width: 100%; box-sizing: border-box; padding: 0.4rem 0.6rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;" />
-                                        </label>
-                                        <label style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.75rem; color: #64748b;">
-                                            Offset Y
-                                            <input type="number" step="0.1" id="dev-pm-oy" style="width: 100%; box-sizing: border-box; padding: 0.4rem 0.6rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;" />
-                                        </label>
-                                    </div>
                                     <label style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.75rem; color: #64748b;">
                                         Block Gap
                                         <input type="text" id="dev-pm-gap" placeholder="0.5rem" style="width: 100%; box-sizing: border-box; padding: 0.4rem 0.6rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;" />
@@ -1388,9 +1452,8 @@
                                 if (renamed[base]) p.itemKey = renamed[base];
                             });
                         });
-                        // Update cover field if it was renamed
-                        const coverBase = fCover.value.includes('/') ? fCover.value.split('/').pop()! : fCover.value;
-                        if (renamed[coverBase]) fCover.value = renamed[coverBase];
+                        const coverBase = fmData.coverKey.split('/').pop() || fmData.coverKey;
+                        if (renamed[coverBase]) fmData.coverKey = renamed[coverBase];
                         showToast(`✅ Renamed ${Object.keys(renamed).length} photos`);
                         renderTree();
                     } catch (err: any) {
@@ -1404,42 +1467,20 @@
                 // FM Form elements
                 const fTitle = dialog.querySelector("#dev-pm-title") as HTMLInputElement;
                 const fInfo = dialog.querySelector("#dev-pm-info") as HTMLInputElement;
-                const fCover = dialog.querySelector("#dev-pm-cover") as HTMLInputElement;
-                const fZoom = dialog.querySelector("#dev-pm-zoom") as HTMLInputElement;
-                const fOX = dialog.querySelector("#dev-pm-ox") as HTMLInputElement;
-                const fOY = dialog.querySelector("#dev-pm-oy") as HTMLInputElement;
 
                 const parseFM = (fm: string) => {
                     const get = (key: string) => (fm.match(new RegExp(`^${key}:\\s*(.*)$`, 'm')) || [])[1]?.trim().replace(/^"(.*)"$/, '$1').replace(/^'(.*)'$/, '$1');
-                    const getObj = (key: string) => {
-                        const m = fm.match(new RegExp(`^${key}:\\s*\\{(.*)\\}`, 'm'));
-                        if (!m) return {};
-                        const parts = m[1].split(',').reduce((acc: any, p) => {
-                            const [k, v] = p.split(':').map(s => s.trim());
-                            acc[k] = v;
-                            return acc;
-                        }, {});
-                        return parts;
-                    };
-                    const offset = getObj('coverOffset');
                     return {
                         title: get('title') || '',
                         info: get('info') || '',
                         coverKey: get('coverKey') || '',
                         order: get('order') || '',
-                        coverZoom: get('coverZoom') || '1',
-                        ox: offset.x || '50',
-                        oy: offset.y || '50'
                     };
                 };
 
                 const fmData = parseFM(data.frontmatter);
                 fTitle.value = fmData.title;
                 fInfo.value = fmData.info;
-                fCover.value = fmData.coverKey;
-                fZoom.value = fmData.coverZoom;
-                fOX.value = fmData.ox;
-                fOY.value = fmData.oy;
 
                 const fGap = dialog.querySelector("#dev-pm-gap") as HTMLInputElement;
                 const getGapFromFM = (fm: string) => (fm.match(/^gap:\s*(.*)$/m) || [])[1]?.trim().replace(/^"(.*)"$/, '$1').replace(/^'(.*)'$/, '$1');
@@ -1508,7 +1549,7 @@
                 };
                 const referencedPhotoNames = () => new Set([
                     ...currentBlocks.flatMap((block: any) => (block.photos || []).map((photo: any) => basename(photo.itemKey))),
-                    ...(fCover.value.trim() ? [basename(fCover.value.trim())] : []),
+                    ...(fmData.coverKey ? [basename(fmData.coverKey)] : []),
                 ]);
                 const initiallyReferencedNames = referencedPhotoNames();
                 const localPhotoNames = new Set(localPhotos.map((photo) => photo.name));
@@ -1533,11 +1574,7 @@
                     frontmatter: {
                         title: fTitle.value.trim(),
                         info: fInfo.value.trim(),
-                        coverKey: fCover.value.trim(),
                         gap: fGap.value.trim(),
-                        zoom: fZoom.value,
-                        ox: fOX.value,
-                        oy: fOY.value,
                     },
                     blocks: currentBlocks,
                     imports: pendingPageImports.map((file) => `${file.name}:${file.size}:${file.lastModified}`),
@@ -1552,7 +1589,6 @@
                     r2SyncBtn.title = dirty ? 'Save page changes before syncing R2' : 'Sync Current Album with R2';
                 };
                 dialog.addEventListener('input', updatePageDirtyState);
-                fCover.addEventListener('input', reconcileRemovedPhotos);
 
                 const handlePhotoClick = (bIdx: number, pIdx: number, insertAfter = false) => {
                     if (!selectedPhoto) {
@@ -1821,7 +1857,6 @@
                                                     ${isLocalhost ? `<img src="${photoPreviewUrl(p.itemKey)}" loading="lazy" style="width:40px;height:30px;object-fit:cover;border-radius:3px;flex-shrink:0;" />` : ''}
                                                     <span style="flex: 1;">${p.itemKey.split('/').pop()}</span>
                                                     ${block.type === 'PhotoCarousel' && pIdx === (block.props.initialSlide ?? 0) ? `<span style="display: flex; align-items: center; margin-right: 4px; color: #2563eb;" title="Initial Slide">${ICONS.slideOne}</span>` : ''}
-                                                    <button class="star-btn dev-pm-photo-action${p.itemKey === fCover.value.trim() ? ' is-cover' : ''}" type="button" title="${p.itemKey === fCover.value.trim() ? 'Current Cover' : 'Set as Cover'}" aria-label="Set ${p.itemKey.split('/').pop()} as cover">${ICONS.star}</button>
                                                     ${block.type === 'PhotoCarousel' || block.photos.length > 1 ? `<div style="position: relative;">
                                                         <button class="photo-menu-trigger dev-pm-photo-menu-btn" title="Options">${ICONS.dots}</button>
                                                         <div class="dev-pm-photo-menu">
@@ -2054,12 +2089,6 @@
                                 pMenu?.classList.toggle('active');
                             });
 
-                            photoEl.querySelector('.star-btn')?.addEventListener('click', (e) => {
-                                e.stopPropagation();
-                                fCover.value = photo.itemKey;
-                                renderTree();
-                            });
-
                             photoEl.querySelector('.initial-slide-btn')?.addEventListener('click', (e) => {
                                 e.stopPropagation();
                                 block.props.initialSlide = pIdx;
@@ -2194,10 +2223,8 @@
                     let newFM = data.frontmatter || '';
                     newFM = setFrontmatter(newFM, 'title', `"${escaped(fTitle.value.trim())}"`);
                     newFM = setFrontmatter(newFM, 'info', fInfo.value.trim() ? `"${escaped(fInfo.value.trim())}"` : null);
-                    newFM = setFrontmatter(newFM, 'coverKey', `"${escaped(fCover.value.trim())}"`);
+                    newFM = setFrontmatter(newFM, 'coverKey', `"${escaped(fmData.coverKey)}"`);
                     newFM = setFrontmatter(newFM, 'gap', fGap.value.trim() ? `"${escaped(fGap.value.trim())}"` : null);
-                    newFM = setFrontmatter(newFM, 'coverZoom', String(parseFloat(fZoom.value || '1')));
-                    newFM = setFrontmatter(newFM, 'coverOffset', `{ x: ${parseFloat(fOX.value || '50')}, y: ${parseFloat(fOY.value || '50')} }`);
 
                     confirmBtn.disabled = true;
                     confirmBtn.innerHTML = '...';
@@ -2720,6 +2747,239 @@
                 });
             }
 
+            type FolderCoverState = {
+                albumSlug: string;
+                coverKey: string;
+                zoom: number;
+                x: number;
+                y: number;
+            };
+
+            const readFolderCoverState = (card: HTMLElement): FolderCoverState => ({
+                albumSlug: card.dataset.albumSlug || '',
+                coverKey: card.dataset.coverKey || '',
+                zoom: Number(card.dataset.coverZoom || 1),
+                x: Number(card.dataset.coverOffsetX || 50),
+                y: Number(card.dataset.coverOffsetY || 50),
+            });
+
+            const applyFolderCoverState = (card: HTMLElement, state: FolderCoverState) => {
+                card.dataset.coverKey = state.coverKey;
+                card.dataset.coverZoom = String(state.zoom);
+                card.dataset.coverOffsetX = String(state.x);
+                card.dataset.coverOffsetY = String(state.y);
+                const image = card.querySelector<HTMLImageElement>('.album-cover img');
+                if (!image) return;
+                image.style.setProperty('--zoom', String(state.zoom));
+                image.style.setProperty('--ox', `${state.x}%`);
+                image.style.setProperty('--oy', `${state.y}%`);
+            };
+
+            const saveFolderCover = async (card: HTMLElement) => {
+                const state = readFolderCoverState(card);
+                const response = await fetch('/api/save-album-cover', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        albumSlug: state.albumSlug,
+                        coverKey: state.coverKey,
+                        coverZoom: state.zoom,
+                        coverOffset: { x: state.x, y: state.y },
+                    }),
+                });
+                const result = await response.json().catch(() => ({}));
+                if (!response.ok) {
+                    showToast(`❌ ${result.error || 'Unable to save cover'}`);
+                    return false;
+                }
+                showToast('✅ Cover saved');
+                return true;
+            };
+
+            const openFolderCoverPicker = async (card: HTMLElement) => {
+                const state = readFolderCoverState(card);
+                showToast('⌛ Loading R2 photos...');
+                const currentSource = state.coverKey.includes('/')
+                    ? state.coverKey.split('/').slice(0, 2).join('/')
+                    : state.albumSlug;
+                const response = await fetch(`/api/get-r2-cover-assets?albumSlug=${encodeURIComponent(currentSource)}`);
+                const result = await response.json().catch(() => ({}));
+                if (!response.ok) return showToast(`❌ ${result.error || 'Unable to load R2 photos'}`);
+
+                const albums = (result.albums || []) as Array<{ slug: string; count: number }>;
+                if (albums.length === 0) return showToast('⚠️ No photos found under r2');
+                const initialSource = albums.some((album) => album.slug === currentSource)
+                    ? currentSource
+                    : albums.some((album) => album.slug === state.albumSlug)
+                        ? state.albumSlug
+                        : albums[0].slug;
+
+                document.getElementById('dev-cover-picker')?.remove();
+                const dialog = document.createElement('dialog');
+                dialog.id = 'dev-cover-picker';
+                const normalizedCurrentKey = state.coverKey.includes('/')
+                    ? state.coverKey
+                    : `${state.albumSlug}/${state.coverKey}`;
+                dialog.innerHTML = `
+                    <div style="display:flex;flex-direction:column;width:min(780px,90vw);height:min(680px,82vh);background:white;border-radius:12px;overflow:hidden;font-family:sans-serif;">
+                        <div style="display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;border-bottom:1px solid #e2e8f0;background:#fafafa;">
+                            <div style="min-width:0;">
+                                <h3 style="margin:0;color:#1e293b;font-size:1rem;">Choose cover photo</h3>
+                                <label style="display:flex;align-items:center;gap:.35rem;margin-top:.45rem;color:#94a3b8;font:11px monospace;">
+                                    r2/
+                                    <select data-cover-source style="max-width:min(420px,60vw);padding:.3rem .45rem;border:1px solid #cbd5e1;border-radius:5px;background:white;color:#475569;font:11px monospace;">
+                                        ${albums.map((album) => `<option value="${escapeHtml(album.slug)}"${album.slug === initialSource ? ' selected' : ''}>${escapeHtml(album.slug)} (${album.count})</option>`).join('')}
+                                    </select>
+                                </label>
+                            </div>
+                            <button data-cover-picker-close class="dev-manager-header-button" type="button" title="Close">${ICONS.close}</button>
+                        </div>
+                        <div style="flex:1;overflow:auto;padding:1rem;">
+                            <div class="dev-cover-picker-grid" data-cover-photo-grid></div>
+                        </div>
+                    </div>`;
+                dialog.style.cssText = 'border:0;border-radius:12px;padding:0;box-shadow:0 20px 50px rgba(0,0,0,.3);';
+                document.body.appendChild(dialog);
+                const close = () => dialog.close();
+                dialog.querySelector('[data-cover-picker-close]')?.addEventListener('click', close);
+                dialog.addEventListener('close', () => dialog.remove(), { once: true });
+                const sourceSelect = dialog.querySelector<HTMLSelectElement>('[data-cover-source]')!;
+                const photoGrid = dialog.querySelector<HTMLElement>('[data-cover-photo-grid]')!;
+                let loadSequence = 0;
+                const loadSourcePhotos = async (sourceAlbum: string, initialPhotos?: Array<{ name: string; key: string }>) => {
+                    const sequence = ++loadSequence;
+                    photoGrid.innerHTML = '<div style="grid-column:1/-1;padding:3rem;text-align:center;color:#94a3b8;">Loading photos…</div>';
+                    let photos = initialPhotos;
+                    if (!photos) {
+                        const sourceResponse = await fetch(`/api/get-r2-cover-assets?albumSlug=${encodeURIComponent(sourceAlbum)}`);
+                        const sourceResult = await sourceResponse.json().catch(() => ({}));
+                        if (sequence !== loadSequence) return;
+                        if (!sourceResponse.ok) {
+                            photoGrid.innerHTML = `<div style="grid-column:1/-1;padding:3rem;text-align:center;color:#dc2626;">${escapeHtml(sourceResult.error || 'Unable to load photos')}</div>`;
+                            return;
+                        }
+                        photos = sourceResult.photos || [];
+                    }
+                    if (sequence !== loadSequence) return;
+                    if (!photos?.length) {
+                        photoGrid.innerHTML = '<div style="grid-column:1/-1;padding:3rem;text-align:center;color:#94a3b8;">No photos in this folder</div>';
+                        return;
+                    }
+                    photoGrid.innerHTML = photos.map((photo) => {
+                        const source = `/r2/${photo.key.split('/').map(encodeURIComponent).join('/')}`;
+                        return `<button class="dev-cover-picker-photo${photo.key === normalizedCurrentKey ? ' is-current' : ''}" type="button" data-cover-key="${escapeHtml(photo.key)}" title="${escapeHtml(photo.key)}"><img src="${source}" loading="lazy" alt="" /><span>${escapeHtml(photo.name)}</span></button>`;
+                    }).join('');
+                    photoGrid.querySelectorAll<HTMLElement>('[data-cover-key]').forEach((button) => {
+                        button.addEventListener('click', async () => {
+                            const fullKey = button.dataset.coverKey;
+                            if (!fullKey) return;
+                            const sourceAlbum = fullKey.split('/').slice(0, 2).join('/');
+                            const name = fullKey.split('/').pop() || fullKey;
+                            const storedKey = sourceAlbum === state.albumSlug ? name : fullKey;
+                            const nextState = { ...readFolderCoverState(card), coverKey: storedKey, zoom: 1, x: 50, y: 50 };
+                            applyFolderCoverState(card, nextState);
+                            const image = card.querySelector<HTMLImageElement>('.album-cover img');
+                            if (image) image.src = `/r2/${fullKey.split('/').map(encodeURIComponent).join('/')}`;
+                            close();
+                            await saveFolderCover(card);
+                        });
+                    });
+                };
+                sourceSelect.addEventListener('change', () => void loadSourcePhotos(sourceSelect.value));
+                void loadSourcePhotos(initialSource, initialSource === currentSource ? result.photos || [] : undefined);
+                dialog.showModal();
+            };
+
+            const initFolderCoverEditors = () => {
+                if (!isFolderPage() || isMountainTagsView()) return;
+                document.querySelectorAll<HTMLElement>('.album-card[data-album-slug]').forEach((card) => {
+                    if (card.dataset.coverEditorInitialized === 'true') return;
+                    card.dataset.coverEditorInitialized = 'true';
+                    const cover = card.querySelector<HTMLElement>('.album-cover');
+                    const link = card.querySelector<HTMLAnchorElement>('.album-link');
+                    if (!cover || !link) return;
+
+                    const actions = document.createElement('div');
+                    actions.className = 'dev-folder-cover-actions';
+                    actions.innerHTML = `
+                        <button class="dev-folder-cover-button" data-cover-photo type="button" title="Choose cover photo" aria-label="Choose cover photo">${ICONS.image}</button>
+                        <button class="dev-folder-cover-button" data-cover-adjust type="button" title="Adjust cover crop" aria-label="Adjust cover crop">${ICONS.gear}</button>`;
+                    card.appendChild(actions);
+                    const photoButton = actions.querySelector<HTMLButtonElement>('[data-cover-photo]')!;
+                    const adjustButton = actions.querySelector<HTMLButtonElement>('[data-cover-adjust]')!;
+                    let drag: { pointerId: number; startX: number; startY: number; x: number; y: number } | null = null;
+                    let editSnapshot = '';
+
+                    const cropSnapshot = () => {
+                        const state = readFolderCoverState(card);
+                        return `${state.zoom}:${state.x}:${state.y}`;
+                    };
+                    const setEditing = (editing: boolean, persist = true) => {
+                        card.classList.toggle('dev-cover-editing', editing);
+                        adjustButton.classList.toggle('is-active', editing);
+                        adjustButton.title = editing ? 'Finish adjusting cover' : 'Adjust cover crop';
+                        cover.querySelector('.dev-cover-edit-hint')?.remove();
+                        if (editing) {
+                            editSnapshot = cropSnapshot();
+                            document.querySelectorAll<HTMLElement>('.album-card.dev-cover-editing').forEach((other) => {
+                                if (other !== card) other.querySelector<HTMLButtonElement>('[data-cover-adjust]')?.click();
+                            });
+                            cover.insertAdjacentHTML('beforeend', '<div class="dev-cover-edit-hint">Scroll to zoom · drag to reposition</div>');
+                        } else if (persist && cropSnapshot() !== editSnapshot) {
+                            void saveFolderCover(card);
+                        }
+                    };
+
+                    photoButton.addEventListener('click', (event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        if (card.classList.contains('dev-cover-editing')) setEditing(false, false);
+                        void openFolderCoverPicker(card);
+                    });
+                    adjustButton.addEventListener('click', (event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        setEditing(!card.classList.contains('dev-cover-editing'));
+                    });
+                    link.addEventListener('click', (event) => {
+                        if (card.classList.contains('dev-cover-editing')) {
+                            event.preventDefault();
+                            event.stopImmediatePropagation();
+                        }
+                    }, true);
+                    cover.addEventListener('wheel', (event) => {
+                        if (!card.classList.contains('dev-cover-editing')) return;
+                        event.preventDefault();
+                        const state = readFolderCoverState(card);
+                        state.zoom = Math.min(4, Math.max(1, Math.round((state.zoom - event.deltaY * 0.0015) * 100) / 100));
+                        applyFolderCoverState(card, state);
+                    }, { passive: false });
+                    cover.addEventListener('pointerdown', (event) => {
+                        if (!card.classList.contains('dev-cover-editing') || (event.target as Element).closest('button')) return;
+                        event.preventDefault();
+                        const state = readFolderCoverState(card);
+                        drag = { pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, x: state.x, y: state.y };
+                        card.classList.add('is-dragging');
+                        cover.setPointerCapture(event.pointerId);
+                    });
+                    cover.addEventListener('pointermove', (event) => {
+                        if (!drag || drag.pointerId !== event.pointerId) return;
+                        const bounds = cover.getBoundingClientRect();
+                        const state = readFolderCoverState(card);
+                        state.x = Math.min(100, Math.max(0, Math.round((drag.x - (event.clientX - drag.startX) / bounds.width * 100) * 10) / 10));
+                        state.y = Math.min(100, Math.max(0, Math.round((drag.y - (event.clientY - drag.startY) / bounds.height * 100) * 10) / 10));
+                        applyFolderCoverState(card, state);
+                    });
+                    const finishDrag = (event: PointerEvent) => {
+                        if (!drag || drag.pointerId !== event.pointerId) return;
+                        drag = null;
+                        card.classList.remove('is-dragging');
+                    };
+                    cover.addEventListener('pointerup', finishDrag);
+                    cover.addEventListener('pointercancel', finishDrag);
+                });
+            };
+
             // Folder Manager
             function createFolderManagerDialog() {
                 let existing = document.getElementById("dev-fm-dialog") as HTMLDialogElement;
@@ -2768,13 +3028,8 @@
                 const confirmBtn = dialog.querySelector("#dev-fm-confirm") as HTMLButtonElement;
                 const addPageBtn = dialog.querySelector("#dev-fm-add-page") as HTMLButtonElement;
 
-                let currentAlbums = data.albums.map((album: any) => ({
-                    ...album,
-                    coverZoom: album.coverZoom ?? 1,
-                    coverOffset: album.coverOffset ?? { x: 50, y: 50 },
-                }));
+                let currentAlbums = data.albums.map((album: any) => ({ ...album }));
                 let selectedAlbum: number | null = null;
-                let expandedAlbums = new Set<number>();
                 const pendingImports: PendingPhotoImport[] = [];
                 const initialSnapshot = JSON.stringify(currentAlbums);
                 const draftSnapshot = () => JSON.stringify({
@@ -2844,12 +3099,8 @@
                 });
 
                 const moveAlbum = (from: number, target: number) => {
-                    const expandedFlags: boolean[] = currentAlbums.map((_: any, index: number) => expandedAlbums.has(index));
                     const [moved] = currentAlbums.splice(from, 1);
-                    const [movedExpanded] = expandedFlags.splice(from, 1);
                     currentAlbums.splice(target, 0, moved);
-                    expandedFlags.splice(target, 0, movedExpanded);
-                    expandedAlbums = new Set(expandedFlags.flatMap((value: boolean, index: number) => value ? [index] : []));
                     selectedAlbum = null;
                     updateFolderDirtyState();
                 };
@@ -2867,7 +3118,6 @@
 
                     treeContainer.innerHTML = '';
                     currentAlbums.forEach((album: any, idx: number) => {
-                        const isExpanded = expandedAlbums.has(idx);
                         const el = document.createElement('div');
                         el.className = 'dev-pm-block';
                         el.style.padding = '0.75rem';
@@ -2883,10 +3133,7 @@
                                     ? `<button class="fm-drag-handle fm-selected" style="background:none;border:none;cursor:pointer;color:#2563eb;padding:4px;display:flex;align-items:center;" title="Cancel move">${ICONS.drag}</button>`
                                     : `<button class="fm-drag-handle" style="background:none;border:none;cursor:pointer;color:#94a3b8;padding:4px;display:flex;align-items:center;" title="Click to move">${ICONS.drag}</button>`
                                 }
-                                <button class="fm-expand" type="button" style="background:none;border:none;cursor:pointer;color:#64748b;padding:4px;display:flex;align-items:center;transform:${isExpanded ? 'rotate(90deg)' : 'rotate(0deg)'};transition:transform 0.2s;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                                </button>
-                                <div class="fm-main" style="flex:1;min-width:0;cursor:pointer;">
+                                <div class="fm-main" style="flex:1;min-width:0;">
                                     <div style="font-weight:500;color:#334155;">${album.title || album.slug.split('/').pop()}</div>
                                     <div style="font-size:0.7rem;color:${album.pendingDeletion ? '#dc2626' : '#94a3b8'};font-family:monospace;">${album.slug}${album.pendingDeletion ? ' · pending deletion' : album.pending ? ' · pending page' : album.hasPendingImport ? ' · pending photos' : ''}</div>
                                 </div>
@@ -2894,37 +3141,10 @@
                                     ? `<button class="fm-undo-delete dev-manager-header-button" type="button" title="Undo page deletion">${ICONS.refresh}</button>`
                                     : `${album.pending ? `<button class="fm-import-photos dev-manager-header-button" type="button" title="Add more photos to pending page" aria-label="Add Photos">${ICONS.plus}</button>` : ''}<button class="fm-delete-page dev-manager-header-button" type="button" title="Delete Page" aria-label="Delete ${album.slug}" style="color:#dc2626;">${ICONS.trash}</button>`}
                             </div>
-                            <div class="fm-settings" style="display:${isExpanded && !album.pendingDeletion ? 'grid' : 'none'};grid-template-columns:2.5fr 1fr 1fr 1fr;gap:0.75rem;margin-top:0.85rem;padding-top:0.85rem;border-top:1px dashed #dbe4ee;">
-                                <label style="display:flex;flex-direction:column;gap:0.25rem;font-size:0.75rem;color:#64748b;">
-                                    Cover Image
-                                    <input class="fm-cover-key" type="text" value="${album.coverKey || ''}" style="width:100%;box-sizing:border-box;padding:0.4rem 0.6rem;border:1px solid #cbd5e1;border-radius:4px;font-size:0.85rem;" />
-                                </label>
-                                <label style="display:flex;flex-direction:column;gap:0.25rem;font-size:0.75rem;color:#64748b;">
-                                    Zoom
-                                    <input class="fm-cover-zoom" type="number" step="0.1" value="${album.coverZoom ?? 1}" style="width:100%;box-sizing:border-box;padding:0.4rem 0.6rem;border:1px solid #cbd5e1;border-radius:4px;font-size:0.85rem;" />
-                                </label>
-                                <label style="display:flex;flex-direction:column;gap:0.25rem;font-size:0.75rem;color:#64748b;">
-                                    Offset X
-                                    <input class="fm-cover-ox" type="number" step="0.1" value="${album.coverOffset?.x ?? 50}" style="width:100%;box-sizing:border-box;padding:0.4rem 0.6rem;border:1px solid #cbd5e1;border-radius:4px;font-size:0.85rem;" />
-                                </label>
-                                <label style="display:flex;flex-direction:column;gap:0.25rem;font-size:0.75rem;color:#64748b;">
-                                    Offset Y
-                                    <input class="fm-cover-oy" type="number" step="0.1" value="${album.coverOffset?.y ?? 50}" style="width:100%;box-sizing:border-box;padding:0.4rem 0.6rem;border:1px solid #cbd5e1;border-radius:4px;font-size:0.85rem;" />
-                                </label>
-                            </div>
                             ${selectedAlbum !== null && idx === 0 ? `<div class="dev-pm-inline-add-zone dev-pm-inline-add-zone--before is-active"><button class="dev-pm-inline-add-button fm-move-gap" type="button" data-fm-gap-index="0" title="Move here">${ICONS.arrowRight}</button></div>` : ''}
                             ${selectedAlbum !== null ? `<div class="dev-pm-inline-add-zone is-active"><button class="dev-pm-inline-add-button fm-move-gap" type="button" data-fm-gap-index="${idx + 1}" title="Move here">${ICONS.arrowRight}</button></div>` : ''}
                         `;
 
-                        const toggleExpanded = (e?: Event) => {
-                            e?.stopPropagation();
-                            if (expandedAlbums.has(idx)) expandedAlbums.delete(idx);
-                            else expandedAlbums.add(idx);
-                            renderView();
-                        };
-
-                        el.querySelector('.fm-expand')?.addEventListener('click', toggleExpanded);
-                        el.querySelector('.fm-main')?.addEventListener('click', toggleExpanded);
                         el.querySelector('.fm-import-photos')?.addEventListener('click', (event) => {
                             event.stopPropagation();
                             openPhotoImportDialog({
@@ -2964,34 +3184,6 @@
                         el.querySelector('.fm-move-gap')?.addEventListener('click', (e) => {
                             e.stopPropagation();
                             moveSelectedAlbumToGap(Number((e.currentTarget as HTMLElement).dataset.fmGapIndex));
-                        });
-
-                        const coverKeyInput = el.querySelector('.fm-cover-key') as HTMLInputElement | null;
-                        const coverZoomInput = el.querySelector('.fm-cover-zoom') as HTMLInputElement | null;
-                        const coverOXInput = el.querySelector('.fm-cover-ox') as HTMLInputElement | null;
-                        const coverOYInput = el.querySelector('.fm-cover-oy') as HTMLInputElement | null;
-
-                        coverKeyInput?.addEventListener('input', () => {
-                            album.coverKey = coverKeyInput.value.trim();
-                            updateFolderDirtyState();
-                        });
-                        coverZoomInput?.addEventListener('input', () => {
-                            album.coverZoom = parseFloat(coverZoomInput.value || '1');
-                            updateFolderDirtyState();
-                        });
-                        coverOXInput?.addEventListener('input', () => {
-                            album.coverOffset = {
-                                x: parseFloat(coverOXInput.value || '50'),
-                                y: album.coverOffset?.y ?? 50,
-                            };
-                            updateFolderDirtyState();
-                        });
-                        coverOYInput?.addEventListener('input', () => {
-                            album.coverOffset = {
-                                x: album.coverOffset?.x ?? 50,
-                                y: parseFloat(coverOYInput.value || '50'),
-                            };
-                            updateFolderDirtyState();
                         });
 
                         treeContainer.appendChild(el);
@@ -3057,15 +3249,6 @@
                             body: JSON.stringify({
                                 folder,
                                 order: activeAlbums.map((album: any) => album.slug),
-                                albums: activeAlbums.map((album: any) => ({
-                                    slug: album.slug,
-                                    coverKey: album.coverKey || '',
-                                    coverZoom: parseFloat(String(album.coverZoom || 1)),
-                                    coverOffset: {
-                                        x: parseFloat(String(album.coverOffset?.x ?? 50)),
-                                        y: parseFloat(String(album.coverOffset?.y ?? 50)),
-                                    },
-                                })),
                             }),
                         });
                         if (res.ok) {
@@ -3424,6 +3607,7 @@
                 }
                 syncAlbumTagStateFromDom();
                 initToolbars();
+                initFolderCoverEditors();
 
                 // Add Gear button
                 if (!document.getElementById('dev-gear-btn')) {

@@ -133,7 +133,14 @@ const mountainGroups = MOUNTAIN_REGION_DEFINITIONS.map((region) => ({
                         const coverUrl = getImageUrl(resolvedCoverKey);
                         const fallbackUrl = `${R2_DOMAIN}/${resolvedCoverKey}`;
                         return (
-                            <div class="album-card group">
+                            <div
+                                class="album-card group"
+                                data-album-slug={album.slug}
+                                data-cover-key={album.data.coverKey}
+                                data-cover-zoom={album.data.coverZoom ?? 1}
+                                data-cover-offset-x={album.data.coverOffset?.x ?? 50}
+                                data-cover-offset-y={album.data.coverOffset?.y ?? 50}
+                            >
                                 <a
                                     href={`/${folder}/${albumSlug}`}
                                     class="album-link"
