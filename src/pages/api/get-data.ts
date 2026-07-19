@@ -7,6 +7,13 @@ const tagFiles = import.meta.glob('/src/album-tags/**/*.json', { eager: true });
 
 
 export const GET: APIRoute = async () => {
+    if (!import.meta.env.DEV) {
+        return new Response(JSON.stringify({ error: 'Not available in production' }), {
+            status: 403,
+            headers: { 'Content-Type': 'application/json' },
+        });
+    }
+
     const allTags: Record<string, any> = {};
 
     for (const path in tagFiles) {
