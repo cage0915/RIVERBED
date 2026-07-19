@@ -1341,6 +1341,85 @@
                 dialog.showModal();
             }
 
+            async function openPhotoRenameDryRun(
+                albumSlug: string,
+                orderedKeys: string[],
+                onRenamed: (renamed: Record<string, string>) => void,
+            ) {
+                showToast('⌛ Building rename dry run...');
+                const response = await fetch('/api/rename-photos', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ albumSlug, orderedKeys, dryRun: true }),
+                });
+                const plan = await response.json().catch(() => ({}));
+                if (!response.ok) return showToast(`❌ ${plan.error || 'Unable to build rename plan'}`);
+
+                const items = (plan.items || []) as Array<{
+                    oldName: string;
+                    newName: string;
+                    status: 'rename' | 'unchanged' | 'missing' | 'conflict' | 'duplicate';
+                }>;
+                const statusMeta = {
+                    rename: { label: 'Rename', color: '#2563eb', background: '#eff6ff' },
+                    unchanged: { label: 'Unchanged', color: '#64748b', background: '#f8fafc' },
+                    missing: { label: 'Missing', color: '#b91c1c', background: '#fef2f2' },
+                    conflict: { label: 'Conflict', color: '#b91c1c', background: '#fef2f2' },
+                    duplicate: { label: 'Duplicate', color: '#b91c1c', background: '#fef2f2' },
+                };
+                const issueCount = items.filter((item) => ['missing', 'conflict', 'duplicate'].includes(item.status)).length;
+                const dialog = document.createElement('dialog');
+                dialog.style.cssText = 'border:0;border-radius:12px;padding:0;box-shadow:0 20px 50px rgba(0,0,0,.3);';
+                dialog.innerHTML = `
+                    <div style="display:flex;flex-direction:column;width:min(720px,92vw);max-height:82vh;background:white;border-radius:12px;overflow:hidden;font-family:sans-serif;">
+                        <div style="display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;border-bottom:1px solid #e2e8f0;background:#fafafa;">
+                            <div><h3 style="margin:0;font-size:1rem;color:#334155;">Rename Photos Dry Run</h3><div style="font-size:.72rem;color:#64748b;margin-top:.2rem;">${escapeHtml(albumSlug)} · ${plan.renameCount} rename${plan.renameCount === 1 ? '' : 's'}</div></div>
+                            <div class="dev-manager-header-actions">
+                                <button data-rename-action="save" class="dev-manager-header-button dev-manager-header-button--save" type="button" ${plan.canExecute ? '' : 'disabled'} title="${plan.canExecute ? `Execute ${plan.renameCount} renames` : 'No executable rename plan'}">${ICONS.check}</button>
+                                <button data-rename-action="close" class="dev-manager-header-button" type="button">${ICONS.close}</button>
+                            </div>
+                        </div>
+                        <div style="overflow:auto;padding:1rem 1.25rem;">
+                            ${issueCount ? `<p style="margin:0 0 .75rem;padding:.75rem;background:#fef2f2;color:#b91c1c;border-radius:6px;">Resolve ${issueCount} blocking issue${issueCount === 1 ? '' : 's'} before renaming.</p>` : ''}
+                            <div style="border:1px solid #e2e8f0;border-radius:7px;overflow:hidden;">
+                                ${items.map((item) => {
+                                    const meta = statusMeta[item.status];
+                                    return `<div style="display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) auto;align-items:center;gap:.65rem;padding:.55rem .75rem;border-top:1px solid #edf2f7;font-size:.75rem;">
+                                        <code style="overflow:hidden;color:#475569;text-overflow:ellipsis;white-space:nowrap;" title="${escapeHtml(item.oldName)}">${escapeHtml(item.oldName)}</code>
+                                        <span style="color:#94a3b8;">→</span>
+                                        <code style="overflow:hidden;color:#475569;text-overflow:ellipsis;white-space:nowrap;" title="${escapeHtml(item.newName)}">${escapeHtml(item.newName)}</code>
+                                        <span style="padding:.18rem .4rem;border-radius:999px;background:${meta.background};color:${meta.color};font-size:.65rem;">${meta.label}</span>
+                                    </div>`;
+                                }).join('')}
+                            </div>
+                        </div>
+                    </div>`;
+                document.body.appendChild(dialog);
+                const saveBtn = dialog.querySelector('[data-rename-action="save"]') as HTMLButtonElement;
+                dialog.querySelector('[data-rename-action="close"]')?.addEventListener('click', () => dialog.close());
+                saveBtn.addEventListener('click', async () => {
+                    if (!confirm(`Execute ${plan.renameCount} photo renames?`)) return;
+                    saveBtn.disabled = true;
+                    saveBtn.textContent = '…';
+                    const executeResponse = await fetch('/api/rename-photos', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ albumSlug, orderedKeys, dryRun: false }),
+                    });
+                    const result = await executeResponse.json().catch(() => ({}));
+                    if (!executeResponse.ok) {
+                        saveBtn.innerHTML = ICONS.check;
+                        saveBtn.disabled = !plan.canExecute;
+                        return showToast(`❌ ${result.error || 'Rename failed'}`);
+                    }
+                    onRenamed(result.renamed || {});
+                    showToast(`✅ Renamed ${Object.keys(result.renamed || {}).length} photos`);
+                    dialog.close();
+                });
+                dialog.addEventListener('close', () => dialog.remove(), { once: true });
+                dialog.showModal();
+            }
+
             function createPageManagerDialog() {
                 let existing = document.getElementById("dev-pm-dialog") as HTMLDialogElement;
                 if (existing) return existing;
@@ -1424,28 +1503,10 @@
 
                 r2SyncBtn.addEventListener('click', () => openAlbumSyncDialog(albumSlug));
 
-                renameBtn.addEventListener('click', async () => {
+                renameBtn.addEventListener('click', () => {
                     const orderedKeys = currentBlocks.flatMap((b: any) => b.photos.map((p: any) => p.itemKey));
                     if (orderedKeys.length === 0) return showToast('⚠️ No photos to rename');
-                    const preview = orderedKeys.slice(0, 3).map((k: string, i: number) => {
-                        const ext = k.split('.').pop()?.toLowerCase() || 'jpg';
-                        const base = k.includes('/') ? k.split('/').pop()! : k;
-                        return `${base} → ${String(i + 1).padStart(3, '0')}.${ext}`;
-                    }).join('\n');
-                    const more = orderedKeys.length > 3 ? `\n...and ${orderedKeys.length - 3} more` : '';
-                    if (!confirm(`Rename ${orderedKeys.length} photos by current order?\n\n${preview}${more}\n\nThis cannot be undone.`)) return;
-                    renameBtn.style.opacity = '0.4';
-                    renameBtn.style.pointerEvents = 'none';
-                    try {
-                        const res = await fetch('/api/rename-photos', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ albumSlug, orderedKeys }),
-                        });
-                        const json = await res.json();
-                        if (!res.ok) throw new Error(json.error || 'Unknown error');
-                        // Update currentBlocks with new keys
-                        const renamed: Record<string, string> = json.renamed;
+                    void openPhotoRenameDryRun(albumSlug, orderedKeys, (renamed) => {
                         currentBlocks.forEach((b: any) => {
                             b.photos.forEach((p: any) => {
                                 const base = p.itemKey.includes('/') ? p.itemKey.split('/').pop()! : p.itemKey;
@@ -1454,14 +1515,10 @@
                         });
                         const coverBase = fmData.coverKey.split('/').pop() || fmData.coverKey;
                         if (renamed[coverBase]) fmData.coverKey = renamed[coverBase];
-                        showToast(`✅ Renamed ${Object.keys(renamed).length} photos`);
                         renderTree();
-                    } catch (err: any) {
-                        showToast(`❌ Rename failed: ${err.message}`);
-                    } finally {
-                        renameBtn.style.opacity = '';
-                        renameBtn.style.pointerEvents = '';
-                    }
+                        initialPageSnapshot = pageStateSnapshot();
+                        updatePageDirtyState();
+                    });
                 });
 
                 // FM Form elements
@@ -1587,6 +1644,8 @@
                     confirmBtn.title = dirty ? 'Save Changes' : 'No pending changes';
                     r2SyncBtn.disabled = dirty;
                     r2SyncBtn.title = dirty ? 'Save page changes before syncing R2' : 'Sync Current Album with R2';
+                    renameBtn.disabled = dirty;
+                    renameBtn.title = dirty ? 'Save page changes before renaming photos' : 'Rename photos by current order';
                 };
                 dialog.addEventListener('input', updatePageDirtyState);
 

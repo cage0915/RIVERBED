@@ -1,103 +1,114 @@
 import type { APIRoute } from 'astro';
+import fs from 'node:fs';
+import path from 'node:path';
+
+type RenameStatus = 'rename' | 'unchanged' | 'missing' | 'conflict' | 'duplicate';
+type RenameItem = { oldName: string; newName: string; status: RenameStatus };
+
+const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), {
+    status,
+    headers: { 'Content-Type': 'application/json' },
+});
+
+const buildPlan = (r2Dir: string, orderedKeys: string[]): RenameItem[] => {
+    const sourceNames = orderedKeys.map((key) => key.split('/').pop() || key);
+    const sourceSet = new Set(sourceNames);
+    const seen = new Set<string>();
+
+    return sourceNames.map((oldName, index) => {
+        const extension = path.extname(oldName).toLowerCase();
+        const newName = `${String(index + 1).padStart(3, '0')}${extension}`;
+        if (seen.has(oldName)) return { oldName, newName, status: 'duplicate' };
+        seen.add(oldName);
+        if (!fs.existsSync(path.join(r2Dir, oldName))) return { oldName, newName, status: 'missing' };
+        if (oldName === newName) return { oldName, newName, status: 'unchanged' };
+        if (fs.existsSync(path.join(r2Dir, newName)) && !sourceSet.has(newName)) {
+            return { oldName, newName, status: 'conflict' };
+        }
+        return { oldName, newName, status: 'rename' };
+    });
+};
 
 export const POST: APIRoute = async ({ request }) => {
-    if (!import.meta.env.DEV) {
-        return new Response(JSON.stringify({ error: 'Not available in production' }), {
-            status: 403, headers: { 'Content-Type': 'application/json' },
-        });
-    }
+    if (!import.meta.env.DEV) return json({ error: 'Not available in production' }, 403);
 
-    const fs = await import('node:fs');
-    const path = await import('node:path');
-
-    let body: { albumSlug: string; orderedKeys: string[] };
+    let body: { albumSlug?: string; orderedKeys?: string[]; dryRun?: boolean };
     try {
         body = await request.json();
     } catch {
-        return new Response(JSON.stringify({ error: 'Invalid JSON' }), { status: 400 });
+        return json({ error: 'Invalid JSON' }, 400);
     }
 
-    const { albumSlug, orderedKeys } = body;
-    if (!albumSlug || !orderedKeys?.length) {
-        return new Response(JSON.stringify({ error: 'Missing albumSlug or orderedKeys' }), { status: 400 });
+    const albumSlug = body.albumSlug || '';
+    const orderedKeys = body.orderedKeys;
+    if (!/^[a-z0-9-]+\/[a-z0-9-]+$/.test(albumSlug) || !Array.isArray(orderedKeys) || orderedKeys.length === 0) {
+        return json({ error: 'Missing or invalid albumSlug or orderedKeys' }, 400);
+    }
+    if (orderedKeys.length > 10000 || orderedKeys.some((key) => typeof key !== 'string' || !/\.(?:jpe?g|png|webp|avif)$/i.test(key))) {
+        return json({ error: 'Invalid photo keys' }, 400);
     }
 
     const [folder, album] = albumSlug.split('/');
     const r2Dir = path.resolve(process.cwd(), 'r2', folder, album);
     const mdxFile = path.resolve(process.cwd(), 'src/content/albums', `${albumSlug}.mdx`);
     const tagsFile = path.resolve(process.cwd(), 'src/album-tags', folder, `${album}.json`);
+    if (!fs.existsSync(r2Dir)) return json({ error: `r2 folder not found: ${r2Dir}` }, 404);
+    if (!fs.existsSync(mdxFile)) return json({ error: 'MDX file not found' }, 404);
 
-    if (!fs.existsSync(r2Dir)) {
-        return new Response(JSON.stringify({ error: `r2 folder not found: ${r2Dir}` }), { status: 404 });
+    const plan = buildPlan(r2Dir, orderedKeys);
+    const blocking = plan.filter((item) => ['missing', 'conflict', 'duplicate'].includes(item.status));
+    const renameItems = plan.filter((item) => item.status === 'rename');
+    if (body.dryRun) {
+        return json({
+            dryRun: true,
+            items: plan,
+            renameCount: renameItems.length,
+            unchangedCount: plan.filter((item) => item.status === 'unchanged').length,
+            canExecute: blocking.length === 0 && renameItems.length > 0,
+        });
     }
-    if (!fs.existsSync(mdxFile)) {
-        return new Response(JSON.stringify({ error: 'MDX file not found' }), { status: 404 });
-    }
+    if (blocking.length > 0) return json({ error: 'Rename plan contains blocking issues', items: plan }, 409);
+    if (renameItems.length === 0) return json({ ok: true, renamed: {} });
 
-    // Build rename map: oldBasename -> newBasename (e.g. "KCS06208.jpg" -> "001.jpg")
-    const renameMap = new Map<string, string>();
-    orderedKeys.forEach((key, i) => {
-        const basename = key.includes('/') ? key.split('/').pop()! : key;
-        const ext = path.extname(basename).toLowerCase();
-        const newName = `${String(i + 1).padStart(3, '0')}${ext}`;
-        renameMap.set(basename, newName);
-    });
-
-    // --- Step 1: Rename files in r2 (via temp names to avoid collisions) ---
+    const renameMap = new Map(renameItems.map((item) => [item.oldName, item.newName]));
     const tmpSuffix = `.__tmp_${Date.now()}`;
-    const renamedFiles: string[] = [];
+    const stagedFiles: string[] = [];
 
     try {
-        // Phase A: rename to temp names
-        for (const [oldName] of renameMap) {
+        for (const oldName of renameMap.keys()) {
             const oldPath = path.join(r2Dir, oldName);
-            if (fs.existsSync(oldPath)) {
-                fs.renameSync(oldPath, oldPath + tmpSuffix);
-                renamedFiles.push(oldName);
-            }
+            fs.renameSync(oldPath, oldPath + tmpSuffix);
+            stagedFiles.push(oldName);
         }
-        // Phase B: rename from temp to final names
         for (const [oldName, newName] of renameMap) {
-            const tmpPath = path.join(r2Dir, oldName + tmpSuffix);
-            if (fs.existsSync(tmpPath)) {
-                fs.renameSync(tmpPath, path.join(r2Dir, newName));
+            fs.renameSync(path.join(r2Dir, oldName + tmpSuffix), path.join(r2Dir, newName));
+        }
+    } catch (error) {
+        for (const oldName of stagedFiles) {
+            const temporaryPath = path.join(r2Dir, oldName + tmpSuffix);
+            if (fs.existsSync(temporaryPath)) {
+                try { fs.renameSync(temporaryPath, path.join(r2Dir, oldName)); } catch {}
             }
         }
-    } catch (err: any) {
-        // Attempt rollback
-        for (const oldName of renamedFiles) {
-            const tmpPath = path.join(r2Dir, oldName + tmpSuffix);
-            if (fs.existsSync(tmpPath)) {
-                try { fs.renameSync(tmpPath, path.join(r2Dir, oldName)); } catch {}
-            }
-        }
-        return new Response(JSON.stringify({ error: `File rename failed: ${err.message}` }), { status: 500 });
+        return json({ error: `File rename failed: ${error instanceof Error ? error.message : 'Unknown error'}` }, 500);
     }
 
-    // --- Step 2: Update MDX (itemKey and coverKey references) ---
-    let mdxContent = fs.readFileSync(mdxFile, 'utf-8');
-    // Single-pass replacement to avoid chained substitution (e.g. 002→001 then 001→002 = both become 002)
-    const escapedKeys = [...renameMap.keys()].map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+    let mdxContent = fs.readFileSync(mdxFile, 'utf8');
+    const escapedKeys = [...renameMap.keys()].map((key) => key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
     const mdxPattern = new RegExp(`"(${escapedKeys.join('|')})"`, 'g');
     mdxContent = mdxContent.replace(mdxPattern, (_, name) => `"${renameMap.get(name) ?? name}"`);
-    fs.writeFileSync(mdxFile, mdxContent, 'utf-8');
+    fs.writeFileSync(mdxFile, mdxContent, 'utf8');
 
-    // --- Step 3: Update album-tags JSON (rename keys, keep values) ---
     if (fs.existsSync(tagsFile)) {
-        const tagsRaw = fs.readFileSync(tagsFile, 'utf-8');
-        let tags: Record<string, any> = {};
-        try { tags = JSON.parse(tagsRaw); } catch {}
-
-        const newTags: Record<string, any> = {};
+        let tags: Record<string, unknown> = {};
+        try { tags = JSON.parse(fs.readFileSync(tagsFile, 'utf8')); } catch {}
+        const nextTags: Record<string, unknown> = {};
         for (const [key, value] of Object.entries(tags)) {
-            const basename = key.includes('/') ? key.split('/').pop()! : key;
-            const mapped = renameMap.get(basename) ?? basename;
-            newTags[mapped] = value;
+            const name = key.split('/').pop() || key;
+            nextTags[renameMap.get(name) ?? name] = value;
         }
-        fs.writeFileSync(tagsFile, JSON.stringify(newTags, null, 2), 'utf-8');
+        fs.writeFileSync(tagsFile, JSON.stringify(nextTags, null, 2), 'utf8');
     }
 
-    return new Response(JSON.stringify({ ok: true, renamed: Object.fromEntries(renameMap) }), {
-        status: 200, headers: { 'Content-Type': 'application/json' },
-    });
+    return json({ ok: true, renamed: Object.fromEntries(renameMap) });
 };
