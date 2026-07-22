@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
 
 import { parseMountainCoverKey } from "../lib/mountain-editor";
+import { readAlbumManifestFile } from "../lib/albums/manifest-files";
 import {
     findMountainRegion,
     readMountainRegion,
@@ -35,26 +36,14 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     const { coverKey, folder, albumId, photoKey } = parsedCoverKey;
-    const path = await import("node:path");
-    const fs = await import("node:fs/promises");
-    const tagsFile = path.resolve(
-        process.cwd(),
-        "src/album-tags",
-        folder,
-        `${albumId}.json`,
-    );
-
     try {
-        const [locatedMountain, tagsText] = await Promise.all([
+        const [locatedMountain, manifest] = await Promise.all([
             findMountainRegion(mountainName),
-            fs.readFile(tagsFile, "utf8"),
+            readAlbumManifestFile(process.cwd(), `${folder}/${albumId}`),
         ]);
-        const tags = JSON.parse(tagsText) as Record<
-            string,
-            { name?: string }[]
-        >;
         if (!locatedMountain) return json({ error: "Mountain not found" }, 404);
-        if (!tags[photoKey]?.some((tag) => tag.name === mountainName)) {
+        const sourcePhoto = manifest.photos.find((photo) => photo.filename === photoKey);
+        if (!sourcePhoto?.tags.some((tag) => tag.name === mountainName)) {
             return json({ error: "Photo does not contain this mountain tag" }, 400);
         }
 

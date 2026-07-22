@@ -74,3 +74,39 @@ test('referenced local names include page photos and cover basenames', () => {
 
     assert.deepEqual([...names], ['one.jpg', 'two.jpg', 'cover.jpg']);
 });
+
+test('tag and photo-caption APIs persist metadata only through Album manifests', () => {
+    const getData = readProjectFile('src/dev-api/get-data.ts');
+    const saveTags = readProjectFile('src/dev-api/save-tags.ts');
+    const editTag = readProjectFile('src/dev-api/edit-tag.ts');
+    const editCaption = readProjectFile('src/dev-api/edit-caption.ts');
+    const mountainCover = readProjectFile('src/dev-api/mountain-cover.ts');
+    const routes = [getData, saveTags, editTag, editCaption, mountainCover];
+
+    for (const source of routes) {
+        assert.doesNotMatch(source, /src\/album-tags|\/src\/album-tags/);
+        assert.doesNotMatch(source, /body\.(?:path|filePath|manifestPath)/);
+    }
+    assert.match(getData, /readAllAlbumManifestFiles/);
+    assert.match(saveTags, /replaceAlbumPhotoTags/);
+    assert.match(saveTags, /parseTagMapInput/);
+    assert.ok(
+        saveTags.indexOf('normalizedTagMap = parseTagMapInput(tagsMap)')
+            < saveTags.indexOf('readAlbumManifestFile(cwd'),
+        'untrusted tagsMap must be parsed before touching a manifest',
+    );
+    assert.match(editTag, /sourceAlbumSlug/);
+    assert.match(editTag, /filename/);
+    assert.match(editTag, /updatePhotoTags/);
+    assert.doesNotMatch(editTag, /photoId/);
+    assert.ok(
+        editTag.indexOf('await updatePhotoTags') < editTag.indexOf('await writeMountainRegion'),
+        'photo tags must validate and persist before creating mountain metadata',
+    );
+    assert.match(editCaption, /updatePhotoCaption/);
+    assert.match(editCaption, /filename/);
+    assert.match(editCaption, /typeof body\.caption !== ['"]string['"]/);
+    assert.doesNotMatch(editCaption, /blockIndex|src\/content\/albums|Row\|PhotoCarousel/);
+    assert.match(mountainCover, /readAlbumManifestFile/);
+    assert.match(mountainCover, /writeMountainRegion/);
+});

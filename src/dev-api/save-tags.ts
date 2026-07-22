@@ -3,8 +3,12 @@ import type { APIRoute } from 'astro';
 import {
     collectTagNames,
     findNewTagNames,
-    normalizeTagMap,
+    parseTagMapInput,
 } from '../lib/dev-tag-state.js';
+import {
+    readAlbumManifestFile,
+    replaceAlbumPhotoTags,
+} from '../lib/albums/manifest-files';
 import {
     isMountainRegion,
     readAllMountainRegions,
@@ -25,7 +29,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     let body: {
         albumSlug?: string;
-        tagsMap?: TagMap;
+        tagsMap?: unknown;
         newMountainRegions?: Record<string, MountainRegion>;
     };
     try {
@@ -38,32 +42,30 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     const { albumSlug, tagsMap } = body;
-    if (!albumSlug || !tagsMap || typeof tagsMap !== 'object') {
+    if (!albumSlug) {
         return new Response(JSON.stringify({ error: 'Missing required fields' }), {
             status: 400,
             headers: { 'Content-Type': 'application/json' },
         });
     }
 
-    const parts = albumSlug.split('/');
-    if (parts.length !== 2) {
-        return new Response(JSON.stringify({ error: 'Invalid albumSlug' }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' },
-        });
-    }
-
-    const [folder, album] = parts;
-    const fs = await import('node:fs');
-    const path = await import('node:path');
     const cwd = process.cwd();
-
-    const tagsDir = path.resolve(cwd, 'src/album-tags', folder);
-    const tagsFile = path.resolve(tagsDir, `${album}.json`);
-    const normalizedTagMap = normalizeTagMap(tagsMap);
-    const previousTagMap = fs.existsSync(tagsFile)
-        ? normalizeTagMap(JSON.parse(fs.readFileSync(tagsFile, 'utf-8')) as TagMap)
-        : {};
+    let normalizedTagMap: TagMap;
+    let previousTagMap: TagMap;
+    try {
+        normalizedTagMap = parseTagMapInput(tagsMap);
+        const manifest = await readAlbumManifestFile(cwd, albumSlug);
+        previousTagMap = Object.fromEntries(
+            manifest.photos
+                .filter((photo) => photo.tags.length > 0)
+                .map((photo) => [photo.filename, photo.tags]),
+        );
+    } catch (error) {
+        return new Response(
+            JSON.stringify({ error: error instanceof Error ? error.message : 'Invalid Album tags' }),
+            { status: 400, headers: { 'Content-Type': 'application/json' } },
+        );
+    }
     const newTagNames = new Set(findNewTagNames(previousTagMap, normalizedTagMap));
 
     const allMountains = await readAllMountainRegions();
@@ -86,8 +88,14 @@ export const POST: APIRoute = async ({ request }) => {
         );
     }
 
-    fs.mkdirSync(tagsDir, { recursive: true });
-    fs.writeFileSync(tagsFile, JSON.stringify(normalizedTagMap, null, 2), 'utf-8');
+    try {
+        await replaceAlbumPhotoTags(cwd, albumSlug, normalizedTagMap);
+    } catch (error) {
+        return new Response(
+            JSON.stringify({ error: error instanceof Error ? error.message : 'Unable to save Album tags' }),
+            { status: 400, headers: { 'Content-Type': 'application/json' } },
+        );
+    }
 
     const targetRegions = [...new Set(
         unknownNames.map((name) => body.newMountainRegions?.[name]),

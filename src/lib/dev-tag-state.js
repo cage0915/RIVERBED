@@ -4,6 +4,8 @@
  * @typedef {Record<string, Tag[]>} TagMap
  */
 
+import { validateLocalPhotoFilename } from './albums/keys.ts';
+
 const TAG_EPSILON = 0.1;
 
 /**
@@ -95,6 +97,50 @@ export function normalizeTagMap(tagMap) {
             ])
             .filter(([, tags]) => tags.length > 0),
     );
+}
+
+/**
+ * Validate untrusted request data before normalizing it as a tag map.
+ * @param {unknown} input
+ * @returns {TagMap}
+ */
+export function parseTagMapInput(input) {
+    if (
+        typeof input !== 'object'
+        || input === null
+        || Array.isArray(input)
+        || ![Object.prototype, null].includes(Object.getPrototypeOf(input))
+    ) {
+        throw new Error('Invalid tagsMap');
+    }
+
+    /** @type {TagMap} */
+    const normalized = {};
+    for (const [filename, tags] of Object.entries(input)) {
+        validateLocalPhotoFilename(filename);
+        if (!Array.isArray(tags)) throw new Error('Invalid tagsMap');
+        for (const tag of tags) {
+            if (
+                typeof tag !== 'object'
+                || tag === null
+                || Array.isArray(tag)
+                || typeof tag.name !== 'string'
+                || !tag.name.trim()
+                || typeof tag.x !== 'number'
+                || !Number.isFinite(tag.x)
+                || tag.x < 0
+                || tag.x > 100
+                || typeof tag.y !== 'number'
+                || !Number.isFinite(tag.y)
+                || tag.y < 0
+                || tag.y > 100
+            ) {
+                throw new Error('Invalid tagsMap');
+            }
+        }
+        normalized[filename] = tags.map(normalizeTag);
+    }
+    return normalized;
 }
 
 /**

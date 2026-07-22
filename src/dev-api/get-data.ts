@@ -3,7 +3,7 @@ import {
     allMountains as mountains,
     MOUNTAIN_REGION_DEFINITIONS as regions,
 } from '../lib/mountains';
-const tagFiles = import.meta.glob('/src/album-tags/**/*.json', { eager: true });
+import { readAllAlbumManifestFiles } from '../lib/albums/manifest-files';
 
 
 export const GET: APIRoute = async () => {
@@ -14,15 +14,17 @@ export const GET: APIRoute = async () => {
         });
     }
 
-    const allTags: Record<string, any> = {};
-
-    for (const path in tagFiles) {
-        // Transform path from '/src/album-tags/folder/album.json' to 'folder/album'
-        const match = path.match(/\/src\/album-tags\/(.*)\.json/);
-        if (match) {
-            allTags[match[1]] = (tagFiles[path] as any).default;
-        }
-    }
+    const manifests = await readAllAlbumManifestFiles(process.cwd());
+    const allTags = Object.fromEntries(
+        Object.entries(manifests).map(([slug, manifest]) => [
+            slug,
+            Object.fromEntries(
+                manifest.photos
+                    .filter((photo) => photo.tags.length > 0)
+                    .map((photo) => [photo.filename, photo.tags]),
+            ),
+        ]),
+    );
 
     return new Response(
         JSON.stringify({ mountains, regions, allTags }),

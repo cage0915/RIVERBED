@@ -1,5 +1,9 @@
 import type { APIRoute } from 'astro';
 import {
+    readAlbumManifestFile,
+    updatePhotoTags,
+} from '../lib/albums/manifest-files';
+import {
     findMountainRegion,
     isMountainRegion,
     readMountainRegion,
@@ -16,7 +20,7 @@ export const POST: APIRoute = async ({ request }) => {
         });
     }
 
-    let body: { action: 'update' | 'delete'; photoId?: string; tagName?: string; x?: number; y?: number; region?: MountainRegion };
+    let body: { action?: 'update' | 'delete'; sourceAlbumSlug?: string; filename?: string; tagName?: string; x?: number; y?: number; region?: MountainRegion };
     try {
         body = await request.json();
     } catch {
@@ -26,44 +30,30 @@ export const POST: APIRoute = async ({ request }) => {
         });
     }
 
-    const { action, photoId, tagName, x, y } = body;
+    const { action, sourceAlbumSlug, filename, tagName, x, y } = body;
 
-    if (!action || !photoId || !tagName || x == null || y == null) {
+    if ((action !== 'update' && action !== 'delete') || !sourceAlbumSlug || !filename || !tagName || x == null || y == null) {
         return new Response(JSON.stringify({ error: 'Missing required fields' }), {
             status: 400,
             headers: { 'Content-Type': 'application/json' },
         });
     }
 
-    const parts = photoId.split('/');
-    if (parts.length < 3) {
-        return new Response(JSON.stringify({ error: 'Invalid photoId' }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' },
-        });
-    }
-    const [folder, album, ...filenameParts] = parts;
-    const filename = filenameParts.join("/");
-
-    const fs = await import('node:fs');
-    const path = await import('node:path');
     const cwd = process.cwd();
-    const tagsDir = path.resolve(cwd, 'src/album-tags', folder);
-    const tagsFile = path.resolve(tagsDir, `${album}.json`);
-
-    let tagsMap: Record<string, { name: string; x: number; y: number }[]> = {};
-    if (fs.existsSync(tagsFile)) {
-        try {
-            tagsMap = JSON.parse(fs.readFileSync(tagsFile, 'utf-8'));
-        } catch { }
-    } else {
-        if (action === 'delete') {
-            return new Response(JSON.stringify({ error: 'File not found' }), { status: 404, headers: { 'Content-Type': 'application/json' }});
+    let currentTags: { name: string; x: number; y: number }[];
+    try {
+        const manifest = await readAlbumManifestFile(cwd, sourceAlbumSlug);
+        const photo = manifest.photos.find((entry) => entry.filename === filename);
+        if (!photo) {
+            return new Response(JSON.stringify({ error: 'Photo not found' }), { status: 404, headers: { 'Content-Type': 'application/json' }});
         }
-        fs.mkdirSync(tagsDir, { recursive: true });
+        currentTags = photo.tags;
+    } catch (error) {
+        return new Response(
+            JSON.stringify({ error: error instanceof Error ? error.message : 'Unable to read Album manifest' }),
+            { status: 400, headers: { 'Content-Type': 'application/json' } },
+        );
     }
-
-    const tagKey = filename || photoId;
     const existingMountain =
         action === 'update' ? await findMountainRegion(tagName) : undefined;
     if (action === 'update' && !existingMountain && !isMountainRegion(body.region)) {
@@ -74,29 +64,30 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     if (action === 'delete') {
-        if (tagsMap[tagKey]) {
-            tagsMap[tagKey] = tagsMap[tagKey].filter(t =>
-                !(t.name === tagName && Math.abs(t.x - (x ?? 0)) < 0.1 && Math.abs(t.y - (y ?? 0)) < 0.1)
-            );
-            if (tagsMap[tagKey].length === 0) {
-                delete tagsMap[tagKey];
-            }
-            fs.writeFileSync(tagsFile, JSON.stringify(tagsMap, null, 2), 'utf-8');
-        }
+        currentTags = currentTags.filter(t =>
+            !(t.name === tagName && Math.abs(t.x - x) < 0.1 && Math.abs(t.y - y) < 0.1)
+        );
     } else {
-        // action === 'update'
-        if (!tagsMap[tagKey]) {
-            tagsMap[tagKey] = [];
-        }
-        tagsMap[tagKey].push({ name: tagName, x: Math.round(x * 100) / 100, y: Math.round(y * 100) / 100 });
-        fs.writeFileSync(tagsFile, JSON.stringify(tagsMap, null, 2), 'utf-8');
+        currentTags = [
+            ...currentTags,
+            { name: tagName, x: Math.round(x * 100) / 100, y: Math.round(y * 100) / 100 },
+        ];
+    }
 
-        if (!existingMountain) {
-            if (!isMountainRegion(body.region)) throw new Error('Missing mountain region');
-            const mountains = await readMountainRegion(body.region);
-            mountains.push({ name: tagName, elevation: null, description: '' });
-            await writeMountainRegion(body.region, mountains);
-        }
+    try {
+        await updatePhotoTags(cwd, sourceAlbumSlug, filename, currentTags);
+    } catch (error) {
+        return new Response(
+            JSON.stringify({ error: error instanceof Error ? error.message : 'Unable to save photo tags' }),
+            { status: 400, headers: { 'Content-Type': 'application/json' } },
+        );
+    }
+
+    if (action === 'update' && !existingMountain) {
+        if (!isMountainRegion(body.region)) throw new Error('Missing mountain region');
+        const mountains = await readMountainRegion(body.region);
+        mountains.push({ name: tagName, elevation: null, description: '' });
+        await writeMountainRegion(body.region, mountains);
     }
 
     return new Response(

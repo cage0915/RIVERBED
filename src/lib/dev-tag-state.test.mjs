@@ -7,6 +7,7 @@ import {
     findNewTagNames,
     normalizeTagMap,
     mergeMountainEntries,
+    parseTagMapInput,
 } from './dev-tag-state.js';
 
 test('findNewTagNames ignores legacy names already present in the album', () => {
@@ -71,6 +72,25 @@ test('normalizeTagMap rounds coordinates and removes empty entries', () => {
 
     assert.deepEqual(next, {
         'cover.jpg': [{ name: '南湖大山', x: 12.35, y: 67.89 }],
+    });
+});
+
+test('parseTagMapInput accepts only a plain filename-to-tag-array record', () => {
+    assert.deepEqual(parseTagMapInput({
+        'cover.jpg': [{ name: '南湖大山', x: 12.345, y: 67.891 }],
+    }), {
+        'cover.jpg': [{ name: '南湖大山', x: 12.35, y: 67.89 }],
+    });
+
+    for (const malformed of [null, [], { 'cover.jpg': {} }, { 'cover.jpg': [null] }]) {
+        assert.throws(() => parseTagMapInput(malformed), /Invalid tagsMap/);
+    }
+    assert.throws(
+        () => parseTagMapInput({ '../bad.jpg': [] }),
+        /Invalid local filename/,
+    );
+    assert.deepEqual(parseTagMapInput({ 'missing.jpg': [] }), {
+        'missing.jpg': [],
     });
 });
 
