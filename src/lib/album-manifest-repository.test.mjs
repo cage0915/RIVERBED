@@ -282,6 +282,41 @@ test("CLI runner exposes read-only check, write, and equivalence validate modes"
     });
 });
 
+test("production Album and Tag rendering read manifests through the catalog", () => {
+    const sourceRoot = path.resolve(path.dirname(migrationScript), "../src");
+    const albumPage = fs.readFileSync(
+        path.join(sourceRoot, "pages/[folder]/[album].astro"),
+        "utf8",
+    );
+    const photoComponent = fs.readFileSync(
+        path.join(sourceRoot, "components/Photo.astro"),
+        "utf8",
+    );
+    const albumPhotoComponent = fs.readFileSync(
+        path.join(sourceRoot, "components/AlbumPhoto.astro"),
+        "utf8",
+    );
+    const tagPage = fs.readFileSync(
+        path.join(sourceRoot, "pages/yama/tags/[tag].astro"),
+        "utf8",
+    );
+
+    assert.match(albumPage, /AlbumPhoto/);
+    assert.doesNotMatch(photoComponent, /album-tags|import\.meta\.glob|Astro\.url\.pathname/);
+    assert.match(albumPhotoComponent, /caption=\{photo\.caption\}/);
+    assert.match(photoComponent, /photo-caption--photo/);
+    assert.match(photoComponent, /<RichText text=\{caption\}/);
+    assert.match(tagPage, /caption=\{photo\.caption\}/);
+    assert.doesNotMatch(photoComponent, /\bonerror=/);
+    assert.match(photoComponent, /data-dev-fallback-url/);
+    assert.match(photoComponent, /addEventListener\("error"/);
+    assert.match(photoComponent, /\{ once: true \}/);
+    assert.match(tagPage, /getTaggedPhotos\(decodedTag\)/);
+    assert.match(tagPage, /sourceAlbumSlug/);
+    assert.doesNotMatch(tagPage, /getAllPhotosWithTags|utils\/tags/);
+    assert.ok(!fs.existsSync(path.join(sourceRoot, "utils/tags.ts")));
+});
+
 test("production catalog pairs every MDX with one manifest and preserves legacy summaries", () => {
     const projectRoot = path.resolve(path.dirname(migrationScript), "..");
     const catalogPath = path.join(projectRoot, "src/lib/albums/catalog.ts");

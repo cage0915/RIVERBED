@@ -12,3 +12,15 @@ interface ImportMetaEnv {
 interface ImportMeta {
     readonly env: ImportMetaEnv;
 }
+
+declare namespace App {
+    interface Locals {
+        albumPhotoContext?: {
+            sourceAlbumSlug: import("./lib/albums/types").AlbumSlug;
+            photos: ReadonlyMap<
+                string,
+                import("./lib/albums/types").ResolvedAlbumPhoto
+            >;
+        };
+    }
+}

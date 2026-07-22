@@ -5,16 +5,23 @@ import Photo from "../../../components/Photo.astro";
 import MountainProfile, {
     type Mountain,
 } from "../../../components/MountainProfile.astro";
-import { getAllPhotosWithTags } from "../../../utils/tags";
+import {
+    getAlbumCatalog,
+    getTaggedPhotos,
+} from "../../../lib/albums/catalog";
 import { allMountains as mountainsData } from "../../../lib/mountains";
 import { getImageUrl, R2_DOMAIN } from "../../../lib/constants";
 import { tagPathParams } from "../../../lib/static-paths";
 
 export async function getStaticPaths() {
-    const photos = await getAllPhotosWithTags();
+    const albums = (await getAlbumCatalog()).getAlbums();
     return tagPathParams(
         mountainsData.map((mountain) => mountain.name),
-        photos.flatMap((photo) => photo.tags.map((tag) => tag.name)),
+        albums.flatMap((album) =>
+            album.photos
+                .filter((photo) => photo.isContent)
+                .flatMap((photo) => photo.tags.map((tag) => tag.name))
+        ),
     );
 }
 
@@ -24,14 +31,11 @@ if (!tag) {
     return Astro.redirect("/404");
 }
 
-const allPhotos = await getAllPhotosWithTags();
 const decodedTag = decodeURIComponent(tag);
 const mountain = (mountainsData as Mountain[]).find(
     (entry) => entry.name === decodedTag,
 );
-const matchingPhotos = allPhotos.filter((photo) =>
-    photo.tags.some((t) => t.name === decodedTag),
-);
+const matchingPhotos = await getTaggedPhotos(decodedTag);
 const representativePhotoKey = mountain?.coverKey;
 const representativePhotoUrl = representativePhotoKey
     ? getImageUrl(representativePhotoKey)
@@ -43,12 +47,11 @@ const isDev = import.meta.env.DEV;
 
 const photosByAlbum = matchingPhotos.reduce(
     (acc, photo) => {
-        const key = `${photo.folder}/${photo.albumId}`;
+        const key = photo.sourceAlbumSlug;
         if (!acc[key]) {
             acc[key] = {
-                albumTitle: photo.albumTitle,
-                folder: photo.folder,
-                albumId: photo.albumId,
+                albumTitle: photo.sourceAlbumTitle,
+                sourceAlbumSlug: photo.sourceAlbumSlug,
                 photos: [],
             };
         }
@@ -59,8 +62,7 @@ const photosByAlbum = matchingPhotos.reduce(
         string,
         {
             albumTitle: string;
-            folder: string;
-            albumId: string;
+            sourceAlbumSlug: string;
             photos: typeof matchingPhotos;
         }
     >,
@@ -196,13 +198,13 @@ function chunkArray<T>(array: T[], size: number): T[][] {
                                         <div
                                             class:list={[
                                                 "tag-photo-entry",
-                                                photo.itemKey === representativePhotoKey &&
+                                                photo.assetKey === representativePhotoKey &&
                                                     "tag-photo-entry--cover",
                                             ]}
-                                            data-cover-key={photo.itemKey}
+                                            data-cover-key={photo.assetKey}
                                         >
                                             <Photo
-                                                itemKey={photo.itemKey}
+                                                assetKey={photo.assetKey}
                                                 caption={photo.caption}
                                                 tags={photo.tags}
                                             />
@@ -210,9 +212,9 @@ function chunkArray<T>(array: T[], size: number): T[][] {
                                                 <button
                                                     class="mountain-cover-choice"
                                                     type="button"
-                                                    disabled={photo.itemKey === representativePhotoKey}
+                                                    disabled={photo.assetKey === representativePhotoKey}
                                                 >
-                                                    {photo.itemKey === representativePhotoKey
+                                                    {photo.assetKey === representativePhotoKey
                                                         ? "Cover photo"
                                                         : "Set as cover"}
                                                 </button>
@@ -225,7 +227,7 @@ function chunkArray<T>(array: T[], size: number): T[][] {
 
                         <div class="mt-8 flex justify-end items-center px-2">
                             <a
-                                href={`/${album.folder}/${album.albumId}`}
+                                href={`/${album.sourceAlbumSlug}`}
                                 class="text-[10px] text-zinc-400 hover:text-white transition-colors tracking-widest uppercase border-b border-transparent hover:border-white/40 pb-0.5"
                             >
                                 View Full Album →

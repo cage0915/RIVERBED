@@ -6,48 +6,25 @@ interface Tag {
 }
 
 interface Props {
-    itemKey: string; // R2 key or bare filename (relative to the album)
+    assetKey: string;
     caption?: string;
     tags?: Tag[];
 }
 
 import { getImageUrl, R2_DOMAIN } from "../lib/constants";
+import RichText from "./RichText.astro";
 
-const { itemKey, tags: providedTags } = Astro.props;
-
-// Resolve full R2 key: if itemKey is a bare filename (no "/"), derive
-// the folder/album prefix from the current URL path (/folder/album/...).
-let fullItemKey: string;
-let tagLookupKey: string;
-if (itemKey.includes("/")) {
-    // Legacy full-path format: "yama/2024-alishan-yushan/KCS00743.jpg"
-    fullItemKey = itemKey;
-    tagLookupKey = itemKey; // old JSON keys were full paths
-} else {
-    // New relative format: "KCS00743.jpg"
-    const pathParts = Astro.url.pathname.split("/").filter(Boolean);
-    const albumPrefix = pathParts.slice(0, 2).join("/"); // "yama/2024-alishan-yushan"
-    fullItemKey = `${albumPrefix}/${itemKey}`;
-    tagLookupKey = itemKey; // new JSON keys are bare filenames
-}
-
-// Load all tags from JSON files
-const allTags = import.meta.glob("/src/album-tags/**/*.json", {
-    eager: true,
-});
-const [folder, album] = fullItemKey.split("/");
-const jsonPath = `/src/album-tags/${folder}/${album}.json`;
-const albumTags = (allTags[jsonPath] as any)?.default || {};
-const tags: Tag[] = providedTags ?? albumTags[tagLookupKey] ?? [];
-const imageUrl = getImageUrl(fullItemKey);
+const { assetKey, caption, tags = [] } = Astro.props;
+const encodedAssetKey = assetKey.split("/").map(encodeURIComponent).join("/");
+const imageUrl = getImageUrl(encodedAssetKey);
 const isDev = import.meta.env.DEV;
-const fallbackUrl = `${R2_DOMAIN}/${fullItemKey}`;
+const fallbackUrl = `${R2_DOMAIN}/${encodedAssetKey}`;
 ---
 
 <div class="photo-container">
     <div
         class="photo-wrapper"
-        data-item-key={fullItemKey}
+        data-item-key={assetKey}
         data-has-tags={tags.length > 0 ? "true" : undefined}
         data-dev={isDev ? "true" : undefined}
     >
@@ -62,9 +39,7 @@ const fallbackUrl = `${R2_DOMAIN}/${fullItemKey}`;
                 alt=""
                 loading="lazy"
                 class="photo-img"
-                onerror={isDev
-                    ? `this.onerror=null; this.src='${fallbackUrl}'; this.parentElement.href='${fallbackUrl}'; this.parentElement.dataset.pswpSrc='${fallbackUrl}';`
-                    : undefined}
+                data-dev-fallback-url={isDev ? fallbackUrl : undefined}
             />
         </a>
 
@@ -98,6 +73,11 @@ const fallbackUrl = `${R2_DOMAIN}/${fullItemKey}`;
             )
         }
     </div>
+    {caption && (
+        <div class="photo-caption photo-caption--photo">
+            <RichText text={caption} />
+        </div>
+    )}
 </div>
 
 <style>
@@ -116,6 +96,13 @@ const fallbackUrl = `${R2_DOMAIN}/${fullItemKey}`;
         height: auto;
         display: block;
         border-radius: 4px;
+    }
+
+    .photo-caption--photo {
+        margin-top: 0.5rem;
+        color: #71717a;
+        font-size: 0.875rem;
+        text-align: center;
     }
 
     .tags-overlay {
@@ -197,5 +184,42 @@ const fallbackUrl = `${R2_DOMAIN}/${fullItemKey}`;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
 
+    @media (prefers-color-scheme: dark) {
+        .photo-caption--photo {
+            color: #a1a1aa;
+        }
+    }
+
 
 </style>
+
+<script>
+    const initPhotoFallbacks = () => {
+        document
+            .querySelectorAll<HTMLImageElement>("img[data-dev-fallback-url]")
+            .forEach((image) => {
+                if (image.dataset.devFallbackReady === "true") return;
+                image.dataset.devFallbackReady = "true";
+
+                const useFallback = () => {
+                    const fallbackUrl = image.dataset.devFallbackUrl;
+                    if (!fallbackUrl) return;
+
+                    delete image.dataset.devFallbackUrl;
+                    image.src = fallbackUrl;
+
+                    const link = image.closest<HTMLAnchorElement>("a.pswp-link");
+                    if (link) {
+                        link.href = fallbackUrl;
+                        link.dataset.pswpSrc = fallbackUrl;
+                    }
+                };
+
+                image.addEventListener("error", useFallback, { once: true });
+                if (image.complete && image.naturalWidth === 0) useFallback();
+            });
+    };
+
+    initPhotoFallbacks();
+    document.addEventListener("astro:after-swap", initPhotoFallbacks);
+</script>

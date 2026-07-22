@@ -1,0 +1,26 @@
+---
+import Photo from "./Photo.astro";
+
+interface Props {
+    itemKey: string;
+}
+
+const { itemKey } = Astro.props;
+const context = Astro.locals.albumPhotoContext;
+
+if (context === undefined) {
+    throw new Error("AlbumPhoto requires an Album rendering context");
+}
+if (itemKey.includes("/")) {
+    throw new Error(`Album content photo must use a local filename: ${itemKey}`);
+}
+
+const photo = context.photos.get(itemKey);
+if (photo === undefined || !photo.isContent) {
+    throw new Error(
+        `Album content photo ${JSON.stringify(itemKey)} is not registered in ${context.sourceAlbumSlug}`,
+    );
+}
+---
+
+<Photo assetKey={photo.assetKey} caption={photo.caption} tags={photo.tags} />

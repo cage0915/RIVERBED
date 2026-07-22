@@ -80,13 +80,13 @@ test("projects tags only from MDX content in stable Album and content order", ()
         record("yama/second", manifest({
             title: "Second",
             order: 20,
-            photos: [{ filename: "B.jpg", tags: [taggedB] }],
+            photos: [{ filename: "B.jpg", caption: "Second photo caption", tags: [taggedB] }],
         }), ["B.jpg"]),
         record("yama/first", manifest({
             title: "First",
             order: 10,
             photos: [
-                { filename: "A.jpg", tags: [taggedA] },
+                { filename: "A.jpg", caption: "First photo caption", tags: [taggedA] },
                 { filename: "cover.jpg", tags: [taggedA] },
             ],
             cover: { kind: "local", filename: "cover.jpg" },
@@ -108,6 +108,19 @@ test("projects tags only from MDX content in stable Album and content order", ()
         "yama/first",
         "yama/second",
     ]);
+    assert.notEqual(tagged[0].sourceAlbumSlug, tagged[1].sourceAlbumSlug);
+    assert.deepEqual(tagged.map((photo) => photo.caption), [
+        "First photo caption",
+        "Second photo caption",
+    ]);
+    assert.deepEqual(tagged.map(({ sourceAlbumTitle, filename }) => ({
+        sourceAlbumTitle,
+        filename,
+    })), [
+        { sourceAlbumTitle: "First", filename: "A.jpg" },
+        { sourceAlbumTitle: "Second", filename: "B.jpg" },
+    ]);
+    assert.ok(!tagged.some((photo) => photo.sourceAlbumSlug === "k/borrower"));
     assert.ok(tagged.every((photo) => photo.isContent === true));
     assert.deepEqual(catalog.getExternalCoverReferences("yama/first/A.jpg"), ["k/borrower"]);
 });

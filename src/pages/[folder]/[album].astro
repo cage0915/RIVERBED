@@ -2,10 +2,11 @@
 import { getCollection } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 import Row from "../../components/Row.astro";
-import Photo from "../../components/Photo.astro";
+import AlbumPhoto from "../../components/AlbumPhoto.astro";
 import PhotoCarousel from "../../components/PhotoCarousel.astro";
 import Text from "../../components/Text.astro";
 import { albumPathParams } from "../../lib/static-paths";
+import { getAlbumBySlug } from "../../lib/albums/catalog";
 
 export async function getStaticPaths() {
     const albums = await getCollection("albums");
@@ -58,6 +59,15 @@ const albumEntry = allAlbums.find((a) => a.slug === `${folder}/${album}`);
 if (!albumEntry) {
     return Astro.redirect("/404");
 }
+
+const albumRecord = await getAlbumBySlug(albumEntry.slug);
+if (!albumRecord) {
+    throw new Error(`Album manifest record not found: ${albumEntry.slug}`);
+}
+Astro.locals.albumPhotoContext = {
+    sourceAlbumSlug: albumRecord.slug,
+    photos: new Map(albumRecord.photos.map((photo) => [photo.filename, photo])),
+};
 
 // Get the Content component from the entry
 let Content;
@@ -188,7 +198,7 @@ const titleSections = extractTitleSections(albumEntry.body);
             class="album-content"
             style={albumEntry.data.gap ? `--album-block-gap: ${albumEntry.data.gap}` : undefined}
         >
-            <Content components={{ Row, Photo, Text, PhotoCarousel }} />
+            <Content components={{ Row, Photo: AlbumPhoto, Text, PhotoCarousel }} />
         </article>
     </div>
 </Layout>
