@@ -68,3 +68,4 @@ export const GET: APIRoute = async ({ url }) => {
         return new Response(JSON.stringify({ error: 'Server error' }), { status: 500 });
     }
 };
+// Registered only by the local development server.

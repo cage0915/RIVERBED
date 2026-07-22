@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { createPageContent } from '../../lib/page-structure';
+import { createPageContent } from '../lib/page-structure';
 
 export const POST: APIRoute = async ({ request }) => {
     if (!import.meta.env.DEV) {
@@ -40,3 +40,4 @@ export const POST: APIRoute = async ({ request }) => {
         headers: { 'Content-Type': 'application/json' },
     });
 };
+// Registered only by the local development server.

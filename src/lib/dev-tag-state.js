@@ -123,3 +123,13 @@ export function mergeMountainEntries(mountains, tagNames) {
 export function collectTagNames(tagMap) {
     return [...new Set(Object.values(tagMap).flat().map((tag) => tag.name))];
 }
+
+/**
+ * @param {TagMap} previousTagMap
+ * @param {TagMap} nextTagMap
+ * @returns {string[]}
+ */
+export function findNewTagNames(previousTagMap, nextTagMap) {
+    const previousNames = new Set(collectTagNames(previousTagMap));
+    return collectTagNames(nextTagMap).filter((name) => !previousNames.has(name));
+}

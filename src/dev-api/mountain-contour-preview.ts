@@ -1,10 +1,10 @@
 import type { APIRoute } from "astro";
 
-import { generateMountainContourPreview } from "../../lib/mountain-contour-files";
+import { generateMountainContourPreview } from "../lib/mountain-contour-files";
 import {
     isMountainSourceRegion,
     readMountainRegion,
-} from "../../lib/mountain-files";
+} from "../lib/mountain-files";
 
 const jsonError = (error: string, status: number) =>
     new Response(JSON.stringify({ error }), {
@@ -68,3 +68,4 @@ export const POST: APIRoute = async ({ request }) => {
         );
     }
 };
+// Registered only by the local development server.

@@ -3,8 +3,8 @@ import { createHash } from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { loadR2SourceIndex } from '../../lib/r2-source-files';
-import { getR2AdminClient } from '../../lib/r2-admin-client';
+import { loadR2SourceIndex } from '../lib/r2-source-files';
+import { getR2AdminClient } from '../lib/r2-admin-client';
 
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), {
     status,
@@ -13,9 +13,9 @@ const json = (body: unknown, status = 200) => new Response(JSON.stringify(body),
 
 const isAlbumSlug = (value: string) => /^[a-z0-9-]+\/[a-z0-9-]+$/.test(value);
 
-export const POST: APIRoute = async ({ request, locals }) => {
+export const POST: APIRoute = async ({ request }) => {
     if (!import.meta.env.DEV) return json({ error: 'Not available in production' }, 403);
-    const r2 = await getR2AdminClient(locals.runtime?.env?.RIVERBED);
+    const r2 = await getR2AdminClient();
     if (!r2) return json({ error: 'Remote R2 is unavailable. Configure the R2 credentials in .env.' }, 503);
 
     try {
@@ -102,3 +102,4 @@ export const POST: APIRoute = async ({ request, locals }) => {
         return json({ error: message }, 500);
     }
 };
+// Registered only by the local development server.

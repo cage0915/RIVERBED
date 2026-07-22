@@ -1,11 +1,11 @@
 import type { APIRoute } from "astro";
 
-import { parseMountainCoverKey } from "../../lib/mountain-editor";
+import { parseMountainCoverKey } from "../lib/mountain-editor";
 import {
     findMountainRegion,
     readMountainRegion,
     writeMountainRegion,
-} from "../../lib/mountain-files";
+} from "../lib/mountain-files";
 
 const json = (body: unknown, status = 200) =>
     new Response(JSON.stringify(body), {
@@ -76,3 +76,4 @@ export const POST: APIRoute = async ({ request }) => {
         );
     }
 };
+// Registered only by the local development server.

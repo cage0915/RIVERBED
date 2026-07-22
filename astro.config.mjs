@@ -1,16 +1,15 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { defineConfig } from 'astro/config';
-import cloudflare from '@astrojs/cloudflare';
 import tailwind from '@astrojs/tailwind';
 import mdx from '@astrojs/mdx';
+import devApiRoutes from './src/integrations/dev-api-routes.mjs';
 
 // https://astro.build/config
 export default defineConfig({
     site: 'https://riverbed.cage0915.com',
-    output: 'server',
-    adapter: cloudflare({}),
-    integrations: [tailwind(), mdx()],
+    output: 'static',
+    integrations: [tailwind(), mdx(), devApiRoutes()],
     vite: {
         plugins: [
             {

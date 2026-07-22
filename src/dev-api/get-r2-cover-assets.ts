@@ -53,3 +53,4 @@ export const GET: APIRoute = async ({ url }) => {
 
     return json({ albums, albumSlug: requestedSlug, photos });
 };
+// Registered only by the local development server.

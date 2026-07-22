@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 
-import { applyAlbumCoverConfig } from '../../lib/album-frontmatter.js';
+import { applyAlbumCoverConfig } from '../lib/album-frontmatter.js';
 
 export const POST: APIRoute = async ({ request }) => {
     if (!import.meta.env.DEV) {
@@ -69,3 +69,4 @@ export const POST: APIRoute = async ({ request }) => {
         return new Response(JSON.stringify({ error: 'Server error' }), { status: 500 });
     }
 };
+// Registered only by the local development server.

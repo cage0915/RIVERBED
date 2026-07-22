@@ -1950,7 +1950,7 @@
             pendingMountainNavigation = null;
             if (!mountainName) return;
             clearPreservedManagerState();
-            location.assign(`/tags/${encodeURIComponent(mountainName)}`);
+            location.assign(`/yama/tags/${encodeURIComponent(mountainName)}`);
         });
         dialog.addEventListener("click", (event) => {
             if (event.target !== dialog || !confirmDiscardPendingDrafts()) return;

@@ -32,3 +32,4 @@ export const POST: APIRoute = async ({ request }) => {
         return json({ error: error instanceof Error ? error.message : 'Page deletion failed' }, 500);
     }
 };
+// Registered only by the local development server.

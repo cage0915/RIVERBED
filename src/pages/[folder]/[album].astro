@@ -5,6 +5,12 @@ import Row from "../../components/Row.astro";
 import Photo from "../../components/Photo.astro";
 import PhotoCarousel from "../../components/PhotoCarousel.astro";
 import Text from "../../components/Text.astro";
+import { albumPathParams } from "../../lib/static-paths";
+
+export async function getStaticPaths() {
+    const albums = await getCollection("albums");
+    return albumPathParams(albums.map((album) => album.slug));
+}
 
 const slugifySectionTitle = (value: string) => value
     .toLowerCase()

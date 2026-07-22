@@ -3,9 +3,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 
-import { collectAlbumReferences } from '../../lib/r2-source-index';
-import { loadR2SourceIndex } from '../../lib/r2-source-files';
-import { getR2AdminClient } from '../../lib/r2-admin-client';
+import { collectAlbumReferences } from '../lib/r2-source-index';
+import { loadR2SourceIndex } from '../lib/r2-source-files';
+import { getR2AdminClient } from '../lib/r2-admin-client';
 
 const IMAGE_PATTERN = /\.(?:jpe?g|png|webp|avif)$/i;
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), {
@@ -13,7 +13,7 @@ const json = (body: unknown, status = 200) => new Response(JSON.stringify(body),
     headers: { 'Content-Type': 'application/json' },
 });
 
-export const GET: APIRoute = async ({ url, locals }) => {
+export const GET: APIRoute = async ({ url }) => {
     if (!import.meta.env.DEV) return json({ error: 'Not available in production' }, 403);
     const albumSlug = (url.searchParams.get('albumSlug') || '').replace(/^\/+|\/+$/g, '');
     if (!/^[a-z0-9-]+\/[a-z0-9-]+$/.test(albumSlug)) return json({ error: 'Invalid albumSlug' }, 400);
@@ -44,7 +44,7 @@ export const GET: APIRoute = async ({ url, locals }) => {
         : [];
     const localMap = new Map(local.map((entry) => [entry.key, entry]));
 
-    const r2 = await getR2AdminClient(locals.runtime?.env?.RIVERBED);
+    const r2 = await getR2AdminClient();
     if (!r2) {
         return json({
             albumSlug,
@@ -102,3 +102,4 @@ export const GET: APIRoute = async ({ url, locals }) => {
         return json({ error: message }, 502);
     }
 };
+// Registered only by the local development server.

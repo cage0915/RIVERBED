@@ -2,15 +2,16 @@ import type { APIRoute } from 'astro';
 
 import {
     collectTagNames,
+    findNewTagNames,
     normalizeTagMap,
-} from '../../lib/dev-tag-state.js';
+} from '../lib/dev-tag-state.js';
 import {
     isMountainRegion,
     readAllMountainRegions,
     readMountainRegion,
     writeMountainRegion,
-} from '../../lib/mountain-files';
-import type { MountainRegion } from '../../lib/mountains';
+} from '../lib/mountain-files';
+import type { MountainRegion } from '../lib/mountains';
 
 type Tag = { name: string; x: number; y: number };
 type TagMap = Record<string, Tag[]>;
@@ -60,6 +61,10 @@ export const POST: APIRoute = async ({ request }) => {
     const tagsDir = path.resolve(cwd, 'src/album-tags', folder);
     const tagsFile = path.resolve(tagsDir, `${album}.json`);
     const normalizedTagMap = normalizeTagMap(tagsMap);
+    const previousTagMap = fs.existsSync(tagsFile)
+        ? normalizeTagMap(JSON.parse(fs.readFileSync(tagsFile, 'utf-8')) as TagMap)
+        : {};
+    const newTagNames = new Set(findNewTagNames(previousTagMap, normalizedTagMap));
 
     const allMountains = await readAllMountainRegions();
     const existingNames = new Set(allMountains.map((mountain) => mountain.name));
@@ -67,7 +72,9 @@ export const POST: APIRoute = async ({ request }) => {
         (name) => !existingNames.has(name),
     );
     const missingRegions = unknownNames.filter(
-        (name) => !isMountainRegion(body.newMountainRegions?.[name]),
+        (name) =>
+            newTagNames.has(name) &&
+            !isMountainRegion(body.newMountainRegions?.[name]),
     );
     if (missingRegions.length > 0) {
         return new Response(
@@ -106,3 +113,4 @@ export const POST: APIRoute = async ({ request }) => {
         headers: { 'Content-Type': 'application/json' },
     });
 };
+// Registered only by the local development server.

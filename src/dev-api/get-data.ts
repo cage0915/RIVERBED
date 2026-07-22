@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro';
 import {
     allMountains as mountains,
     MOUNTAIN_REGION_DEFINITIONS as regions,
-} from '../../lib/mountains';
+} from '../lib/mountains';
 const tagFiles = import.meta.glob('/src/album-tags/**/*.json', { eager: true });
 
 
@@ -32,3 +32,4 @@ export const GET: APIRoute = async () => {
         }
     );
 };
+// Registered only by the local development server.

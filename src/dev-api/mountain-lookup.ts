@@ -4,7 +4,7 @@ import {
     parseWikidataMountainEntity,
     type MountainLookupCandidate,
     type WikidataEntity,
-} from "../../lib/wikidata-mountain";
+} from "../lib/wikidata-mountain";
 
 const WIKIDATA_USER_AGENT =
     "RIVERBED-MountainDevTool/1.1 (https://riverbed.cage0915.com)";
@@ -130,3 +130,4 @@ export const GET: APIRoute = async ({ url }) => {
         );
     }
 };
+// Registered only by the local development server.

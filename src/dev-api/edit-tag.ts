@@ -4,8 +4,8 @@ import {
     isMountainRegion,
     readMountainRegion,
     writeMountainRegion,
-} from '../../lib/mountain-files';
-import type { MountainRegion } from '../../lib/mountains';
+} from '../lib/mountain-files';
+import type { MountainRegion } from '../lib/mountains';
 
 export const POST: APIRoute = async ({ request }) => {
     // Only allow in dev mode
@@ -104,3 +104,4 @@ export const POST: APIRoute = async ({ request }) => {
         { status: 200, headers: { 'Content-Type': 'application/json' } }
     );
 };
+// Registered only by the local development server.

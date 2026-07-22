@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { createAlbumMdx, validateAlbumSegment, validateImageFilename } from '../../lib/album-import.js';
+import { createAlbumMdx, validateAlbumSegment, validateImageFilename } from '../lib/album-import.js';
 
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), {
     status,
@@ -84,3 +84,4 @@ export const POST: APIRoute = async ({ request }) => {
         return json({ error: message }, 400);
     }
 };
+// Registered only by the local development server.

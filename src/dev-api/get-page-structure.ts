@@ -116,3 +116,4 @@ export const GET: APIRoute = async ({ request }) => {
         headers: { 'Content-Type': 'application/json' },
     });
 };
+// Registered only by the local development server.

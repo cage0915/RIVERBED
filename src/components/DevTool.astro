@@ -13,6 +13,10 @@
         DEFAULT_MOUNTAIN_VIEW_SETTINGS,
         type MountainViewSettings,
     } from "../lib/mountain-view-settings";
+    import {
+        isMountainTagIndex,
+        isMountainTagPage,
+    } from "../lib/dev-route-state.js";
 
     // Only run in development
     if (import.meta.env.DEV) {
@@ -882,7 +886,7 @@
                     <div class="tag-marker" style="left: ${tag.x}%; top: ${tag.y}%;">
                         <div class="tag-content">
                             <div class="tag-line"></div>
-                            <a href="/tags/${encodeURIComponent(tag.name)}" class="tag-link">
+                            <a href="/yama/tags/${encodeURIComponent(tag.name)}" class="tag-link">
                                 <span class="tag-name" data-name="${escapeHtml(tag.name)}" data-x="${tag.x}" data-y="${tag.y}">${escapeHtml(tag.name)}</span>
                             </a>
                         </div>
@@ -2950,7 +2954,7 @@
             };
 
             const initFolderCoverEditors = () => {
-                if (!isFolderPage() || isMountainTagsView()) return;
+                if (!isFolderPage() || isMountainTagIndex(window.location.pathname)) return;
                 document.querySelectorAll<HTMLElement>('.album-card[data-album-slug]').forEach((card) => {
                     if (card.dataset.coverEditorInitialized === 'true') return;
                     card.dataset.coverEditorInitialized = 'true';
@@ -3358,13 +3362,6 @@
             const isRootPage = () =>
                 window.location.pathname.split('/').filter(Boolean).length === 0;
 
-            const isMountainTagsView = () =>
-                window.location.pathname.replace(/\/$/, '') === '/yama' &&
-                new URLSearchParams(window.location.search).get('view') === 'tags';
-
-            const isTagPage = () =>
-                window.location.pathname.split('/').filter(Boolean)[0] === 'tags';
-
             async function openR2Manager() {
                 showToast('⌛ Auditing source and R2...');
                 const response = await fetch('/api/r2-global-plan', { cache: 'no-store' });
@@ -3613,7 +3610,7 @@
             // Block unwanted interactions in DEV mode
             const enforceDevInteractionModes = (e: MouseEvent | PointerEvent) => {
                 const target = e.target as HTMLElement;
-                if (isTagPage()) return;
+                if (isMountainTagPage(window.location.pathname)) return;
 
                 // Allow our specific Dev UI buttons, tags, AND all interactions within dialogs
                 if (target.closest('.dev-block-toolbar') || target.closest('.dev-tag-edit-btn') || target.closest('.tag-link') || target.closest('dialog')) {
@@ -3644,7 +3641,7 @@
 
             // Native right-click context menu prevention to handle Tag Dialog
             window.addEventListener('contextmenu', (e) => {
-                if (isTagPage()) return;
+                if (isMountainTagPage(window.location.pathname)) return;
                 const target = e.target as HTMLElement;
                 const wrapper = target.closest('.photo-wrapper');
                 // Ensure clicks on toolbar elements get native menus or nothing
@@ -3659,7 +3656,7 @@
 
             const init = () => {
                 injectStyles();
-                if (isTagPage()) {
+                if (isMountainTagPage(window.location.pathname)) {
                     document.getElementById('dev-gear-btn')?.remove();
                     document.getElementById('dev-save-btn')?.remove();
                     return;
@@ -3678,7 +3675,7 @@
                     if (isRootPage()) {
                         gearBtn.title = 'R2 Manager';
                         gearBtn.addEventListener('click', openR2Manager);
-                    } else if (isMountainTagsView()) {
+                    } else if (isMountainTagIndex(window.location.pathname)) {
                         gearBtn.title = 'Region Manager';
                         gearBtn.addEventListener('click', openRegionManager);
                     } else if (isFolderPage()) {
@@ -3699,7 +3696,12 @@
                     }
                 }
 
-                if (!isRootPage() && !isFolderPage() && !document.getElementById('dev-save-btn')) {
+                if (
+                    !isRootPage() &&
+                    !isFolderPage() &&
+                    !isMountainTagIndex(window.location.pathname) &&
+                    !document.getElementById('dev-save-btn')
+                ) {
                     const saveBtn = document.createElement('button');
                     saveBtn.id = 'dev-save-btn';
                     saveBtn.className = 'dev-save-btn';

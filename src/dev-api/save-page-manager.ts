@@ -4,8 +4,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import trash from 'trash';
 
-import { validateImageFilename } from '../../lib/album-import.js';
-import { createPageContent, referencedLocalNames } from '../../lib/page-structure';
+import { validateImageFilename } from '../lib/album-import.js';
+import { createPageContent, referencedLocalNames } from '../lib/page-structure';
 
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), {
     status,
@@ -84,3 +84,4 @@ export const POST: APIRoute = async ({ request }) => {
         return json({ error: error instanceof Error ? error.message : 'Page Manager save failed' }, 400);
     }
 };
+// Registered only by the local development server.

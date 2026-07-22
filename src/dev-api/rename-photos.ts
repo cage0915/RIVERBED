@@ -112,3 +112,4 @@ export const POST: APIRoute = async ({ request }) => {
 
     return json({ ok: true, renamed: Object.fromEntries(renameMap) });
 };
+// Registered only by the local development server.

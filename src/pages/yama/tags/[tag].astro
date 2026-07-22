@@ -1,15 +1,22 @@
 ---
-import Layout from "../../layouts/Layout.astro";
-import Row from "../../components/Row.astro";
-import Photo from "../../components/Photo.astro";
+import Layout from "../../../layouts/Layout.astro";
+import Row from "../../../components/Row.astro";
+import Photo from "../../../components/Photo.astro";
 import MountainProfile, {
     type Mountain,
-} from "../../components/MountainProfile.astro";
-import { getAllPhotosWithTags } from "../../utils/tags";
-import { allMountains as mountainsData } from "../../lib/mountains";
-import { getImageUrl, R2_DOMAIN } from "../../lib/constants";
+} from "../../../components/MountainProfile.astro";
+import { getAllPhotosWithTags } from "../../../utils/tags";
+import { allMountains as mountainsData } from "../../../lib/mountains";
+import { getImageUrl, R2_DOMAIN } from "../../../lib/constants";
+import { tagPathParams } from "../../../lib/static-paths";
 
-export const prerender = false;
+export async function getStaticPaths() {
+    const photos = await getAllPhotosWithTags();
+    return tagPathParams(
+        mountainsData.map((mountain) => mountain.name),
+        photos.flatMap((photo) => photo.tags.map((tag) => tag.name)),
+    );
+}
 
 const { tag } = Astro.params;
 
@@ -96,7 +103,7 @@ function chunkArray<T>(array: T[], size: number): T[][] {
             </div>
         </button>
         <a
-            href="/yama?view=tags"
+            href="/yama/tags"
             title="Back to mountains"
             aria-label="Back to mountain view"
             class="group text-zinc-500 hover:text-white transition-all duration-300"

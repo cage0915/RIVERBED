@@ -26,55 +26,6 @@ export interface R2AdminClient {
     delete(key: string): Promise<void>;
 }
 
-type WorkerR2Object = import('@cloudflare/workers-types').R2Object;
-
-const fromWorkerObject = (object: WorkerR2Object): R2AdminObject => ({
-    key: object.key,
-    size: object.size,
-    etag: object.etag,
-    uploaded: object.uploaded,
-    customMetadata: object.customMetadata,
-});
-
-const createWorkerClient = (bucket: R2Bucket): R2AdminClient => ({
-    async list(prefix) {
-        const objects: R2AdminObject[] = [];
-        let cursor: string | undefined;
-        do {
-            const page = await bucket.list({ prefix, cursor });
-            objects.push(...page.objects.map(fromWorkerObject));
-            cursor = page.truncated ? page.cursor : undefined;
-        } while (cursor);
-        return objects;
-    },
-    async head(key) {
-        const object = await bucket.head(key);
-        return object ? fromWorkerObject(object) : null;
-    },
-    async get(key) {
-        const object = await bucket.get(key);
-        if (!object) return null;
-        return {
-            ...fromWorkerObject(object),
-            bytes: new Uint8Array(await object.arrayBuffer()),
-            contentType: object.httpMetadata?.contentType,
-        };
-    },
-    async put(key, bytes, options = {}) {
-        const result = await bucket.put(key, bytes, {
-            httpMetadata: options.contentType ? { contentType: options.contentType } : undefined,
-            customMetadata: options.customMetadata,
-            onlyIf: options.etagMatches
-                ? { etagMatches: options.etagMatches }
-                : options.onlyIfMissing ? { etagDoesNotMatch: '*' } : undefined,
-        });
-        return result !== null;
-    },
-    async delete(key) {
-        await bucket.delete(key);
-    },
-});
-
 const createS3Client = async (): Promise<R2AdminClient | null> => {
     const accountId = import.meta.env.R2_ACCOUNT_ID?.trim();
     const accessKeyId = import.meta.env.R2_ACCESS_KEY_ID?.trim();
@@ -179,6 +130,6 @@ const createS3Client = async (): Promise<R2AdminClient | null> => {
     };
 };
 
-export async function getR2AdminClient(binding?: R2Bucket): Promise<R2AdminClient | null> {
-    return binding ? createWorkerClient(binding) : createS3Client();
+export async function getR2AdminClient(): Promise<R2AdminClient | null> {
+    return createS3Client();
 }

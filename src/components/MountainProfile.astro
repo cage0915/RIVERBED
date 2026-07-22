@@ -27,8 +27,7 @@ interface Props {
 
 const { mountain } = Astro.props;
 const peakFinderEnabled = resolveFeatureFlag(
-    Astro.locals.runtime?.env?.PEAKFINDER_ENABLED ??
-        import.meta.env.PEAKFINDER_ENABLED,
+    import.meta.env.PEAKFINDER_ENABLED,
     true,
 );
 const description = mountain.description.trim();

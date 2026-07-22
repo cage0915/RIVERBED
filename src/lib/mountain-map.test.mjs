@@ -28,7 +28,7 @@ test("view boxes use positive dimensions and contain their mountain point", () =
             longitude: 121.258157,
         },
         {
-            context: "jp-northern-alps",
+            context: "jp-honshu",
             latitude: 36.758611,
             longitude: 137.758611,
         },
@@ -105,7 +105,7 @@ test("code-owned full-map contexts cover every source feature", () => {
 });
 
 test("interactive zoom keeps the requested focal point stable", () => {
-    const initial = boundsToViewBox(MAP_CONTEXTS["jp-northern-alps"].bounds);
+    const initial = boundsToViewBox(MAP_CONTEXTS["jp-honshu"].bounds);
     const source = [...MAP_SOURCES.japan.extent];
     const focus = projectCoordinates(36.758611, 137.758611);
     const beforeXRatio = (focus.x - initial[0]) / initial[2];

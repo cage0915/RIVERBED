@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro';
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { applyAlbumCoverConfig } from '../../lib/album-frontmatter.js';
+import { applyAlbumCoverConfig } from '../lib/album-frontmatter.js';
 
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), {
     status,
@@ -64,3 +64,4 @@ export const POST: APIRoute = async ({ request }) => {
         return json({ error: error instanceof Error ? error.message : 'Unable to save cover' }, 500);
     }
 };
+// Registered only by the local development server.

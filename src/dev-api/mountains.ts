@@ -1,21 +1,21 @@
 import type { APIRoute } from "astro";
 
-import { sanitizeMountainEntry } from "../../lib/mountain-editor";
+import { sanitizeMountainEntry } from "../lib/mountain-editor";
 import {
     isMountainSourceRegion,
     readAllMountainRegions,
     readMountainRegion,
     writeMountainRegion,
-} from "../../lib/mountain-files";
+} from "../lib/mountain-files";
 import {
     MOUNTAIN_REGION_DEFINITIONS,
     type MountainSourceRegion,
-} from "../../lib/mountains";
-import { MAP_SOURCES } from "../../lib/mountain-map";
+} from "../lib/mountains";
+import { MAP_SOURCES } from "../lib/mountain-map";
 import {
     mountainContourFileExists,
     regenerateMountainContour,
-} from "../../lib/mountain-contour-files";
+} from "../lib/mountain-contour-files";
 
 const json = (body: unknown, status = 200) =>
     new Response(JSON.stringify(body), {
@@ -174,3 +174,4 @@ export const POST: APIRoute = async ({ request }) => {
         );
     }
 };
+// Registered only by the local development server.

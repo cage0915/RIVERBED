@@ -1,11 +1,11 @@
 import type { APIRoute } from "astro";
 
-import type { EditableMountain } from "../../lib/mountain-editor";
+import type { EditableMountain } from "../lib/mountain-editor";
 import {
     sanitizeMountainViewSettings,
     type MountainViewSettings,
-} from "../../lib/mountain-view-settings";
-import type { MountainRegionDefinition } from "../../lib/mountains";
+} from "../lib/mountain-view-settings";
+import type { MountainRegionDefinition } from "../lib/mountains";
 
 const json = (body: unknown, status = 200) =>
     new Response(JSON.stringify(body), {
@@ -158,3 +158,4 @@ export const PUT: APIRoute = async ({ request }) => {
         );
     }
 };
+// Registered only by the local development server.

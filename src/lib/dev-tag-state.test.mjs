@@ -4,9 +4,25 @@ import assert from 'node:assert/strict';
 import {
     addOrUpdateTag,
     deleteTag,
+    findNewTagNames,
     normalizeTagMap,
     mergeMountainEntries,
 } from './dev-tag-state.js';
+
+test('findNewTagNames ignores legacy names already present in the album', () => {
+    const previous = {
+        'old.jpg': [{ name: '南大', x: 10, y: 20 }],
+    };
+    const next = {
+        ...previous,
+        'new.jpg': [
+            { name: '南大', x: 30, y: 40 },
+            { name: '新山名', x: 50, y: 60 },
+        ],
+    };
+
+    assert.deepEqual(findNewTagNames(previous, next), ['新山名']);
+});
 
 test('addOrUpdateTag adds a new tag to a photo entry', () => {
     const next = addOrUpdateTag({}, 'cover.jpg', {

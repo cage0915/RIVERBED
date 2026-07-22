@@ -1,15 +1,15 @@
 import type { APIRoute } from "astro";
 
-import { sanitizeMountainEntry, type EditableMountain } from "../../lib/mountain-editor";
-import { isValidMapBounds, type MapBounds } from "../../lib/mountain-map";
+import { sanitizeMountainEntry, type EditableMountain } from "../lib/mountain-editor";
+import { isValidMapBounds, type MapBounds } from "../lib/mountain-map";
 import {
     isMountainSourceRegion,
     readAllMountainRegions,
     readMountainRegion,
     writeAllMountainRegions,
     writeMountainRegion,
-} from "../../lib/mountain-files";
-import type { MountainSourceRegion } from "../../lib/mountains";
+} from "../lib/mountain-files";
+import type { MountainSourceRegion } from "../lib/mountains";
 
 type ContextConfig = {
     id: string;
@@ -256,3 +256,4 @@ export const DELETE: APIRoute = async ({ request }) => {
         return json({ error: error instanceof Error ? error.message : "Unable to delete context" }, 400);
     }
 };
+// Registered only by the local development server.

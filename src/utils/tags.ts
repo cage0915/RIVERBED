@@ -50,7 +50,7 @@ export async function getAllPhotosWithTags() {
             if (itemKey) {
                 // itemKey from MDX may be a bare filename (new format) or a full path (legacy).
                 // Normalise to a full path so Photo.astro works outside the album URL context
-                // (e.g. on the /tags/[tag] page where the URL can't be used to infer the album).
+                // (e.g. on the /yama/tags/[tag] page where the URL can't infer the album).
                 const fullItemKey = itemKey.includes('/')
                     ? itemKey
                     : `${folder}/${albumId}/${itemKey}`;
@@ -69,4 +69,3 @@ export async function getAllPhotosWithTags() {
 
     return allPhotos;
 }
-
