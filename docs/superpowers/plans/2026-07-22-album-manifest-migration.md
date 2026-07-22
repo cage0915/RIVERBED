@@ -141,8 +141,10 @@ Implement `validateAlbumSlug`, `validateLocalPhotoFilename`, and
 `normalizeAssetKey` in `keys.ts`. Implement `parseAlbumManifest(input,
 albumSlug)` without type assertions escaping the module. Reject duplicate
 filenames, non-finite coordinates, coordinates outside 0–100, empty tags,
-invalid dates, invalid order, unsupported cover kinds, and local covers absent
-from `photos`.
+invalid dates, invalid order, unsupported cover kinds, non-positive or
+non-finite zoom, and local covers absent from `photos`. The DevTool may impose a
+1–4 editing range, but the persisted manifest schema accepts every positive
+finite zoom.
 
 - [ ] **Step 4: Add a package test command and run the focused test**
 
