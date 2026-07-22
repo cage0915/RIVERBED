@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 1,
+  "title": "石筍尖",
+  "info": "2025.3",
+  "order": 40,
+  "cover": {
+    "photo": {
+      "kind": "local",
+      "filename": "KCS02305.jpg"
+    },
+    "zoom": 1,
+    "offset": {
+      "x": 50,
+      "y": 50
+    }
+  },
+  "photos": [
+    {
+      "filename": "KCS02233.jpg",
+      "tags": [
+        {
+          "name": "石筍尖",
+          "x": 52.32,
+          "y": 24.12
+        }
+      ]
+    },
+    {
+      "filename": "KCS02240-Pano.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02242.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02252.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02256.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02265.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02267.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02285.jpg",
+      "tags": [
+        {
+          "name": "基隆嶼",
+          "x": 52.03,
+          "y": 53.77
+        }
+      ]
+    },
+    {
+      "filename": "KCS02293.jpg",
+      "tags": [
+        {
+          "name": "無耳茶壺山",
+          "x": 23.56,
+          "y": 30.93
+        },
+        {
+          "name": "半屏山",
+          "x": 68.15,
+          "y": 20.02
+        }
+      ]
+    },
+    {
+      "filename": "KCS02290.jpg",
+      "tags": [
+        {
+          "name": "無耳茶壺山",
+          "x": 53.19,
+          "y": 30.37
+        }
+      ]
+    },
+    {
+      "filename": "KCS02292.jpg",
+      "tags": [
+        {
+          "name": "半屏山",
+          "x": 51.65,
+          "y": 25.71
+        }
+      ]
+    },
+    {
+      "filename": "KCS02295.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02305.jpg",
+      "tags": [
+        {
+          "name": "基隆山",
+          "x": 52.8,
+          "y": 21.55
+        }
+      ]
+    },
+    {
+      "filename": "KCS02300.jpg",
+      "tags": [
+        {
+          "name": "基隆山東峰",
+          "x": 33.02,
+          "y": 16.46
+        }
+      ]
+    },
+    {
+      "filename": "KCS02312.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02317.jpg",
+      "tags": []
+    }
+  ]
+}

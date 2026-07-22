@@ -1,0 +1,240 @@
+{
+  "schemaVersion": 1,
+  "title": "基隆嶼",
+  "info": "2026.6",
+  "order": 10,
+  "cover": {
+    "photo": {
+      "kind": "local",
+      "filename": "KCS03481.jpg"
+    },
+    "zoom": 1.1,
+    "offset": {
+      "x": 50,
+      "y": 10
+    }
+  },
+  "photos": [
+    {
+      "filename": "KCS03353.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03384.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03361.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03368.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03386.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03370.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03380.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03392.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03397.jpg",
+      "tags": [
+        {
+          "name": "小基隆嶼",
+          "x": 54.01,
+          "y": 23.53
+        }
+      ]
+    },
+    {
+      "filename": "KCS03406.jpg",
+      "tags": [
+        {
+          "name": "小基隆嶼",
+          "x": 56.69,
+          "y": 26.36
+        }
+      ]
+    },
+    {
+      "filename": "KCS03409.jpg",
+      "tags": [
+        {
+          "name": "小基隆嶼",
+          "x": 51.03,
+          "y": 25.11
+        }
+      ]
+    },
+    {
+      "filename": "KCS03420.jpg",
+      "tags": [
+        {
+          "name": "基隆山",
+          "x": 31.66,
+          "y": 35.01
+        },
+        {
+          "name": "基隆山東峰",
+          "x": 13.04,
+          "y": 41.53
+        },
+        {
+          "name": "燦光寮山",
+          "x": 42.19,
+          "y": 34.44
+        },
+        {
+          "name": "牡丹山",
+          "x": 68.63,
+          "y": 34.87
+        },
+        {
+          "name": "半屏山",
+          "x": 21.53,
+          "y": 33.57
+        }
+      ]
+    },
+    {
+      "filename": "KCS03431.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0530-1542-37.312.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0530-1523-00.123.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0530-1523-53.146.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03445.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03441.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03447.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03455.jpg",
+      "tags": [
+        {
+          "name": "小基隆嶼",
+          "x": 52.8,
+          "y": 28.91
+        }
+      ]
+    },
+    {
+      "filename": "KCS03462.jpg",
+      "tags": [
+        {
+          "name": "基隆嶼",
+          "x": 46.63,
+          "y": 24.1
+        }
+      ]
+    },
+    {
+      "filename": "KCS03464.jpg",
+      "tags": [
+        {
+          "name": "基隆嶼",
+          "x": 46.82,
+          "y": 25.65
+        }
+      ]
+    },
+    {
+      "filename": "KCS03475.jpg",
+      "tags": [
+        {
+          "name": "基隆嶼",
+          "x": 65.26,
+          "y": 21.96
+        },
+        {
+          "name": "小基隆嶼",
+          "x": 9.75,
+          "y": 52.22
+        }
+      ]
+    },
+    {
+      "filename": "KCS03479.jpg",
+      "tags": [
+        {
+          "name": "基隆嶼",
+          "x": 52.61,
+          "y": 21.68
+        }
+      ]
+    },
+    {
+      "filename": "KCS03506.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03505.jpg",
+      "tags": [
+        {
+          "name": "基隆山",
+          "x": 52.52,
+          "y": 36.27
+        },
+        {
+          "name": "基隆山東峰",
+          "x": 36.55,
+          "y": 43.42
+        }
+      ]
+    },
+    {
+      "filename": "KCS03508.jpg",
+      "tags": [
+        {
+          "name": "基隆山",
+          "x": 62.59,
+          "y": 27.87
+        },
+        {
+          "name": "基隆山東峰",
+          "x": 43.16,
+          "y": 37.16
+        }
+      ]
+    },
+    {
+      "filename": "KCS03495.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03513.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03481.jpg",
+      "tags": []
+    }
+  ]
+}

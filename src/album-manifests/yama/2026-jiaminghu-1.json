@@ -1,0 +1,600 @@
+{
+  "schemaVersion": 1,
+  "title": "嘉明湖-1",
+  "info": "2026.7 南橫.向陽山",
+  "publishedAt": "2026-07-12",
+  "order": 20,
+  "cover": {
+    "photo": {
+      "kind": "local",
+      "filename": "KCS03777.jpg"
+    },
+    "zoom": 1,
+    "offset": {
+      "x": 50,
+      "y": 60
+    }
+  },
+  "photos": [
+    {
+      "filename": "2026-0703-0804-10.035.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03575.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0703-0841-54.077.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0703-0848-37.919.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0703-0853-09.166.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03590.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03595.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03601.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03630.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03703.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03728.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03747.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03798.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03754.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03762.jpg",
+      "tags": [
+        {
+          "name": "向陽山",
+          "x": 38.59,
+          "y": 29.29
+        },
+        {
+          "name": "向陽山北峰",
+          "x": 70.64,
+          "y": 45.74
+        },
+        {
+          "name": "三叉山",
+          "x": 87.21,
+          "y": 46.81
+        }
+      ]
+    },
+    {
+      "filename": "KCS03774.jpg",
+      "tags": [
+        {
+          "name": "向陽山",
+          "x": 58.09,
+          "y": 8.74
+        }
+      ]
+    },
+    {
+      "filename": "KCS03770.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03777.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03784.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03790.jpg",
+      "tags": [
+        {
+          "name": "魔保來山",
+          "x": 82.64,
+          "y": 0.15
+        }
+      ]
+    },
+    {
+      "filename": "KCS03785.jpg",
+      "tags": [
+        {
+          "name": "溪頭山",
+          "x": 59.32,
+          "y": 7.86
+        }
+      ]
+    },
+    {
+      "filename": "KCS03809.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0703-1518-34.004.jpg",
+      "tags": [
+        {
+          "name": "三叉山",
+          "x": 82.01,
+          "y": 34.91
+        }
+      ]
+    },
+    {
+      "filename": "KCS04389.jpg",
+      "tags": [
+        {
+          "name": "馬利加南山",
+          "x": 50.62,
+          "y": 48.22
+        }
+      ]
+    },
+    {
+      "filename": "KCS04394.jpg",
+      "tags": [
+        {
+          "name": "馬利加南山",
+          "x": 50.08,
+          "y": 45.54
+        }
+      ]
+    },
+    {
+      "filename": "KCS04396.jpg",
+      "tags": [
+        {
+          "name": "秀姑巒山",
+          "x": 52.16,
+          "y": 43.57
+        },
+        {
+          "name": "大水窟山",
+          "x": 29.28,
+          "y": 48.58
+        }
+      ]
+    },
+    {
+      "filename": "KCS04410.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS04423.jpg",
+      "tags": [
+        {
+          "name": "關山",
+          "x": 54.08,
+          "y": 41.41
+        }
+      ]
+    },
+    {
+      "filename": "KCS04424.jpg",
+      "tags": [
+        {
+          "name": "關山",
+          "x": 62.5,
+          "y": 14.37
+        }
+      ]
+    },
+    {
+      "filename": "KCS04422.jpg",
+      "tags": [
+        {
+          "name": "卑南主山",
+          "x": 51.5,
+          "y": 43.34
+        },
+        {
+          "name": "卑南主山北峰",
+          "x": 64.34,
+          "y": 44.5
+        }
+      ]
+    },
+    {
+      "filename": "KCS04425.jpg",
+      "tags": [
+        {
+          "name": "北大武山",
+          "x": 51.7,
+          "y": 37.57
+        }
+      ]
+    },
+    {
+      "filename": "KCS04429.jpg",
+      "tags": [
+        {
+          "name": "關山",
+          "x": 54.11,
+          "y": 39.84
+        }
+      ]
+    },
+    {
+      "filename": "KCS04432.jpg",
+      "tags": [
+        {
+          "name": "關山",
+          "x": 69.69,
+          "y": 43.22
+        },
+        {
+          "name": "小關山",
+          "x": 47.52,
+          "y": 46.26
+        },
+        {
+          "name": "小關山北峰",
+          "x": 43.47,
+          "y": 47.15
+        },
+        {
+          "name": "卑南主山",
+          "x": 25.12,
+          "y": 45.18
+        },
+        {
+          "name": "北大武山",
+          "x": 12.85,
+          "y": 44.29
+        }
+      ]
+    },
+    {
+      "filename": "KCS04428.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS04449.jpg",
+      "tags": [
+        {
+          "name": "關山",
+          "x": 59.68,
+          "y": 24.73
+        },
+        {
+          "name": "鷹仔嘴山",
+          "x": 52.05,
+          "y": 57.83
+        },
+        {
+          "name": "塔關山",
+          "x": 78.51,
+          "y": 70.33
+        }
+      ]
+    },
+    {
+      "filename": "KCS04452.jpg",
+      "tags": [
+        {
+          "name": "鷹仔嘴山",
+          "x": 71.67,
+          "y": 0
+        }
+      ]
+    },
+    {
+      "filename": "KCS04443.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS04465.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS04470.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS04484.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS04479.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS04476.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS04487.jpg",
+      "tags": [
+        {
+          "name": "溪頭山",
+          "x": 7.49,
+          "y": 4.01
+        },
+        {
+          "name": "魔保來山",
+          "x": 66.85,
+          "y": 7.85
+        }
+      ]
+    },
+    {
+      "filename": "KCS04515.jpg",
+      "tags": [
+        {
+          "name": "溪頭山",
+          "x": 34.06,
+          "y": 6.7
+        },
+        {
+          "name": "魔保來山",
+          "x": 76.24,
+          "y": 2.68
+        }
+      ]
+    },
+    {
+      "filename": "KCS04525.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS04526.jpg",
+      "tags": [
+        {
+          "name": "魔保來山",
+          "x": 48.87,
+          "y": 10.91
+        }
+      ]
+    },
+    {
+      "filename": "KCS04508.jpg",
+      "tags": [
+        {
+          "name": "溪頭山",
+          "x": 63.32,
+          "y": 4.2
+        }
+      ]
+    },
+    {
+      "filename": "KCS04509.jpg",
+      "tags": [
+        {
+          "name": "溪頭山",
+          "x": 54.03,
+          "y": 4.2
+        }
+      ]
+    },
+    {
+      "filename": "KCS04489.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS04548.jpg",
+      "tags": [
+        {
+          "name": "魔保來山",
+          "x": 9.71,
+          "y": 28.13
+        }
+      ]
+    },
+    {
+      "filename": "KCS04522.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS04562.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS04559.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS04588.jpg",
+      "tags": [
+        {
+          "name": "溪頭山",
+          "x": 51.28,
+          "y": 13.82
+        }
+      ]
+    },
+    {
+      "filename": "KCS04589.jpg",
+      "tags": [
+        {
+          "name": "魔保來山",
+          "x": 52.45,
+          "y": 19.07
+        }
+      ]
+    },
+    {
+      "filename": "KCS04615.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS04641.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS04594.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS04624.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS04629.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS04631.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS04644.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS04633.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS04665.jpg",
+      "tags": [
+        {
+          "name": "關山",
+          "x": 20.33,
+          "y": 27.61
+        },
+        {
+          "name": "關山嶺山",
+          "x": 80.17,
+          "y": 32.96
+        },
+        {
+          "name": "鷹仔嘴山",
+          "x": 42.62,
+          "y": 26.49
+        },
+        {
+          "name": "塔關山",
+          "x": 53.44,
+          "y": 32.19
+        }
+      ]
+    },
+    {
+      "filename": "KCS04670.jpg",
+      "tags": [
+        {
+          "name": "海諾南山",
+          "x": 27.98,
+          "y": 42.43
+        },
+        {
+          "name": "關山",
+          "x": 82.68,
+          "y": 37.07
+        }
+      ]
+    },
+    {
+      "filename": "KCS04657.jpg",
+      "tags": [
+        {
+          "name": "海諾南山",
+          "x": 48.89,
+          "y": 33.14
+        }
+      ]
+    },
+    {
+      "filename": "KCS04679.jpg",
+      "tags": [
+        {
+          "name": "關山",
+          "x": 69.44,
+          "y": 20.8
+        }
+      ]
+    },
+    {
+      "filename": "KCS04695.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS04715.jpg",
+      "tags": [
+        {
+          "name": "新港山",
+          "x": 69.36,
+          "y": 45.92
+        },
+        {
+          "name": "成廣澳山",
+          "x": 24.86,
+          "y": 48.52
+        }
+      ]
+    },
+    {
+      "filename": "KCS04716.jpg",
+      "tags": [
+        {
+          "name": "新港山",
+          "x": 62.22,
+          "y": 38.81
+        },
+        {
+          "name": "成廣澳山",
+          "x": 17.62,
+          "y": 42.65
+        }
+      ]
+    },
+    {
+      "filename": "KCS04710.jpg",
+      "tags": [
+        {
+          "name": "新港山",
+          "x": 68.3,
+          "y": 37.54
+        },
+        {
+          "name": "成廣澳山",
+          "x": 12.41,
+          "y": 42.48
+        }
+      ]
+    },
+    {
+      "filename": "KCS04717.jpg",
+      "tags": [
+        {
+          "name": "新港山",
+          "x": 69.84,
+          "y": 44.7
+        },
+        {
+          "name": "成廣澳山",
+          "x": 34.32,
+          "y": 47.97
+        }
+      ]
+    }
+  ]
+}

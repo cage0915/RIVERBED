@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "title": "２０１６",
+  "order": 70,
+  "cover": {
+    "photo": {
+      "kind": "local",
+      "filename": "11.JPG"
+    },
+    "zoom": 1,
+    "offset": {
+      "x": 50,
+      "y": 50
+    }
+  },
+  "photos": [
+    {
+      "filename": "01.JPG",
+      "tags": []
+    },
+    {
+      "filename": "02.JPG",
+      "tags": []
+    },
+    {
+      "filename": "03.JPG",
+      "tags": []
+    },
+    {
+      "filename": "04.JPG",
+      "tags": []
+    },
+    {
+      "filename": "05.JPG",
+      "tags": []
+    },
+    {
+      "filename": "06.JPG",
+      "tags": []
+    },
+    {
+      "filename": "07.JPG",
+      "tags": []
+    },
+    {
+      "filename": "08.JPG",
+      "tags": []
+    },
+    {
+      "filename": "09.JPG",
+      "tags": []
+    },
+    {
+      "filename": "10.JPG",
+      "tags": []
+    },
+    {
+      "filename": "11.JPG",
+      "tags": []
+    },
+    {
+      "filename": "12.JPG",
+      "tags": []
+    },
+    {
+      "filename": "13.JPG",
+      "tags": []
+    },
+    {
+      "filename": "14.JPG",
+      "tags": []
+    },
+    {
+      "filename": "15.JPG",
+      "tags": []
+    },
+    {
+      "filename": "16.JPG",
+      "tags": []
+    },
+    {
+      "filename": "17.JPG",
+      "tags": []
+    },
+    {
+      "filename": "18.JPG",
+      "tags": []
+    }
+  ]
+}

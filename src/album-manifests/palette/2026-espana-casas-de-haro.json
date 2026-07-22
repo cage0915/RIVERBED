@@ -1,0 +1,375 @@
+{
+  "schemaVersion": 1,
+  "title": "Casas de Haro",
+  "info": "2026.4",
+  "order": 30,
+  "cover": {
+    "photo": {
+      "kind": "local",
+      "filename": "2026-0404-1033-29.625.jpg"
+    },
+    "zoom": 1,
+    "offset": {
+      "x": 50,
+      "y": 50
+    }
+  },
+  "photos": [
+    {
+      "filename": "KCS01906.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS01911.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS01924.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS01930.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS01934.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS01946.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS01945.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS01944.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS01951.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS01947.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS01940.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS01954.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS01965.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS01978.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS01970.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS01974.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS01982.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0402-1546-50.611.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0402-1548-05.461.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0402-1552-49.242.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS01983.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0402-1744-57.336.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0402-1740-09.176.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0402-1744-28.785.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS01989.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0403-1453-18.215.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0403-1934-49.403.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0403-1651-00.558.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0404-1345-25.879.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0404-1412-31.664.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0403-2007-59.079.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02053.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02048.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0403-1940-09.265.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02021.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0404-1033-29.625.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02032.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02034.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02056.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0403-1951-19.290.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0404-1919-27.750.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02072.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02189.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02071.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0404-1347-46.887.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0404-1924-51.968.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02182.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02178.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02038.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02082.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02063.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02065.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02064.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0405-1844-42.733.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02094.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02073.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02084.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02076.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02081.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02105.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02098.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02126.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0405-1128-30.312.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02170.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02136.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02169.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02161.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0405-1228-53.762.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0405-1244-28.629.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0405-1217-28.891.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0405-1230-40.532.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0405-1228-59.633.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02207.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0405-1232-00.283.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0405-1235-35.588.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0405-1332-39.623.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0405-1356-25.748.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0405-1441-13.672.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02067.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0405-2045-24.377.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0405-1403-37.890.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0405-1507-04.871.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0405-2013-14.900.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0405-2011-44.548.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0403-2155-33.471.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0403-2155-53.472.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0403-2158-06.673.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0406-1108-04.277.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0406-1108-36.646.jpg",
+      "tags": []
+    }
+  ]
+}

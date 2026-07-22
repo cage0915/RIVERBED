@@ -33,7 +33,7 @@ function photoContext(body: string, start: number, end?: number): string {
     return body.slice(start, contextEnd);
 }
 
-function findTagEnd(body: string, start: number): number {
+export function findMdxTagEnd(body: string, start: number): number {
     let quote: "'" | "\"" | null = null;
     let escaped = false;
     let braceDepth = 0;
@@ -304,7 +304,7 @@ export function extractMdxPhotos(body: string): MdxPhotoReference[] {
     for (let match = photoStart.exec(body); match !== null; match = photoStart.exec(body)) {
         const offset = match.index;
         if (isInsideRange(offset, ignoredRanges) || isEscaped(body, offset)) continue;
-        const end = findTagEnd(body, offset + match[0].length);
+        const end = findMdxTagEnd(body, offset + match[0].length);
         if (end === -1) throw unsupported(body, offset);
 
         const tag = body.slice(offset, end + 1);

@@ -1,0 +1,232 @@
+{
+  "schemaVersion": 1,
+  "title": "大屯山系",
+  "info": "2025.1, 2025.3",
+  "order": 220,
+  "cover": {
+    "photo": {
+      "kind": "local",
+      "filename": "KCS02357.jpg"
+    },
+    "zoom": 1,
+    "offset": {
+      "x": 50,
+      "y": 50
+    }
+  },
+  "photos": [
+    {
+      "filename": "KCS01347.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS01363.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS01382.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS01391.jpg",
+      "tags": [
+        {
+          "name": "大屯山南峰",
+          "x": 45.99,
+          "y": 68.09
+        }
+      ]
+    },
+    {
+      "filename": "KCS01401.jpg",
+      "tags": [
+        {
+          "name": "大屯山南峰",
+          "x": 75.64,
+          "y": 68.11
+        }
+      ]
+    },
+    {
+      "filename": "KCS01410.jpg",
+      "tags": [
+        {
+          "name": "七星山",
+          "x": 81.97,
+          "y": 11.38
+        },
+        {
+          "name": "小油坑",
+          "x": 35.9,
+          "y": 55.49
+        },
+        {
+          "name": "磺嘴山",
+          "x": 33.41,
+          "y": 27.72
+        }
+      ]
+    },
+    {
+      "filename": "KCS01420.jpg",
+      "tags": [
+        {
+          "name": "小油坑",
+          "x": 23.88,
+          "y": 62.4
+        },
+        {
+          "name": "七星山",
+          "x": 52.48,
+          "y": 37.28
+        },
+        {
+          "name": "七星山南峰",
+          "x": 68.51,
+          "y": 39.08
+        },
+        {
+          "name": "七星山東峰",
+          "x": 58.65,
+          "y": 39.14
+        },
+        {
+          "name": "磺嘴山",
+          "x": 21.71,
+          "y": 46.35
+        }
+      ]
+    },
+    {
+      "filename": "KCS01428.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS01478.jpg",
+      "tags": [
+        {
+          "name": "竹子山",
+          "x": 60.82,
+          "y": 32.29
+        }
+      ]
+    },
+    {
+      "filename": "KCS01494.jpg",
+      "tags": [
+        {
+          "name": "大屯山",
+          "x": 60.82,
+          "y": 21.84
+        }
+      ]
+    },
+    {
+      "filename": "KCS01497.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS01505.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS01515.jpg",
+      "tags": [
+        {
+          "name": "竹子山",
+          "x": 48.08,
+          "y": 32.59
+        }
+      ]
+    },
+    {
+      "filename": "KCS01528.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS01534.jpg",
+      "tags": [
+        {
+          "name": "觀音山",
+          "x": 61.06,
+          "y": 31.21
+        }
+      ]
+    },
+    {
+      "filename": "KCS02344.jpg",
+      "tags": [
+        {
+          "name": "竹子山",
+          "x": 58.17,
+          "y": 25.61
+        }
+      ]
+    },
+    {
+      "filename": "KCS02348.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02357.jpg",
+      "tags": [
+        {
+          "name": "七星山",
+          "x": 47.28,
+          "y": 12.81
+        },
+        {
+          "name": "小油坑",
+          "x": 42.39,
+          "y": 38.41
+        }
+      ]
+    },
+    {
+      "filename": "KCS02374.jpg",
+      "tags": [
+        {
+          "name": "觀音山",
+          "x": 65.22,
+          "y": 32.46
+        }
+      ]
+    },
+    {
+      "filename": "KCS02375.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02378.jpg",
+      "tags": [
+        {
+          "name": "七星山",
+          "x": 49.6,
+          "y": 33.66
+        },
+        {
+          "name": "小油坑",
+          "x": 21.96,
+          "y": 58.78
+        },
+        {
+          "name": "磺嘴山",
+          "x": 20.03,
+          "y": 41.83
+        }
+      ]
+    },
+    {
+      "filename": "KCS02377.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02391.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02395.jpg",
+      "tags": []
+    }
+  ]
+}

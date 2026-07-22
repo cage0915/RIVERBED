@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "title": "２０１８",
+  "info": "",
+  "order": 200,
+  "cover": {
+    "photo": {
+      "kind": "local",
+      "filename": "009.jpg"
+    },
+    "zoom": 1,
+    "offset": {
+      "x": 50,
+      "y": 50
+    }
+  },
+  "photos": [
+    {
+      "filename": "001.jpg",
+      "tags": []
+    },
+    {
+      "filename": "002.jpg",
+      "tags": []
+    },
+    {
+      "filename": "003.jpg",
+      "tags": []
+    },
+    {
+      "filename": "004.jpg",
+      "tags": []
+    },
+    {
+      "filename": "005.jpg",
+      "tags": []
+    },
+    {
+      "filename": "006.jpg",
+      "tags": []
+    },
+    {
+      "filename": "007.jpg",
+      "tags": []
+    },
+    {
+      "filename": "008.jpg",
+      "tags": []
+    },
+    {
+      "filename": "009.jpg",
+      "tags": []
+    },
+    {
+      "filename": "010.jpg",
+      "tags": []
+    },
+    {
+      "filename": "011.jpg",
+      "tags": []
+    }
+  ]
+}

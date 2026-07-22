@@ -1,0 +1,227 @@
+{
+  "schemaVersion": 1,
+  "title": "２０２２",
+  "info": "",
+  "order": 120,
+  "cover": {
+    "photo": {
+      "kind": "local",
+      "filename": "027.jpg"
+    },
+    "zoom": 1,
+    "offset": {
+      "x": 50,
+      "y": 50
+    }
+  },
+  "photos": [
+    {
+      "filename": "001.jpg",
+      "tags": []
+    },
+    {
+      "filename": "002.jpg",
+      "tags": []
+    },
+    {
+      "filename": "003.jpg",
+      "tags": []
+    },
+    {
+      "filename": "004.jpg",
+      "tags": []
+    },
+    {
+      "filename": "005.jpg",
+      "tags": []
+    },
+    {
+      "filename": "007.jpg",
+      "tags": []
+    },
+    {
+      "filename": "008.jpg",
+      "tags": []
+    },
+    {
+      "filename": "009.jpg",
+      "tags": []
+    },
+    {
+      "filename": "010.jpg",
+      "tags": []
+    },
+    {
+      "filename": "011.jpg",
+      "tags": []
+    },
+    {
+      "filename": "012.jpg",
+      "tags": []
+    },
+    {
+      "filename": "013.jpg",
+      "tags": []
+    },
+    {
+      "filename": "014.jpg",
+      "tags": []
+    },
+    {
+      "filename": "015.jpg",
+      "tags": []
+    },
+    {
+      "filename": "016.jpg",
+      "tags": []
+    },
+    {
+      "filename": "017.jpg",
+      "tags": []
+    },
+    {
+      "filename": "018.jpg",
+      "tags": []
+    },
+    {
+      "filename": "019.jpg",
+      "tags": []
+    },
+    {
+      "filename": "020.jpg",
+      "tags": []
+    },
+    {
+      "filename": "021.jpg",
+      "tags": []
+    },
+    {
+      "filename": "022.jpg",
+      "tags": []
+    },
+    {
+      "filename": "023.jpg",
+      "tags": []
+    },
+    {
+      "filename": "006.jpg",
+      "tags": []
+    },
+    {
+      "filename": "024.jpg",
+      "tags": []
+    },
+    {
+      "filename": "025.jpg",
+      "tags": []
+    },
+    {
+      "filename": "026.jpg",
+      "tags": []
+    },
+    {
+      "filename": "027.jpg",
+      "tags": [
+        {
+          "name": "龜山島",
+          "x": 36.49,
+          "y": 29.49
+        }
+      ]
+    },
+    {
+      "filename": "028.jpg",
+      "tags": []
+    },
+    {
+      "filename": "029.jpg",
+      "tags": [
+        {
+          "name": "龜山島",
+          "x": 54.29,
+          "y": 10.58
+        }
+      ]
+    },
+    {
+      "filename": "030.jpg",
+      "tags": [
+        {
+          "name": "龜山島",
+          "x": 52.22,
+          "y": 18.4
+        }
+      ]
+    },
+    {
+      "filename": "031.jpg",
+      "tags": [
+        {
+          "name": "龜山島",
+          "x": 63.9,
+          "y": 17.32
+        }
+      ]
+    },
+    {
+      "filename": "032.jpg",
+      "tags": []
+    },
+    {
+      "filename": "033.jpg",
+      "tags": []
+    },
+    {
+      "filename": "034.jpg",
+      "tags": []
+    },
+    {
+      "filename": "035.jpg",
+      "tags": []
+    },
+    {
+      "filename": "036.jpg",
+      "tags": []
+    },
+    {
+      "filename": "037.jpg",
+      "tags": []
+    },
+    {
+      "filename": "038.jpg",
+      "tags": []
+    },
+    {
+      "filename": "039.jpg",
+      "tags": []
+    },
+    {
+      "filename": "040.jpg",
+      "tags": []
+    },
+    {
+      "filename": "041.jpg",
+      "tags": []
+    },
+    {
+      "filename": "042.jpg",
+      "tags": []
+    },
+    {
+      "filename": "043.jpg",
+      "tags": []
+    },
+    {
+      "filename": "044.jpg",
+      "tags": []
+    },
+    {
+      "filename": "045.jpg",
+      "tags": []
+    },
+    {
+      "filename": "046.jpg",
+      "tags": []
+    }
+  ]
+}

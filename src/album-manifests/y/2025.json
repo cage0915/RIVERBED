@@ -1,0 +1,314 @@
+{
+  "schemaVersion": 1,
+  "title": "２０２５",
+  "info": "",
+  "order": 20,
+  "cover": {
+    "photo": {
+      "kind": "local",
+      "filename": "007.jpg"
+    },
+    "zoom": 1,
+    "offset": {
+      "x": 50,
+      "y": 50
+    }
+  },
+  "photos": [
+    {
+      "filename": "001.jpg",
+      "tags": []
+    },
+    {
+      "filename": "002.jpg",
+      "tags": []
+    },
+    {
+      "filename": "003.jpg",
+      "tags": []
+    },
+    {
+      "filename": "004.jpg",
+      "tags": []
+    },
+    {
+      "filename": "005.jpg",
+      "tags": []
+    },
+    {
+      "filename": "006.jpg",
+      "tags": []
+    },
+    {
+      "filename": "007.jpg",
+      "tags": []
+    },
+    {
+      "filename": "008.jpg",
+      "tags": []
+    },
+    {
+      "filename": "009.jpg",
+      "tags": []
+    },
+    {
+      "filename": "010.jpg",
+      "tags": []
+    },
+    {
+      "filename": "011.jpg",
+      "tags": []
+    },
+    {
+      "filename": "012.jpg",
+      "tags": []
+    },
+    {
+      "filename": "013.jpg",
+      "tags": []
+    },
+    {
+      "filename": "014.jpg",
+      "tags": [
+        {
+          "name": "基隆嶼",
+          "x": 50.49,
+          "y": 58.08
+        }
+      ]
+    },
+    {
+      "filename": "015.jpg",
+      "tags": [
+        {
+          "name": "基隆嶼",
+          "x": 53.09,
+          "y": 44.78
+        }
+      ]
+    },
+    {
+      "filename": "016.jpg",
+      "tags": []
+    },
+    {
+      "filename": "017.jpg",
+      "tags": [
+        {
+          "name": "七腳川山",
+          "x": 49.81,
+          "y": 28
+        }
+      ]
+    },
+    {
+      "filename": "018.jpg",
+      "tags": [
+        {
+          "name": "七腳川山",
+          "x": 53.38,
+          "y": 52.1
+        }
+      ]
+    },
+    {
+      "filename": "019.jpg",
+      "tags": [
+        {
+          "name": "奇萊主山",
+          "x": 54.25,
+          "y": 30.31
+        }
+      ]
+    },
+    {
+      "filename": "020.jpg",
+      "tags": [
+        {
+          "name": "奇萊主山",
+          "x": 51.33,
+          "y": 33.11
+        }
+      ]
+    },
+    {
+      "filename": "021.jpg",
+      "tags": [
+        {
+          "name": "奇萊主山",
+          "x": 51.38,
+          "y": 39.73
+        }
+      ]
+    },
+    {
+      "filename": "022.jpg",
+      "tags": []
+    },
+    {
+      "filename": "023.jpg",
+      "tags": []
+    },
+    {
+      "filename": "024.jpg",
+      "tags": []
+    },
+    {
+      "filename": "025.jpg",
+      "tags": []
+    },
+    {
+      "filename": "026.jpg",
+      "tags": []
+    },
+    {
+      "filename": "027.jpg",
+      "tags": []
+    },
+    {
+      "filename": "028.jpg",
+      "tags": []
+    },
+    {
+      "filename": "029.jpg",
+      "tags": [
+        {
+          "name": "鳳林山主峰",
+          "x": 50.58,
+          "y": 16.82
+        },
+        {
+          "name": "林田山",
+          "x": 69.12,
+          "y": 25.45
+        }
+      ]
+    },
+    {
+      "filename": "030.jpg",
+      "tags": [
+        {
+          "name": "鳳林山主峰",
+          "x": 58.6,
+          "y": 20.41
+        },
+        {
+          "name": "林田山",
+          "x": 78.38,
+          "y": 29.04
+        }
+      ]
+    },
+    {
+      "filename": "031.jpg",
+      "tags": []
+    },
+    {
+      "filename": "032.jpg",
+      "tags": []
+    },
+    {
+      "filename": "033.jpg",
+      "tags": []
+    },
+    {
+      "filename": "034.jpg",
+      "tags": []
+    },
+    {
+      "filename": "035.jpg",
+      "tags": []
+    },
+    {
+      "filename": "036.jpg",
+      "tags": []
+    },
+    {
+      "filename": "037.jpg",
+      "tags": []
+    },
+    {
+      "filename": "038.jpg",
+      "tags": []
+    },
+    {
+      "filename": "039.jpg",
+      "tags": []
+    },
+    {
+      "filename": "040.jpg",
+      "tags": [
+        {
+          "name": "北插天山",
+          "x": 72.78,
+          "y": 18.76
+        },
+        {
+          "name": "魯培山",
+          "x": 86.97,
+          "y": 19.1
+        },
+        {
+          "name": "南插天山",
+          "x": 96.05,
+          "y": 19.04
+        },
+        {
+          "name": "卡保山",
+          "x": 51.55,
+          "y": 17.65
+        },
+        {
+          "name": "拔刀爾山",
+          "x": 29.83,
+          "y": 22.77
+        }
+      ]
+    },
+    {
+      "filename": "041.jpg",
+      "tags": [
+        {
+          "name": "觀音山",
+          "x": 63.23,
+          "y": 21.9
+        },
+        {
+          "name": "觀音山",
+          "x": 63.23,
+          "y": 21.61
+        }
+      ]
+    },
+    {
+      "filename": "042.jpg",
+      "tags": [
+        {
+          "name": "大屯山",
+          "x": 66.32,
+          "y": 34.56
+        },
+        {
+          "name": "大屯山南峰",
+          "x": 41.32,
+          "y": 41.32
+        },
+        {
+          "name": "大屯山西峰",
+          "x": 35.91,
+          "y": 41.16
+        },
+        {
+          "name": "面天山",
+          "x": 27.03,
+          "y": 43.19
+        },
+        {
+          "name": "向天山",
+          "x": 19.6,
+          "y": 44.06
+        }
+      ]
+    }
+  ]
+}

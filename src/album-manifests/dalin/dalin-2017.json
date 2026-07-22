@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "title": "２０１７",
+  "info": "",
+  "order": 60,
+  "cover": {
+    "photo": {
+      "kind": "local",
+      "filename": "01.JPG"
+    },
+    "zoom": 1,
+    "offset": {
+      "x": 50,
+      "y": 50
+    }
+  },
+  "photos": [
+    {
+      "filename": "01.JPG",
+      "tags": []
+    },
+    {
+      "filename": "02.JPG",
+      "tags": []
+    },
+    {
+      "filename": "03.JPG",
+      "tags": []
+    },
+    {
+      "filename": "04.JPG",
+      "tags": []
+    },
+    {
+      "filename": "05.JPG",
+      "tags": []
+    },
+    {
+      "filename": "06.JPG",
+      "tags": []
+    },
+    {
+      "filename": "07.JPG",
+      "tags": []
+    }
+  ]
+}

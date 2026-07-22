@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "title": "阿里山望玉山",
+  "info": "2024.2",
+  "order": 260,
+  "cover": {
+    "photo": {
+      "kind": "local",
+      "filename": "KCS00743.jpg"
+    },
+    "zoom": 1,
+    "offset": {
+      "x": 50,
+      "y": 50
+    }
+  },
+  "photos": [
+    {
+      "filename": "KCS00743.jpg",
+      "tags": [
+        {
+          "name": "玉山主峰",
+          "x": 48.19,
+          "y": 15.27
+        }
+      ]
+    },
+    {
+      "filename": "KCS00797.jpg",
+      "tags": [
+        {
+          "name": "玉山北北峰",
+          "x": 14.11,
+          "y": 33.44
+        },
+        {
+          "name": "玉山北峰",
+          "x": 20.56,
+          "y": 33.59
+        },
+        {
+          "name": "玉山南峰",
+          "x": 77.62,
+          "y": 35.11
+        },
+        {
+          "name": "玉山主峰",
+          "x": 46.98,
+          "y": 32.16
+        }
+      ]
+    },
+    {
+      "filename": "KCS00741.jpg",
+      "tags": [
+        {
+          "name": "玉山北北峰",
+          "x": 17.54,
+          "y": 34.38
+        },
+        {
+          "name": "玉山北峰",
+          "x": 50.71,
+          "y": 31.5
+        }
+      ]
+    },
+    {
+      "filename": "KCS00815.jpg",
+      "tags": [
+        {
+          "name": "玉山南峰",
+          "x": 50.4,
+          "y": 28.43
+        }
+      ]
+    },
+    {
+      "filename": "KCS00534.jpg",
+      "tags": [
+        {
+          "name": "塔山",
+          "x": 33.37,
+          "y": 36.92
+        }
+      ]
+    },
+    {
+      "filename": "KCS00675.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS00753.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS00754.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS00756.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS00561.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS00789.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS00569.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS00871.jpg",
+      "tags": []
+    }
+  ]
+}

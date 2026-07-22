@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "title": "濁水溪",
+  "info": "2024.10",
+  "order": 10,
+  "cover": {
+    "photo": {
+      "kind": "local",
+      "filename": "KCS03677.jpg"
+    },
+    "zoom": 1,
+    "offset": {
+      "x": 50,
+      "y": 50
+    }
+  },
+  "photos": [
+    {
+      "filename": "KCS03631.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03636.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03640.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03643.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03651.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03657.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03666.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03668.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03669.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03673.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03677.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03681.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03694.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03696.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03699.jpg",
+      "tags": []
+    }
+  ]
+}

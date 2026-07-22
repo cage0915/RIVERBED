@@ -4,6 +4,9 @@
   "version": "0.0.1",
   "scripts": {
     "test": "node --test src/lib/*.test.mjs src/lib/albums/*.test.mjs",
+    "albums:migrate:check": "node scripts/migrate-album-manifests.mjs check",
+    "albums:migrate:write": "node scripts/migrate-album-manifests.mjs write",
+    "albums:validate": "node scripts/migrate-album-manifests.mjs validate",
     "dev": "astro dev",
     "contours:generate": "node scripts/generate-mountain-contours.mjs",
     "prebuild": "node scripts/prepare-contour-assets.mjs prepare",

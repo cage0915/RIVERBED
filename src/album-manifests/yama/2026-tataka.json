@@ -1,0 +1,320 @@
+{
+  "schemaVersion": 1,
+  "title": "塔塔加三山",
+  "info": "2026.1",
+  "order": 80,
+  "cover": {
+    "photo": {
+      "kind": "local",
+      "filename": "KCS00741.jpg"
+    },
+    "zoom": 1,
+    "offset": {
+      "x": 50,
+      "y": 50
+    }
+  },
+  "photos": [
+    {
+      "filename": "KCS00671.jpg",
+      "tags": [
+        {
+          "name": "大湖尖山",
+          "x": 22.52,
+          "y": 21.52
+        },
+        {
+          "name": "天雲山",
+          "x": 54.07,
+          "y": 21.81
+        }
+      ]
+    },
+    {
+      "filename": "KCS00670.jpg",
+      "tags": [
+        {
+          "name": "天雲山",
+          "x": 48.59,
+          "y": 14.69
+        }
+      ]
+    },
+    {
+      "filename": "KCS00696.jpg",
+      "tags": [
+        {
+          "name": "大塔山",
+          "x": 17.96,
+          "y": 38.74
+        },
+        {
+          "name": "松山",
+          "x": 84.34,
+          "y": 41.26
+        }
+      ]
+    },
+    {
+      "filename": "KCS00693.jpg",
+      "tags": [
+        {
+          "name": "大塔山",
+          "x": 40.09,
+          "y": 18.26
+        }
+      ]
+    },
+    {
+      "filename": "KCS00695.jpg",
+      "tags": [
+        {
+          "name": "松山",
+          "x": 45.34,
+          "y": 21.38
+        }
+      ]
+    },
+    {
+      "filename": "KCS00697.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS00707.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS00712.jpg",
+      "tags": [
+        {
+          "name": "郡大山",
+          "x": 54.89,
+          "y": 43.77
+        },
+        {
+          "name": "郡大山北峰",
+          "x": 22.68,
+          "y": 46.59
+        }
+      ]
+    },
+    {
+      "filename": "KCS00715.jpg",
+      "tags": [
+        {
+          "name": "關山北峰",
+          "x": 47.68,
+          "y": 47.43
+        },
+        {
+          "name": "鷹仔嘴山",
+          "x": 41.19,
+          "y": 48.52
+        },
+        {
+          "name": "塔關山",
+          "x": 38.46,
+          "y": 48.88
+        },
+        {
+          "name": "關山嶺山",
+          "x": 24.76,
+          "y": 48.64
+        },
+        {
+          "name": "玉德山",
+          "x": 19.95,
+          "y": 47.43
+        }
+      ]
+    },
+    {
+      "filename": "KCS00716.jpg",
+      "tags": [
+        {
+          "name": "關山北峰",
+          "x": 54.65,
+          "y": 37.16
+        },
+        {
+          "name": "鷹仔嘴山",
+          "x": 13.06,
+          "y": 43.05
+        }
+      ]
+    },
+    {
+      "filename": "KCS00720.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS00735.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS00729.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS00736.jpg",
+      "tags": [
+        {
+          "name": "郡大山",
+          "x": 60.58,
+          "y": 34.23
+        },
+        {
+          "name": "郡大山北峰",
+          "x": 36.46,
+          "y": 34.59
+        }
+      ]
+    },
+    {
+      "filename": "KCS00741.jpg",
+      "tags": [
+        {
+          "name": "郡大山",
+          "x": 47.36,
+          "y": 32.79
+        },
+        {
+          "name": "郡大山北峰",
+          "x": 23.96,
+          "y": 34.05
+        }
+      ]
+    },
+    {
+      "filename": "KCS00737.jpg",
+      "tags": [
+        {
+          "name": "新望嶺",
+          "x": 50.56,
+          "y": 41.38
+        }
+      ]
+    },
+    {
+      "filename": "KCS00743.jpg",
+      "tags": [
+        {
+          "name": "玉山北北峰",
+          "x": 34.78,
+          "y": 22.28
+        },
+        {
+          "name": "玉山北峰",
+          "x": 69.55,
+          "y": 18.8
+        }
+      ]
+    },
+    {
+      "filename": "KCS00761.jpg",
+      "tags": [
+        {
+          "name": "玉山北北峰",
+          "x": 40.79,
+          "y": 34.96
+        },
+        {
+          "name": "玉山北峰",
+          "x": 56.17,
+          "y": 33.28
+        }
+      ]
+    },
+    {
+      "filename": "KCS00762.jpg",
+      "tags": [
+        {
+          "name": "玉山北北峰",
+          "x": 31.65,
+          "y": 30.52
+        },
+        {
+          "name": "玉山北峰",
+          "x": 61.78,
+          "y": 26.07
+        }
+      ]
+    },
+    {
+      "filename": "KCS00749.jpg",
+      "tags": [
+        {
+          "name": "玉山南峰",
+          "x": 46.31,
+          "y": 22.22
+        }
+      ]
+    },
+    {
+      "filename": "KCS00772.jpg",
+      "tags": [
+        {
+          "name": "玉山南峰",
+          "x": 55.85,
+          "y": 39.47
+        }
+      ]
+    },
+    {
+      "filename": "KCS00771.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS00746.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS00780.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS00776.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS00784.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS00787.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS00849.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS00789.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS00818.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS00831.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS00862.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS00724.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS00872.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS00879.jpg",
+      "tags": []
+    }
+  ]
+}

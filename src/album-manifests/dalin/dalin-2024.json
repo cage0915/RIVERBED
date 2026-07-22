@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "title": "２０２４",
+  "info": "",
+  "order": 20,
+  "cover": {
+    "photo": {
+      "kind": "local",
+      "filename": "KCS00509.jpg"
+    },
+    "zoom": 1,
+    "offset": {
+      "x": 50,
+      "y": 50
+    }
+  },
+  "photos": [
+    {
+      "filename": "KCS00491.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS00502.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS00509.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS04912.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS04914.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS04918.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS04939.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS04962.jpg",
+      "tags": []
+    }
+  ]
+}

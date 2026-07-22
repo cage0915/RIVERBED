@@ -2,8 +2,8 @@
 
 ## Status
 
-Candidate design revised after review. This document does not authorize
-implementation.
+Accepted design under implementation. The storage layout was revised after
+Astro 4 rejected mixed MDX content and JSON data entries in one collection.
 
 ## Summary
 
@@ -31,9 +31,9 @@ catalog can hide those joins from consumers, but the physical sources can still
 drift.
 
 The manifest option makes mutable Album metadata structurally explicit and
-co-located. MDX remains the layout document, while the adjacent manifest is the
-validated inventory and metadata record for every local photo used by that
-MDX.
+paired by slug. MDX remains the layout document, while the manifest in a
+parallel source tree is the validated inventory and metadata record for every
+local photo used by that MDX.
 
 The design must not confuse a cross-Album query with cross-Album ownership. Tag
 view reads photos from their source Albums and renders their existing R2 URLs;
@@ -70,14 +70,20 @@ version 1.
 src/content/albums/
   yama/
     2026-hakuba.mdx
-    2026-hakuba.album.json
   k/
     2024-ldk.mdx
-    2024-ldk.album.json
+
+src/album-manifests/
+  yama/
+    2026-hakuba.json
+  k/
+    2024-ldk.json
 ```
 
-The shared basename is the Album ID. Folder and basename define the public
-slug, so `/yama/2026-hakuba` remains unchanged.
+The parallel relative path is the Album ID. Folder and basename define the
+public slug, so `/yama/2026-hakuba` remains unchanged. Manifests stay outside
+`src/content` because Astro 4 does not allow MDX content and JSON data entries
+inside the same collection.
 
 After migration:
 
@@ -217,7 +223,7 @@ cover; this permits an intentional cover-only source image without treating it
 as Album content.
 
 Frontmatter is reduced to the minimum required by Astro Content Collections, or
-removed if the selected loader can associate MDX with its adjacent manifest.
+removed once the catalog adapter associates MDX with its slug-paired manifest.
 Mutable Album metadata must not remain duplicated in frontmatter after cutover.
 
 ## Local Photo Resolution
@@ -336,7 +342,7 @@ introduced.
 ## Runtime and Build Data Flow
 
 ```text
-adjacent Album manifests ─> schema validation ─> normalized catalog
+slug-paired Album manifests ─> schema validation ─> normalized catalog
               MDX bodies ─> local-reference validation ─┘  ├─> home
                                                             ├─> folders
                                                             ├─> Albums
@@ -429,6 +435,19 @@ The migration avoids a long-lived mixed source of truth:
     `_order.json` files, migrated frontmatter fields, and migration code.
 11. Add a guard test that fails if retired legacy storage reappears.
 
+The migration gate exposed seven legacy-data defects that are repaired before
+the equivalence snapshot is generated:
+
+- remove stale, non-MDX tag entries `KCS07180.jpg` from
+  `yama/2025-omoteginza-d2`, `KCS01529.jpg` and `KCS01544.jpg` from
+  `yama/2026-hakuba`, and `KCS00947.jpg`, `KCS01012.jpg`, and `KCS01061.jpg`
+  from `yama/2026-yangmin-ten-peaks`;
+- correct the `KCS04452.jpg` tag coordinate in `yama/2026-jiaminghu-1` from
+  `y: -0.1` to the valid boundary `y: 0`.
+
+The converter remains strict: it reports stale keys and out-of-range
+coordinates instead of silently dropping or clamping them.
+
 Steps 6 through 10 should be completed in one feature branch. Production must
 not ship a state where some writers update manifests while readers still trust
 legacy sidecars.
@@ -448,7 +467,8 @@ This option changes editor persistence but keeps most operations Album-local:
   validated operation plan;
 - trash and source-Album deletion report blocking external covers;
 - reordering Albums updates manifest order values;
-- importing an Album creates adjacent MDX and manifest files;
+- importing an Album creates slug-paired MDX and manifest files in their
+  parallel source trees;
 - deleting an Album removes both files only after external cover conflicts are
   resolved.
 
@@ -532,7 +552,7 @@ content photo order, and tag-photo groupings must remain identical.
 
 ## Success Criteria
 
-- Every tracked Album has exactly one adjacent, schema-valid manifest.
+- Every tracked Album has exactly one slug-paired, schema-valid manifest.
 - Album MDX content references only local photos.
 - `src/album-tags` and Album `_order.json` files are retired.
 - Tag view aggregates source Album photos through catalog queries without new

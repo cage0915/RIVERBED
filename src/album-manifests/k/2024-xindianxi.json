@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "title": "新店溪",
+  "info": "2024.7, 2024.9",
+  "order": 20,
+  "cover": {
+    "photo": {
+      "kind": "local",
+      "filename": "KCS01648.jpg"
+    },
+    "zoom": 1,
+    "offset": {
+      "x": 50,
+      "y": 50
+    }
+  },
+  "photos": [
+    {
+      "filename": "KCS01648.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS01647.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS01654.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS01657.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS01653.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03550.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03556.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03567.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03587.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03609.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS03617.jpg",
+      "tags": []
+    }
+  ]
+}

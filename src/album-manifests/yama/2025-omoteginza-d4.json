@@ -1,0 +1,252 @@
+{
+  "schemaVersion": 1,
+  "title": "表銀座 D4",
+  "info": "2025.7 槍岳 - 上高地",
+  "order": 140,
+  "cover": {
+    "photo": {
+      "kind": "local",
+      "filename": "KCS08085.jpg"
+    },
+    "zoom": 1,
+    "offset": {
+      "x": 50,
+      "y": 50
+    }
+  },
+  "photos": [
+    {
+      "filename": "KCS08043.jpg",
+      "tags": [
+        {
+          "name": "富士山",
+          "x": 50.88,
+          "y": 38.22
+        },
+        {
+          "name": "甲斐駒ヶ岳",
+          "x": 90.71,
+          "y": 40.99
+        }
+      ]
+    },
+    {
+      "filename": "KCS08044.jpg",
+      "tags": [
+        {
+          "name": "富士山",
+          "x": 49.76,
+          "y": 45.79
+        },
+        {
+          "name": "甲斐駒ヶ岳",
+          "x": 63.62,
+          "y": 46.88
+        },
+        {
+          "name": "北岳",
+          "x": 81.97,
+          "y": 46.27
+        },
+        {
+          "name": "間ノ岳",
+          "x": 90.71,
+          "y": 46.03
+        },
+        {
+          "name": "赤石山脈",
+          "x": 74.28,
+          "y": 35.58
+        }
+      ]
+    },
+    {
+      "filename": "KCS08046.jpg",
+      "tags": [
+        {
+          "name": "赤岳",
+          "x": 76.68,
+          "y": 44.53
+        },
+        {
+          "name": "権現岳",
+          "x": 90.46,
+          "y": 45.73
+        },
+        {
+          "name": "三叉峰",
+          "x": 68.43,
+          "y": 45.25
+        },
+        {
+          "name": "天狗岳",
+          "x": 55.37,
+          "y": 46.94
+        },
+        {
+          "name": "横岳",
+          "x": 24.28,
+          "y": 48.74
+        },
+        {
+          "name": "蓼科山",
+          "x": 19.87,
+          "y": 47.36
+        },
+        {
+          "name": "蓼科山",
+          "x": 19.63,
+          "y": 47.24
+        },
+        {
+          "name": "八ヶ岳連峰",
+          "x": 52.8,
+          "y": 35.4
+        }
+      ]
+    },
+    {
+      "filename": "KCS08049.jpg",
+      "tags": [
+        {
+          "name": "槍ヶ岳",
+          "x": 79.73,
+          "y": 12.33
+        }
+      ]
+    },
+    {
+      "filename": "KCS08051.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS08053.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS08054.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS08056.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS08062.jpg",
+      "tags": [
+        {
+          "name": "槍ヶ岳",
+          "x": 61.3,
+          "y": 36.38
+        }
+      ]
+    },
+    {
+      "filename": "KCS08070.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS08080.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS08085.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS08084.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS08092.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS08104.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS08105.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS08148.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS08117.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS08132.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS08136.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS08149.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS08153.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS08171.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS08163.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS08169.jpg",
+      "tags": [
+        {
+          "name": "前穂高岳",
+          "x": 87.66,
+          "y": 23.8
+        },
+        {
+          "name": "明神岳",
+          "x": 36.38,
+          "y": 37.38
+        }
+      ]
+    },
+    {
+      "filename": "KCS08181.jpg",
+      "tags": [
+        {
+          "name": "明神岳",
+          "x": 62.82,
+          "y": 16.46
+        }
+      ]
+    },
+    {
+      "filename": "KCS08178.jpg",
+      "tags": [
+        {
+          "name": "明神岳",
+          "x": 47.68,
+          "y": 23.25
+        }
+      ]
+    },
+    {
+      "filename": "KCS08186.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS08193.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS08197.jpg",
+      "tags": []
+    }
+  ]
+}

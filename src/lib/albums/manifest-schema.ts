@@ -15,6 +15,16 @@ function requireRecord(value: unknown, field: string): Record<string, unknown> {
     return value;
 }
 
+function rejectUnknownFields(
+    value: Record<string, unknown>,
+    allowed: readonly string[],
+    field: string,
+): void {
+    const allowedSet = new Set(allowed);
+    const unknown = Object.keys(value).find((key) => !allowedSet.has(key));
+    if (unknown !== undefined) throw new Error(`${field} has unknown field: ${unknown}`);
+}
+
 function requireString(value: unknown, field: string): string {
     if (typeof value !== "string") throw new Error(`${field} must be a string`);
     return value;
@@ -54,6 +64,7 @@ function isIsoDate(value: string): boolean {
 
 function parseTag(value: unknown, index: number): PhotoTag {
     const tag = requireRecord(value, `tag ${index}`);
+    rejectUnknownFields(tag, ["name", "x", "y"], `tag ${index}`);
     const name = requireString(tag.name, `tag ${index} name`);
     if (!name.trim()) throw new Error(`tag ${index} name must not be empty`);
     return {
@@ -66,12 +77,14 @@ function parseTag(value: unknown, index: number): PhotoTag {
 function parseCoverPhoto(value: unknown): LocalCoverPhoto | ExternalCoverPhoto {
     const photo = requireRecord(value, "cover photo");
     if (photo.kind === "local") {
+        rejectUnknownFields(photo, ["kind", "filename"], "cover photo");
         return {
             kind: "local",
             filename: validateLocalPhotoFilename(requireString(photo.filename, "cover photo filename")),
         };
     }
     if (photo.kind === "external") {
+        rejectUnknownFields(photo, ["kind", "assetKey"], "cover photo");
         return {
             kind: "external",
             assetKey: normalizeAssetKey(requireString(photo.assetKey, "cover photo asset key")),
@@ -83,6 +96,11 @@ function parseCoverPhoto(value: unknown): LocalCoverPhoto | ExternalCoverPhoto {
 export function parseAlbumManifest(input: unknown, albumSlug: string): AlbumManifest {
     validateAlbumSlug(albumSlug);
     const manifest = requireRecord(input, "album manifest");
+    rejectUnknownFields(
+        manifest,
+        ["schemaVersion", "title", "info", "publishedAt", "order", "gap", "cover", "photos"],
+        "album manifest",
+    );
 
     if (manifest.schemaVersion !== 1) {
         throw new Error("album manifest has an unsupported schemaVersion");
@@ -99,10 +117,12 @@ export function parseAlbumManifest(input: unknown, albumSlug: string): AlbumMani
     if (!Number.isInteger(order)) throw new Error("order must be an integer");
 
     const coverInput = requireRecord(manifest.cover, "cover");
+    rejectUnknownFields(coverInput, ["photo", "zoom", "offset"], "cover");
     const coverPhoto = parseCoverPhoto(coverInput.photo);
     const zoom = requireFiniteNumber(coverInput.zoom, "cover zoom");
     if (zoom <= 0) throw new Error("cover zoom must be positive");
     const offsetInput = requireRecord(coverInput.offset, "cover offset");
+    rejectUnknownFields(offsetInput, ["x", "y"], "cover offset");
     const offset = {
         x: requireCoordinate(offsetInput.x, "cover offset x"),
         y: requireCoordinate(offsetInput.y, "cover offset y"),
@@ -112,6 +132,7 @@ export function parseAlbumManifest(input: unknown, albumSlug: string): AlbumMani
     const filenames = new Set<string>();
     const photos = manifest.photos.map((value, photoIndex) => {
         const photo = requireRecord(value, `photo ${photoIndex}`);
+        rejectUnknownFields(photo, ["filename", "caption", "tags"], `photo ${photoIndex}`);
         const filename = validateLocalPhotoFilename(
             requireString(photo.filename, `photo ${photoIndex} filename`),
         );

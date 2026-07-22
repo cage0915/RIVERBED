@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "title": "蘭陽溪",
+  "info": "2023.11 Llyung Mnibu",
+  "order": 30,
+  "cover": {
+    "photo": {
+      "kind": "local",
+      "filename": "KCS231104_1332_12191.jpg"
+    },
+    "zoom": 1,
+    "offset": {
+      "x": 50,
+      "y": 50
+    }
+  },
+  "photos": [
+    {
+      "filename": "KCS231104_1328_14688.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS231104_1330_26264.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS231104_1332_12191.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS231104_1335_17836.jpg",
+      "tags": [
+        {
+          "name": "龜山島",
+          "x": 49.76,
+          "y": 42.2
+        }
+      ]
+    },
+    {
+      "filename": "KCS231104_1340_08091.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS231104_1419_24735.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS231104_1419_42742.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS231104_1422_03221.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS231104_1430_41151.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS231104_1436_16727.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS231104_1443_42920.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS231104_1454_57520.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS231104_1456_03101.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS231104_1459_46121.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS231104_1501_49203.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS231104_1517_28872.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS231104_1530_57271.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS231104_1617_07032.jpg",
+      "tags": [
+        {
+          "name": "龜山島",
+          "x": 48.75,
+          "y": 41.25
+        }
+      ]
+    }
+  ]
+}

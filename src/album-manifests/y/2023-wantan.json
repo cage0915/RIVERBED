@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "title": "灣潭",
+  "info": "2023.11",
+  "order": 70,
+  "cover": {
+    "photo": {
+      "kind": "local",
+      "filename": "KCS231118_1245_25814.jpg"
+    },
+    "zoom": 1,
+    "offset": {
+      "x": 50,
+      "y": 40
+    }
+  },
+  "photos": [
+    {
+      "filename": "KCS231118_1034_52538.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS231118_1245_25814.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS231118_1232_20012.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS231118_1110_46509.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS231118_1113_20983.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS231118_1238_17641.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS231118_1215_21642.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS231118_1411_33138.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS231118_1133_23719.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS231118_1301_24891.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS231118_1302_13061.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS231118_1302_50404.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS231118_1303_59463.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS231118_1316_02920.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS231118_1458_08773.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS231118_1512_16530.jpg",
+      "tags": []
+    }
+  ]
+}

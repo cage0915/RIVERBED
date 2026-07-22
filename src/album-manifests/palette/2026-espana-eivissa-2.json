@@ -1,0 +1,236 @@
+{
+  "schemaVersion": 1,
+  "title": "Eivissa",
+  "info": "2026.4",
+  "order": 10,
+  "cover": {
+    "photo": {
+      "kind": "local",
+      "filename": "KCS02694.jpg"
+    },
+    "zoom": 1.7,
+    "offset": {
+      "x": 60,
+      "y": 45
+    }
+  },
+  "photos": [
+    {
+      "filename": "KCS02574.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02584.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02592.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02593.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02603.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02638.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02662.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0410-0913-37.045.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0410-0921-06.600.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02670.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02694.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02697.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02701.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02705.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0410-1353-17.222.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02703.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02708.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02716.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0410-1126-18.732.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02723.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0410-1120-12.724.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0410-1350-40.498.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0410-1349-00.754.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0410-1554-46.390.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0410-1538-58.353.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0410-1541-40.497.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02734.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02778.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02783.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02824.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0410-1959-26.626.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0411-1557-35.868.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0410-2033-49.214.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0410-2037-03.788.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0410-2041-41.891.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0411-0959-42.199.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0411-1001-03.690.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0411-1447-00.466.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0411-1447-23.565.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0411-1448-16.683.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0411-1338-27.716.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0411-1352-17.971.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0410-1855-15.971.jpg",
+      "tags": []
+    },
+    {
+      "filename": "2026-0410-1905-47.265.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02830.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02832.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02838.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02837.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS02842.jpg",
+      "tags": [
+        {
+          "name": "中央尖山",
+          "x": 58.17,
+          "y": 30.81
+        },
+        {
+          "name": "南湖大山",
+          "x": 47.35,
+          "y": 30.37
+        },
+        {
+          "name": "雪山主峰",
+          "x": 41.18,
+          "y": 31.98
+        },
+        {
+          "name": "大霸尖山",
+          "x": 23.42,
+          "y": 33.23
+        }
+      ]
+    }
+  ]
+}

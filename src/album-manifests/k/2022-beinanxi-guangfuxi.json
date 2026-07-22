@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "title": "卑南溪・光復溪",
+  "info": "2022.3",
+  "order": 50,
+  "cover": {
+    "photo": {
+      "kind": "local",
+      "filename": "000885290023.jpg"
+    },
+    "zoom": 1,
+    "offset": {
+      "x": 50,
+      "y": 50
+    }
+  },
+  "photos": [
+    {
+      "filename": "000885290009.jpg",
+      "tags": []
+    },
+    {
+      "filename": "000885290020.jpg",
+      "tags": []
+    },
+    {
+      "filename": "000885290014.jpg",
+      "tags": []
+    },
+    {
+      "filename": "000885290023.jpg",
+      "tags": []
+    },
+    {
+      "filename": "000885290024.jpg",
+      "tags": []
+    },
+    {
+      "filename": "000885290027.jpg",
+      "tags": []
+    },
+    {
+      "filename": "000885290033.jpg",
+      "tags": []
+    },
+    {
+      "filename": "000885290034.jpg",
+      "tags": []
+    },
+    {
+      "filename": "000885290035.jpg",
+      "tags": []
+    },
+    {
+      "filename": "000885290036.jpg",
+      "tags": []
+    }
+  ]
+}

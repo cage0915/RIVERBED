@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Replace distributed Album frontmatter, tag sidecars, and order files with one adjacent manifest per Album while keeping content photos local, deriving Tag view across source Albums, and allowing only external cover references.
+**Goal:** Replace distributed Album frontmatter, tag sidecars, and order files with one slug-paired manifest per Album while keeping content photos local, deriving Tag view across source Albums, and allowing only external cover references.
 
 **Architecture:** Pure manifest/schema and catalog-core modules validate injected records without Astro globals; a thin Astro source adapter joins manifests with MDX entries. A one-shot migration produces manifests and equivalence snapshots before production readers and DevTool writers cut over. Legacy files are deleted only after all readers and writers use manifests and repository-wide validation passes.
 
@@ -37,7 +37,9 @@ Modified consumers:
 
 Generated migration output:
 
-- `src/content/albums/<folder>/<album>.album.json` for all 67 Albums.
+- `src/album-manifests/<folder>/<album>.json` for all 67 Albums. This parallel
+  root avoids Astro 4's prohibition on mixing MDX content and JSON data entries
+  inside one collection.
 - MDX frontmatter reduced after the equivalence gate.
 - `src/album-tags` and Album `_order.json` files removed only in Task 10.
 
@@ -383,6 +385,14 @@ Run: `npm run albums:migrate:check`
 
 Expected: exit 0 with 67 candidate manifests and zero unresolved diagnostics.
 
+The zero-diagnostic baseline includes seven explicit legacy-data repairs found
+by the gate: six tag-sidecar photo keys absent from their Album MDX are removed
+(`d2/KCS07180.jpg`, `hakuba/KCS01529.jpg`, `hakuba/KCS01544.jpg`,
+`yangmin-ten-peaks/KCS00947.jpg`, `KCS01012.jpg`, and `KCS01061.jpg`), and the
+`jiaminghu-1/KCS04452.jpg` tag coordinate is corrected from `y: -0.1` to `y: 0`.
+The converter must continue rejecting both defect classes; it must not silently
+repair future inputs.
+
 - [ ] **Step 6: Generate manifests and run equivalence validation**
 
 Run: `npm run albums:migrate:write && npm run albums:validate`
@@ -396,7 +406,7 @@ external reference to its `d2` source photo.
 - [ ] **Step 7: Commit converter and generated manifests**
 
 ```bash
-git add package.json scripts/migrate-album-manifests.mjs src/lib/albums src/lib/album-manifest-repository.test.mjs src/content/albums
+git add package.json scripts/migrate-album-manifests.mjs src/lib/albums src/lib/album-manifest-repository.test.mjs src/album-manifests src/album-tags docs/superpowers
 git commit -m "feat: generate album manifests"
 ```
 
@@ -414,7 +424,7 @@ git commit -m "feat: generate album manifests"
 
 - [ ] **Step 1: Add failing source-adapter contract assertions**
 
-Extend the repository test to assert every MDX slug has exactly one adjacent
+Extend the repository test to assert every MDX slug has exactly one paired
 manifest and the catalog summaries match the legacy route, title, order, cover,
 and publication snapshots.
 
@@ -424,12 +434,12 @@ Use eager globs:
 
 ```ts
 const manifestModules = import.meta.glob(
-  "/src/content/albums/**/*.album.json",
+  "/src/album-manifests/**/*.json",
   { eager: true },
 );
 ```
 
-Join by `/src/content/albums/${album.slug}.album.json`, parse through
+Join by `/src/album-manifests/${album.slug}.json`, parse through
 `parseAlbumManifest`, and create one cached catalog promise per build process.
 Expose `getAlbumCatalog()`, `getAlbumSummaries()`, `getAlbumBySlug()`, and
 `getTaggedPhotos()`.
@@ -629,7 +639,7 @@ listing consumer Albums while external covers exist.
 
 - [ ] **Step 2: Make imports create MDX and manifest together**
 
-Create minimal MDX layout plus an adjacent valid manifest with local cover,
+Create minimal MDX layout plus a slug-paired valid manifest with local cover,
 photo inventory, empty tags, publication date, and next order increment. If
 either proposed file fails validation, write neither.
 
@@ -714,7 +724,7 @@ Create/update root `README.md` with:
 
 ```text
 MDX = layout and prose
-.album.json = Album metadata, local photo inventory, tags, photo captions
+src/album-manifests/*.json = Album metadata, local photo inventory, tags, photo captions
 R2 = image bytes
 Tag view = derived catalog query
 external cover = only supported persistent cross-Album photo reference

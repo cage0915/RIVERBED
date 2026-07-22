@@ -1,0 +1,350 @@
+{
+  "schemaVersion": 1,
+  "title": "陽明山十連峰",
+  "info": "2026.1",
+  "order": 70,
+  "cover": {
+    "photo": {
+      "kind": "local",
+      "filename": "KCS01071.jpg"
+    },
+    "zoom": 1.2,
+    "offset": {
+      "x": 50,
+      "y": 40
+    }
+  },
+  "photos": [
+    {
+      "filename": "KCS00911.jpg",
+      "tags": [
+        {
+          "name": "紗帽山",
+          "x": 58.49,
+          "y": 45.28
+        },
+        {
+          "name": "觀音山",
+          "x": 83.57,
+          "y": 37.11
+        }
+      ]
+    },
+    {
+      "filename": "KCS00914.jpg",
+      "tags": [
+        {
+          "name": "紗帽山",
+          "x": 76.6,
+          "y": 35.48
+        }
+      ]
+    },
+    {
+      "filename": "KCS00923.jpg",
+      "tags": [
+        {
+          "name": "觀音山",
+          "x": 69.79,
+          "y": 43.36
+        }
+      ]
+    },
+    {
+      "filename": "KCS00937.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS00943.jpg",
+      "tags": [
+        {
+          "name": "紗帽山",
+          "x": 63.54,
+          "y": 61.03
+        }
+      ]
+    },
+    {
+      "filename": "KCS00965.jpg",
+      "tags": [
+        {
+          "name": "七星山",
+          "x": 44.63,
+          "y": 17.23
+        }
+      ]
+    },
+    {
+      "filename": "KCS00964.jpg",
+      "tags": [
+        {
+          "name": "七星山",
+          "x": 37.02,
+          "y": 12.07
+        }
+      ]
+    },
+    {
+      "filename": "KCS00981.jpg",
+      "tags": [
+        {
+          "name": "大屯山西峰",
+          "x": 55.37,
+          "y": 35.38
+        },
+        {
+          "name": "大屯山南峰",
+          "x": 20.35,
+          "y": 44.58
+        },
+        {
+          "name": "面天山",
+          "x": 91.03,
+          "y": 32.44
+        },
+        {
+          "name": "向天山",
+          "x": 81.33,
+          "y": 33.34
+        },
+        {
+          "name": "觀音山",
+          "x": 55.05,
+          "y": 29.13
+        }
+      ]
+    },
+    {
+      "filename": "KCS00972.jpg",
+      "tags": [
+        {
+          "name": "大屯山南峰",
+          "x": 60.18,
+          "y": 48.72
+        }
+      ]
+    },
+    {
+      "filename": "KCS00976.jpg",
+      "tags": [
+        {
+          "name": "大屯山西峰",
+          "x": 48.64,
+          "y": 26.79
+        }
+      ]
+    },
+    {
+      "filename": "KCS00978.jpg",
+      "tags": [
+        {
+          "name": "七星山",
+          "x": 57.05,
+          "y": 31.31
+        }
+      ]
+    },
+    {
+      "filename": "KCS00986.jpg",
+      "tags": [
+        {
+          "name": "七星山",
+          "x": 61.86,
+          "y": 28.18
+        }
+      ]
+    },
+    {
+      "filename": "KCS00989.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS00991.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS01005.jpg",
+      "tags": [
+        {
+          "name": "大屯山",
+          "x": 49.84,
+          "y": 25.06
+        }
+      ]
+    },
+    {
+      "filename": "KCS01008.jpg",
+      "tags": [
+        {
+          "name": "大屯山西峰",
+          "x": 64.74,
+          "y": 25.01
+        }
+      ]
+    },
+    {
+      "filename": "KCS01015.jpg",
+      "tags": [
+        {
+          "name": "大屯山",
+          "x": 34.46,
+          "y": 40.06
+        },
+        {
+          "name": "大屯山南峰",
+          "x": 91.43,
+          "y": 53.1
+        },
+        {
+          "name": "七星山",
+          "x": 69.63,
+          "y": 46.01
+        }
+      ]
+    },
+    {
+      "filename": "KCS01010.jpg",
+      "tags": [
+        {
+          "name": "大屯山",
+          "x": 55.45,
+          "y": 34.67
+        }
+      ]
+    },
+    {
+      "filename": "KCS01011.jpg",
+      "tags": [
+        {
+          "name": "大屯山南峰",
+          "x": 63.62,
+          "y": 13.9
+        }
+      ]
+    },
+    {
+      "filename": "KCS01022.jpg",
+      "tags": [
+        {
+          "name": "面天山",
+          "x": 55.29,
+          "y": 36.57
+        },
+        {
+          "name": "向天山",
+          "x": 35.5,
+          "y": 40.78
+        }
+      ]
+    },
+    {
+      "filename": "KCS01042.jpg",
+      "tags": [
+        {
+          "name": "觀音山",
+          "x": 55.69,
+          "y": 32.36
+        }
+      ]
+    },
+    {
+      "filename": "KCS01048.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS01050.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS01067.jpg",
+      "tags": [
+        {
+          "name": "竹子山",
+          "x": 54.09,
+          "y": 25.28
+        }
+      ]
+    },
+    {
+      "filename": "KCS01057.jpg",
+      "tags": [
+        {
+          "name": "大屯山",
+          "x": 54.49,
+          "y": 28.59
+        }
+      ]
+    },
+    {
+      "filename": "KCS01071.jpg",
+      "tags": [
+        {
+          "name": "觀音山",
+          "x": 55.61,
+          "y": 36.16
+        }
+      ]
+    },
+    {
+      "filename": "KCS01060.jpg",
+      "tags": [
+        {
+          "name": "觀音山",
+          "x": 50.37,
+          "y": 40.86
+        },
+        {
+          "name": "向天山",
+          "x": 47.31,
+          "y": 53.62
+        }
+      ]
+    },
+    {
+      "filename": "KCS01062.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS01065.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS00950.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS01090.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS00891.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS00956.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS01084.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS01092.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS01093.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS01101.jpg",
+      "tags": [
+        {
+          "name": "觀音山",
+          "x": 60.26,
+          "y": 35.74
+        }
+      ]
+    }
+  ]
+}

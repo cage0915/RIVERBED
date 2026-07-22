@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "title": "２０２２",
+  "order": 30,
+  "cover": {
+    "photo": {
+      "kind": "local",
+      "filename": "09.jpg"
+    },
+    "zoom": 1,
+    "offset": {
+      "x": 50,
+      "y": 50
+    }
+  },
+  "photos": [
+    {
+      "filename": "01.jpg",
+      "tags": []
+    },
+    {
+      "filename": "02.jpg",
+      "tags": []
+    },
+    {
+      "filename": "03.jpg",
+      "tags": []
+    },
+    {
+      "filename": "04.jpg",
+      "tags": []
+    },
+    {
+      "filename": "05.jpg",
+      "tags": []
+    },
+    {
+      "filename": "07.jpg",
+      "tags": []
+    },
+    {
+      "filename": "08.jpg",
+      "tags": []
+    },
+    {
+      "filename": "09.jpg",
+      "tags": []
+    },
+    {
+      "filename": "10.jpg",
+      "tags": []
+    },
+    {
+      "filename": "11.jpg",
+      "tags": []
+    },
+    {
+      "filename": "12.jpg",
+      "tags": []
+    }
+  ]
+}

@@ -181,3 +181,23 @@ test("rejects unsupported versions, empty titles, and malformed cover unions", (
         assert.throws(() => parseAlbumManifest(manifest, "taiwan/morning-walk"));
     }
 });
+
+test("rejects unknown keys at every persisted manifest object boundary", () => {
+    const cases = [
+        ["album manifest", (manifest) => { manifest.unexpected = true; }],
+        ["cover", (manifest) => { manifest.cover.unexpected = true; }],
+        ["cover photo", (manifest) => { manifest.cover.photo.unexpected = true; }],
+        ["cover offset", (manifest) => { manifest.cover.offset.unexpected = true; }],
+        ["photo 0", (manifest) => { manifest.photos[0].unexpected = true; }],
+        ["tag 0", (manifest) => { manifest.photos[0].tags[0].unexpected = true; }],
+    ];
+
+    for (const [boundary, mutate] of cases) {
+        const manifest = structuredClone(validManifest());
+        mutate(manifest);
+        assert.throws(
+            () => parseAlbumManifest(manifest, "taiwan/morning-walk"),
+            new RegExp(`${boundary}.*unknown field`, "i"),
+        );
+    }
+});
