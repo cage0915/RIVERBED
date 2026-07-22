@@ -152,6 +152,7 @@ test("resolves external covers only to tracked manifest inventory", () => {
             message: "External cover asset \"yama/source/not-tracked.jpg\" is not tracked by any Album manifest inventory",
             albumSlug: "k/missing",
             sourcePath: "src/content/albums/k/missing.album.json",
+            manifestPath: "src/content/albums/k/missing.album.json",
             fieldPath: "cover.photo.assetKey",
         }],
     );
@@ -173,6 +174,7 @@ test("rejects a same-Album photo encoded as an external cover", () => {
         message: "External cover asset \"yama/self-reference/A.jpg\" belongs to the consumer Album; use a local cover reference",
         albumSlug: "yama/self-reference",
         sourcePath: "src/content/albums/yama/self-reference.album.json",
+        manifestPath: "src/content/albums/yama/self-reference.album.json",
         fieldPath: "cover.photo.assetKey",
     }]);
 });
@@ -229,6 +231,7 @@ test("reports and skips an invalid Album slug", () => {
         message: "Invalid album slug: not-a-slug",
         albumSlug: "not-a-slug",
         sourcePath: "src/content/albums/not-a-slug.album.json",
+        manifestPath: "src/content/albums/not-a-slug.album.json",
         fieldPath: "slug",
     }]);
 });

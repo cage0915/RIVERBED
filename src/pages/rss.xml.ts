@@ -1,6 +1,6 @@
 import rss from "@astrojs/rss";
-import { getCollection } from "astro:content";
 import type { APIContext } from "astro";
+import { getAlbumSummaries } from "../lib/albums/catalog";
 import { getFolderTitle, getImageUrl } from "../lib/constants";
 
 export const prerender = true;
@@ -17,9 +17,10 @@ export async function GET({ site }: APIContext) {
         throw new Error("RSS requires the site URL in astro.config.mjs");
     }
 
-    const albums = (await getCollection("albums", ({ data }) => Boolean(data.publishedAt)))
+    const albums = (await getAlbumSummaries())
+        .filter((album) => Boolean(album.publishedAt))
         .sort((a, b) => {
-            const dateDifference = b.data.publishedAt!.getTime() - a.data.publishedAt!.getTime();
+            const dateDifference = Date.parse(b.publishedAt!) - Date.parse(a.publishedAt!);
             return dateDifference || a.slug.localeCompare(b.slug);
         });
 
@@ -28,21 +29,19 @@ export async function GET({ site }: APIContext) {
         description: "RIVERBED photography albums",
         site,
         items: albums.map((album) => {
-            const folder = album.slug.split("/")[0];
-            const resolvedCoverKey = album.data.coverKey.includes("/")
-                ? album.data.coverKey
-                : `${album.slug}/${album.data.coverKey}`;
+            const folder = album.folder;
+            const resolvedCoverKey = album.cover.assetKey;
             const coverUrl = getImageUrl(resolvedCoverKey);
-            const info = album.data.info?.trim();
+            const info = album.info?.trim();
 
             return {
-                title: album.data.title,
+                title: album.title,
                 description: info || getFolderTitle(folder),
-                pubDate: album.data.publishedAt,
+                pubDate: new Date(`${album.publishedAt}T00:00:00Z`),
                 link: `/${album.slug}`,
                 categories: [getFolderTitle(folder)],
                 content: [
-                    `<p><img src="${escapeHtml(coverUrl)}" alt="${escapeHtml(album.data.title)}" /></p>`,
+                    `<p><img src="${escapeHtml(coverUrl)}" alt="${escapeHtml(album.title)}" /></p>`,
                     info ? `<p>${escapeHtml(info)}</p>` : "",
                 ].join(""),
             };

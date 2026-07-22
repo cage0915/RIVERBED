@@ -6,6 +6,7 @@ export type AlbumDiagnostic = {
     message: string;
     albumSlug: string;
     sourcePath: string;
+    manifestPath: string;
     fieldPath?: string;
 };
 
@@ -29,6 +30,7 @@ export function validateAlbumInventory(input: AlbumInventoryInput): AlbumDiagnos
             message: error.message,
             albumSlug,
             sourcePath: mdxPath,
+            manifestPath,
             fieldPath: `Photo@${error.offset}`,
         }];
     }
@@ -45,6 +47,7 @@ export function validateAlbumInventory(input: AlbumInventoryInput): AlbumDiagnos
                 message: `Duplicate MDX Photo reference ${JSON.stringify(reference.filename)}; first referenced at offset ${firstOffset}`,
                 albumSlug,
                 sourcePath: mdxPath,
+                manifestPath,
                 fieldPath: `Photo@${reference.offset}`,
             });
         } else {
@@ -57,6 +60,7 @@ export function validateAlbumInventory(input: AlbumInventoryInput): AlbumDiagnos
                 message: `MDX Photo ${JSON.stringify(reference.filename)} is missing from the Album manifest photos inventory`,
                 albumSlug,
                 sourcePath: mdxPath,
+                manifestPath,
                 fieldPath: `Photo@${reference.offset}`,
             });
         }
@@ -74,6 +78,7 @@ export function validateAlbumInventory(input: AlbumInventoryInput): AlbumDiagnos
                 message: `Manifest photo ${JSON.stringify(filename)} is not referenced by MDX and is not the selected local cover`,
                 albumSlug,
                 sourcePath: manifestPath,
+                manifestPath,
                 fieldPath: `photos[${index}].filename`,
             });
         }
@@ -94,6 +99,7 @@ export function validateAlbumInventory(input: AlbumInventoryInput): AlbumDiagnos
             message: `Manifest content photo order [${manifestContentOrder.join(", ")}] does not match MDX order [${mdxContentOrder.join(", ")}]`,
             albumSlug,
             sourcePath: manifestPath,
+            manifestPath,
             fieldPath: "photos",
         });
     }

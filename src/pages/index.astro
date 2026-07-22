@@ -1,6 +1,6 @@
 ---
-import { getCollection } from "astro:content";
 import Layout from "../layouts/Layout.astro";
+import { getAlbumSummaries } from "../lib/albums/catalog";
 import {
     getFolderTitle,
     getFolderOrder,
@@ -8,34 +8,23 @@ import {
     R2_DOMAIN,
 } from "../lib/constants";
 
-// Get all albums
-const allAlbums = await getCollection("albums");
-
-// Load external order using import.meta.glob
-const orderFiles = import.meta.glob("../content/albums/**/_order.json", { eager: true });
-
-const getAlbumOrderIndex = (slug: string) => {
-    const [folder, album] = slug.split("/");
-    const orderData = orderFiles[`../content/albums/${folder}/_order.json`] as
-        | { default: string[] }
-        | undefined;
-    const index = orderData?.default.indexOf(album) ?? -1;
-    return index === -1 ? Number.MAX_SAFE_INTEGER : index;
-};
+const allAlbums = await getAlbumSummaries();
 
 const latestAlbum = [...allAlbums].sort((a, b) => {
     const dateDifference =
-        (b.data.publishedAt?.getTime() ?? 0) -
-        (a.data.publishedAt?.getTime() ?? 0);
+        (b.publishedAt ? Date.parse(b.publishedAt) : 0) -
+        (a.publishedAt ? Date.parse(a.publishedAt) : 0);
     if (dateDifference !== 0) return dateDifference;
 
-    const orderDifference = getAlbumOrderIndex(a.slug) - getAlbumOrderIndex(b.slug);
+    const orderDifference = a.order - b.order;
     return orderDifference || a.slug.localeCompare(b.slug);
 })[0];
 
-const latestAlbumCoverKey = latestAlbum.data.coverKey.includes("/")
-    ? latestAlbum.data.coverKey
-    : `${latestAlbum.slug}/${latestAlbum.data.coverKey}`;
+if (!latestAlbum) {
+    throw new Error("Home page requires at least one Album in the catalog");
+}
+
+const latestAlbumCoverKey = latestAlbum.cover.assetKey;
 const latestAlbumFolder = latestAlbum.slug.split("/")[0];
 
 // Group albums by folder, sorted by album order (matching folder page logic)
@@ -54,41 +43,19 @@ const folderMap = new Map<
 for (const slug of folderSlugs) {
     const albumsInFolder = allAlbums.filter((album) => album.slug.startsWith(`${slug}/`));
 
-    // Sort according to _order.json if exists
-    const targetOrderPath = `../content/albums/${slug}/_order.json`;
-    const orderData = orderFiles[targetOrderPath] as { default: string[] } | undefined;
-    const order = orderData ? orderData.default : [];
-
-    albumsInFolder.sort((a, b) => {
-        const albumSlugA = a.slug.split("/")[1];
-        const albumSlugB = b.slug.split("/")[1];
-        const idxA = order.indexOf(albumSlugA);
-        const idxB = order.indexOf(albumSlugB);
-
-        if (idxA !== -1 && idxB !== -1) return idxA - idxB;
-        if (idxA !== -1) return -1;
-        if (idxB !== -1) return 1;
-        return (b.data.order ?? 0) - (a.data.order ?? 0);
-    });
-
     folderMap.set(slug, albumsInFolder.map(album => {
-        const resolvedCoverKey = album.data.coverKey.includes("/")
-            ? album.data.coverKey
-            : `${album.slug}/${album.data.coverKey}`;
+        const resolvedCoverKey = album.cover.assetKey;
         return {
             coverUrl: getImageUrl(resolvedCoverKey),
             fallbackUrl: `${R2_DOMAIN}/${resolvedCoverKey}`,
-            title: album.data.title,
-            coverZoom: album.data.coverZoom,
-            coverOffset: album.data.coverOffset,
+            title: album.title,
+            coverZoom: album.cover.zoom,
+            coverOffset: album.cover.offset,
         };
     }));
 }
 
 const isDev = import.meta.env.DEV;
-
-const globalOrderData = orderFiles["../content/albums/_order.json"] as { default: string[] } | undefined;
-const globalOrder = globalOrderData ? globalOrderData.default : [];
 
 const sortedFolders = folderSlugs
     .map((slug) => ({
@@ -97,14 +64,7 @@ const sortedFolders = folderSlugs
         order: getFolderOrder(slug),
         covers: folderMap.get(slug) ?? [],
     }))
-    .sort((a, b) => {
-        const idxA = globalOrder.indexOf(a.id);
-        const idxB = globalOrder.indexOf(b.id);
-        if (idxA !== -1 && idxB !== -1) return idxA - idxB;
-        if (idxA !== -1) return -1;
-        if (idxB !== -1) return 1;
-        return a.order - b.order;
-    });
+    .sort((a, b) => a.order - b.order);
 
 ---
 
@@ -116,10 +76,10 @@ const sortedFolders = folderSlugs
                     <div class="album-cover latest-post-cover">
                         <img
                             src={getImageUrl(latestAlbumCoverKey)}
-                            alt={latestAlbum.data.title}
+                            alt={latestAlbum.title}
                             loading="eager"
                             class="slide active"
-                            style={`--zoom: ${latestAlbum.data.coverZoom ?? 1}; --ox: ${latestAlbum.data.coverOffset?.x ?? 50}%; --oy: ${latestAlbum.data.coverOffset?.y ?? 50}%;`}
+                            style={`--zoom: ${latestAlbum.cover.zoom}; --ox: ${latestAlbum.cover.offset.x}%; --oy: ${latestAlbum.cover.offset.y}%;`}
                             onerror={
                                 isDev
                                     ? `this.onerror=null; this.src='${R2_DOMAIN}/${latestAlbumCoverKey}';`
@@ -131,9 +91,9 @@ const sortedFolders = folderSlugs
                                 <p class="latest-post-label">
                                     Latest · {getFolderTitle(latestAlbumFolder)}
                                 </p>
-                                <h1 class="album-title">{latestAlbum.data.title}</h1>
-                                {latestAlbum.data.info && (
-                                    <p class="latest-post-meta">{latestAlbum.data.info}</p>
+                                <h1 class="album-title">{latestAlbum.title}</h1>
+                                {latestAlbum.info && (
+                                    <p class="latest-post-meta">{latestAlbum.info}</p>
                                 )}
                             </div>
                         </div>

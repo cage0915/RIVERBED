@@ -281,3 +281,73 @@ test("CLI runner exposes read-only check, write, and equivalence validate modes"
         validate: "node scripts/migrate-album-manifests.mjs validate",
     });
 });
+
+test("production catalog pairs every MDX with one manifest and preserves legacy summaries", () => {
+    const projectRoot = path.resolve(path.dirname(migrationScript), "..");
+    const catalogPath = path.join(projectRoot, "src/lib/albums/catalog.ts");
+
+    assert.ok(fs.existsSync(catalogPath), "Astro catalog adapter must exist");
+
+    const plan = createLegacyMigrationPlan(projectRoot);
+    assert.deepEqual(plan.diagnostics, []);
+    assert.equal(plan.candidates.length, 67);
+
+    const legacySummaries = plan.candidates.map(({ slug, manifest }) => ({
+        route: `/${slug}`,
+        title: manifest.title,
+        order: manifest.order,
+        coverKey: manifest.cover.photo.kind === "local"
+            ? `${slug}/${manifest.cover.photo.filename}`
+            : manifest.cover.photo.assetKey,
+        publishedAt: manifest.publishedAt,
+    }));
+    const manifestSummaries = plan.candidates.map(({ slug, manifestPath }) => {
+        const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+        return {
+            route: `/${slug}`,
+            title: manifest.title,
+            order: manifest.order,
+            coverKey: manifest.cover.photo.kind === "local"
+                ? `${slug}/${manifest.cover.photo.filename}`
+                : manifest.cover.photo.assetKey,
+            publishedAt: manifest.publishedAt,
+        };
+    });
+
+    assert.deepEqual(manifestSummaries, legacySummaries);
+    assert.deepEqual(
+        manifestSummaries.find(({ route }) => route === "/yama/2025-omoteginza-d3"),
+        {
+            route: "/yama/2025-omoteginza-d3",
+            title: "表銀座 D3",
+            order: 150,
+            coverKey: "yama/2025-omoteginza-d2/KCS06809.jpg",
+            publishedAt: undefined,
+        },
+    );
+
+    const catalogSource = fs.readFileSync(catalogPath, "utf8");
+    assert.match(catalogSource, /import\.meta\.glob\(\s*["']\/src\/album-manifests\/\*\*\/\*\.json["']/);
+    for (const api of ["getAlbumCatalog", "getAlbumSummaries", "getAlbumBySlug", "getTaggedPhotos"]) {
+        assert.match(catalogSource, new RegExp(`export\\s+(?:async\\s+)?function\\s+${api}\\b`));
+    }
+});
+
+test("production catalog readers do not read legacy Album metadata or order files", () => {
+    const projectRoot = path.resolve(path.dirname(migrationScript), "..");
+    const readers = [
+        "src/pages/index.astro",
+        "src/pages/[folder]/index.astro",
+        "src/layouts/Layout.astro",
+        "src/pages/rss.xml.ts",
+    ];
+
+    for (const relativePath of readers) {
+        const source = fs.readFileSync(path.join(projectRoot, relativePath), "utf8");
+        assert.doesNotMatch(source, /_order\.json|\.data\.(?:title|info|publishedAt|coverKey|coverZoom|coverOffset|order|gap)\b/);
+        assert.match(source, /lib\/albums\/catalog/);
+    }
+
+    const homeSource = fs.readFileSync(path.join(projectRoot, "src/pages/index.astro"), "utf8");
+    assert.match(homeSource, /Home page requires at least one Album in the catalog/);
+});

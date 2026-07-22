@@ -39,12 +39,14 @@ test("turns MDX Photo syntax errors into a stable diagnostic", () => {
             code: diagnostics[0].code,
             albumSlug: diagnostics[0].albumSlug,
             sourcePath: diagnostics[0].sourcePath,
+            manifestPath: diagnostics[0].manifestPath,
             fieldPath: diagnostics[0].fieldPath,
         },
         {
             code: "mdx-photo-syntax",
             albumSlug: "yama/walk",
             sourcePath: "src/content/albums/yama/walk.mdx",
+            manifestPath: "src/content/albums/yama/walk.album.json",
             fieldPath: "Photo@0",
         },
     );

@@ -1,11 +1,11 @@
 ---
-import { getCollection } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
+import { getAlbumSummaries } from "../../lib/albums/catalog";
 import { getFolderTitle, getFolderCols, getImageUrl, R2_DOMAIN, FOLDER_METADATA } from "../../lib/constants";
 import { folderPathParams } from "../../lib/static-paths";
 
 export async function getStaticPaths() {
-    const albums = await getCollection("albums");
+    const albums = await getAlbumSummaries();
     return folderPathParams(
         albums.map((album) => album.slug),
         Object.keys(FOLDER_METADATA),
@@ -15,30 +15,8 @@ export async function getStaticPaths() {
 const { folder } = Astro.params;
 
 // Get all albums in this folder by checking the slug prefix
-const allAlbums = await getCollection("albums");
-let folderAlbums = allAlbums.filter((album) => album.slug.startsWith(`${folder}/`));
-
-// Load external order using import.meta.glob (works in production/Cloudflare)
-const orderFiles = import.meta.glob("../../content/albums/**/_order.json", { eager: true });
-const targetOrderPath = `../../content/albums/${folder}/_order.json`;
-const orderData = orderFiles[targetOrderPath] as { default: string[] } | undefined;
-const order = orderData ? orderData.default : [];
-
-if (order.length > 0) {
-    folderAlbums.sort((a, b) => {
-        const slugA = a.slug.split("/")[1];
-        const slugB = b.slug.split("/")[1];
-        const idxA = order.indexOf(slugA);
-        const idxB = order.indexOf(slugB);
-
-        if (idxA !== -1 && idxB !== -1) return idxA - idxB;
-        if (idxA !== -1) return -1;
-        if (idxB !== -1) return 1;
-        return (b.data.order ?? 0) - (a.data.order ?? 0);
-    });
-} else {
-    folderAlbums.sort((a, b) => (b.data.order ?? 0) - (a.data.order ?? 0));
-}
+const allAlbums = await getAlbumSummaries();
+const folderAlbums = allAlbums.filter((album) => album.folder === folder);
 
 const isExistentFolder = folder && (folder in FOLDER_METADATA || folderAlbums.length > 0);
 
@@ -84,19 +62,20 @@ const isYama = folder === "yama";
                 folderAlbums.length > 0 ? (
                     folderAlbums.map((album) => {
                         const albumSlug = album.slug.split("/")[1];
-                        const resolvedCoverKey = album.data.coverKey.includes("/")
-                            ? album.data.coverKey
-                            : `${album.slug}/${album.data.coverKey}`;
+                        const resolvedCoverKey = album.cover.assetKey;
+                        const storedCoverKey = album.cover.photo.kind === "local"
+                            ? album.cover.photo.filename
+                            : album.cover.photo.assetKey;
                         const coverUrl = getImageUrl(resolvedCoverKey);
                         const fallbackUrl = `${R2_DOMAIN}/${resolvedCoverKey}`;
                         return (
                             <div
                                 class="album-card group"
                                 data-album-slug={album.slug}
-                                data-cover-key={album.data.coverKey}
-                                data-cover-zoom={album.data.coverZoom ?? 1}
-                                data-cover-offset-x={album.data.coverOffset?.x ?? 50}
-                                data-cover-offset-y={album.data.coverOffset?.y ?? 50}
+                                data-cover-key={storedCoverKey}
+                                data-cover-zoom={album.cover.zoom}
+                                data-cover-offset-x={album.cover.offset.x}
+                                data-cover-offset-y={album.cover.offset.y}
                             >
                                 <a
                                     href={`/${folder}/${albumSlug}`}
@@ -105,9 +84,9 @@ const isYama = folder === "yama";
                                     <div class="album-cover">
                                         <img
                                             src={coverUrl}
-                                            alt={album.data.title}
+                                            alt={album.title}
                                             loading="lazy"
-                                            style={`--zoom: ${album.data.coverZoom ?? 1}; --ox: ${album.data.coverOffset?.x ?? 50}%; --oy: ${album.data.coverOffset?.y ?? 50}%;`}
+                                            style={`--zoom: ${album.cover.zoom}; --ox: ${album.cover.offset.x}%; --oy: ${album.cover.offset.y}%;`}
                                             onerror={
                                                 isDev
                                                     ? `this.onerror=null; this.src='${fallbackUrl}';`
@@ -116,10 +95,10 @@ const isYama = folder === "yama";
                                         />
                                         <div class="album-overlay">
                                             <h2 class="album-title">
-                                                {album.data.title}
+                                                {album.title}
                                             </h2>
-                                            {album.data.info && (
-                                                <p class="album-info">{album.data.info}</p>
+                                            {album.info && (
+                                                <p class="album-info">{album.info}</p>
                                             )}
                                         </div>
                                     </div>

@@ -51,6 +51,7 @@ function compareSourceRecords(left: AlbumSourceRecord, right: AlbumSourceRecord)
 function compareDiagnostics(left: AlbumDiagnostic, right: AlbumDiagnostic): number {
     return compareText(left.albumSlug, right.albumSlug) ||
         compareText(left.sourcePath, right.sourcePath) ||
+        compareText(left.manifestPath, right.manifestPath) ||
         compareText(left.fieldPath ?? "", right.fieldPath ?? "") ||
         compareText(left.code, right.code) ||
         compareText(left.message, right.message);
@@ -92,6 +93,7 @@ function invalidSlugDiagnostic(record: AlbumSourceRecord, error: unknown): Album
         message: error instanceof Error ? error.message : `Invalid album slug: ${record.slug}`,
         albumSlug: record.slug,
         sourcePath: record.manifestPath,
+        manifestPath: record.manifestPath,
         fieldPath: "slug",
     };
 }
@@ -118,6 +120,7 @@ export function createAlbumCatalog(records: AlbumSourceRecord[]): AlbumCatalog {
                 message: `Duplicate Album slug ${JSON.stringify(slug)}; first declared by ${existing.manifestPath}`,
                 albumSlug: slug,
                 sourcePath: record.manifestPath,
+                manifestPath: record.manifestPath,
                 fieldPath: "slug",
             });
             continue;
@@ -141,6 +144,7 @@ export function createAlbumCatalog(records: AlbumSourceRecord[]): AlbumCatalog {
                 message: `Album order ${record.manifest.order} duplicates ${previousOrderOwner.slug} within folder ${folder}`,
                 albumSlug: slug,
                 sourcePath: record.manifestPath,
+                manifestPath: record.manifestPath,
                 fieldPath: "order",
             });
         } else {
@@ -209,6 +213,7 @@ export function createAlbumCatalog(records: AlbumSourceRecord[]): AlbumCatalog {
                 message: `External cover asset ${JSON.stringify(album.cover.photo.assetKey)} belongs to the consumer Album; use a local cover reference`,
                 albumSlug: album.slug,
                 sourcePath: sourceBySlug.get(album.slug)!.manifestPath,
+                manifestPath: sourceBySlug.get(album.slug)!.manifestPath,
                 fieldPath: "cover.photo.assetKey",
             });
         } else if (!trackedAssetKeys.has(album.cover.photo.assetKey)) {
@@ -217,6 +222,7 @@ export function createAlbumCatalog(records: AlbumSourceRecord[]): AlbumCatalog {
                 message: `External cover asset ${JSON.stringify(album.cover.photo.assetKey)} is not tracked by any Album manifest inventory`,
                 albumSlug: album.slug,
                 sourcePath: sourceBySlug.get(album.slug)!.manifestPath,
+                manifestPath: sourceBySlug.get(album.slug)!.manifestPath,
                 fieldPath: "cover.photo.assetKey",
             });
         }

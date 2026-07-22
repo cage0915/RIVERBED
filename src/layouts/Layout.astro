@@ -1,6 +1,6 @@
 ---
-import { getCollection } from "astro:content";
 import { ViewTransitions } from "astro:transitions";
+import { getAlbumSummaries } from "../lib/albums/catalog";
 import { getFolderTitle, getFolderOrder, getFolderFooter, FOLDER_METADATA } from "../lib/constants";
 import "@fontsource/noto-sans-jp/300.css";
 import "@fontsource/noto-sans-jp/400.css";
@@ -29,8 +29,8 @@ const MountainDevTool = import.meta.env.DEV
 const metadataSlugs = Object.keys(FOLDER_METADATA);
 
 // Fetch unique folders from album slugs to catch any folders missing from metadata
-const albums = await getCollection("albums");
-const albumFolderSlugs = albums.map((album) => album.slug.split("/")[0]);
+const albums = await getAlbumSummaries();
+const albumFolderSlugs = albums.map((album) => album.folder);
 
 // Combine and get unique slugs
 const folderSlugs = [...new Set([...metadataSlugs, ...albumFolderSlugs])];
