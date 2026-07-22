@@ -11,7 +11,11 @@ import {
 import path from "node:path";
 import { randomUUID } from "node:crypto";
 
-import { validateAlbumSlug, validateLocalPhotoFilename } from "./keys.ts";
+import {
+    normalizeAssetKey,
+    validateAlbumSlug,
+    validateLocalPhotoFilename,
+} from "./keys.ts";
 import { parseAlbumManifest } from "./manifest-schema.ts";
 import type { AlbumManifest, PhotoTag } from "./types.ts";
 
@@ -21,6 +25,26 @@ type ManifestLocation = {
     folder: string;
     target: string;
 };
+
+export type ManifestFileOperations = {
+    rename: typeof rename;
+    unlink: typeof unlink;
+};
+
+const defaultFileOperations: ManifestFileOperations = { rename, unlink };
+
+export class AlbumManifestMutationError extends Error {
+    readonly code: "album-not-found" | "cover-untracked";
+
+    constructor(
+        code: "album-not-found" | "cover-untracked",
+        message: string,
+    ) {
+        super(message);
+        this.name = "AlbumManifestMutationError";
+        this.code = code;
+    }
+}
 
 const mutationQueues = new Map<string, Promise<void>>();
 
@@ -126,7 +150,7 @@ export async function readAllAlbumManifestFiles(
     return Object.fromEntries(entries);
 }
 
-export async function writeAlbumManifestFile(
+async function writeAlbumManifestFileUnlocked(
     projectRoot: string,
     albumSlug: string,
     input: unknown,
@@ -159,18 +183,154 @@ export async function writeAlbumManifestFile(
     return manifest;
 }
 
-async function enqueueManifestMutation<T>(
-    key: string,
+function manifestLockKeys(locations: ManifestLocation[]): string[] {
+    return locations.flatMap(({ target, folder }) => [target, `${folder}\0folder`]);
+}
+
+export async function writeAlbumManifestFile(
+    projectRoot: string,
+    albumSlug: string,
+    input: unknown,
+): Promise<AlbumManifest> {
+    const location = await resolveManifestLocation(projectRoot, albumSlug);
+    return enqueueManifestMutations(manifestLockKeys([location]), () =>
+        writeAlbumManifestFileUnlocked(projectRoot, location.slug, input)
+    );
+}
+
+async function enqueueManifestMutations<T>(
+    keys: string[],
     operation: () => Promise<T>,
 ): Promise<T> {
-    const previous = mutationQueues.get(key) ?? Promise.resolve();
-    const result = previous.catch(() => undefined).then(operation);
+    const uniqueKeys = [...new Set(keys)].sort();
+    const previous = Promise.all(
+        uniqueKeys.map((key) => (mutationQueues.get(key) ?? Promise.resolve()).catch(() => undefined)),
+    );
+    const result = previous.then(operation);
     const tail = result.then(() => undefined, () => undefined);
-    mutationQueues.set(key, tail);
+    for (const key of uniqueKeys) mutationQueues.set(key, tail);
     try {
         return await result;
     } finally {
-        if (mutationQueues.get(key) === tail) mutationQueues.delete(key);
+        for (const key of uniqueKeys) {
+            if (mutationQueues.get(key) === tail) mutationQueues.delete(key);
+        }
+    }
+}
+
+async function replaceAlbumManifestFiles(
+    projectRoot: string,
+    manifests: Record<string, AlbumManifest>,
+    originals: Record<string, AlbumManifest>,
+    operations: ManifestFileOperations = defaultFileOperations,
+): Promise<void> {
+    const entries = await Promise.all(Object.entries(manifests).map(async ([slug, input]) => {
+        const location = await resolveManifestLocation(projectRoot, slug);
+        const manifest = parseAlbumManifest(input, location.slug);
+        return { location, manifest };
+    }));
+    const staged: Array<{
+        location: ManifestLocation;
+        manifest: AlbumManifest;
+        temporary: string;
+        backup: string;
+        backupCreated: boolean;
+        replaced: boolean;
+    }> = [];
+
+    try {
+        for (const entry of entries) {
+            const token = `${process.pid}.${randomUUID()}`;
+            const basename = path.basename(entry.location.target);
+            const temporary = path.join(entry.location.folder, `.${basename}.${token}.tmp`);
+            const backup = path.join(entry.location.folder, `.${basename}.${token}.bak`);
+            const stagedEntry = {
+                ...entry,
+                temporary,
+                backup,
+                backupCreated: false,
+                replaced: false,
+            };
+            staged.push(stagedEntry);
+            await writeFile(temporary, `${JSON.stringify(entry.manifest, null, 2)}\n`, {
+                encoding: "utf8",
+                flag: "wx",
+            });
+            await assertExistingPathIsSafe(entry.location.manifestRoot, temporary, "temporary manifest");
+            parseAlbumManifest(JSON.parse(await readFile(temporary, "utf8")), entry.location.slug);
+        }
+
+        for (const entry of staged) {
+            const currentLocation = await resolveManifestLocation(projectRoot, entry.location.slug);
+            if (currentLocation.target !== entry.location.target || currentLocation.folder !== entry.location.folder) {
+                throw new Error(`Album manifest path changed before replacement: ${entry.location.slug}`);
+            }
+            await operations.rename(entry.location.target, entry.backup);
+            entry.backupCreated = true;
+            await operations.rename(entry.temporary, entry.location.target);
+            entry.replaced = true;
+        }
+        const cleanupErrors: unknown[] = [];
+        for (const entry of staged) {
+            try {
+                await operations.unlink(entry.backup);
+            } catch (cleanupError) {
+                cleanupErrors.push(cleanupError);
+            }
+        }
+        if (cleanupErrors.length > 0) {
+            throw new AggregateError(
+                cleanupErrors,
+                "Album manifest replacement committed but backup cleanup is incomplete",
+            );
+        }
+    } catch (error) {
+        if (error instanceof AggregateError &&
+            error.message.includes("replacement committed")) throw error;
+        const rollbackErrors: unknown[] = [];
+        for (const entry of [...staged].reverse()) {
+            if (entry.replaced) {
+                try {
+                    await operations.unlink(entry.location.target);
+                } catch (rollbackError) {
+                    rollbackErrors.push(rollbackError);
+                }
+            }
+            if (entry.backupCreated) {
+                try {
+                    await operations.rename(entry.backup, entry.location.target);
+                } catch (rollbackError) {
+                    rollbackErrors.push(rollbackError);
+                }
+            }
+            try {
+                await operations.unlink(entry.temporary);
+            } catch (cleanupError) {
+                if ((cleanupError as NodeJS.ErrnoException).code !== "ENOENT") {
+                    rollbackErrors.push(cleanupError);
+                }
+            }
+        }
+        for (const entry of staged) {
+            try {
+                const restored = parseAlbumManifest(
+                    JSON.parse(await readFile(entry.location.target, "utf8")),
+                    entry.location.slug,
+                );
+                if (JSON.stringify(restored) !== JSON.stringify(originals[entry.location.slug])) {
+                    rollbackErrors.push(new Error(`Rollback verification failed: ${entry.location.slug}`));
+                }
+            } catch (verificationError) {
+                rollbackErrors.push(verificationError);
+            }
+        }
+        if (rollbackErrors.length > 0) {
+            throw new AggregateError(
+                [error, ...rollbackErrors],
+                "Album manifest batch replacement failed; rollback incomplete and backups were preserved",
+            );
+        }
+        throw error;
     }
 }
 
@@ -180,10 +340,132 @@ export async function mutateAlbumManifestFile(
     mutate: (manifest: AlbumManifest) => AlbumManifest | Promise<AlbumManifest>,
 ): Promise<AlbumManifest> {
     const location = await resolveManifestLocation(projectRoot, albumSlug);
-    return enqueueManifestMutation(location.target, async () => {
+    return enqueueManifestMutations(manifestLockKeys([location]), async () => {
         const manifest = await readAlbumManifestFile(projectRoot, location.slug);
         const updated = await mutate(manifest);
-        return writeAlbumManifestFile(projectRoot, location.slug, updated);
+        return writeAlbumManifestFileUnlocked(projectRoot, location.slug, updated);
+    });
+}
+
+export async function mutateAlbumManifestFiles(
+    projectRoot: string,
+    albumSlugs: string[],
+    mutate: (
+        manifests: Record<string, AlbumManifest>,
+    ) => Record<string, AlbumManifest> | Promise<Record<string, AlbumManifest>>,
+    operations: ManifestFileOperations = defaultFileOperations,
+): Promise<Record<string, AlbumManifest>> {
+    const slugs = [...new Set(albumSlugs.map(validateAlbumSlug))].sort();
+    if (slugs.length !== albumSlugs.length) throw new Error("Duplicate Album slug in manifest mutation");
+    const locations = await Promise.all(slugs.map((slug) => resolveManifestLocation(projectRoot, slug)));
+    return enqueueManifestMutations(manifestLockKeys(locations), async () => {
+        const current = Object.fromEntries(await Promise.all(slugs.map(async (slug) => [
+            slug,
+            await readAlbumManifestFile(projectRoot, slug),
+        ])));
+        const proposed = await mutate(current);
+        const proposedSlugs = Object.keys(proposed).sort();
+        if (proposedSlugs.length !== slugs.length || proposedSlugs.some((slug, index) => slug !== slugs[index])) {
+            throw new Error("Multi-Album manifest mutation must return exactly the requested Albums");
+        }
+        const parsed = Object.fromEntries(slugs.map((slug) => [
+            slug,
+            parseAlbumManifest(proposed[slug], slug),
+        ]));
+        await replaceAlbumManifestFiles(projectRoot, parsed, current, operations);
+        return parsed;
+    });
+}
+
+export async function updateAlbumCover(
+    projectRoot: string,
+    albumSlug: string,
+    input: {
+        assetKey: string;
+        zoom: number;
+        offset: { x: number; y: number };
+    },
+): Promise<AlbumManifest> {
+    const consumerSlug = validateAlbumSlug(albumSlug);
+    const assetKey = normalizeAssetKey(input.assetKey);
+    const parts = assetKey.split("/");
+    const sourceSlug = validateAlbumSlug(`${parts[0]}/${parts[1]}`);
+    const filename = validateLocalPhotoFilename(parts[2]);
+    const locations = await Promise.all(
+        [...new Set([consumerSlug, sourceSlug])].map((slug) => resolveManifestLocation(projectRoot, slug)),
+    );
+    return enqueueManifestMutations(manifestLockKeys(locations), async () => {
+        let consumerManifest: AlbumManifest;
+        try {
+            consumerManifest = await readAlbumManifestFile(projectRoot, consumerSlug);
+        } catch (error) {
+            if ((error as Error & { cause?: NodeJS.ErrnoException }).cause?.code === "ENOENT") {
+                throw new AlbumManifestMutationError(
+                    "album-not-found",
+                    `Album manifest not found: ${consumerSlug}`,
+                );
+            }
+            throw error;
+        }
+        let sourceManifest: AlbumManifest;
+        try {
+            sourceManifest = sourceSlug === consumerSlug
+                ? consumerManifest
+                : await readAlbumManifestFile(projectRoot, sourceSlug);
+        } catch (error) {
+            if ((error as Error & { cause?: NodeJS.ErrnoException }).cause?.code === "ENOENT") {
+                throw new AlbumManifestMutationError(
+                    "cover-untracked",
+                    `Cover asset is not tracked by an Album manifest: ${assetKey}`,
+                );
+            }
+            throw error;
+        }
+        if (!sourceManifest.photos.some((photo) => photo.filename === filename)) {
+            throw new AlbumManifestMutationError(
+                "cover-untracked",
+                `Cover asset is not tracked by an Album manifest: ${assetKey}`,
+            );
+        }
+        const photo = sourceSlug === consumerSlug
+            ? { kind: "local" as const, filename }
+            : { kind: "external" as const, assetKey };
+        return writeAlbumManifestFileUnlocked(projectRoot, consumerSlug, {
+            ...consumerManifest,
+            cover: { photo, zoom: input.zoom, offset: { ...input.offset } },
+        });
+    });
+}
+
+export async function reorderFolderAlbums(
+    projectRoot: string,
+    folder: string,
+    requestedOrder: string[],
+): Promise<Array<{ slug: string; manifest: AlbumManifest }>> {
+    if (!/^[a-z0-9-]+$/.test(folder)) throw new Error("Invalid Album folder");
+    if (!Array.isArray(requestedOrder)) throw new Error("Album order must be an array");
+    const order = requestedOrder.map(validateAlbumSlug);
+    if (new Set(order).size !== order.length) throw new Error("Album order contains duplicate entries");
+    if (order.some((slug) => !slug.startsWith(`${folder}/`))) {
+        throw new Error("Album order contains an entry from another folder");
+    }
+    if (order.length === 0) throw new Error("Album order must contain the complete folder Album list");
+    const firstLocation = await resolveManifestLocation(projectRoot, order[0]);
+    return enqueueManifestMutations([`${firstLocation.folder}\0folder`], async () => {
+        const allManifests = await readAllAlbumManifestFiles(projectRoot);
+        const existing = Object.keys(allManifests).filter((slug) => slug.startsWith(`${folder}/`)).sort();
+        if (existing.length === 0) throw new Error(`Album folder not found: ${folder}`);
+        const requestedSlugs = new Set<string>(order);
+        if (existing.length !== order.length || existing.some((slug) => !requestedSlugs.has(slug))) {
+            throw new Error("Album order must contain the complete folder Album list");
+        }
+        const originals = Object.fromEntries(order.map((slug) => [slug, allManifests[slug]]));
+        const updated = Object.fromEntries(order.map((slug, index) => [
+            slug,
+            parseAlbumManifest({ ...originals[slug], order: (index + 1) * 10 }, slug),
+        ]));
+        await replaceAlbumManifestFiles(projectRoot, updated, originals);
+        return order.map((slug) => ({ slug, manifest: updated[slug] }));
     });
 }
 

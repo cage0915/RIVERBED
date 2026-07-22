@@ -1,72 +1,42 @@
 import type { APIRoute } from 'astro';
 
-import { applyAlbumCoverConfig } from '../lib/album-frontmatter.js';
+import { reorderFolderAlbums } from '../lib/albums/manifest-files';
+
+const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), {
+    status,
+    headers: { 'Content-Type': 'application/json' },
+});
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+    typeof value === 'object' && value !== null && !Array.isArray(value);
 
 export const POST: APIRoute = async ({ request }) => {
-    if (!import.meta.env.DEV) {
-        return new Response(JSON.stringify({ error: 'Not available in production' }), {
-            status: 403, headers: { 'Content-Type': 'application/json' },
-        });
-    }
+    if (!import.meta.env.DEV) return json({ error: 'Not available in production' }, 403);
 
-    const fs = await import('node:fs');
-    const path = await import('node:path');
-
-    let body: {
-        folder: string;
-        order: string[];
-        albums?: Array<{
-            slug: string;
-            coverKey: string;
-            coverZoom: number;
-            coverOffset: { x: number; y: number };
-        }>;
-    };
+    let input: unknown;
     try {
-        body = await request.json();
+        input = await request.json();
     } catch {
-        return new Response(JSON.stringify({ error: 'Invalid JSON' }), { status: 400 });
+        return json({ error: 'Invalid JSON' }, 400);
     }
-
-    const { folder, order, albums = [] } = body;
-    if (!folder || !Array.isArray(order)) {
-        return new Response(JSON.stringify({ error: 'Missing folder or order' }), { status: 400 });
+    if (!isRecord(input) || typeof input.folder !== 'string' || !Array.isArray(input.order) ||
+        input.order.some((slug) => typeof slug !== 'string')) {
+        return json({ error: 'Missing folder or order' }, 400);
     }
 
     try {
-        const targetDir = path.resolve(process.cwd(), 'src/content/albums', folder);
-        if (!fs.existsSync(targetDir)) {
-            return new Response(JSON.stringify({ error: 'Folder not found' }), { status: 404 });
-        }
-
-        const outputPath = path.join(targetDir, '_order.json');
-
-        // Strip prefixes if they exist (e.g. yama/slug -> slug)
-        const simplifiedOrder = order.map(item => item.includes('/') ? item.split('/')[1] : item);
-
-        fs.writeFileSync(outputPath, JSON.stringify(simplifiedOrder, null, 4), 'utf8');
-
-        for (const album of albums) {
-            const mdxPath = path.resolve(process.cwd(), 'src/content/albums', `${album.slug}.mdx`);
-            if (!fs.existsSync(mdxPath)) continue;
-
-            const originalContent = fs.readFileSync(mdxPath, 'utf8');
-            const nextContent = applyAlbumCoverConfig(originalContent, {
-                coverKey: album.coverKey,
-                coverZoom: album.coverZoom,
-                coverOffset: album.coverOffset,
-            });
-            fs.writeFileSync(mdxPath, nextContent, 'utf8');
-        }
-
-        return new Response(JSON.stringify({ success: true }), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' },
+        const albums = await reorderFolderAlbums(process.cwd(), input.folder, input.order as string[]);
+        return json({
+            success: true,
+            albums: albums.map(({ slug, manifest }) => ({ slug, order: manifest.order })),
         });
-
-    } catch (err) {
-        console.error(err);
-        return new Response(JSON.stringify({ error: 'Server error' }), { status: 500 });
+    } catch (error) {
+        const message = error instanceof Error ? error.message : '';
+        if (/folder not found/i.test(message)) return json({ error: 'Album folder not found' }, 404);
+        if (/Invalid|duplicate|complete|another folder/.test(message)) {
+            return json({ error: 'Invalid or incomplete Album order' }, 400);
+        }
+        console.error('Unable to save Album order', error);
+        return json({ error: 'Unable to save Album order' }, 500);
     }
 };
 // Registered only by the local development server.

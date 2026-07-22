@@ -110,3 +110,31 @@ test('tag and photo-caption APIs persist metadata only through Album manifests',
     assert.match(mountainCover, /readAlbumManifestFile/);
     assert.match(mountainCover, /writeMountainRegion/);
 });
+
+test('cover and folder-order APIs persist only through Album manifests', () => {
+    const saveCover = readProjectFile('src/dev-api/save-album-cover.ts');
+    const saveOrder = readProjectFile('src/dev-api/save-folder-order.ts');
+    const getFolder = readProjectFile('src/dev-api/get-folder-structure.ts');
+    const devTool = readProjectFile('src/components/DevTool.astro');
+    const folderPage = readProjectFile('src/pages/[folder]/index.astro');
+
+    assert.match(saveCover, /updateAlbumCover/);
+    assert.doesNotMatch(saveCover, /getAlbumBySlug/);
+    assert.match(saveCover, /validateAlbumSlug/);
+    assert.match(saveCover, /isRecord/);
+    assert.match(saveOrder, /reorderFolderAlbums/);
+    assert.match(saveOrder, /isRecord/);
+    assert.match(getFolder, /readAllAlbumManifestFiles/);
+    for (const source of [saveCover, saveOrder, getFolder]) {
+        assert.doesNotMatch(source, /album-frontmatter|_order\.json|getCollection\(['"]albums['"]\)/);
+        assert.doesNotMatch(source, /src\/content\/albums|\.mdx/);
+    }
+    assert.doesNotMatch(devTool, /const storedKey = sourceAlbum === state\.albumSlug/);
+    assert.match(devTool, /settleCoverSave\(persisted, result/);
+    assert.match(devTool, /settleCoverSave\(persisted, null\)/);
+    assert.match(devTool, /Unable to reach cover save API/);
+    assert.match(folderPage, /data-cover-key=\{resolvedCoverKey\}/);
+    const picker = readProjectFile('src/dev-api/get-r2-cover-assets.ts');
+    assert.match(picker, /createCoverPickerInventory/);
+    assert.doesNotMatch(picker, /readdirSync|\br2Root\b/);
+});

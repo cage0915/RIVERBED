@@ -63,16 +63,13 @@ const isYama = folder === "yama";
                     folderAlbums.map((album) => {
                         const albumSlug = album.slug.split("/")[1];
                         const resolvedCoverKey = album.cover.assetKey;
-                        const storedCoverKey = album.cover.photo.kind === "local"
-                            ? album.cover.photo.filename
-                            : album.cover.photo.assetKey;
                         const coverUrl = getImageUrl(resolvedCoverKey);
                         const fallbackUrl = `${R2_DOMAIN}/${resolvedCoverKey}`;
                         return (
                             <div
                                 class="album-card group"
                                 data-album-slug={album.slug}
-                                data-cover-key={storedCoverKey}
+                                data-cover-key={resolvedCoverKey}
                                 data-cover-zoom={album.cover.zoom}
                                 data-cover-offset-x={album.cover.offset.x}
                                 data-cover-offset-y={album.cover.offset.y}

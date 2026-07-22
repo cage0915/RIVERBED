@@ -17,6 +17,11 @@
         isMountainTagIndex,
         isMountainTagPage,
     } from "../lib/dev-route-state.js";
+    import {
+        createCoverSaveQueue,
+        isCoverDraftCurrent,
+        settleCoverSave,
+    } from "../lib/dev-cover-state.js";
 
     // Only run in development
     if (import.meta.env.DEV) {
@@ -2817,6 +2822,9 @@
                 x: number;
                 y: number;
             };
+            type PersistedFolderCover = { state: FolderCoverState; imageSrc: string };
+            const persistedFolderCovers = new WeakMap<HTMLElement, PersistedFolderCover>();
+            const enqueueFolderCoverSave = createCoverSaveQueue();
 
             const readFolderCoverState = (card: HTMLElement): FolderCoverState => ({
                 albumSlug: card.dataset.albumSlug || '',
@@ -2838,33 +2846,66 @@
                 image.style.setProperty('--oy', `${state.y}%`);
             };
 
-            const saveFolderCover = async (card: HTMLElement) => {
-                const state = readFolderCoverState(card);
-                const response = await fetch('/api/save-album-cover', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        albumSlug: state.albumSlug,
-                        coverKey: state.coverKey,
-                        coverZoom: state.zoom,
-                        coverOffset: { x: state.x, y: state.y },
-                    }),
-                });
-                const result = await response.json().catch(() => ({}));
+            const saveFolderCover = (card: HTMLElement) => {
+                const draftState = readFolderCoverState(card);
+                const draftImageSrc = card.querySelector<HTMLImageElement>('.album-cover img')?.src || '';
+                return enqueueFolderCoverSave(card, async () => {
+                const image = card.querySelector<HTMLImageElement>('.album-cover img');
+                applyFolderCoverState(card, draftState);
+                if (image) image.src = draftImageSrc;
+                const persisted = persistedFolderCovers.get(card) || {
+                    state: { ...draftState },
+                    imageSrc: draftImageSrc,
+                };
+                const draftStillOwnsUi = () => isCoverDraftCurrent(
+                    readFolderCoverState(card),
+                    image?.src || '',
+                    draftState,
+                    draftImageSrc,
+                );
+                const restorePersisted = () => {
+                    const restored = settleCoverSave(persisted, null);
+                    if (draftStillOwnsUi()) {
+                        applyFolderCoverState(card, restored.state);
+                        if (image) image.src = restored.imageSrc;
+                    }
+                };
+                let response: Response;
+                let result: any;
+                try {
+                    response = await fetch('/api/save-album-cover', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            albumSlug: draftState.albumSlug,
+                            coverKey: draftState.coverKey,
+                            coverZoom: draftState.zoom,
+                            coverOffset: { x: draftState.x, y: draftState.y },
+                        }),
+                    });
+                    result = await response.json().catch(() => ({}));
+                } catch {
+                    restorePersisted();
+                    showToast('❌ Unable to reach cover save API');
+                    return false;
+                }
                 if (!response.ok) {
+                    restorePersisted();
                     showToast(`❌ ${result.error || 'Unable to save cover'}`);
                     return false;
                 }
+                const saved = settleCoverSave(persisted, result, draftImageSrc);
+                if (draftStillOwnsUi()) applyFolderCoverState(card, saved.state);
+                persistedFolderCovers.set(card, saved);
                 showToast('✅ Cover saved');
                 return true;
+                });
             };
 
             const openFolderCoverPicker = async (card: HTMLElement) => {
                 const state = readFolderCoverState(card);
                 showToast('⌛ Loading R2 photos...');
-                const currentSource = state.coverKey.includes('/')
-                    ? state.coverKey.split('/').slice(0, 2).join('/')
-                    : state.albumSlug;
+                const currentSource = state.coverKey.split('/').slice(0, 2).join('/');
                 const response = await fetch(`/api/get-r2-cover-assets?albumSlug=${encodeURIComponent(currentSource)}`);
                 const result = await response.json().catch(() => ({}));
                 if (!response.ok) return showToast(`❌ ${result.error || 'Unable to load R2 photos'}`);
@@ -2880,9 +2921,7 @@
                 document.getElementById('dev-cover-picker')?.remove();
                 const dialog = document.createElement('dialog');
                 dialog.id = 'dev-cover-picker';
-                const normalizedCurrentKey = state.coverKey.includes('/')
-                    ? state.coverKey
-                    : `${state.albumSlug}/${state.coverKey}`;
+                const normalizedCurrentKey = state.coverKey;
                 dialog.innerHTML = `
                     <div style="display:flex;flex-direction:column;width:min(780px,90vw);height:min(680px,82vh);background:white;border-radius:12px;overflow:hidden;font-family:sans-serif;">
                         <div style="display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;border-bottom:1px solid #e2e8f0;background:#fafafa;">
@@ -2936,10 +2975,7 @@
                         button.addEventListener('click', async () => {
                             const fullKey = button.dataset.coverKey;
                             if (!fullKey) return;
-                            const sourceAlbum = fullKey.split('/').slice(0, 2).join('/');
-                            const name = fullKey.split('/').pop() || fullKey;
-                            const storedKey = sourceAlbum === state.albumSlug ? name : fullKey;
-                            const nextState = { ...readFolderCoverState(card), coverKey: storedKey, zoom: 1, x: 50, y: 50 };
+                            const nextState = { ...readFolderCoverState(card), coverKey: fullKey, zoom: 1, x: 50, y: 50 };
                             applyFolderCoverState(card, nextState);
                             const image = card.querySelector<HTMLImageElement>('.album-cover img');
                             if (image) image.src = `/r2/${fullKey.split('/').map(encodeURIComponent).join('/')}`;
@@ -2961,6 +2997,11 @@
                     const cover = card.querySelector<HTMLElement>('.album-cover');
                     const link = card.querySelector<HTMLAnchorElement>('.album-link');
                     if (!cover || !link) return;
+                    const coverImage = cover.querySelector<HTMLImageElement>('img');
+                    persistedFolderCovers.set(card, {
+                        state: readFolderCoverState(card),
+                        imageSrc: coverImage?.src || '',
+                    });
 
                     const actions = document.createElement('div');
                     actions.className = 'dev-folder-cover-actions';
