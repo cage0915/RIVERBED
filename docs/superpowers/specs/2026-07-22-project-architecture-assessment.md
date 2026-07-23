@@ -24,18 +24,19 @@ abstraction.
 The main concern is not that the architecture is unorthodox. The previous
 largest data-boundary problem has been addressed: Album metadata, ordering,
 photo inventory, captions, and tags now have one validated manifest schema and
-one normalized production catalog. The remaining risk is concentrated in the
-mountain domain's type and route-policy boundaries and in client scripts that
-use broad document-level selectors and persistent View Transition listeners.
+one normalized production catalog. Mountain data now also has one canonical
+schema and validated read boundary. The remaining risk is concentrated in
+mountain route policy and in client scripts that use broad document-level
+selectors and persistent View Transition listeners.
 
 Current characterization:
 
 - framework and deployment architecture: conventional and appropriate;
-- production module boundaries: improved for Albums, still inconsistent for
-  mountains and browser behavior;
+- production module boundaries: improved for Albums and mountains, still
+  inconsistent for browser behavior;
 - Album content/data discoverability: substantially improved and documented;
 - immediate stability: healthy based on current checks;
-- future maintenance risk: moderate, concentrated in mountain policy and
+- future maintenance risk: moderate, concentrated in mountain route policy and
   browser lifecycle behavior.
 
 This does not justify a rewrite. It calls for several targeted boundary
@@ -45,7 +46,7 @@ improvements.
 
 The following checks were rerun after the Album migration:
 
-- `npm test`: 28 tests passed, 0 failed;
+- `npm test`: 30 tests passed, 0 failed;
 - `npm run albums:validate`: 67 of 67 Album manifests valid, 0 diagnostics;
 - `npm exec astro check`: 0 errors and 6 hints;
 - `npm run build`: completed successfully and generated 356 static pages.
@@ -73,43 +74,11 @@ R2 images + generated public map/contour assets
 The dependency graph is shallow, which is a strength. Production Album
 consumers now use `src/lib/albums/catalog.ts`; manifest discovery, schema
 validation, inventory checks, ordering, asset-key resolution, and tag queries
-are behind that boundary. Some mountain pages and client components still own
-domain or lifecycle policy locally.
+are behind that boundary. Mountain records are now parsed through
+`src/lib/mountain-schema.ts` before loaders expose them. Mountain route policy
+and some client lifecycle policy are still owned locally by pages/components.
 
 ## Prioritized Findings
-
-### P1: Mountain domain types have reversed and duplicated ownership
-
-`src/lib/mountains.ts` imports the `EditableMountain` type from
-`mountain-editor.ts`, so production data depends conceptually on an editor
-module. `MountainProfile.astro` exports a second `Mountain` type, and the tag
-detail page casts production mountain data to that view-owned type.
-
-The current conceptual dependency is:
-
-```text
-production data ─> editor type
-page ─> component-owned type
-```
-
-The desired dependency is:
-
-```text
-shared Mountain schema/type
-        ↑       ↑       ↑
-      data    editor  components
-```
-
-Consequences:
-
-- the authoritative Mountain shape is unclear;
-- changes can require synchronized edits to unrelated layers;
-- JSON data is typed through assertions rather than validated at its boundary;
-- presentation code participates in domain type ownership.
-
-Recommended direction: move `Mountain`, `MountainLocation`, and validation to a
-production-neutral domain module. Data loaders, editor helpers, and components
-should import that module; components should not export canonical domain types.
 
 ### P1: View Transition client lifecycle is globally coupled
 
@@ -231,6 +200,25 @@ authoritative authoring guide.
 
 ## Resolved Since the Original Assessment
 
+### Mountain domain types and validation now have neutral ownership
+
+`src/lib/mountain-schema.ts` owns `Mountain`, `MountainLocation`, cover-key
+parsing, and the strict runtime parser. Production glob loading and filesystem
+reads validate every Mountain record before exposing it; source failures name
+the JSON path and failing array index. The production build successfully
+validated all 281 current Mountain records.
+
+Editor input remains separately responsible for trimming, numeric coercion,
+rounding, and transient lookup metadata, then validates its final stored shape
+through the canonical parser. Components, routes, and development helpers now
+consume the domain type without editor-owned aliases, component-owned
+duplicates, or presentation-layer assertions.
+
+Filesystem context validation uses the currently persisted context set by
+default. Context creation/update operations pass their proposed context set to
+Mountain writers, preserving the existing ability to create a context and
+assign it in one operation.
+
 ### Album data now has one normalized read boundary
 
 The project selected and completed Option 2, the per-Album manifest design:
@@ -294,8 +282,7 @@ complexity.
 
 ### Phase 1: Clarify domain boundaries
 
-1. Move Mountain types and validation to a production-neutral domain module.
-2. Document and test explicit mountain route/index eligibility policies.
+1. Document and test explicit mountain route/index eligibility policies.
 
 These changes reduce semantic duplication without changing the user interface.
 
@@ -338,8 +325,8 @@ The Album decision is complete: Option 2 was selected and implemented. The
 [migration plan](../plans/2026-07-22-album-manifest-migration.md) remain useful
 historical rationale, not open choices.
 
-The next design decision is the Mountain domain contract: define the canonical
-type and runtime validation boundary together with explicit route, index, and
+The Mountain domain contract and runtime validation boundary are complete. The
+next Mountain decision is to define explicit route, index, and
 profile-completeness policies. Keep the browser lifecycle, Layout extraction,
 and development-only cover editor as separate work items so each can be
 implemented and verified independently.
