@@ -276,6 +276,29 @@ test('Layout delegates navigation rendering and lifecycle ownership', () => {
     assert.match(siteNavigation, /data-site-mobile-menu/);
     assert.match(siteNavigation, /installPageLifecycle/);
     assert.match(siteNavigation, /new AbortController\(\)/);
+    assert.match(
+        siteNavigation,
+        /<button[\s\S]*type="button"[\s\S]*aria-controls="mobile-menu"[\s\S]*aria-expanded="false"[\s\S]*>/,
+    );
+    assert.match(
+        siteNavigation,
+        /let menuOpen = !mobileMenu\.classList\.contains\("hidden"\)/,
+    );
+    assert.equal(
+        (siteNavigation.match(/const setMenuOpen = \(open: boolean\)/g) ?? []).length,
+        1,
+    );
+    assert.match(
+        siteNavigation,
+        /menuToggle\.setAttribute\("aria-expanded", String\(open\)\)/,
+    );
+    assert.equal(
+        (siteNavigation.match(/aria-hidden="true"/g) ?? []).length,
+        2,
+    );
+    assert.doesNotMatch(layout, /\.condensed-kanji\s*\{|\.mask-linear-right\s*\{|\.mask-none\s*\{/);
+    assert.match(siteNavigation, /\.condensed-kanji\s*\{/);
+    assert.match(siteNavigation, /\.mask-linear-right\s*\{/);
     assert.doesNotMatch(siteNavigation, /astro:after-swap/);
     assert.doesNotMatch(siteNavigation, /cloneNode|replaceChild/);
 });

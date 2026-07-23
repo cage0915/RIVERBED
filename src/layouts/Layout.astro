@@ -206,20 +206,4 @@ const { title } = Astro.props;
 		font-family: "PT Sans", "Noto Sans TC", "Noto Sans JP", sans-serif;
 	}
 
-	.condensed-kanji {
-		display: inline-block;
-		transform: scaleX(0.7);
-		transform-origin: center;
-		letter-spacing: -0.05em;
-	}
-
-	.mask-linear-right {
-		mask-image: linear-gradient(to right, black 85%, transparent 100%);
-	}
-
-	@media (min-width: 640px) {
-		.mask-none {
-			mask-image: none;
-		}
-	}
 </style>

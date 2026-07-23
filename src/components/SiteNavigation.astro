@@ -34,11 +34,15 @@ const currentPath = Astro.url.pathname;
 		<button
 			id="menu-toggle"
 			data-site-menu-toggle
+			type="button"
 			class="sm:hidden p-1 text-zinc-400 hover:text-white transition-colors"
 			aria-label="Toggle menu"
+			aria-controls="mobile-menu"
+			aria-expanded="false"
 		>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
+				aria-hidden="true"
 				width="20"
 				height="20"
 				viewBox="0 0 24 24"
@@ -57,6 +61,7 @@ const currentPath = Astro.url.pathname;
 			>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
+				aria-hidden="true"
 				width="20"
 				height="20"
 				viewBox="0 0 24 24"
@@ -112,9 +117,6 @@ const currentPath = Astro.url.pathname;
 
 	</div>
 
-		</div>
-	</div>
-
 	<!-- Mobile Navigation Dropdown -->
 	<div
 		id="mobile-menu"
@@ -164,6 +166,7 @@ const currentPath = Astro.url.pathname;
 		const controller = new AbortController();
 		let closeTimer: number | undefined;
 		let lastScrollY = window.scrollY;
+		let menuOpen = !mobileMenu.classList.contains("hidden");
 
 		const clearCloseTimer = () => {
 			if (closeTimer === undefined) return;
@@ -171,39 +174,37 @@ const currentPath = Astro.url.pathname;
 			closeTimer = undefined;
 		};
 
-		const closeMenu = () => {
+		const setMenuOpen = (open: boolean) => {
 			clearCloseTimer();
-			mobileMenu.style.maxHeight = "0px";
-			menuToggle.querySelector(".menu-icon")?.classList.remove("hidden");
-			menuToggle.querySelector(".close-icon")?.classList.add("hidden");
-			closeTimer = window.setTimeout(() => {
-				if (mobileMenu.style.maxHeight === "0px") {
-					mobileMenu.classList.add("hidden");
-				}
-				closeTimer = undefined;
-			}, 300);
-		};
+			menuOpen = open;
+			menuToggle.setAttribute("aria-expanded", String(open));
+			menuToggle.querySelector(".menu-icon")?.classList.toggle("hidden", open);
+			menuToggle.querySelector(".close-icon")?.classList.toggle("hidden", !open);
 
-		menuToggle.addEventListener("click", () => {
-			const isExpanded = mobileMenu.classList.contains("hidden");
-
-			if (isExpanded) {
-				clearCloseTimer();
+			if (open) {
 				mobileMenu.classList.remove("hidden");
 				void mobileMenu.offsetWidth;
 				mobileMenu.style.maxHeight = "500px";
-				menuToggle.querySelector(".menu-icon")?.classList.add("hidden");
-				menuToggle.querySelector(".close-icon")?.classList.remove("hidden");
 			} else {
-				closeMenu();
+				mobileMenu.style.maxHeight = "0px";
+				closeTimer = window.setTimeout(() => {
+					if (!menuOpen) {
+						mobileMenu.classList.add("hidden");
+					}
+					closeTimer = undefined;
+				}, 300);
 			}
+		};
+
+		menuToggle.addEventListener("click", () => {
+			setMenuOpen(!menuOpen);
 		}, { signal: controller.signal });
 
 		window.addEventListener("scroll", () => {
 			const currentScrollY = window.scrollY;
 
-			if (!mobileMenu.classList.contains("hidden")) {
-				closeMenu();
+			if (menuOpen) {
+				setMenuOpen(false);
 			}
 
 			if (currentScrollY > lastScrollY && currentScrollY > 120) {
@@ -221,3 +222,16 @@ const currentPath = Astro.url.pathname;
 		};
 	});
 </script>
+
+<style>
+	.condensed-kanji {
+		display: inline-block;
+		transform: scaleX(0.7);
+		transform-origin: center;
+		letter-spacing: -0.05em;
+	}
+
+	.mask-linear-right {
+		mask-image: linear-gradient(to right, black 85%, transparent 100%);
+	}
+</style>
