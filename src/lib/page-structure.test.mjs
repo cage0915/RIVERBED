@@ -330,8 +330,9 @@ test('Layout delegates explicit content keyboard navigation targets and lifecycl
     assert.match(contentKeyboardNavigation, /\[data-keyboard-navigation-target\]/);
     assert.match(
         contentKeyboardNavigation,
-        /dialog, input, textarea, select, \[contenteditable='true'\], \[role='textbox'\]/,
+        /dialog, input, textarea, select, \[role='textbox'\]/,
     );
+    assert.match(contentKeyboardNavigation, /\.isContentEditable/);
     assert.doesNotMatch(contentKeyboardNavigation, /astro:after-swap/);
     assert.match(contentKeyboardNavigation, /addEventListener\(["']keydown["'][\s\S]*signal: controller\.signal/);
     assert.match(contentKeyboardNavigation, /controller\.abort\(\)/);

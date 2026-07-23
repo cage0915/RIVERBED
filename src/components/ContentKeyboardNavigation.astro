@@ -13,15 +13,19 @@
             )
                 return;
 
-            const eventTarget = e.target;
+            const eventElement = e.target instanceof Element ? e.target : null;
             if (
-                eventTarget instanceof Element &&
-                eventTarget.closest(
-                    "dialog, input, textarea, select, [contenteditable='true'], [role='textbox']",
+                eventElement?.closest(
+                    "dialog, input, textarea, select, [role='textbox']",
                 )
             ) {
                 return;
             }
+
+            const editableElement = eventElement instanceof HTMLElement
+                ? eventElement
+                : eventElement?.parentElement;
+            if (editableElement?.isContentEditable) return;
 
             const targets = Array.from(
                 document.querySelectorAll<HTMLElement>(
