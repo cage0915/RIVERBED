@@ -1,7 +1,8 @@
 import type { APIRoute } from "astro";
 
-import { sanitizeMountainEntry, type EditableMountain } from "../lib/mountain-editor";
+import { sanitizeMountainEntry } from "../lib/mountain-editor";
 import { isValidMapBounds, type MapBounds } from "../lib/mountain-map";
+import type { Mountain } from "../lib/mountain-schema";
 import {
     isMountainSourceRegion,
     readAllMountainRegions,
@@ -77,7 +78,7 @@ const writeConfig = async (configFile: string, config: MapConfigFile) => {
 const saveMountainDraft = (
     body: ContextRequestBody,
     config: MapConfigFile,
-    mountains: EditableMountain[],
+    mountains: Mountain[],
 ) => {
     if (body.mountain === undefined) return undefined;
     const originalName = body.originalName?.trim();
@@ -193,7 +194,7 @@ export const PUT: APIRoute = async ({ request }) => {
             delete mountain.location.initialBounds;
             affectedMountains += 1;
         }
-        let mountain: EditableMountain | undefined;
+        let mountain: Mountain | undefined;
         if (body.mountain !== undefined && body.region) {
             const group = mountains.filter((entry) => entry.region === body.region);
             mountain = saveMountainDraft(body, config, group);

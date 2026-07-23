@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 
-import { parseMountainCoverKey } from "../lib/mountain-editor";
+import { parseMountainCoverKey } from "../lib/mountain-schema";
 import { readAlbumManifestFile } from "../lib/albums/manifest-files";
 import {
     findMountainRegion,

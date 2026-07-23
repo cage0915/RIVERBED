@@ -1,44 +1,9 @@
-import type { MapBounds } from "./mountain-map.ts";
 import { isValidMapBounds } from "./mountain-map.ts";
-
-export type EditableMountain = {
-    name: string;
-    alternateName?: string;
-    elevation: number | null;
-    description: string;
-    coverKey?: string;
-    location?: {
-        latitude: number;
-        longitude: number;
-        mapContext: string;
-        initialBounds?: MapBounds;
-    };
-    panorama?: boolean;
-};
-
-export type MountainCoverKey = {
-    coverKey: string;
-    folder: string;
-    albumId: string;
-    photoKey: string;
-};
-
-export function parseMountainCoverKey(input: unknown): MountainCoverKey | null {
-    if (typeof input !== "string") return null;
-
-    const coverKey = input.trim();
-    const match = coverKey.match(
-        /^([a-z0-9][a-z0-9-]*)\/([a-z0-9][a-z0-9-]*)\/([^/]+)$/i,
-    );
-    if (!match || match[3] === "." || match[3] === "..") return null;
-
-    return {
-        coverKey,
-        folder: match[1],
-        albumId: match[2],
-        photoKey: match[3],
-    };
-}
+import {
+    parseMountain,
+    parseMountainCoverKey,
+    type Mountain,
+} from "./mountain-schema.ts";
 
 const optionalNumber = (
     value: unknown,
@@ -65,7 +30,7 @@ const roundTo = (value: number, decimalPlaces: number) => {
 export function sanitizeMountainEntry(
     input: unknown,
     contextIds: ReadonlySet<string>,
-): EditableMountain {
+): Mountain {
     if (!input || typeof input !== "object") {
         throw new Error("Invalid mountain entry");
     }
@@ -92,7 +57,7 @@ export function sanitizeMountainEntry(
         elevation = parsedElevation === undefined ? null : roundTo(parsedElevation, 0);
     }
 
-    const result: EditableMountain = {
+    const result: Mountain = {
         name,
         ...(alternateName ? { alternateName } : {}),
         elevation,
@@ -147,5 +112,5 @@ export function sanitizeMountainEntry(
         result.panorama = candidate.panorama;
     }
 
-    return result;
+    return parseMountain(result, contextIds);
 }

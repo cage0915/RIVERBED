@@ -940,7 +940,7 @@
 </style>
 
 <script>
-    import type { EditableMountain } from "../lib/mountain-editor";
+    import type { Mountain } from "../lib/mountain-schema";
     import type { MountainWithRegion } from "../lib/mountains";
     import {
         boundsToViewBox,
@@ -1843,7 +1843,7 @@
             });
         };
 
-        const collectMountainDraft = (mapContext = contextSelect.value): EditableMountain => {
+        const collectMountainDraft = (mapContext = contextSelect.value): Mountain => {
             if (!currentMountain) throw new Error("No mountain selected");
             const elevation = normalizeNumberInput(elevationInput, 0);
             const latitude = normalizeNumberInput(latitudeInput, 6);
@@ -1852,7 +1852,7 @@
                 throw new Error("Latitude and longitude must be entered together");
             }
 
-            const mountain: EditableMountain = {
+            const mountain: Mountain = {
                 name: currentMountain.name,
                 ...(alternateNameInput.value.trim()
                     ? { alternateName: alternateNameInput.value.trim() }
@@ -1877,7 +1877,7 @@
         const buildMountainDraftFromState = (
             baseMountain: MountainWithRegion,
             state: MountainFormState,
-        ): EditableMountain => {
+        ): Mountain => {
             if ((state.latitude === null) !== (state.longitude === null)) {
                 throw new Error(`${baseMountain.name}: latitude and longitude must be entered together`);
             }
@@ -1888,7 +1888,7 @@
             ) {
                 throw new Error(`${baseMountain.name}: choose a valid map context`);
             }
-            const mountain: EditableMountain = {
+            const mountain: Mountain = {
                 name: baseMountain.name,
                 ...(state.alternateName
                     ? { alternateName: state.alternateName }
@@ -2438,7 +2438,7 @@
             let changes: Array<{
                 originalName: string;
                 region: string;
-                mountain: EditableMountain;
+                mountain: Mountain;
                 forceContour: boolean;
             }>;
             try {

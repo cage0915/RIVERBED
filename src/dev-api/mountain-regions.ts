@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
 
-import type { EditableMountain } from "../lib/mountain-editor";
+import { MAP_CONTEXTS } from "../lib/mountain-map";
+import { parseMountainRegionSource } from "../lib/mountain-source";
 import {
     sanitizeMountainViewSettings,
     type MountainViewSettings,
@@ -107,9 +108,11 @@ export const PUT: APIRoute = async ({ request }) => {
 
         for (const id of removedIds) {
             const file = path.join(directory, `${id}.json`);
-            const mountains = JSON.parse(
-                await fs.readFile(file, "utf8"),
-            ) as EditableMountain[];
+            const mountains = parseMountainRegionSource(
+                JSON.parse(await fs.readFile(file, "utf8")),
+                file,
+                new Set(Object.keys(MAP_CONTEXTS)),
+            );
             if (mountains.length > 0) {
                 return json(
                     { error: `Region "${id}" still contains ${mountains.length} mountains` },
