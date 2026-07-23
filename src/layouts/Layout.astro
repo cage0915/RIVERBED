@@ -1,7 +1,9 @@
 ---
 import { ViewTransitions } from "astro:transitions";
+import SiteDevTools from "../components/SiteDevTools.astro";
+import SiteFooter from "../components/SiteFooter.astro";
 import { getAlbumSummaries } from "../lib/albums/catalog";
-import { getFolderTitle, getFolderOrder, getFolderFooter, FOLDER_METADATA } from "../lib/constants";
+import { getFolderTitle, getFolderOrder, FOLDER_METADATA } from "../lib/constants";
 import "@fontsource/noto-sans-jp/300.css";
 import "@fontsource/noto-sans-jp/400.css";
 import "@fontsource/noto-sans-jp/500.css";
@@ -18,12 +20,6 @@ interface Props {
 }
 
 const { title } = Astro.props;
-const DevTool = import.meta.env.DEV
-    ? (await import("../components/DevTool.astro")).default
-    : null;
-const MountainDevTool = import.meta.env.DEV
-    ? (await import("../components/MountainDevTool.astro")).default
-    : null;
 
 // Use FOLDER_METADATA keys as the base for navigation
 const metadataSlugs = Object.keys(FOLDER_METADATA);
@@ -45,10 +41,6 @@ const sortedFolders = folderSlugs
 
 // Get the current path to highlight active link
 const currentPath = Astro.url.pathname;
-
-// Determine current folder for footer
-const currentFolderSlug = currentPath.split("/").filter(Boolean)[0];
-const folderFooter = currentFolderSlug ? getFolderFooter(currentFolderSlug) : null;
 ---
 
 <!doctype html>
@@ -58,7 +50,6 @@ const folderFooter = currentFolderSlug ? getFolderFooter(currentFolderSlug) : nu
 		<meta name="description" content="RIVERBED" />
 		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" type="image/x-icon" href="/favicon.ico" />
-		<link rel="alternate" type="application/rss+xml" title="RIVERBED RSS" href="/rss.xml" />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
 		<ViewTransitions />
@@ -193,56 +184,8 @@ const folderFooter = currentFolderSlug ? getFolderFooter(currentFolderSlug) : nu
 			<slot />
 		</main>
 
-		{folderFooter && (
-			<footer class="py-12 border-t border-white/5">
-				<div class="mx-auto max-w-[1100px] px-4 sm:px-8 text-center">
-					<p
-						class="text-zinc-500 font-sans tracking-[0.3em] text-sm"
-					>
-						{folderFooter}
-					</p>
-				</div>
-			</footer>
-		)}
-
-		{currentPath === "/" && (
-			<footer class="pb-8">
-				<div class="mx-auto flex max-w-[1100px] justify-end px-4 sm:px-8">
-					<a
-						href="/rss.xml"
-						class="flex h-7 w-7 items-center justify-center rounded-full border border-white/10 text-zinc-500 transition-colors hover:border-white/30 hover:text-white"
-						aria-label="Subscribe to RIVERBED RSS"
-						title="Subscribe to RSS"
-					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="14"
-							height="14"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							aria-hidden="true"
-						>
-							<path d="M4 11a9 9 0 0 1 9 9"></path>
-							<path d="M4 4a16 16 0 0 1 16 16"></path>
-							<circle cx="5" cy="19" r="1"></circle>
-						</svg>
-					</a>
-				</div>
-			</footer>
-		)}
-
-        {DevTool && (
-            <>
-                <DevTool />
-                {MountainDevTool && currentPath.startsWith("/yama/tags/") && (
-                    <MountainDevTool />
-                )}
-            </>
-        )}
+		<SiteFooter />
+		<SiteDevTools />
 
 		<script>
 			let lastScrollY = window.scrollY;

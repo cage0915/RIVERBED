@@ -28,11 +28,11 @@ test('mountain navigation uses the static yama tag route hierarchy', () => {
     const photo = readProjectFile('src/components/Photo.astro');
     const devTool = readProjectFile('src/components/DevTool.astro');
     const mountainDevTool = readProjectFile('src/components/MountainDevTool.astro');
-    const layout = readProjectFile('src/layouts/Layout.astro');
+    const siteDevTools = readProjectFile('src/components/SiteDevTools.astro');
 
     assert.match(mountainGrid, /\/yama\/tags\/\$\{encodeURIComponent\(mountain\.name\)\}/);
     assert.match(folderPage, /href=[{]["']\/yama\/tags["'][}]/);
-    for (const source of [photo, devTool, mountainDevTool, layout]) {
+    for (const source of [photo, devTool, mountainDevTool, siteDevTools]) {
         assert.doesNotMatch(source, /["'`]\/tags\//);
         assert.match(source, /\/yama\/tags\//);
     }
@@ -216,4 +216,21 @@ test('region removal validates Mountains against persisted map contexts', () => 
     assert.match(regions, /readMountainRegion/);
     assert.doesNotMatch(regions, /MAP_CONTEXTS/);
     assert.doesNotMatch(regions, /parseMountainRegionSource/);
+});
+
+test('Layout delegates footer and development tool rendering boundaries', () => {
+    const layout = readProjectFile('src/layouts/Layout.astro');
+
+    assert.match(
+        layout,
+        /import SiteFooter from ["']\.\.\/components\/SiteFooter\.astro["']/,
+    );
+    assert.match(
+        layout,
+        /import SiteDevTools from ["']\.\.\/components\/SiteDevTools\.astro["']/,
+    );
+    assert.match(layout, /<SiteFooter\s*\/>/);
+    assert.match(layout, /<SiteDevTools\s*\/>/);
+    assert.doesNotMatch(layout, /DevTool\.astro|MountainDevTool\.astro/);
+    assert.doesNotMatch(layout, /\bfolderFooter\b|getFolderFooter|\/rss\.xml/);
 });
