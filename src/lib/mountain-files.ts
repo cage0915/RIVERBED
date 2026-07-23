@@ -1,11 +1,15 @@
 import type { Mountain } from "./mountain-schema.ts";
 import { parseMountainRegionSource } from "./mountain-source.ts";
 import {
+    commitTextFiles,
+    type TextFileProposal,
+} from "./source-transaction.ts";
+import {
     MOUNTAIN_REGIONS,
     type MountainRegion,
     type MountainSourceRegion,
-    type MountainWithRegion,
-} from "./mountains";
+} from "./mountain-regions.ts";
+import type { MountainWithRegion } from "./mountains.ts";
 
 export const isMountainRegion = (value: unknown): value is MountainRegion =>
     typeof value === "string" &&
@@ -19,6 +23,16 @@ export const isMountainSourceRegion = (
 const regionFile = async (region: MountainSourceRegion) => {
     const path = await import("node:path");
     return path.resolve(process.cwd(), "src/mountains", `${region}.json`);
+};
+
+const readJsonSource = async (file: string): Promise<unknown> => {
+    const fs = await import("node:fs/promises");
+    try {
+        return JSON.parse(await fs.readFile(file, "utf8"));
+    } catch (cause) {
+        const message = cause instanceof Error ? cause.message : String(cause);
+        throw new Error(`Invalid Mountain source ${file}: ${message}`, { cause });
+    }
 };
 
 const readConfiguredContextIds = async (): Promise<ReadonlySet<string>> => {
@@ -44,9 +58,8 @@ export const readMountainRegion = async (
     region: MountainSourceRegion,
     contextIds?: ReadonlySet<string>,
 ): Promise<Mountain[]> => {
-    const fs = await import("node:fs/promises");
     const file = await regionFile(region);
-    const input = JSON.parse(await fs.readFile(file, "utf8"));
+    const input = await readJsonSource(file);
     return parseMountainRegionSource(
         input,
         file,
@@ -70,14 +83,12 @@ export const readAllMountainRegions = async (
     );
 };
 
-export const writeMountainRegion = async (
+export const createMountainRegionProposal = async (
     region: MountainSourceRegion,
     mountains: Mountain[],
     contextIds?: ReadonlySet<string>,
-) => {
-    const fs = await import("node:fs/promises");
+): Promise<TextFileProposal> => {
     const file = await regionFile(region);
-    const temporaryFile = `${file}.${process.pid}.tmp`;
     const validated = parseMountainRegionSource(
         mountains,
         file,
@@ -86,26 +97,34 @@ export const writeMountainRegion = async (
     const sorted = validated.sort((left, right) =>
         left.name.localeCompare(right.name, "zh-Hant"),
     );
-    await fs.writeFile(
-        temporaryFile,
-        `${JSON.stringify(sorted, null, 2)}\n`,
-        "utf8",
-    );
-    await fs.rename(temporaryFile, file);
+    return {
+        target: file,
+        contents: `${JSON.stringify(sorted, null, 2)}\n`,
+    };
+};
+
+export const writeMountainRegion = async (
+    region: MountainSourceRegion,
+    mountains: Mountain[],
+    contextIds?: ReadonlySet<string>,
+) => {
+    await commitTextFiles([
+        await createMountainRegionProposal(region, mountains, contextIds),
+    ]);
 };
 
 export const findMountainRegion = async (name: string) =>
     (await readAllMountainRegions()).find((mountain) => mountain.name === name);
 
-export const writeAllMountainRegions = async (
+export const createAllMountainRegionProposals = async (
     mountains: MountainWithRegion[],
     contextIds?: ReadonlySet<string>,
-) => {
+): Promise<TextFileProposal[]> => {
     const regions: MountainSourceRegion[] = [...MOUNTAIN_REGIONS];
     const resolvedContextIds = contextIds ?? (await readConfiguredContextIds());
-    await Promise.all(
+    return Promise.all(
         regions.map((region) =>
-            writeMountainRegion(
+            createMountainRegionProposal(
                 region,
                 mountains
                     .filter((mountain) => mountain.region === region)
@@ -113,5 +132,14 @@ export const writeAllMountainRegions = async (
                 resolvedContextIds,
             ),
         ),
+    );
+};
+
+export const writeAllMountainRegions = async (
+    mountains: MountainWithRegion[],
+    contextIds?: ReadonlySet<string>,
+) => {
+    await commitTextFiles(
+        await createAllMountainRegionProposals(mountains, contextIds),
     );
 };

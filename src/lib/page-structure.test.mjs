@@ -181,10 +181,39 @@ test('Mountain context writes validate against the proposed context set', () => 
     );
     assert.match(
         contexts,
-        /writeMountainRegion\(body\.region, mountains, proposedContextIds\)/,
+        /createMountainRegionProposal\(\s*body\.region,\s*mountains,\s*proposedContextIds/s,
     );
     assert.match(
         contexts,
-        /writeAllMountainRegions\(mountains, proposedContextIds\)/,
+        /createAllMountainRegionProposals\(\s*mountains,\s*proposedContextIds/s,
     );
+    assert.match(
+        contexts,
+        /getMountainContextReferences\(mountains, id\)[\s\S]*affectedMountains\.length > 0[\s\S]*}, 409\);[\s\S]*delete config\.contexts\[id\]/,
+    );
+});
+
+test('Mountain context config and records share one source transaction', () => {
+    const contexts = readProjectFile('src/dev-api/mountain-contexts.ts');
+
+    assert.match(contexts, /commitTextFiles/);
+    assert.match(contexts, /createMountainRegionProposal/);
+    assert.match(contexts, /createAllMountainRegionProposals/);
+    assert.match(
+        contexts,
+        /commitTextFiles\(\[\s*configProposal\(configFile, config\),[\s\S]*createMountainRegionProposal/,
+    );
+    assert.match(
+        contexts,
+        /commitTextFiles\(\[\s*configProposal\(configFile, config\),\s*\.\.\.\(await createAllMountainRegionProposals/,
+    );
+    assert.doesNotMatch(contexts, /Promise\.all\(\[\s*writeConfig/);
+});
+
+test('region removal validates Mountains against persisted map contexts', () => {
+    const regions = readProjectFile('src/dev-api/mountain-regions.ts');
+
+    assert.match(regions, /readMountainRegion/);
+    assert.doesNotMatch(regions, /MAP_CONTEXTS/);
+    assert.doesNotMatch(regions, /parseMountainRegionSource/);
 });

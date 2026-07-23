@@ -217,7 +217,10 @@ duplicates, or presentation-layer assertions.
 Filesystem context validation uses the currently persisted context set by
 default. Context creation/update operations pass their proposed context set to
 Mountain writers, preserving the existing ability to create a context and
-assign it in one operation.
+assign it in one operation. Context deletion returns a conflict while any
+Mountain still references it. Configuration and affected Mountain files are
+committed as one serialized, rollback-capable source transaction, so a failed
+multi-file write cannot leave the repository between two schema-valid states.
 
 ### Album data now has one normalized read boundary
 

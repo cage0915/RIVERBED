@@ -1,7 +1,6 @@
 import type { APIRoute } from "astro";
 
-import { MAP_CONTEXTS } from "../lib/mountain-map";
-import { parseMountainRegionSource } from "../lib/mountain-source";
+import { readMountainRegion } from "../lib/mountain-files";
 import {
     sanitizeMountainViewSettings,
     type MountainViewSettings,
@@ -107,12 +106,7 @@ export const PUT: APIRoute = async ({ request }) => {
         const { config, viewSettings, directory } = await files();
 
         for (const id of removedIds) {
-            const file = path.join(directory, `${id}.json`);
-            const mountains = parseMountainRegionSource(
-                JSON.parse(await fs.readFile(file, "utf8")),
-                file,
-                new Set(Object.keys(MAP_CONTEXTS)),
-            );
+            const mountains = await readMountainRegion(id);
             if (mountains.length > 0) {
                 return json(
                     { error: `Region "${id}" still contains ${mountains.length} mountains` },

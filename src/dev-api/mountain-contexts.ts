@@ -1,16 +1,21 @@
 import type { APIRoute } from "astro";
 
 import { sanitizeMountainEntry } from "../lib/mountain-editor";
+import { getMountainContextReferences } from "../lib/mountain-context-lifecycle";
 import { isValidMapBounds, type MapBounds } from "../lib/mountain-map";
 import type { Mountain } from "../lib/mountain-schema";
 import {
+    createAllMountainRegionProposals,
+    createMountainRegionProposal,
     isMountainSourceRegion,
     readAllMountainRegions,
     readMountainRegion,
-    writeAllMountainRegions,
-    writeMountainRegion,
 } from "../lib/mountain-files";
 import type { MountainSourceRegion } from "../lib/mountains";
+import {
+    commitTextFiles,
+    type TextFileProposal,
+} from "../lib/source-transaction";
 
 type ContextConfig = {
     id: string;
@@ -68,12 +73,13 @@ const roundedBounds = (bounds: MapBounds): MapBounds => ({
     north: Number(bounds.north.toFixed(6)),
 });
 
-const writeConfig = async (configFile: string, config: MapConfigFile) => {
-    const fs = await import("node:fs/promises");
-    const temporaryConfigFile = `${configFile}.${process.pid}.tmp`;
-    await fs.writeFile(temporaryConfigFile, `${JSON.stringify(config, null, 2)}\n`, "utf8");
-    await fs.rename(temporaryConfigFile, configFile);
-};
+const configProposal = (
+    configFile: string,
+    config: MapConfigFile,
+): TextFileProposal => ({
+    target: configFile,
+    contents: `${JSON.stringify(config, null, 2)}\n`,
+});
 
 const saveMountainDraft = (
     body: ContextRequestBody,
@@ -137,10 +143,14 @@ export const POST: APIRoute = async ({ request }) => {
         config.contexts[fields.id] = context;
         const proposedContextIds = new Set(Object.keys(config.contexts));
         const mountain = saveMountainDraft(body, config, mountains);
-        await Promise.all([
-            writeConfig(configFile, config),
+        await commitTextFiles([
+            configProposal(configFile, config),
             ...(isMountainSourceRegion(body.region)
-                ? [writeMountainRegion(body.region, mountains, proposedContextIds)]
+                ? [await createMountainRegionProposal(
+                    body.region,
+                    mountains,
+                    proposedContextIds,
+                )]
                 : []),
         ]);
         return json({
@@ -207,9 +217,12 @@ export const PUT: APIRoute = async ({ request }) => {
                 mountains[index] = { ...mountain, region: body.region };
             }
         }
-        await Promise.all([
-            writeConfig(configFile, config),
-            writeAllMountainRegions(mountains, proposedContextIds),
+        await commitTextFiles([
+            configProposal(configFile, config),
+            ...(await createAllMountainRegionProposals(
+                mountains,
+                proposedContextIds,
+            )),
         ]);
         return json({
             success: true,
@@ -241,14 +254,17 @@ export const DELETE: APIRoute = async ({ request }) => {
         if (context.protected) {
             return json({ error: `Context ID "${id}" is code-owned and cannot be deleted in DevTool` }, 403);
         }
-        const affectedMountains = mountains
-            .filter((mountain) => mountain.location?.mapContext === id)
-            .map((mountain) => mountain.name);
+        const affectedMountains = getMountainContextReferences(mountains, id);
+        if (affectedMountains.length > 0) {
+            return json({
+                error: `Context ID "${id}" is still referenced by ${affectedMountains.length} Mountains`,
+                affectedMountains,
+                affectedCount: affectedMountains.length,
+            }, 409);
+        }
         delete config.contexts[id];
 
-        // Preserve coordinates and the now-missing context ID. Dev and production
-        // both suppress the map until another valid context is assigned.
-        await writeConfig(configFile, config);
+        await commitTextFiles([configProposal(configFile, config)]);
         return json({
             success: true,
             deletedContextId: id,
