@@ -1,0 +1,58 @@
+<script>
+    import { installPageLifecycle } from "../lib/client-page-lifecycle";
+
+    const INTERVAL_MS = 5000;
+
+    installPageLifecycle(document, () => {
+        const root = document.querySelector<HTMLElement>("[data-catalog-grid]");
+        if (!root) return;
+
+        const controller = new AbortController();
+        const cards = root.querySelectorAll<HTMLElement>("[data-catalog-card]");
+        const intervals: number[] = [];
+        const closeCards = () => {
+            cards.forEach((card) => card.classList.remove("show-info"));
+        };
+
+        cards.forEach((card) => {
+            const slides = card.querySelectorAll<HTMLElement>(".slide");
+
+            if (slides.length > 1) {
+                let current = 0;
+                const interval = window.setInterval(() => {
+                    slides[current].classList.remove("active");
+                    current = (current + 1) % slides.length;
+                    slides[current].classList.add("active");
+                }, INTERVAL_MS);
+                intervals.push(interval);
+            }
+
+            card.addEventListener("click", (event) => {
+                const isMobile = window.matchMedia(
+                    "(max-width: 768px) and (hover: none)",
+                ).matches;
+                if (!isMobile || card.classList.contains("show-info")) return;
+
+                event.preventDefault();
+                closeCards();
+                card.classList.add("show-info");
+            }, { signal: controller.signal });
+        });
+
+        document.addEventListener("click", (event) => {
+            const target = event.target;
+            const isInsideCurrentCard = target instanceof Node
+                && [...cards].some((card) => card.contains(target));
+
+            if (!isInsideCurrentCard) {
+                closeCards();
+            }
+        }, { signal: controller.signal });
+
+        return () => {
+            controller.abort();
+            intervals.forEach((interval) => window.clearInterval(interval));
+            closeCards();
+        };
+    });
+</script>

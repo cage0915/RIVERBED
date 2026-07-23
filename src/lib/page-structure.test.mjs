@@ -302,3 +302,64 @@ test('Layout delegates navigation rendering and lifecycle ownership', () => {
     assert.doesNotMatch(siteNavigation, /astro:after-swap/);
     assert.doesNotMatch(siteNavigation, /cloneNode|replaceChild/);
 });
+
+test('catalog routes share lifecycle-scoped card interactions', () => {
+    const homePage = readProjectFile('src/pages/index.astro');
+    const folderPage = readProjectFile('src/pages/[folder]/index.astro');
+    const interactionsPath = new URL(
+        '../components/CatalogCardInteractions.astro',
+        import.meta.url,
+    );
+    const interactions = existsSync(interactionsPath)
+        ? readFileSync(interactionsPath, 'utf8')
+        : '';
+
+    assert.match(
+        homePage,
+        /import CatalogCardInteractions from ["']\.\.\/components\/CatalogCardInteractions\.astro["']/,
+    );
+    assert.match(
+        folderPage,
+        /import CatalogCardInteractions from ["']\.\.\/\.\.\/components\/CatalogCardInteractions\.astro["']/,
+    );
+
+    for (const page of [homePage, folderPage]) {
+        assert.equal(
+            (page.match(/<CatalogCardInteractions\s*\/>/g) ?? []).length,
+            1,
+        );
+        assert.match(page, /data-catalog-grid/);
+        assert.match(page, /data-catalog-card/);
+        assert.doesNotMatch(page, /astro:after-swap|initFolderCards|initAlbumCards/);
+    }
+
+    assert.match(
+        homePage,
+        /<div class="pt-6 pb-8" data-catalog-grid>[\s\S]*<article class="album-card latest-post-card group" data-catalog-card>[\s\S]*<nav[\s\S]*class="folders-grid"[\s\S]*class="album-card folder-card group"[\s\S]*data-catalog-card/,
+    );
+    assert.match(
+        folderPage,
+        /<div class="albums-grid" data-catalog-grid[\s\S]*class="album-card group"[\s\S]*data-catalog-card/,
+    );
+    assert.match(interactions.trim(), /^<script>[\s\S]*<\/script>$/);
+    assert.match(interactions, /installPageLifecycle/);
+    assert.match(interactions, /new AbortController\(\)/);
+    assert.match(interactions, /root\.querySelectorAll[^;]*data-catalog-card/);
+    assert.match(interactions, /const INTERVAL_MS = 5000/);
+    assert.match(interactions, /window\.setInterval/);
+    assert.match(interactions, /clearInterval/);
+    assert.match(interactions, /controller\.abort\(\)/);
+    assert.match(interactions, /classList\.remove\("show-info"\)/);
+    assert.match(
+        interactions,
+        /\(max-width: 768px\) and \(hover: none\)[\s\S]*classList\.contains\("show-info"\)[\s\S]*event\.preventDefault\(\)/,
+    );
+    assert.match(
+        interactions,
+        /card\.contains\(target\)[\s\S]*if \(!isInsideCurrentCard\)/,
+    );
+    assert.doesNotMatch(
+        interactions,
+        /document\.querySelectorAll[^;]*\.album-card/,
+    );
+});
