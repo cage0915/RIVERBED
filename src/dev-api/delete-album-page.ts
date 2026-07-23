@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
-import fs from 'node:fs';
 import path from 'node:path';
 import trash from 'trash';
+import { AlbumLifecycleConflictError, deleteAlbumSourceFiles } from '../lib/albums/album-lifecycle';
 
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), {
     status,
@@ -16,12 +16,11 @@ export const POST: APIRoute = async ({ request }) => {
         if (!/^[a-z0-9-]+\/[a-z0-9-]+$/.test(pagePath)) return json({ error: 'Invalid page path' }, 400);
 
         const projectRoot = process.cwd();
-        const mdxPath = path.resolve(projectRoot, 'src/content/albums', `${pagePath}.mdx`);
-        if (!fs.existsSync(mdxPath)) return json({ error: 'Page does not exist' }, 404);
-        const [folder, page] = pagePath.split('/');
-        const tagsPath = path.resolve(projectRoot, 'src/album-tags', folder, `${page}.json`);
-        const sources = [mdxPath, tagsPath].filter((source) => fs.existsSync(source));
-        await trash(sources, { glob: false });
+        const sources = await deleteAlbumSourceFiles(
+            projectRoot,
+            pagePath,
+            (paths) => trash(paths, { glob: false }),
+        );
         return json({
             success: true,
             pagePath,
@@ -29,6 +28,12 @@ export const POST: APIRoute = async ({ request }) => {
             localPhotosPreserved: true,
         });
     } catch (error) {
+        if (error instanceof AlbumLifecycleConflictError) {
+            return json({ error: error.message, consumers: error.consumerSlugs }, 409);
+        }
+        if (error instanceof Error && /manifest not found/i.test(error.message)) {
+            return json({ error: 'Page does not exist' }, 404);
+        }
         return json({ error: error instanceof Error ? error.message : 'Page deletion failed' }, 500);
     }
 };

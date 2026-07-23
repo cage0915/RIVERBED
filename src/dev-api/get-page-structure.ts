@@ -1,6 +1,8 @@
 import type { APIRoute } from 'astro';
 import fs from 'node:fs';
 import path from 'node:path';
+import { readAlbumManifestFile } from '../lib/albums/manifest-files';
+import { albumPageManagerMetadata, assertAlbumAssetStorageSafe } from '../lib/albums/album-lifecycle';
 
 export const GET: APIRoute = async ({ request }) => {
     if (!import.meta.env.DEV) {
@@ -21,12 +23,17 @@ export const GET: APIRoute = async ({ request }) => {
         return new Response(JSON.stringify({ error: 'MDX file not found' }), { status: 404 });
     }
 
+    let manifest;
+    try {
+        manifest = await readAlbumManifestFile(process.cwd(), albumSlug);
+    } catch (error) {
+        return new Response(JSON.stringify({ error: error instanceof Error ? error.message : 'Manifest not found' }), { status: 404 });
+    }
     const content = fs.readFileSync(mdxFile, 'utf-8');
 
     // Simple parser for MDX blocks
     // 1. Extract Frontmatter
-    const fmMatch = content.match(/^---\n([\s\S]*?)\n---/);
-    const frontmatter = fmMatch ? fmMatch[1] : '';
+    const fmMatch = content.match(/^---\r?\n[\s\S]*?^---[ \t]*(?:\r?\n|$)/m);
     const body = fmMatch ? content.slice(fmMatch[0].length).trim() : content;
 
     // 2. Extract Blocks
@@ -101,6 +108,7 @@ export const GET: APIRoute = async ({ request }) => {
     }
 
     const localDirectory = path.resolve(process.cwd(), 'r2', albumSlug);
+    await assertAlbumAssetStorageSafe(process.cwd(), albumSlug);
     const localPhotos = fs.existsSync(localDirectory)
         ? fs.readdirSync(localDirectory, { withFileTypes: true })
             .filter((entry) => entry.isFile() && /\.(?:jpe?g|png|webp|avif)$/i.test(entry.name))
@@ -111,7 +119,11 @@ export const GET: APIRoute = async ({ request }) => {
             .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }))
         : [];
 
-    return new Response(JSON.stringify({ frontmatter, blocks, localPhotos }), {
+    return new Response(JSON.stringify({
+        metadata: albumPageManagerMetadata(albumSlug, manifest),
+        blocks,
+        localPhotos,
+    }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' },
     });

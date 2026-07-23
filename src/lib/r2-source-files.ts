@@ -7,7 +7,9 @@ import {
     collectMountainReferences,
     type R2SourceIndex,
     type R2SourceReference,
-} from './r2-source-index';
+} from './r2-source-index.ts';
+import { parseAlbumManifest } from './albums/manifest-schema.ts';
+import type { AlbumManifest } from './albums/types.ts';
 
 const walkFiles = (directory: string, extension: string): string[] => {
     if (!fs.existsSync(directory)) return [];
@@ -20,10 +22,28 @@ const walkFiles = (directory: string, extension: string): string[] => {
 
 export function loadR2SourceIndex(projectRoot = process.cwd()): R2SourceIndex {
     const references: R2SourceReference[] = [];
-    const albumsRoot = path.join(projectRoot, 'src/content/albums');
-    for (const filename of walkFiles(albumsRoot, '.mdx')) {
-        const albumSlug = path.relative(albumsRoot, filename).replace(/\.mdx$/, '').split(path.sep).join('/');
-        references.push(...collectAlbumReferences(albumSlug, fs.readFileSync(filename, 'utf8')));
+    const albumsRoot = path.join(projectRoot, 'src/album-manifests');
+    const manifests = new Map<string, AlbumManifest>();
+    for (const filename of walkFiles(albumsRoot, '.json')) {
+        const albumSlug = path.relative(albumsRoot, filename).replace(/\.json$/, '').split(path.sep).join('/');
+        try {
+            const manifest = parseAlbumManifest(JSON.parse(fs.readFileSync(filename, 'utf8')), albumSlug);
+            manifests.set(albumSlug, manifest);
+        } catch (error) {
+            throw new Error(`Failed to read R2 references from ${filename}`, { cause: error });
+        }
+    }
+    for (const [albumSlug, manifest] of manifests) {
+        if (manifest.cover.photo.kind === 'external') {
+            const [folder, album, filename] = manifest.cover.photo.assetKey.split('/');
+            const source = manifests.get(`${folder}/${album}`);
+            if (!source?.photos.some((photo) => photo.filename === filename)) {
+                throw new Error(
+                    `External cover ${manifest.cover.photo.assetKey} in ${albumSlug} does not resolve to tracked Album inventory`,
+                );
+            }
+        }
+        references.push(...collectAlbumReferences(albumSlug, manifest));
     }
 
     const mountainsRoot = path.join(projectRoot, 'src/mountains');

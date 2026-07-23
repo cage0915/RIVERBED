@@ -1534,23 +1534,16 @@
                 const fTitle = dialog.querySelector("#dev-pm-title") as HTMLInputElement;
                 const fInfo = dialog.querySelector("#dev-pm-info") as HTMLInputElement;
 
-                const parseFM = (fm: string) => {
-                    const get = (key: string) => (fm.match(new RegExp(`^${key}:\\s*(.*)$`, 'm')) || [])[1]?.trim().replace(/^"(.*)"$/, '$1').replace(/^'(.*)'$/, '$1');
-                    return {
-                        title: get('title') || '',
-                        info: get('info') || '',
-                        coverKey: get('coverKey') || '',
-                        order: get('order') || '',
-                    };
+                const fmData = {
+                    title: String(data.metadata?.title || ''),
+                    info: String(data.metadata?.info || ''),
+                    coverKey: String(data.metadata?.cover?.assetKey || ''),
                 };
-
-                const fmData = parseFM(data.frontmatter);
                 fTitle.value = fmData.title;
                 fInfo.value = fmData.info;
 
                 const fGap = dialog.querySelector("#dev-pm-gap") as HTMLInputElement;
-                const getGapFromFM = (fm: string) => (fm.match(/^gap:\s*(.*)$/m) || [])[1]?.trim().replace(/^"(.*)"$/, '$1').replace(/^'(.*)'$/, '$1');
-                fGap.value = getGapFromFM(data.frontmatter) || '';
+                fGap.value = String(data.metadata?.gap || '');
 
                 const fmSection = dialog.querySelector("#dev-pm-fm-section") as HTMLElement;
                 const fmToggle = dialog.querySelector("#dev-pm-fm-toggle") as HTMLButtonElement;
@@ -1613,9 +1606,12 @@
                     const fullKey = itemKey.includes('/') ? itemKey : `${albumSlug}/${itemKey}`;
                     return `/r2/${fullKey.split('/').map(encodeURIComponent).join('/')}`;
                 };
+                const localCoverName = () => fmData.coverKey.startsWith(`${albumSlug}/`)
+                    ? basename(fmData.coverKey)
+                    : '';
                 const referencedPhotoNames = () => new Set([
                     ...currentBlocks.flatMap((block: any) => (block.photos || []).map((photo: any) => basename(photo.itemKey))),
-                    ...(fmData.coverKey ? [basename(fmData.coverKey)] : []),
+                    ...(localCoverName() ? [localCoverName()] : []),
                 ]);
                 const initiallyReferencedNames = referencedPhotoNames();
                 const localPhotoNames = new Set(localPhotos.map((photo) => photo.name));
@@ -1637,7 +1633,7 @@
                     pendingPageImports = retainedImports;
                 };
                 const pageStateSnapshot = () => JSON.stringify({
-                    frontmatter: {
+                    metadata: {
                         title: fTitle.value.trim(),
                         info: fInfo.value.trim(),
                         gap: fGap.value.trim(),
@@ -2282,18 +2278,6 @@
                 };
 
                 const confirmHandler = async () => {
-                    const escaped = (value: string) => value.replaceAll('\\', '\\\\').replaceAll('"', '\\"');
-                    const setFrontmatter = (source: string, key: string, value: string | null) => {
-                        const pattern = new RegExp(`^${key}:\\s*.*$`, 'm');
-                        if (value === null) return source.replace(new RegExp(`^${key}:\\s*.*$\\n?`, 'm'), '');
-                        return pattern.test(source) ? source.replace(pattern, `${key}: ${value}`) : `${source.trimEnd()}\n${key}: ${value}`;
-                    };
-                    let newFM = data.frontmatter || '';
-                    newFM = setFrontmatter(newFM, 'title', `"${escaped(fTitle.value.trim())}"`);
-                    newFM = setFrontmatter(newFM, 'info', fInfo.value.trim() ? `"${escaped(fInfo.value.trim())}"` : null);
-                    newFM = setFrontmatter(newFM, 'coverKey', `"${escaped(fmData.coverKey)}"`);
-                    newFM = setFrontmatter(newFM, 'gap', fGap.value.trim() ? `"${escaped(fGap.value.trim())}"` : null);
-
                     confirmBtn.disabled = true;
                     confirmBtn.innerHTML = '...';
                     reconcileRemovedPhotos();
@@ -2303,7 +2287,11 @@
                         form.set('albumSlug', albumSlug);
                         form.set('draft', JSON.stringify({
                             blocks: blocksToSave,
-                            frontmatter: newFM,
+                            metadata: {
+                                title: fTitle.value.trim(),
+                                info: fInfo.value.trim() || undefined,
+                                gap: fGap.value.trim() || undefined,
+                            },
                             removeLocal: [...pendingLocalRemovals],
                         }));
                         pendingPageImports.forEach((file) => form.append('photos', file, file.name));

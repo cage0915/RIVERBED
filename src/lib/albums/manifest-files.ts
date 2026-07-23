@@ -218,6 +218,17 @@ async function enqueueManifestMutations<T>(
     }
 }
 
+/** Serialize lifecycle operations with every manifest writer touching these Albums. */
+export async function withAlbumManifestLocks<T>(
+    projectRoot: string,
+    albumSlugs: string[],
+    operation: () => Promise<T>,
+): Promise<T> {
+    const slugs = [...new Set(albumSlugs.map(validateAlbumSlug))].sort();
+    const locations = await Promise.all(slugs.map((slug) => resolveManifestLocation(projectRoot, slug)));
+    return enqueueManifestMutations(manifestLockKeys(locations), operation);
+}
+
 async function replaceAlbumManifestFiles(
     projectRoot: string,
     manifests: Record<string, AlbumManifest>,

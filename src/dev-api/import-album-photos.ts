@@ -1,16 +1,22 @@
 import type { APIRoute } from 'astro';
-import { createHash } from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { createAlbumMdx, validateAlbumSegment, validateImageFilename } from '../lib/album-import.js';
+import { createAlbumImport, validateAlbumSegment, validateImageFilename } from '../lib/album-import.js';
+import {
+    AlbumAssetConflictError,
+    AlbumSourceRollbackIncompleteError,
+    assertAlbumAssetStorageSafe,
+    commitAlbumAssets,
+    commitAlbumImportSources,
+    nextAlbumOrder,
+} from '../lib/albums/album-lifecycle';
+import { readAllAlbumManifestFiles } from '../lib/albums/manifest-files';
 
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), {
     status,
     headers: { 'Content-Type': 'application/json' },
 });
-
-const digest = (value: Uint8Array) => createHash('sha256').update(value).digest('hex');
 
 export const POST: APIRoute = async ({ request }) => {
     if (!import.meta.env.DEV) return json({ error: 'Not available in production' }, 403);
@@ -30,47 +36,42 @@ export const POST: APIRoute = async ({ request }) => {
         const albumDir = path.resolve(projectRoot, 'r2', folder, album);
         const allowedAlbumRoot = path.resolve(projectRoot, 'r2', folder) + path.sep;
         const mdxPath = path.resolve(projectRoot, 'src/content/albums', folder, `${album}.mdx`);
+        const manifestPath = path.resolve(projectRoot, 'src/album-manifests', folder, `${album}.json`);
         if (!albumDir.startsWith(allowedAlbumRoot)) return json({ error: 'Invalid target path' }, 400);
-        if (createPage && fs.existsSync(mdxPath)) return json({ error: 'Page already exists' }, 409);
-        if (!createPage && !fs.existsSync(mdxPath)) return json({ error: 'Page does not exist' }, 404);
+        if (createPage && (fs.existsSync(mdxPath) || fs.existsSync(manifestPath))) return json({ error: 'Page already exists' }, 409);
+        if (!createPage && (!fs.existsSync(mdxPath) || !fs.existsSync(manifestPath))) return json({ error: 'Page does not exist' }, 404);
+
+        const albumSlug = `${folder}/${album}`;
+        await assertAlbumAssetStorageSafe(projectRoot, albumSlug);
+        const importProposal = createPage
+            ? createAlbumImport({
+                albumSlug,
+                title,
+                filenames: names,
+                order: nextAlbumOrder(await readAllAlbumManifestFiles(projectRoot), folder),
+            })
+            : undefined;
 
         const payloads = await Promise.all(files.map(async (file, index) => ({
             name: names[index],
             bytes: new Uint8Array(await file.arrayBuffer()),
         })));
 
-        const conflicts: string[] = [];
-        const skipped: string[] = [];
-        for (const payload of payloads) {
-            const target = path.join(albumDir, payload.name);
-            if (!fs.existsSync(target)) continue;
-            const current = fs.readFileSync(target);
-            if (digest(current) === digest(payload.bytes)) skipped.push(payload.name);
-            else conflicts.push(payload.name);
-        }
-        if (conflicts.length > 0) return json({ error: 'Different files already use these names', conflicts }, 409);
-
-        fs.mkdirSync(albumDir, { recursive: true });
-        const copied: string[] = [];
-        for (const payload of payloads) {
-            if (skipped.includes(payload.name)) continue;
-            fs.writeFileSync(path.join(albumDir, payload.name), payload.bytes);
-            copied.push(payload.name);
-        }
-
+        let copied: string[] = [];
+        let skipped: string[] = [];
         if (createPage) {
-            fs.mkdirSync(path.dirname(mdxPath), { recursive: true });
-            fs.writeFileSync(mdxPath, createAlbumMdx({ title, filenames: names }), 'utf8');
-            const orderPath = path.join(path.dirname(mdxPath), '_order.json');
-            let order: string[] = [];
-            if (fs.existsSync(orderPath)) {
-                try {
-                    const parsed = JSON.parse(fs.readFileSync(orderPath, 'utf8'));
-                    if (Array.isArray(parsed)) order = parsed.filter((item): item is string => typeof item === 'string');
-                } catch {}
-            }
-            if (!order.includes(album)) order.unshift(album);
-            fs.writeFileSync(orderPath, JSON.stringify(order, null, 4), 'utf8');
+            const committed = await commitAlbumImportSources(
+                projectRoot,
+                albumSlug,
+                importProposal!,
+                payloads,
+            );
+            copied = committed.copied;
+            skipped.splice(0, skipped.length, ...committed.skipped);
+        } else {
+            const committed = await commitAlbumAssets(projectRoot, albumSlug, payloads);
+            copied = committed.copied;
+            skipped = committed.skipped;
         }
 
         return json({
@@ -81,6 +82,22 @@ export const POST: APIRoute = async ({ request }) => {
         });
     } catch (error) {
         const message = error instanceof Error ? error.message : 'Import failed';
+        if (error instanceof AlbumSourceRollbackIncompleteError) {
+            return json({
+                error: message,
+                code: error.code,
+                outcome: error.outcome,
+                recoveryArtifacts: error.recoveryArtifacts,
+            }, 500);
+        }
+        if (error instanceof AlbumAssetConflictError) {
+            return json({ error: message, conflicts: error.filenames }, 409);
+        }
+        if ((error as NodeJS.ErrnoException)?.code === 'EEXIST' ||
+            /Album source already exists|Page already exists/.test(message)) {
+            return json({ error: message }, 409);
+        }
+        if (/Unable to read Album manifest|Album source does not exist/.test(message)) return json({ error: message }, 404);
         return json({ error: message }, 400);
     }
 };

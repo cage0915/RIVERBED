@@ -45,6 +45,10 @@ export function createPageContent(originalContent: string, blocks: PageBlock[], 
     return `${frontmatter}\n\n${serializePageBody(blocks)}\n`;
 }
 
+export function createLayoutOnlyPageContent(blocks: PageBlock[]) {
+    return `---\n---\n\n${serializePageBody(blocks)}\n`;
+}
+
 export function referencedLocalNames(blocks: PageBlock[], frontmatter = '') {
     const names = new Set<string>();
     const add = (value?: string) => {

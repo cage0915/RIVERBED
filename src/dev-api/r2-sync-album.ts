@@ -5,6 +5,13 @@ import path from 'node:path';
 
 import { loadR2SourceIndex } from '../lib/r2-source-files';
 import { getR2AdminClient } from '../lib/r2-admin-client';
+import {
+    assertAlbumAssetStorageSafe,
+    assertUniqueR2ActionKeys,
+    findExternalCoverConsumers,
+    withR2SourceAlbumLocks,
+} from '../lib/albums/album-lifecycle';
+import { readAllAlbumManifestFiles } from '../lib/albums/manifest-files';
 
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), {
     status,
@@ -26,15 +33,59 @@ export const POST: APIRoute = async ({ request }) => {
         const albumSlug = String(body.albumSlug || '');
         if (!isAlbumSlug(albumSlug) || !Array.isArray(body.actions)) return json({ error: 'Invalid sync plan' }, 400);
         const prefix = `${albumSlug}/`;
-        const sourceIndex = loadR2SourceIndex();
-        const results: Array<{ key: string; action: string; status: string; trashKey?: string }> = [];
-
-        for (const requested of body.actions) {
+        const actions = body.actions.map((requested) => {
             const key = String(requested.key || '').replace(/^\/+/, '');
-            const action = requested.action;
-            if (!key.startsWith(prefix) || !action || !['download', 'upload', 'overwrite', 'trash'].includes(action)) return json({ error: `Invalid object key or action: ${key}` }, 400);
+            const action = String(requested.action || '');
+            return { ...requested, key, action };
+        });
+        const invalid = actions.find(({ key, action }) =>
+            !key.startsWith(prefix) ||
+            key.slice(prefix.length).includes('/') ||
+            !/\.(?:jpe?g|png|webp|avif)$/i.test(key) ||
+            !action ||
+            !['download', 'upload', 'overwrite', 'trash'].includes(action)
+        );
+        if (invalid) return json({ error: `Invalid object key or action: ${invalid.key}` }, 400);
+        try {
+            assertUniqueR2ActionKeys(actions.map(({ key }) => key));
+        } catch (error) {
+            return json({ error: error instanceof Error ? error.message : 'Duplicate R2 action key' }, 400);
+        }
 
-            if (action === 'download') {
+        return await withR2SourceAlbumLocks(process.cwd(), actions.map(({ key }) => key), async () => {
+            await assertAlbumAssetStorageSafe(process.cwd(), albumSlug);
+            const sourceIndex = loadR2SourceIndex();
+            const manifests = await readAllAlbumManifestFiles(process.cwd());
+            const results: Array<{ key: string; action: string; status: string; trashKey?: string }> = [];
+            const trashObjects = new Map<string, NonNullable<Awaited<ReturnType<typeof r2.get>>>>();
+            const date = new Date().toISOString().slice(0, 10);
+            for (const requested of actions.filter(({ action }) => action === 'trash')) {
+                const consumers = findExternalCoverConsumers(manifests, requested.key);
+                if (consumers.length > 0) {
+                    return json({
+                        error: `${requested.key} is used as an external cover by: ${consumers.join(', ')}`,
+                        consumers,
+                    }, 409);
+                }
+                const references = sourceIndex.get(requested.key) || [];
+                if (references.length > 0) return json({ error: `${requested.key} is still referenced`, references }, 409);
+                if (!requested.etag) return json({ error: `Missing trash ETag for ${requested.key}` }, 400);
+                const object = await r2.get(requested.key);
+                if (!object) continue;
+                if (object.etag !== requested.etag) {
+                    return json({ error: `${requested.key} changed after the dry run; refresh and try again` }, 409);
+                }
+                const trashKey = `_trash/${date}/${requested.key}`;
+                if (await r2.head(trashKey)) {
+                    return json({ error: `Trash already contains ${trashKey}; source was not removed` }, 409);
+                }
+                trashObjects.set(requested.key, object);
+            }
+
+            for (const requested of actions) {
+                const { key, action } = requested;
+
+                if (action === 'download') {
                 const localPath = path.resolve(process.cwd(), 'r2', key);
                 const allowedRoot = path.resolve(process.cwd(), 'r2', albumSlug) + path.sep;
                 if (!localPath.startsWith(allowedRoot)) return json({ error: `Invalid download path: ${key}` }, 400);
@@ -48,12 +99,13 @@ export const POST: APIRoute = async ({ request }) => {
                     continue;
                 }
                 fs.mkdirSync(path.dirname(localPath), { recursive: true });
-                fs.writeFileSync(localPath, object.bytes);
+                await assertAlbumAssetStorageSafe(process.cwd(), albumSlug);
+                fs.writeFileSync(localPath, object.bytes, { flag: 'wx' });
                 results.push({ key, action, status: 'complete' });
                 continue;
             }
 
-            if (action === 'upload' || action === 'overwrite') {
+                if (action === 'upload' || action === 'overwrite') {
                 if (!sourceIndex.has(key)) return json({ error: `Source no longer references ${key}` }, 409);
                 const localPath = path.resolve(process.cwd(), 'r2', key);
                 const allowedRoot = path.resolve(process.cwd(), 'r2', albumSlug) + path.sep;
@@ -76,27 +128,27 @@ export const POST: APIRoute = async ({ request }) => {
                 continue;
             }
 
-            const references = sourceIndex.get(key) || [];
-            if (references.length > 0) return json({ error: `${key} is still referenced`, references }, 409);
-            const object = await r2.get(key);
-            if (!object) {
-                results.push({ key, action, status: 'already-missing' });
-                continue;
+                const object = trashObjects.get(key);
+                if (!object) {
+                    results.push({ key, action, status: 'already-missing' });
+                    continue;
+                }
+                const trashKey = `_trash/${date}/${key}`;
+                const copied = await r2.put(trashKey, object.bytes, {
+                    contentType: object.contentType,
+                    customMetadata: {
+                        ...object.customMetadata,
+                        originalKey: key,
+                        trashedAt: new Date().toISOString(),
+                    },
+                    onlyIfMissing: true,
+                });
+                if (!copied) return json({ error: `Trash already contains ${trashKey}; source was not removed` }, 409);
+                await r2.delete(key);
+                results.push({ key, action, status: 'complete', trashKey });
             }
-            const date = new Date().toISOString().slice(0, 10);
-            const trashKey = `_trash/${date}/${key}`;
-            await r2.put(trashKey, object.bytes, {
-                contentType: object.contentType,
-                customMetadata: {
-                    ...object.customMetadata,
-                    originalKey: key,
-                    trashedAt: new Date().toISOString(),
-                },
-            });
-            await r2.delete(key);
-            results.push({ key, action, status: 'complete', trashKey });
-        }
-        return json({ success: true, results });
+            return json({ success: true, results });
+        });
     } catch (error) {
         const message = error instanceof Error ? error.message : 'R2 sync failed';
         return json({ error: message }, 500);

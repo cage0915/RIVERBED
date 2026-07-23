@@ -1,7 +1,12 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { createAlbumMdx, validateAlbumSegment, validateImageFilename } from './album-import.js';
+import {
+    createAlbumImport,
+    createAlbumMdx,
+    validateAlbumSegment,
+    validateImageFilename,
+} from './album-import.js';
 
 test('album path segments reject traversal and unsafe names', () => {
     assert.equal(validateAlbumSegment('2026-new-page'), '2026-new-page');
@@ -24,4 +29,35 @@ test('createAlbumMdx uses the first selected photo as cover and preserves order'
     assert.match(source, /coverKey: "002\.jpg"/);
     assert.ok(source.indexOf('002.jpg') < source.indexOf('001.jpg'));
     assert.match(source, /publishedAt: 2026-07-19/);
+});
+
+test('createAlbumImport proposes matching MDX and manifest inventory', () => {
+    const proposal = createAlbumImport({
+        albumSlug: 'yama/new-album',
+        title: 'New Album',
+        filenames: ['002.jpg', '001.jpg'],
+        publishedAt: '2026-07-19',
+        order: 30,
+    });
+
+    assert.equal(proposal.manifest.title, 'New Album');
+    assert.equal(proposal.manifest.publishedAt, '2026-07-19');
+    assert.equal(proposal.manifest.order, 30);
+    assert.deepEqual(proposal.manifest.cover.photo, { kind: 'local', filename: '002.jpg' });
+    assert.deepEqual(proposal.manifest.photos, [
+        { filename: '002.jpg', caption: undefined, tags: [] },
+        { filename: '001.jpg', caption: undefined, tags: [] },
+    ]);
+    assert.match(proposal.mdx, /<Photo itemKey="002\.jpg" \/>/);
+    assert.doesNotMatch(proposal.mdx, /^(?:title|publishedAt|coverKey|coverZoom|coverOffset):/m);
+});
+
+test('createAlbumImport validates both proposals before returning either', () => {
+    assert.throws(() => createAlbumImport({
+        albumSlug: 'yama/new-album',
+        title: 'New Album',
+        filenames: ['002.jpg'],
+        publishedAt: '2026-02-30',
+        order: 30,
+    }), /publishedAt/);
 });

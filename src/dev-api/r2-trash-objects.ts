@@ -2,6 +2,8 @@ import type { APIRoute } from 'astro';
 
 import { getR2AdminClient } from '../lib/r2-admin-client';
 import { loadR2SourceIndex } from '../lib/r2-source-files';
+import { findExternalCoverConsumers, withR2SourceAlbumLocks } from '../lib/albums/album-lifecycle';
+import { readAllAlbumManifestFiles } from '../lib/albums/manifest-files';
 
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), {
     status,
@@ -23,7 +25,6 @@ export const POST: APIRoute = async ({ request }) => {
             return json({ error: 'Select between 1 and 100 objects or folder markers' }, 400);
         }
 
-        const sourceIndex = loadR2SourceIndex();
         const seen = new Set<string>();
         const requested = objects.map((entry) => ({
             key: String(entry.key || '').replace(/^\/+/, ''),
@@ -34,8 +35,9 @@ export const POST: APIRoute = async ({ request }) => {
                 return json({ error: `Invalid Trash object: ${entry.key || '(empty)'}` }, 400);
             }
             if (!entry.etag) return json({ error: `Missing dry-run ETag for ${entry.key}` }, 400);
-            const references = sourceIndex.get(entry.key) || [];
-            if (references.length) return json({ error: `${entry.key} is now referenced by source`, references }, 409);
+            if (!/^[a-z0-9-]+\/[a-z0-9-]+\/[^/]+\.(?:jpe?g|png|webp|avif)$/i.test(entry.key)) {
+                return json({ error: `Invalid Trash object: ${entry.key}` }, 400);
+            }
             seen.add(entry.key);
         }
         const requestedMarkers = markers.map((entry) => ({
@@ -50,16 +52,53 @@ export const POST: APIRoute = async ({ request }) => {
             seen.add(entry.key);
         }
 
-        const date = new Date().toISOString().slice(0, 10);
-        const results: Array<{ key: string; action: 'trash' | 'delete-marker'; trashKey?: string; status: string }> = [];
-        for (const entry of requested) {
-            const object = await r2.get(entry.key);
+        return await withR2SourceAlbumLocks(process.cwd(), requested.map(({ key }) => key), async () => {
+            const sourceIndex = loadR2SourceIndex();
+            const manifests = await readAllAlbumManifestFiles(process.cwd());
+            for (const entry of requested) {
+                const consumers = findExternalCoverConsumers(manifests, entry.key);
+                if (consumers.length > 0) {
+                    return json({
+                        error: `${entry.key} is used as an external cover by: ${consumers.join(', ')}`,
+                        consumers,
+                    }, 409);
+                }
+                const references = sourceIndex.get(entry.key) || [];
+                if (references.length) return json({ error: `${entry.key} is now referenced by source`, references }, 409);
+            }
+
+            const date = new Date().toISOString().slice(0, 10);
+            const objectsByKey = new Map<string, NonNullable<Awaited<ReturnType<typeof r2.get>>>>();
+            for (const entry of requested) {
+                const object = await r2.get(entry.key);
+                if (!object) continue;
+                if (object.etag !== entry.etag) {
+                    return json({ error: `${entry.key} changed after the audit; refresh and try again` }, 409);
+                }
+                const trashKey = `_trash/${date}/${entry.key}`;
+                if (await r2.head(trashKey)) {
+                    return json({ error: `Trash already contains ${trashKey}; source was not removed` }, 409);
+                }
+                objectsByKey.set(entry.key, object);
+            }
+            const markersByKey = new Map<string, NonNullable<Awaited<ReturnType<typeof r2.head>>>>();
+            for (const entry of requestedMarkers) {
+                const marker = await r2.head(entry.key);
+                if (!marker) continue;
+                if (marker.etag !== entry.etag) {
+                    return json({ error: `${entry.key} changed after the audit; refresh and try again` }, 409);
+                }
+                if (marker.size !== 0) {
+                    return json({ error: `${entry.key} is not an empty folder marker and was not deleted` }, 409);
+                }
+                markersByKey.set(entry.key, marker);
+            }
+            const results: Array<{ key: string; action: 'trash' | 'delete-marker'; trashKey?: string; status: string }> = [];
+            for (const entry of requested) {
+            const object = objectsByKey.get(entry.key);
             if (!object) {
                 results.push({ key: entry.key, action: 'trash', status: 'already-missing' });
                 continue;
-            }
-            if (object.etag !== entry.etag) {
-                return json({ error: `${entry.key} changed after the audit; refresh and try again` }, 409);
             }
 
             const trashKey = `_trash/${date}/${entry.key}`;
@@ -75,25 +114,20 @@ export const POST: APIRoute = async ({ request }) => {
             if (!copied) return json({ error: `Trash already contains ${trashKey}; source was not removed` }, 409);
             await r2.delete(entry.key);
             results.push({ key: entry.key, action: 'trash', trashKey, status: 'complete' });
-        }
+            }
 
-        for (const entry of requestedMarkers) {
-            const marker = await r2.head(entry.key);
+            for (const entry of requestedMarkers) {
+            const marker = markersByKey.get(entry.key);
             if (!marker) {
                 results.push({ key: entry.key, action: 'delete-marker', status: 'already-missing' });
                 continue;
             }
-            if (marker.etag !== entry.etag) {
-                return json({ error: `${entry.key} changed after the audit; refresh and try again` }, 409);
-            }
-            if (marker.size !== 0) {
-                return json({ error: `${entry.key} is not an empty folder marker and was not deleted` }, 409);
-            }
             await r2.delete(entry.key);
             results.push({ key: entry.key, action: 'delete-marker', status: 'complete' });
-        }
+            }
 
-        return json({ success: true, results });
+            return json({ success: true, results });
+        });
     } catch (error) {
         const message = error instanceof Error ? error.message : 'R2 Trash operation failed';
         return json({ error: message }, 500);

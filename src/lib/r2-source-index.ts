@@ -1,3 +1,5 @@
+import type { AlbumManifest } from './albums/types.ts';
+
 export type R2ReferenceKind = 'album-photo' | 'album-cover' | 'mountain-cover';
 
 export type R2SourceReference = {
@@ -9,32 +11,24 @@ export type R2SourceReference = {
 
 export type R2SourceIndex = Map<string, R2SourceReference[]>;
 
-export function resolveAlbumAssetKey(albumSlug: string, itemKey: string) {
-    const value = itemKey.trim().replace(/^\/+/, '');
-    return value.includes('/') ? value : `${albumSlug}/${value}`;
+export function resolveAlbumAssetKey(albumSlug: string, filename: string) {
+    return `${albumSlug}/${filename}`;
 }
 
-export function collectAlbumReferences(albumSlug: string, content: string): R2SourceReference[] {
-    const references: R2SourceReference[] = [];
-    const frontmatter = content.match(/^---\r?\n([\s\S]*?)\r?\n---/)?.[1] || '';
-    const coverKey = frontmatter.match(/^coverKey:\s*["']([^"']+)["']/m)?.[1];
-    if (coverKey) {
-        references.push({
-            key: resolveAlbumAssetKey(albumSlug, coverKey),
-            kind: 'album-cover',
-            source: `src/content/albums/${albumSlug}.mdx`,
-        });
-    }
-
-    const photoPattern = /<Photo\s+[^>]*?itemKey=["']([^"']+)["'][^>]*?\/?\s*>/g;
-    let match: RegExpExecArray | null;
-    while ((match = photoPattern.exec(content)) !== null) {
-        references.push({
-            key: resolveAlbumAssetKey(albumSlug, match[1]),
-            kind: 'album-photo',
-            source: `src/content/albums/${albumSlug}.mdx`,
-        });
-    }
+export function collectAlbumReferences(albumSlug: string, manifest: AlbumManifest): R2SourceReference[] {
+    const source = `src/album-manifests/${albumSlug}.json`;
+    const references: R2SourceReference[] = manifest.photos.map(({ filename }) => ({
+        key: resolveAlbumAssetKey(albumSlug, filename),
+        kind: 'album-photo' as const,
+        source,
+    }));
+    references.push({
+        key: manifest.cover.photo.kind === 'local'
+            ? resolveAlbumAssetKey(albumSlug, manifest.cover.photo.filename)
+            : manifest.cover.photo.assetKey,
+        kind: 'album-cover',
+        source,
+    });
     return references;
 }
 

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
 
-import { createPageContent, referencedLocalNames } from './page-structure.ts';
+import { createLayoutOnlyPageContent, createPageContent, referencedLocalNames } from './page-structure.ts';
 
 const readProjectFile = (path) => readFileSync(new URL(`../../${path}`, import.meta.url), 'utf8');
 
@@ -73,6 +73,33 @@ test('referenced local names include page photos and cover basenames', () => {
     ], `title: "Page"\ncoverKey: "yama/page/cover.jpg"`);
 
     assert.deepEqual([...names], ['one.jpg', 'two.jpg', 'cover.jpg']);
+});
+
+test('layout-only Page Manager serialization never writes Album metadata to MDX', () => {
+    const content = createLayoutOnlyPageContent([
+        { type: 'Row', photos: [{ itemKey: 'new.jpg' }] },
+    ]);
+    assert.equal(content, '---\n---\n\n<Row>\n  <Photo itemKey="new.jpg" />\n</Row>\n');
+    assert.doesNotMatch(
+        content,
+        /^(?:title|info|coverKey|coverZoom|coverOffset|gap|order|publishedAt):/m,
+    );
+});
+
+test('Page Manager route and UI use structured manifest metadata without frontmatter writeback', () => {
+    const getStructure = readProjectFile('src/dev-api/get-page-structure.ts');
+    const saveManager = readProjectFile('src/dev-api/save-page-manager.ts');
+    const devTool = readProjectFile('src/components/DevTool.astro');
+    assert.match(getStructure, /readAlbumManifestFile/);
+    assert.match(getStructure, /metadata/);
+    assert.doesNotMatch(getStructure, /frontmatter\s*[,}]/);
+    assert.match(saveManager, /createLayoutOnlyPageContent/);
+    assert.match(saveManager, /withAlbumManifestLocks[\s\S]*commitAlbumPageSourcesWithinLock/);
+    assert.doesNotMatch(saveManager, /if \(fs\.existsSync\(target\)\) continue/);
+    assert.doesNotMatch(saveManager, /draft\.frontmatter|frontmatterString/);
+    assert.match(devTool, /data\.metadata/);
+    assert.match(devTool, /metadata:\s*\{/);
+    assert.doesNotMatch(devTool, /frontmatter:\s*newFM|parseFM\(data\.frontmatter\)/);
 });
 
 test('tag and photo-caption APIs persist metadata only through Album manifests', () => {

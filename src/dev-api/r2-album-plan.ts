@@ -3,9 +3,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 
-import { collectAlbumReferences } from '../lib/r2-source-index';
 import { loadR2SourceIndex } from '../lib/r2-source-files';
 import { getR2AdminClient } from '../lib/r2-admin-client';
+import { readAlbumManifestFile } from '../lib/albums/manifest-files';
+import { assertAlbumAssetStorageSafe } from '../lib/albums/album-lifecycle';
 
 const IMAGE_PATTERN = /\.(?:jpe?g|png|webp|avif)$/i;
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), {
@@ -19,14 +20,23 @@ export const GET: APIRoute = async ({ url }) => {
     if (!/^[a-z0-9-]+\/[a-z0-9-]+$/.test(albumSlug)) return json({ error: 'Invalid albumSlug' }, 400);
 
     const projectRoot = process.cwd();
-    const mdxPath = path.resolve(projectRoot, 'src/content/albums', `${albumSlug}.mdx`);
-    if (!fs.existsSync(mdxPath)) return json({ error: 'Page does not exist' }, 404);
-
     const prefix = `${albumSlug}/`;
-    const currentReferences = collectAlbumReferences(albumSlug, fs.readFileSync(mdxPath, 'utf8'));
-    const required = [...new Set(currentReferences.map((entry) => entry.key).filter((key) => key.startsWith(prefix)))];
+    let manifest;
+    try {
+        manifest = await readAlbumManifestFile(projectRoot, albumSlug);
+    } catch (error) {
+        if ((error as Error & { cause?: NodeJS.ErrnoException }).cause?.code === 'ENOENT') {
+            return json({ error: 'Page does not exist' }, 404);
+        }
+        throw error;
+    }
+    const required = [...new Set([
+        ...manifest.photos.map(({ filename }) => `${prefix}${filename}`),
+        ...(manifest.cover.photo.kind === 'local' ? [`${prefix}${manifest.cover.photo.filename}`] : []),
+    ])];
     const globalIndex = loadR2SourceIndex(projectRoot);
     const localDir = path.resolve(projectRoot, 'r2', albumSlug);
+    await assertAlbumAssetStorageSafe(projectRoot, albumSlug);
     const local = fs.existsSync(localDir)
         ? fs.readdirSync(localDir, { withFileTypes: true })
             .filter((entry) => entry.isFile() && IMAGE_PATTERN.test(entry.name))
