@@ -220,6 +220,7 @@ test('region removal validates Mountains against persisted map contexts', () => 
 
 test('Layout delegates footer and development tool rendering boundaries', () => {
     const layout = readProjectFile('src/layouts/Layout.astro');
+    const siteFooter = readProjectFile('src/components/SiteFooter.astro');
 
     assert.match(
         layout,
@@ -232,5 +233,14 @@ test('Layout delegates footer and development tool rendering boundaries', () => 
     assert.match(layout, /<SiteFooter\s*\/>/);
     assert.match(layout, /<SiteDevTools\s*\/>/);
     assert.doesNotMatch(layout, /DevTool\.astro|MountainDevTool\.astro/);
-    assert.doesNotMatch(layout, /\bfolderFooter\b|getFolderFooter|\/rss\.xml/);
+    assert.doesNotMatch(layout, /\bfolderFooter\b|getFolderFooter/);
+    assert.match(
+        layout,
+        /<head>[\s\S]*<link rel="alternate" type="application\/rss\+xml" title="RIVERBED RSS" href="\/rss\.xml" \/>[\s\S]*<\/head>/,
+    );
+    assert.match(
+        siteFooter,
+        /currentPath === ["']\/["'][\s\S]*<footer class="pb-8">[\s\S]*href="\/rss\.xml"/,
+    );
+    assert.doesNotMatch(siteFooter, /rel="alternate"/);
 });
