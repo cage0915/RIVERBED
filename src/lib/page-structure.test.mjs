@@ -303,6 +303,66 @@ test('Layout delegates navigation rendering and lifecycle ownership', () => {
     assert.doesNotMatch(siteNavigation, /cloneNode|replaceChild/);
 });
 
+test('Layout delegates explicit content keyboard navigation targets and lifecycle ownership', () => {
+    const layout = readProjectFile('src/layouts/Layout.astro');
+    const row = readProjectFile('src/components/Row.astro');
+    const homePage = readProjectFile('src/pages/index.astro');
+    const folderPage = readProjectFile('src/pages/[folder]/index.astro');
+    const navigationPath = new URL(
+        '../components/ContentKeyboardNavigation.astro',
+        import.meta.url,
+    );
+    const contentKeyboardNavigation = existsSync(navigationPath)
+        ? readFileSync(navigationPath, 'utf8')
+        : '';
+
+    assert.match(
+        layout,
+        /import ContentKeyboardNavigation from ["']\.\.\/components\/ContentKeyboardNavigation\.astro["']/,
+    );
+    assert.match(layout, /<\/main>[\s\S]*<ContentKeyboardNavigation\s*\/>/);
+    assert.doesNotMatch(layout, /ArrowRight|ArrowLeft/);
+    assert.doesNotMatch(layout, /\.photo-row,\s*\.album-card|addEventListener\(["']keydown/);
+
+    assert.match(contentKeyboardNavigation.trim(), /^<script>[\s\S]*<\/script>$/);
+    assert.match(contentKeyboardNavigation, /installPageLifecycle/);
+    assert.match(contentKeyboardNavigation, /new AbortController\(\)/);
+    assert.match(contentKeyboardNavigation, /\[data-keyboard-navigation-target\]/);
+    assert.match(
+        contentKeyboardNavigation,
+        /dialog, input, textarea, select, \[contenteditable='true'\], \[role='textbox'\]/,
+    );
+    assert.doesNotMatch(contentKeyboardNavigation, /astro:after-swap/);
+    assert.match(contentKeyboardNavigation, /addEventListener\(["']keydown["'][\s\S]*signal: controller\.signal/);
+    assert.match(contentKeyboardNavigation, /controller\.abort\(\)/);
+    assert.doesNotMatch(
+        contentKeyboardNavigation,
+        /querySelectorAll[^;]*(?:\.album-card|\.folder-card|\.photo-row)/,
+    );
+
+    assert.match(row, /<div class="photo-row" data-keyboard-navigation-target>/);
+    assert.match(
+        homePage,
+        /class="album-card latest-post-card group"[\s\S]*data-catalog-card[\s\S]*data-keyboard-navigation-target/,
+    );
+    assert.match(
+        homePage,
+        /class="album-card folder-card group"[\s\S]*data-catalog-card[\s\S]*data-keyboard-navigation-target/,
+    );
+    assert.match(
+        folderPage,
+        /class="album-card group"[\s\S]*data-catalog-card[\s\S]*data-keyboard-navigation-target/,
+    );
+    assert.equal(
+        (homePage.match(/data-keyboard-navigation-target/g) ?? []).length,
+        (homePage.match(/data-catalog-card/g) ?? []).length,
+    );
+    assert.equal(
+        (folderPage.match(/data-keyboard-navigation-target/g) ?? []).length,
+        (folderPage.match(/data-catalog-card/g) ?? []).length,
+    );
+});
+
 test('catalog routes share lifecycle-scoped card interactions', () => {
     const homePage = readProjectFile('src/pages/index.astro');
     const folderPage = readProjectFile('src/pages/[folder]/index.astro');
@@ -335,7 +395,7 @@ test('catalog routes share lifecycle-scoped card interactions', () => {
 
     assert.match(
         homePage,
-        /<div class="pt-6 pb-8" data-catalog-grid>[\s\S]*<article class="album-card latest-post-card group" data-catalog-card>[\s\S]*<nav[\s\S]*class="folders-grid"[\s\S]*class="album-card folder-card group"[\s\S]*data-catalog-card/,
+        /<div class="pt-6 pb-8" data-catalog-grid>[\s\S]*class="album-card latest-post-card group"[\s\S]*data-catalog-card[\s\S]*<nav[\s\S]*class="folders-grid"[\s\S]*class="album-card folder-card group"[\s\S]*data-catalog-card/,
     );
     assert.match(
         folderPage,

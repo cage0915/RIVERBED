@@ -72,7 +72,7 @@ const sortedFolders = folderSlugs
 <Layout title="RIVERBED">
     <div class="pt-6 pb-8" data-catalog-grid>
         <section class="latest-post" aria-label="Latest post">
-            <article class="album-card latest-post-card group" data-catalog-card>
+            <article class="album-card latest-post-card group" data-catalog-card data-keyboard-navigation-target>
                 <a href={`/${latestAlbum.slug}`} class="album-link">
                     <div class="album-cover latest-post-cover">
                         <img
@@ -113,6 +113,7 @@ const sortedFolders = folderSlugs
                     <div
                         class="album-card folder-card group"
                         data-catalog-card
+                        data-keyboard-navigation-target
                         data-covers={folder.covers.length}
                     >
                         <a href={`/${folder.id}`} class="album-link">

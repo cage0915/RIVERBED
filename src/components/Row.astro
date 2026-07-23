@@ -60,7 +60,7 @@ if (finalMB) {
             <RichText text={caption} />
         </div>
     )}
-    <div class="photo-row">
+    <div class="photo-row" data-keyboard-navigation-target>
         <slot />
     </div>
     {caption && parsedPos === 'bottom' && (
