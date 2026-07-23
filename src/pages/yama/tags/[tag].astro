@@ -2,9 +2,7 @@
 import Layout from "../../../layouts/Layout.astro";
 import Row from "../../../components/Row.astro";
 import Photo from "../../../components/Photo.astro";
-import MountainProfile, {
-    type Mountain,
-} from "../../../components/MountainProfile.astro";
+import MountainProfile from "../../../components/MountainProfile.astro";
 import {
     getAlbumCatalog,
     getTaggedPhotos,
@@ -32,7 +30,7 @@ if (!tag) {
 }
 
 const decodedTag = decodeURIComponent(tag);
-const mountain = (mountainsData as Mountain[]).find(
+const mountain = mountainsData.find(
     (entry) => entry.name === decodedTag,
 );
 const matchingPhotos = await getTaggedPhotos(decodedTag);

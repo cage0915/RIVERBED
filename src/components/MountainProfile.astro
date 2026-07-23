@@ -1,25 +1,9 @@
 ---
 import MountainViewer from "./MountainViewer.astro";
 import RichText from "./RichText.astro";
-import { isMapContextId, type MapBounds } from "../lib/mountain-map";
+import { isMapContextId } from "../lib/mountain-map";
+import type { Mountain } from "../lib/mountain-schema";
 import { resolveFeatureFlag } from "../lib/feature-flags";
-
-export type MountainLocation = {
-    latitude: number;
-    longitude: number;
-    mapContext: string;
-    initialBounds?: MapBounds;
-};
-
-export type Mountain = {
-    name: string;
-    alternateName?: string;
-    elevation: number | null;
-    description: string;
-    coverKey?: string;
-    location?: MountainLocation;
-    panorama?: boolean;
-};
 
 interface Props {
     mountain: Mountain;

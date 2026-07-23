@@ -157,11 +157,19 @@ test('cover and folder-order APIs persist only through Album manifests', () => {
 test('Mountain data uses one canonical schema and validated read boundaries', () => {
     const mountains = readProjectFile('src/lib/mountains.ts');
     const files = readProjectFile('src/lib/mountain-files.ts');
+    const profile = readProjectFile('src/components/MountainProfile.astro');
+    const tagPage = readProjectFile('src/pages/yama/tags/[tag].astro');
 
     assert.match(mountains, /parseMountainRegionSource/);
     assert.match(files, /parseMountainRegionSource/);
     assert.doesNotMatch(mountains, /mountain-editor|EditableMountain/);
     assert.doesNotMatch(files, /mountain-editor|EditableMountain/);
+    assert.match(
+        profile,
+        /import type \{ Mountain \} from ["']\.\.\/lib\/mountain-schema/,
+    );
+    assert.doesNotMatch(profile, /export type Mountain(?:Location)?\b/);
+    assert.doesNotMatch(tagPage, /mountainsData as Mountain\[\]/);
 });
 
 test('Mountain context writes validate against the proposed context set', () => {
