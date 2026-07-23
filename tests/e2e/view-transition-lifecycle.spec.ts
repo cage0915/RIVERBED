@@ -76,6 +76,13 @@ async function waitPastMenuCloseTimer(page: Page) {
     );
 }
 
+function photoSwipeLocators(page: Page) {
+    return {
+        root: page.locator(".pswp"),
+        closeButton: page.locator(".pswp__button--close"),
+    };
+}
+
 test.describe("touch navigation lifecycle", () => {
     test.use(PIXEL_5_TOUCH);
 
@@ -99,6 +106,12 @@ test.describe("touch navigation lifecycle", () => {
         page,
     }) => {
         await page.goto("/");
+
+        for (let iteration = 0; iteration < 2; iteration += 1) {
+            await openYamaFromHomeWithTouch(page);
+            await page.getByRole("link", { name: "RIVERBED" }).click();
+            await expect.poll(() => new URL(page.url()).pathname).toBe("/");
+        }
 
         const toggle = page.locator("[data-site-menu-toggle]");
         const menu = page.locator("[data-site-mobile-menu]");
@@ -151,7 +164,7 @@ test.describe("album lifecycle", () => {
 
         for (let iteration = 0; iteration < 2; iteration += 1) {
             await page.locator("#toggle-all-tags").click();
-            await page.locator(".tag-link").first().click();
+            await page.locator("[data-mountain-tag-link]").first().click();
             await expect(page).toHaveURL(/\/yama\/tags\//);
             await page.goBack();
             await expect(page).toHaveURL(
@@ -159,14 +172,15 @@ test.describe("album lifecycle", () => {
             );
         }
 
+        const photoSwipe = photoSwipeLocators(page);
         await page.locator("[data-photo-lightbox-link]").first().click();
         await waitForPhotoSwipeOpen(page);
-        await expect(page.locator(".pswp")).toHaveCount(1);
-        await page.locator(".pswp__button--close").click();
-        await expect(page.locator(".pswp")).toHaveCount(0);
+        await expect(photoSwipe.root).toHaveCount(1);
+        await photoSwipe.closeButton.click();
+        await expect(photoSwipe.root).toHaveCount(0);
 
         await page.locator("#toggle-all-tags").click();
-        await page.locator(".tag-link").first().click();
+        await page.locator("[data-mountain-tag-link]").first().click();
         await expect(page).toHaveURL(/\/yama\/tags\//);
         await page.goBack();
         await expect(page).toHaveURL(
@@ -174,7 +188,7 @@ test.describe("album lifecycle", () => {
         );
         await page.locator("[data-photo-lightbox-link]").first().click();
         await waitForPhotoSwipeOpen(page);
-        await expect(page.locator(".pswp")).toHaveCount(1);
+        await expect(photoSwipe.root).toHaveCount(1);
     });
 });
 
