@@ -3,7 +3,8 @@
 ## Status and Scope
 
 This document records the current architecture assessment as of 2026-07-23,
-after the manifest-backed Album migration was completed.
+after the manifest-backed Album migration, Mountain domain-boundary work, and
+View Transition lifecycle refactor were completed.
 It is an issue inventory and prioritization document, not an implementation
 plan.
 
@@ -22,38 +23,41 @@ suffer from unnecessary service layers, dependency injection, or framework
 abstraction.
 
 The main concern is not that the architecture is unorthodox. The previous
-largest data-boundary problem has been addressed: Album metadata, ordering,
+largest data-boundary problems have been addressed: Album metadata, ordering,
 photo inventory, captions, and tags now have one validated manifest schema and
-one normalized production catalog. Mountain data now also has one canonical
-schema and validated read boundary. The remaining risk is concentrated in
-mountain route policy and in client scripts that use broad document-level
-selectors and persistent View Transition listeners.
+one normalized production catalog, while Mountain data has one canonical
+schema and validated read boundary. Browser behavior covered by the production
+navigation flows now follows one mount/cleanup contract and is owned by focused
+components. The remaining risk is concentrated in mountain route policy and a
+development-only Mountain cover editor that is not fully isolated from
+production client code.
 
 Current characterization:
 
 - framework and deployment architecture: conventional and appropriate;
-- production module boundaries: improved for Albums and mountains, still
-  inconsistent for browser behavior;
+- production module boundaries: improved for Albums, mountains, and covered
+  browser behavior;
 - Album content/data discoverability: substantially improved and documented;
 - immediate stability: healthy based on current checks;
 - future maintenance risk: moderate, concentrated in mountain route policy and
-  browser lifecycle behavior.
+  production/development isolation.
 
 This does not justify a rewrite. It calls for several targeted boundary
 improvements.
 
 ## Verification Snapshot
 
-The following checks were rerun after the Album migration:
+The following checks were rerun after the client lifecycle refactor:
 
-- `npm test`: 30 tests passed, 0 failed;
-- `npm run albums:validate`: 67 of 67 Album manifests valid, 0 diagnostics;
-- `npm exec astro check`: 0 errors and 6 hints;
-- `npm run build`: completed successfully and generated 356 static pages.
+- `npm test`: 34 Node test files passed, 0 failed;
+- `npm exec astro check`: 0 errors and 3 existing unrelated hints;
+- `npm run build`: completed successfully and generated 356 static pages;
+- `npm run test:e2e`: 7 production-preview Playwright tests passed, 0 failed.
 
-The checks show that the current project builds and its existing pure-function
-tests pass. They do not prove that the architecture is easy to evolve, nor do
-they cover browser behavior across View Transition navigation.
+The checks show that the current project builds, its Node contracts pass, and
+the covered browser behavior survives repeated production View Transition
+navigation. They do not prove that every route or development facility is easy
+to evolve; the open findings below remain outside that browser-test scope.
 
 ## Current Production Shape
 
@@ -64,7 +68,7 @@ Astro pages
   ├─ mountain/tag index and detail pages
   └─ RSS
         ↓
-Astro components and Layout
+focused Astro components composed by the Layout shell
         ↓
 src/lib helpers + normalized Album catalog + JSON data + Content Collections
         ↓
@@ -74,68 +78,13 @@ R2 images + generated public map/contour assets
 The dependency graph is shallow, which is a strength. Production Album
 consumers now use `src/lib/albums/catalog.ts`; manifest discovery, schema
 validation, inventory checks, ordering, asset-key resolution, and tag queries
-are behind that boundary. Mountain records are now parsed through
-`src/lib/mountain-schema.ts` before loaders expose them. Mountain route policy
-and some client lifecycle policy are still owned locally by pages/components.
+are behind that boundary. Mountain records are parsed through
+`src/lib/mountain-schema.ts` before loaders expose them. Covered client behavior
+is mounted through `src/lib/client-page-lifecycle.ts` and scoped by explicit DOM
+contracts. Mountain route policy and the Mountain cover editor's environment
+boundary are still owned locally by route code.
 
 ## Prioritized Findings
-
-### P1: View Transition client lifecycle is globally coupled
-
-The site enables Astro View Transitions in `Layout.astro`. Layout and multiple
-route/component scripts register document- or window-level listeners and rerun
-initializers after page swaps.
-
-The home and folder pages both target the broad `.album-card` selector and both
-retain `astro:after-swap` handlers. They do not share an initialization guard or
-cleanup strategy. After navigating between those routes, code originating from
-one page can act on cards rendered by another page.
-
-Other components use a mixture of strategies:
-
-- some use a `data-*Ready` guard;
-- some disconnect observers during `astro:before-swap`;
-- some add persistent document listeners without removing them;
-- Layout owns global scroll, keyboard, navigation, and PhotoSwipe behavior.
-
-Consequences:
-
-- behavior depends on navigation history rather than only the current page;
-- duplicate handlers and retained closures are possible;
-- generic class names become implicit JavaScript APIs;
-- browser-level regressions are not exercised by the current Node tests.
-
-Recommended direction:
-
-- establish one documented client lifecycle pattern;
-- scope queries beneath component-owned root elements;
-- add initialization markers and deterministic cleanup;
-- use shared card behavior instead of separate home/folder implementations;
-- add at least one browser navigation test covering home → folder → home and
-  Album → tag → Album transitions.
-
-### P2: Layout owns too many unrelated responsibilities
-
-`Layout.astro` currently owns:
-
-- navigation data loading and folder sorting;
-- desktop and mobile navigation markup;
-- conditional footers and RSS entry point;
-- development tool loading;
-- scroll-aware navbar behavior;
-- keyboard navigation across content cards;
-- global PhotoSwipe initialization and image dimension discovery;
-- global styles and font imports.
-
-Astro encourages colocating markup, styles, and scripts, so file length alone is
-not a defect. The issue is that unrelated site services share one lifecycle and
-one file. A change to the navigation shell requires reading lightbox and global
-keyboard behavior, and PhotoSwipe is initialized for pages without album
-photos.
-
-Recommended direction: keep one Layout but extract focused site-level units such
-as `SiteNavigation`, `SiteFooter`, and `PhotoLightbox`. Avoid turning each unit
-into a framework-independent service; Astro components are sufficient.
 
 ### P2: Mountain route-generation policy is surprising
 
@@ -161,12 +110,12 @@ expected.
 
 ### P2: Development-only behavior is not fully isolated from production bundles
 
-Development components are conditionally imported in `Layout.astro`, which is
-a good boundary. However, the mountain tag detail route conditionally renders
-cover-editing controls while shipping the cover chooser client script
-unconditionally. The production JavaScript bundle therefore contains session
-state and a request to `/api/mountain-cover`, even though production markup has
-no button that triggers it.
+`SiteDevTools.astro` conditionally imports the general and Mountain development
+tools, which is a good boundary. However, the mountain tag detail route
+conditionally renders cover-editing controls while shipping the cover chooser
+client script unconditionally. The production JavaScript bundle therefore
+contains session state and a request to `/api/mountain-cover`, even though
+production markup has no button that triggers it.
 
 Consequences:
 
@@ -222,6 +171,63 @@ Mountain still references it. Configuration and affected Mountain files are
 committed as one serialized, rollback-capable source transaction, so a failed
 multi-file write cannot leave the repository between two schema-valid states.
 
+### View Transition client behavior has one cleanup contract
+
+Behavior covered by the repeated-navigation flows now mounts through
+`installPageLifecycle`. `astro:page-load` first runs the previous cleanup and
+then mounts behavior for the current document. `astro:before-swap` runs the same
+idempotent cleanup and clears the active mount. Covered production behavior
+aborts event listeners and explicitly disconnects observers, cancels animation
+frames, clears timers or intervals, and destroys the current PhotoSwipe
+instance where those resources apply.
+
+The Album and Mountain tag routes, catalog cards, navigation, keyboard
+navigation, photos, photo rows and carousels, Mountain profile and tag grid no
+longer retain `astro:after-swap` initializers. Missing component roots are
+normal no-ops, so behavior is selected by the current page rather than its
+navigation history. `DevTool.astro` and `MountainDevTool.astro` now use the
+shared page-load entry point without claiming that their internal behavior was
+otherwise refactored.
+
+JavaScript-owned behavior is exposed through explicit contracts including
+`data-site-navigation`, `data-catalog-grid`, `data-catalog-card`,
+`data-keyboard-navigation-target`, `data-photo-row`,
+`data-photo-lightbox-link`, and route-owned roots. Generic presentation classes
+remain available for styling but are no longer the cross-route behavior API for
+these interactions.
+
+Home and folder catalog routes now render the same
+`CatalogCardInteractions.astro` behavior. Its queries are scoped beneath the
+current catalog root, and its listeners and cover-rotation intervals are
+released during cleanup.
+
+Production-preview Playwright tests exercise repeated home → folder → home
+navigation, touch card behavior, rapid mobile-menu close/reopen and repeated
+scrolling, Album → tag → Album round trips with a single PhotoSwipe overlay,
+one keyboard scroll response after repeated navigation, and editable targets
+that must ignore arrow-key navigation. Screenshots and traces are retained for
+failed runs.
+
+### Layout is now a focused composition shell
+
+`Layout.astro` retains the HTML document and head, View Transitions, global font
+and stylesheet imports, the main slot, and genuinely global styles. It composes
+focused units rather than implementing their policies:
+
+- `SiteNavigation.astro` owns folder discovery, navigation markup, mobile-menu
+  state, and scroll-aware navbar behavior;
+- `SiteFooter.astro` owns folder footer and homepage RSS-link rendering;
+- `ContentKeyboardNavigation.astro` owns global arrow-key navigation over
+  explicit targets;
+- `PhotoLightbox.astro` owns PhotoSwipe initialization, missing dimensions, and
+  cleanup;
+- `SiteDevTools.astro` owns development-only tool imports and route selection.
+
+This remains an Astro-component architecture rather than introducing a
+framework-independent service layer. The separate production-isolation finding
+remains open because the Mountain tag route still contains its own cover-editor
+script.
+
 ### Album data now has one normalized read boundary
 
 The project selected and completed Option 2, the per-Album manifest design:
@@ -231,7 +237,7 @@ The project selected and completed Option 2, the per-Album manifest design:
 - MDX frontmatter is empty and MDX owns only layout and prose;
 - manifests own metadata, order, covers, photo inventory, captions, and tags;
 - `src/lib/albums/catalog.ts` is the cached production read boundary used by
-  home, folder pages, Layout, Album rendering, tag routes, and RSS;
+  home, folder pages, SiteNavigation, Album rendering, tag routes, and RSS;
 - `AlbumPhoto.astro` resolves local filenames through an Album rendering
   context instead of deriving identity from the URL or globbing sidecars;
 - legacy `src/album-tags`, `_order.json`, and `utils/tags.ts` storage/readers
@@ -248,17 +254,17 @@ content photos for tag routes. It does not create a competing metadata source.
 
 ### Album catalog assembly and ordering policy are centralized
 
-Home, folder, Layout, tag routes, and RSS now consume normalized catalog
+Home, folder, SiteNavigation, tag routes, and RSS now consume normalized catalog
 records. Album order and cover-key resolution are no longer reconstructed from
 frontmatter, `_order.json`, and path fallbacks. Pages still perform
 view-specific projections, such as selecting the latest published Album or
 grouping records by folder; those are presentation policies, not duplicate
 storage joins.
 
-Album-card markup and mobile interaction remain duplicated between home and
-folder routes. That residual issue belongs to the View Transition lifecycle
-finding because the material risk is retained handlers and broad selectors,
-not divergent Album data policy.
+Home and folder routes still own their view-specific Album-card markup, but
+their mobile interaction and cover rotation are shared through
+`CatalogCardInteractions.astro`. This avoids a second Album data policy while
+giving both projections one client lifecycle owner.
 
 ## What Is Already Appropriate
 
@@ -289,22 +295,14 @@ complexity.
 
 These changes reduce semantic duplication without changing the user interface.
 
-### Phase 2: Stabilize browser lifecycle
+### Phase 2: Complete environment isolation
 
-1. Define a single View Transition initialization and cleanup convention.
-2. Consolidate shared Album-card behavior.
-3. Scope component selectors and remove retained route-specific handlers.
-4. Add browser navigation regression coverage.
+1. Isolate mountain cover editing as a development-only component.
+2. Verify production bundles contain no development write endpoints.
 
-The Album read model is now stable, so this phase no longer has a data-boundary
-prerequisite.
+### Phase 3: Extend repository documentation
 
-### Phase 3: Reduce shell and environment coupling
-
-1. Split focused site-level units out of Layout.
-2. Isolate mountain cover editing as a development-only component.
-3. Verify production bundles contain no development write endpoints.
-4. Extend the root architecture and contributor documentation beyond Albums.
+1. Extend the root architecture and contributor documentation beyond Albums.
 
 ## Changes Not Recommended
 
@@ -329,9 +327,10 @@ The Album decision is complete: Option 2 was selected and implemented. The
 historical rationale, not open choices.
 
 The Mountain domain contract and runtime validation boundary are complete. The
-next Mountain decision is to define explicit route, index, and
-profile-completeness policies. Keep the browser lifecycle, Layout extraction,
-and development-only cover editor as separate work items so each can be
-implemented and verified independently.
+View Transition lifecycle convention and Layout extraction are also complete.
+The next Mountain decision is to define explicit route, index, and
+profile-completeness policies. Keep that policy work and the development-only
+cover editor as separate work items so each can be implemented and verified
+independently.
 
 This assessment remains the shared backlog and rationale for that work.
