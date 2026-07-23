@@ -2,8 +2,8 @@
 
 ## Status
 
-Accepted design under implementation. The storage layout was revised after
-Astro 4 rejected mixed MDX content and JSON data entries in one collection.
+Implemented and final. The storage layout was revised after Astro 4 rejected
+mixed MDX content and JSON data entries in one collection.
 
 ## Summary
 
