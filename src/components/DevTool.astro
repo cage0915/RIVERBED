@@ -22,6 +22,7 @@
         isCoverDraftCurrent,
         settleCoverSave,
     } from "../lib/dev-cover-state.js";
+    import { installPageLifecycle } from "../lib/client-page-lifecycle";
 
     // Only run in development
     if (import.meta.env.DEV) {
@@ -3752,8 +3753,9 @@
                 updateSaveButtonState();
             };
 
-            init();
-            document.addEventListener('astro:after-swap', init);
+            installPageLifecycle(document, () => {
+                init();
+            });
         })();
     }
 </script>

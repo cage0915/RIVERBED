@@ -363,6 +363,8 @@ function chunkArray<T>(array: T[], size: number): T[][] {
 </style>
 
 <script>
+    import { installPageLifecycle } from "../../../lib/client-page-lifecycle";
+
     const COVER_SCROLL_RESET_KEY = "riverbed:mountain-cover:scroll-top";
 
     const setCoverScrollReset = (enabled: boolean) => {
@@ -374,7 +376,7 @@ function chunkArray<T>(array: T[], size: number): T[][] {
         }
     };
 
-    const resetCoverSaveScrollPosition = () => {
+    const resetCoverSaveScrollPosition = (signal: AbortSignal) => {
         try {
             if (sessionStorage.getItem(COVER_SCROLL_RESET_KEY) !== "true") return;
         } catch {
@@ -384,17 +386,25 @@ function chunkArray<T>(array: T[], size: number): T[][] {
         history.scrollRestoration = "manual";
         const forcePageTop = () => window.scrollTo(0, 0);
         forcePageTop();
-        window.addEventListener("pageshow", forcePageTop, { once: true });
-        requestAnimationFrame(forcePageTop);
-        window.setTimeout(forcePageTop, 100);
-        window.setTimeout(() => {
+        window.addEventListener("pageshow", forcePageTop, { once: true, signal });
+        const frameId = requestAnimationFrame(forcePageTop);
+        const shortResetTimer = window.setTimeout(forcePageTop, 100);
+        const restoreTimer = window.setTimeout(() => {
             forcePageTop();
             setCoverScrollReset(false);
             history.scrollRestoration = "auto";
         }, 500);
+
+        return () => {
+            cancelAnimationFrame(frameId);
+            window.clearTimeout(shortResetTimer);
+            window.clearTimeout(restoreTimer);
+            setCoverScrollReset(false);
+            history.scrollRestoration = "auto";
+        };
     };
 
-    const initMountainCoverChooser = () => {
+    const initMountainCoverChooser = (signal: AbortSignal) => {
         const page = document.querySelector<HTMLElement>(".tag-page[data-tag-name]");
         if (!page) return;
 
@@ -402,7 +412,20 @@ function chunkArray<T>(array: T[], size: number): T[][] {
         const choiceButtons = page.querySelectorAll<HTMLButtonElement>(
             ".mountain-cover-choice",
         );
+        if (!choiceButtons.length) return;
 
+        let scrollResetFrame: number | undefined;
+        let scrollResetTimer: number | undefined;
+        const clearScrollResetHandles = () => {
+            if (scrollResetFrame !== undefined) {
+                cancelAnimationFrame(scrollResetFrame);
+                scrollResetFrame = undefined;
+            }
+            if (scrollResetTimer !== undefined) {
+                window.clearTimeout(scrollResetTimer);
+                scrollResetTimer = undefined;
+            }
+        };
         choiceButtons.forEach((button) => {
             button.addEventListener("click", async () => {
                 const entry = button.closest<HTMLElement>("[data-cover-key]");
@@ -419,8 +442,10 @@ function chunkArray<T>(array: T[], size: number): T[][] {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ mountainName, coverKey }),
+                        signal,
                     });
                     const result = await response.json();
+                    if (signal.aborted) return;
                     if (!response.ok) {
                         throw new Error(result.error || "Unable to save cover");
                     }
@@ -462,12 +487,16 @@ function chunkArray<T>(array: T[], size: number): T[][] {
 
                     history.scrollRestoration = "manual";
                     window.scrollTo(0, 0);
-                    requestAnimationFrame(() => window.scrollTo(0, 0));
-                    window.setTimeout(() => {
+                    clearScrollResetHandles();
+                    scrollResetFrame = requestAnimationFrame(
+                        () => window.scrollTo(0, 0),
+                    );
+                    scrollResetTimer = window.setTimeout(() => {
                         setCoverScrollReset(false);
                         history.scrollRestoration = "auto";
                     }, 3_000);
                 } catch (error) {
+                    if (signal.aborted) return;
                     setCoverScrollReset(false);
                     choiceButtons.forEach((candidate) => {
                         candidate.disabled = Boolean(
@@ -481,13 +510,21 @@ function chunkArray<T>(array: T[], size: number): T[][] {
                                 : "Unable to save cover";
                     }
                 }
-            });
+            }, { signal });
         });
-    };
 
-    resetCoverSaveScrollPosition();
-    initMountainCoverChooser();
-    document.addEventListener("astro:after-swap", initMountainCoverChooser);
+        return () => {
+            clearScrollResetHandles();
+            setCoverScrollReset(false);
+            history.scrollRestoration = "auto";
+            choiceButtons.forEach((candidate) => {
+                candidate.disabled = Boolean(
+                    candidate.closest(".tag-photo-entry--cover"),
+                );
+            });
+            if (status) status.textContent = "";
+        };
+    };
 
     const handleScroll = () => {
         const backToTop = document.getElementById("back-to-top");
@@ -515,7 +552,27 @@ function chunkArray<T>(array: T[], size: number): T[][] {
         }
     };
 
-    window.addEventListener("scroll", handleScroll);
-    document.addEventListener("astro:after-swap", handleScroll);
-    handleScroll();
+    installPageLifecycle(document, () => {
+        const page = document.querySelector<HTMLElement>(
+            ".tag-page[data-tag-name]",
+        );
+        if (!page) return;
+
+        const controller = new AbortController();
+        const clearCoverScrollReset = resetCoverSaveScrollPosition(
+            controller.signal,
+        );
+        const clearCoverChooser = initMountainCoverChooser(controller.signal);
+        handleScroll();
+        window.addEventListener("scroll", handleScroll, {
+            passive: true,
+            signal: controller.signal,
+        });
+
+        return () => {
+            controller.abort();
+            clearCoverScrollReset?.();
+            clearCoverChooser?.();
+        };
+    });
 </script>

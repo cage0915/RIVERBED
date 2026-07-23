@@ -160,6 +160,7 @@ const titleSections = extractTitleSections(albumEntry.body);
 
     <div
         class="album-page relative py-4"
+        data-album-page
         data-has-breadcrumb={titleSections.length > 0 ? "true" : undefined}
     >
         {titleSections.length > 0 && (
@@ -272,7 +273,8 @@ const titleSections = extractTitleSections(albumEntry.body);
 </style>
 
 <script>
-    let breadcrumbObserver: IntersectionObserver | null = null;
+    import { installPageLifecycle } from "../../lib/client-page-lifecycle";
+
     let areAllTagsVisible = false;
 
     const slugifySectionTitle = (value: string) => value
@@ -310,8 +312,7 @@ const titleSections = extractTitleSections(albumEntry.body);
             });
         };
 
-        breadcrumbObserver?.disconnect();
-        breadcrumbObserver = new IntersectionObserver(
+        const breadcrumbObserver = new IntersectionObserver(
             (entries) => {
                 const visibleEntry = entries
                     .filter((entry) => entry.isIntersecting)
@@ -331,6 +332,7 @@ const titleSections = extractTitleSections(albumEntry.body);
         if (titleNodes[0] instanceof HTMLElement) {
             updateActiveBreadcrumb(titleNodes[0].id);
         }
+        return breadcrumbObserver;
     };
 
     const syncAlbumTagToggle = () => {
@@ -353,15 +355,15 @@ const titleSections = extractTitleSections(albumEntry.body);
         toggleButton.dataset.active = areAllTagsVisible ? "true" : "false";
     };
 
-    const initAlbumTagToggle = () => {
+    const initAlbumTagToggle = (signal: AbortSignal) => {
         const toggleButton = document.getElementById("toggle-all-tags") as HTMLButtonElement | null;
         if (!toggleButton) return;
 
-        toggleButton.onclick = (event) => {
+        toggleButton.addEventListener("click", (event) => {
             event.preventDefault();
             areAllTagsVisible = !areAllTagsVisible;
             syncAlbumTagToggle();
-        };
+        }, { signal });
 
         syncAlbumTagToggle();
     };
@@ -392,11 +394,26 @@ const titleSections = extractTitleSections(albumEntry.body);
         }
     };
 
-    window.addEventListener("scroll", handleScroll);
-    document.addEventListener("astro:after-swap", handleScroll);
-    document.addEventListener("astro:after-swap", initAlbumBreadcrumbs);
-    document.addEventListener("astro:after-swap", initAlbumTagToggle);
-    handleScroll();
-    initAlbumBreadcrumbs();
-    initAlbumTagToggle();
+    installPageLifecycle(document, () => {
+        const page = document.querySelector<HTMLElement>(
+            "[data-album-page]",
+        );
+        if (!page) return;
+
+        const controller = new AbortController();
+        areAllTagsVisible = false;
+        const breadcrumbObserver = initAlbumBreadcrumbs();
+        initAlbumTagToggle(controller.signal);
+        handleScroll();
+        window.addEventListener("scroll", handleScroll, {
+            passive: true,
+            signal: controller.signal,
+        });
+
+        return () => {
+            controller.abort();
+            breadcrumbObserver?.disconnect();
+            areAllTagsVisible = false;
+        };
+    });
 </script>

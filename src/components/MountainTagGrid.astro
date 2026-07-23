@@ -39,6 +39,7 @@ const sortedGroups = groups.map((group) => ({
 <div
     class="mountain-tag-view"
     data-mountain-tag-sort
+    data-mountain-tag-grid
     style={`--mountain-tag-columns: ${tagColumns}`}
 >
     <div
@@ -152,157 +153,173 @@ const sortedGroups = groups.map((group) => ({
         type MountainTagSort,
         type MountainTagSortKey,
     } from "../lib/mountain-tag-sort";
+    import { installPageLifecycle } from "../lib/client-page-lifecycle";
 
-    const initMountainTagSort = () => {
-        document
-            .querySelectorAll<HTMLElement>("[data-mountain-tag-sort]")
-            .forEach((view) => {
-                if (view.dataset.sortReady) return;
-                view.dataset.sortReady = "true";
+    installPageLifecycle(document, () => {
+        const root = document.querySelector<HTMLElement>(
+            "[data-mountain-tag-grid]",
+        );
+        if (!root) return;
 
-                let currentSort: MountainTagSort | null = {
-                    ...DEFAULT_MOUNTAIN_TAG_SORT,
-                };
-                const buttons = Array.from(
-                    view.querySelectorAll<HTMLButtonElement>("[data-sort-key]"),
-                );
-                const cards = Array.from(
-                    view.querySelectorAll<HTMLElement>(".mountain-tag-card"),
-                );
+        const controller = new AbortController();
+        root.dataset.sortReady = "true";
+        let currentSort: MountainTagSort | null = {
+            ...DEFAULT_MOUNTAIN_TAG_SORT,
+        };
+        const buttons = Array.from(
+            root.querySelectorAll<HTMLButtonElement>("[data-sort-key]"),
+        );
+        const cards = Array.from(
+            root.querySelectorAll<HTMLElement>(".mountain-tag-card"),
+        );
 
-                const loadContours = (card: HTMLElement) => {
-                    const image = card.querySelector<HTMLImageElement>(
-                        "img[data-contour-src]",
-                    );
-                    if (!image || image.dataset.contourLoading) return;
-                    image.dataset.contourLoading = "true";
+        const loadContours = (card: HTMLElement) => {
+            const image = card.querySelector<HTMLImageElement>(
+                "img[data-contour-src]",
+            );
+            if (!image || image.dataset.contourLoading) return;
+            image.dataset.contourLoading = "true";
 
-                    const markReady = () => {
-                        image.classList.add("is-ready");
-                    };
-                    const decodeAndMarkReady = () => {
-                        image.decode().then(markReady).catch(() => {
-                            if (image.complete && image.naturalWidth > 0) {
-                                markReady();
-                            }
-                        });
-                    };
-                    image.addEventListener("load", decodeAndMarkReady, {
-                        once: true,
-                    });
-                    image.src = image.dataset.contourSrc ?? "";
-                    decodeAndMarkReady();
-                };
-
-                if ("IntersectionObserver" in window) {
-                    const contourObserver = new IntersectionObserver(
-                        (entries) => {
-                            entries.forEach((entry) => {
-                                if (!entry.isIntersecting) return;
-                                const card = entry.target as HTMLElement;
-                                loadContours(card);
-                                contourObserver.unobserve(card);
-                            });
-                        },
-                        { rootMargin: "600px 0px" },
-                    );
-                    cards.forEach((card) => contourObserver.observe(card));
-                } else {
-                    cards.forEach(loadContours);
-                }
-
-                const updateButtons = () => {
-                    buttons.forEach((button) => {
-                        const key = button.dataset.sortKey as MountainTagSortKey;
-                        const isActive = currentSort?.key === key;
-                        button.classList.toggle("is-active", isActive);
-                        button.setAttribute("aria-pressed", String(isActive));
-                        const icon = button.querySelector<HTMLElement>(
-                            "[data-sort-icon]",
-                        );
-                        if (icon) {
-                            icon.textContent = isActive
-                                ? currentSort?.direction === "desc"
-                                    ? "↓"
-                                    : "↑"
-                                : "↕";
-                        }
-                    });
-                };
-
-                const sortGroups = () => {
-                    view.querySelectorAll<HTMLElement>(".mountain-tag-grid")
-                        .forEach((grid) => {
-                            const cards = Array.from(
-                                grid.querySelectorAll<HTMLElement>(
-                                    ":scope > .mountain-tag-card",
-                                ),
-                            ).map((element) => ({
-                                element,
-                                name: element.dataset.mountainName || "",
-                                elevation: Number(
-                                    element.dataset.mountainElevation,
-                                ),
-                                latitude: Number(
-                                    element.dataset.mountainLatitude,
-                                ),
-                            }));
-
-                            sortMountainTags(cards, currentSort).forEach(
-                                ({ element }) => grid.appendChild(element),
-                            );
-                        });
-                };
-
-                buttons.forEach((button) => {
-                    button.addEventListener("click", () => {
-                        currentSort = nextMountainTagSort(
-                            currentSort,
-                            button.dataset.sortKey as MountainTagSortKey,
-                        );
-                        sortGroups();
-                        updateButtons();
-                    });
-                });
-
-                cards.forEach((card) => {
-                    card.addEventListener("pointerenter", () =>
-                        loadContours(card),
-                    );
-                    card.addEventListener("focusin", () => loadContours(card));
-                    card.addEventListener("click", (event) => {
-                        const isMobile = window.matchMedia(
-                            "(max-width: 768px) and (hover: none)",
-                        ).matches;
-                        if (!isMobile || card.classList.contains("show-info")) {
-                            return;
-                        }
-
-                        event.preventDefault();
-                        loadContours(card);
-                        cards.forEach((otherCard) =>
-                            otherCard.classList.remove("show-info"),
-                        );
-                        card.classList.add("show-info");
-                    });
-                });
-
-                document.addEventListener("click", (event) => {
-                    const target = event.target;
-                    if (
-                        target instanceof Element &&
-                        !target.closest(".mountain-tag-card")
-                    ) {
-                        cards.forEach((card) =>
-                            card.classList.remove("show-info"),
-                        );
+            const markReady = () => {
+                if (controller.signal.aborted) return;
+                image.classList.add("is-ready");
+            };
+            const decodeAndMarkReady = () => {
+                image.decode().then(markReady).catch(() => {
+                    if (image.complete && image.naturalWidth > 0) {
+                        markReady();
                     }
                 });
+            };
+            image.addEventListener("load", decodeAndMarkReady, {
+                once: true,
+                signal: controller.signal,
             });
-    };
+            image.src = image.dataset.contourSrc ?? "";
+            decodeAndMarkReady();
+        };
 
-    initMountainTagSort();
-    document.addEventListener("astro:after-swap", initMountainTagSort);
+        let contourObserver: IntersectionObserver | undefined;
+        if ("IntersectionObserver" in window) {
+            contourObserver = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach((entry) => {
+                        if (!entry.isIntersecting) return;
+                        const card = entry.target as HTMLElement;
+                        loadContours(card);
+                        contourObserver?.unobserve(card);
+                    });
+                },
+                { rootMargin: "600px 0px" },
+            );
+            cards.forEach((card) => contourObserver?.observe(card));
+        } else {
+            cards.forEach(loadContours);
+        }
+
+        const updateButtons = () => {
+            buttons.forEach((button) => {
+                const key = button.dataset.sortKey as MountainTagSortKey;
+                const isActive = currentSort?.key === key;
+                button.classList.toggle("is-active", isActive);
+                button.setAttribute("aria-pressed", String(isActive));
+                const icon = button.querySelector<HTMLElement>(
+                    "[data-sort-icon]",
+                );
+                if (icon) {
+                    icon.textContent = isActive
+                        ? currentSort?.direction === "desc"
+                            ? "↓"
+                            : "↑"
+                        : "↕";
+                }
+            });
+        };
+
+        const sortGroups = () => {
+            root.querySelectorAll<HTMLElement>(".mountain-tag-grid")
+                .forEach((grid) => {
+                    const cards = Array.from(
+                        grid.querySelectorAll<HTMLElement>(
+                            ":scope > .mountain-tag-card",
+                        ),
+                    ).map((element) => ({
+                        element,
+                        name: element.dataset.mountainName || "",
+                        elevation: Number(element.dataset.mountainElevation),
+                        latitude: Number(element.dataset.mountainLatitude),
+                    }));
+
+                    sortMountainTags(cards, currentSort).forEach(
+                        ({ element }) => grid.appendChild(element),
+                    );
+                });
+        };
+
+        buttons.forEach((button) => {
+            button.addEventListener("click", () => {
+                currentSort = nextMountainTagSort(
+                    currentSort,
+                    button.dataset.sortKey as MountainTagSortKey,
+                );
+                sortGroups();
+                updateButtons();
+            }, { signal: controller.signal });
+        });
+
+        cards.forEach((card) => {
+            card.addEventListener("pointerenter", () => loadContours(card), {
+                signal: controller.signal,
+            });
+            card.addEventListener("focusin", () => loadContours(card), {
+                signal: controller.signal,
+            });
+            card.addEventListener("click", (event) => {
+                const isMobile = window.matchMedia(
+                    "(max-width: 768px) and (hover: none)",
+                ).matches;
+                if (!isMobile || card.classList.contains("show-info")) {
+                    return;
+                }
+
+                event.preventDefault();
+                loadContours(card);
+                cards.forEach((otherCard) =>
+                    otherCard.classList.remove("show-info"),
+                );
+                card.classList.add("show-info");
+            }, { signal: controller.signal });
+        });
+
+        document.addEventListener("click", (event) => {
+            const target = event.target;
+            if (target instanceof Element) {
+                const targetCard = target.closest(".mountain-tag-card");
+                if (targetCard && root.contains(targetCard)) return;
+                cards.forEach((card) =>
+                    card.classList.remove("show-info"),
+                );
+            }
+        }, { signal: controller.signal });
+
+        sortGroups();
+        updateButtons();
+
+        return () => {
+            controller.abort();
+            contourObserver?.disconnect();
+            delete root.dataset.sortReady;
+            cards.forEach((card) => {
+                card.classList.remove("show-info");
+                const image = card.querySelector<HTMLImageElement>(
+                    "img[data-contour-src]",
+                );
+                if (image && !image.classList.contains("is-ready")) {
+                    delete image.dataset.contourLoading;
+                }
+            });
+        };
+    });
 </script>
 
 <style>

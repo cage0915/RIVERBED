@@ -491,3 +491,76 @@ test('catalog routes share lifecycle-scoped card interactions', () => {
         /document\.querySelectorAll[^;]*\.album-card/,
     );
 });
+
+test("covered client scripts do not retain after-swap initializers", () => {
+    const paths = [
+        "src/pages/[folder]/[album].astro",
+        "src/pages/yama/tags/[tag].astro",
+        "src/components/MountainTagGrid.astro",
+        "src/components/DevTool.astro",
+        "src/components/MountainDevTool.astro",
+        "src/components/Photo.astro",
+        "src/components/Row.astro",
+        "src/components/PhotoCarousel.astro",
+        "src/components/MountainProfile.astro",
+    ];
+
+    for (const path of paths) {
+        assert.doesNotMatch(
+            readProjectFile(path),
+            /addEventListener\(["']astro:after-swap/,
+            path,
+        );
+    }
+
+    const mountainTagPage = readProjectFile(
+        "src/pages/yama/tags/[tag].astro",
+    );
+    const albumPage = readProjectFile("src/pages/[folder]/[album].astro");
+    assert.match(albumPage, /data-album-page/);
+    assert.match(
+        albumPage,
+        /installPageLifecycle\(document, \(\) => \{\s*const page = document\.querySelector<HTMLElement>\(\s*"\[data-album-page\]"/,
+    );
+    assert.match(
+        mountainTagPage,
+        /installPageLifecycle\(document, \(\) => \{\s*const page = document\.querySelector<HTMLElement>\(\s*"\.tag-page\[data-tag-name\]"/,
+    );
+    assert.match(
+        mountainTagPage,
+        /fetch\("\/api\/mountain-cover",[\s\S]*signal,[\s\S]*if \(signal\.aborted\) return;/,
+    );
+    assert.match(mountainTagPage, /cancelAnimationFrame\(scrollResetFrame\)/);
+    assert.match(
+        mountainTagPage,
+        /cancelAnimationFrame\(frameId\);[\s\S]*setCoverScrollReset\(false\);/,
+    );
+    assert.match(
+        mountainTagPage,
+        /cancelAnimationFrame\(scrollResetFrame\);[\s\S]*setCoverScrollReset\(false\);/,
+    );
+    assert.match(
+        mountainTagPage,
+        /clearScrollResetHandles\(\);\s*scrollResetFrame = requestAnimationFrame/,
+    );
+    assert.match(
+        mountainTagPage,
+        /return \(\) => \{[\s\S]*candidate\.disabled = Boolean\([\s\S]*status\.textContent = "";/,
+    );
+
+    const mountainTagGrid = readProjectFile(
+        "src/components/MountainTagGrid.astro",
+    );
+    assert.match(
+        mountainTagGrid,
+        /const markReady = \(\) => \{[\s\S]*if \(controller\.signal\.aborted\) return;/,
+    );
+    assert.match(
+        mountainTagGrid,
+        /delete image\.dataset\.contourLoading/,
+    );
+    assert.match(
+        mountainTagGrid,
+        /sortGroups\(\);\s*updateButtons\(\);\s*return \(\) =>/,
+    );
+});

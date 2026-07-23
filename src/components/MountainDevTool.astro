@@ -955,6 +955,7 @@
     import { getMountainContourAssetUrl } from "../lib/mountain-contours";
     import { parseDirectionalCoordinates } from "../lib/mountain-coordinates";
     import type { MountainLookupCandidate } from "../lib/wikidata-mountain";
+    import { installPageLifecycle } from "../lib/client-page-lifecycle";
 
     type ContextConfig = {
         id: string;
@@ -2536,6 +2537,7 @@
         }
     }
 
-    initMountainManager();
-    document.addEventListener("astro:after-swap", initMountainManager);
+    installPageLifecycle(document, () => {
+        initMountainManager();
+    });
 </script>
