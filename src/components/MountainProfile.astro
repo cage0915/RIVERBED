@@ -239,12 +239,20 @@ const hasMap =
 </style>
 
 <script>
-    const initMountainProfileSizing = () => {
+    import { installPageLifecycle } from "../lib/client-page-lifecycle";
+
+    installPageLifecycle(document, () => {
+        const mountedProfiles: Array<{
+            profile: HTMLElement;
+            resizeObserver: ResizeObserver;
+            panelObserver: MutationObserver;
+            cancelFrame: () => void;
+        }> = [];
+
         document
             .querySelectorAll<HTMLElement>(".mountain-profile--split")
             .forEach((profile) => {
                 if (profile.dataset.sizingReady === "true") return;
-                profile.dataset.sizingReady = "true";
 
                 const details = profile.querySelector<HTMLElement>(
                     ".mountain-profile__details",
@@ -253,11 +261,13 @@ const hasMap =
                     ".mountain-viewer",
                 );
                 if (!details || !viewer) return;
+                profile.dataset.sizingReady = "true";
 
                 let animationFrame = 0;
                 const updateSizing = () => {
                     cancelAnimationFrame(animationFrame);
                     animationFrame = requestAnimationFrame(() => {
+                        animationFrame = 0;
                         if (!window.matchMedia("(min-width: 768px)").matches) {
                             profile.style.removeProperty("--mountain-details-height");
                             profile.style.removeProperty("--mountain-details-offset");
@@ -300,9 +310,28 @@ const hasMap =
                 });
 
                 updateSizing();
+                mountedProfiles.push({
+                    profile,
+                    resizeObserver,
+                    panelObserver,
+                    cancelFrame: () => cancelAnimationFrame(animationFrame),
+                });
             });
-    };
 
-    initMountainProfileSizing();
-    document.addEventListener("astro:after-swap", initMountainProfileSizing);
+        return () => {
+            mountedProfiles.forEach(({
+                profile,
+                resizeObserver,
+                panelObserver,
+                cancelFrame,
+            }) => {
+                resizeObserver.disconnect();
+                panelObserver.disconnect();
+                cancelFrame();
+                delete profile.dataset.sizingReady;
+                profile.style.removeProperty("--mountain-details-height");
+                profile.style.removeProperty("--mountain-details-offset");
+            });
+        };
+    });
 </script>

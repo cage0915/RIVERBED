@@ -1,0 +1,70 @@
+<script>
+    import { installPageLifecycle } from "../lib/client-page-lifecycle";
+
+    installPageLifecycle(document, () => {
+        const controller = new AbortController();
+
+        window.addEventListener("keydown", (e) => {
+            if (
+                e.key !== "ArrowRight" &&
+                e.key !== "ArrowLeft" &&
+                e.key !== "ArrowDown" &&
+                e.key !== "ArrowUp"
+            )
+                return;
+
+            const eventElement = e.target instanceof Element ? e.target : null;
+            if (
+                eventElement?.closest(
+                    "dialog, input, textarea, select, [role='textbox']",
+                )
+            ) {
+                return;
+            }
+
+            const editableElement = eventElement instanceof HTMLElement
+                ? eventElement
+                : eventElement?.parentElement;
+            if (editableElement?.isContentEditable) return;
+
+            const targets = Array.from(
+                document.querySelectorAll<HTMLElement>(
+                    "[data-keyboard-navigation-target]",
+                ),
+            );
+            if (targets.length === 0) return;
+
+            const navbarHeight = 110;
+            const scrollPadding = 20;
+            const currentPos = window.scrollY + navbarHeight + scrollPadding;
+
+            const nextIndex = targets.findIndex((t) => {
+                const rect = t.getBoundingClientRect();
+                return window.scrollY + rect.top > currentPos;
+            });
+
+            let target;
+            if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+                if (nextIndex !== -1) target = targets[nextIndex];
+            } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+                const currentIndex = nextIndex === -1 ? targets.length : nextIndex;
+                if (currentIndex > 1) {
+                    target = targets[currentIndex - 2];
+                } else if (currentIndex === 1) {
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                    return;
+                }
+            }
+
+            if (target) {
+                const targetTop = window.scrollY + target.getBoundingClientRect().top - navbarHeight + 10;
+                window.scrollTo({ top: targetTop, behavior: "smooth" });
+                e.preventDefault();
+            }
+        }, { signal: controller.signal });
+
+        return () => {
+            controller.abort();
+        };
+    });
+</script>

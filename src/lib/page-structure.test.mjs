@@ -28,11 +28,11 @@ test('mountain navigation uses the static yama tag route hierarchy', () => {
     const photo = readProjectFile('src/components/Photo.astro');
     const devTool = readProjectFile('src/components/DevTool.astro');
     const mountainDevTool = readProjectFile('src/components/MountainDevTool.astro');
-    const layout = readProjectFile('src/layouts/Layout.astro');
+    const siteDevTools = readProjectFile('src/components/SiteDevTools.astro');
 
     assert.match(mountainGrid, /\/yama\/tags\/\$\{encodeURIComponent\(mountain\.name\)\}/);
     assert.match(folderPage, /href=[{]["']\/yama\/tags["'][}]/);
-    for (const source of [photo, devTool, mountainDevTool, layout]) {
+    for (const source of [photo, devTool, mountainDevTool, siteDevTools]) {
         assert.doesNotMatch(source, /["'`]\/tags\//);
         assert.match(source, /\/yama\/tags\//);
     }
@@ -216,4 +216,351 @@ test('region removal validates Mountains against persisted map contexts', () => 
     assert.match(regions, /readMountainRegion/);
     assert.doesNotMatch(regions, /MAP_CONTEXTS/);
     assert.doesNotMatch(regions, /parseMountainRegionSource/);
+});
+
+test('Layout delegates footer and development tool rendering boundaries', () => {
+    const layout = readProjectFile('src/layouts/Layout.astro');
+    const siteFooter = readProjectFile('src/components/SiteFooter.astro');
+
+    assert.match(
+        layout,
+        /import SiteFooter from ["']\.\.\/components\/SiteFooter\.astro["']/,
+    );
+    assert.match(
+        layout,
+        /import SiteDevTools from ["']\.\.\/components\/SiteDevTools\.astro["']/,
+    );
+    assert.match(layout, /<SiteFooter\s*\/>/);
+    assert.match(layout, /<SiteDevTools\s*\/>/);
+    assert.doesNotMatch(layout, /DevTool\.astro|MountainDevTool\.astro/);
+    assert.doesNotMatch(layout, /\bfolderFooter\b|getFolderFooter/);
+    assert.match(
+        layout,
+        /<head>[\s\S]*<link rel="alternate" type="application\/rss\+xml" title="RIVERBED RSS" href="\/rss\.xml" \/>[\s\S]*<\/head>/,
+    );
+    assert.match(
+        siteFooter,
+        /currentPath === ["']\/["'][\s\S]*<footer class="pb-8">[\s\S]*href="\/rss\.xml"/,
+    );
+    assert.doesNotMatch(siteFooter, /rel="alternate"/);
+});
+
+test('Layout delegates navigation rendering and lifecycle ownership', () => {
+    const layout = readProjectFile('src/layouts/Layout.astro');
+    const navigationPath = new URL('../components/SiteNavigation.astro', import.meta.url);
+    const siteNavigation = existsSync(navigationPath)
+        ? readFileSync(navigationPath, 'utf8')
+        : '';
+
+    assert.match(
+        layout,
+        /import SiteNavigation from ["']\.\.\/components\/SiteNavigation\.astro["']/,
+    );
+    assert.match(layout, /<SiteNavigation\s*\/>[\s\S]*<main/);
+
+    for (const ownedNavigationDetail of [
+        /getAlbumSummaries/,
+        /FOLDER_METADATA/,
+        /menu-toggle/,
+        /mobile-menu/,
+        /initNavbar/,
+    ]) {
+        assert.doesNotMatch(layout, ownedNavigationDetail);
+    }
+
+    assert.match(siteNavigation, /getAlbumSummaries/);
+    assert.match(siteNavigation, /FOLDER_METADATA/);
+    assert.match(siteNavigation, /\.sort\(\(a, b\) => a\.order - b\.order\)/);
+    assert.match(siteNavigation, /data-site-navigation/);
+    assert.match(siteNavigation, /data-site-menu-toggle/);
+    assert.match(siteNavigation, /data-site-mobile-menu/);
+    assert.match(siteNavigation, /installPageLifecycle/);
+    assert.match(siteNavigation, /new AbortController\(\)/);
+    assert.match(
+        siteNavigation,
+        /<button[\s\S]*type="button"[\s\S]*aria-controls="mobile-menu"[\s\S]*aria-expanded="false"[\s\S]*>/,
+    );
+    assert.match(
+        siteNavigation,
+        /let menuOpen = !mobileMenu\.classList\.contains\("hidden"\)/,
+    );
+    assert.equal(
+        (siteNavigation.match(/const setMenuOpen = \(open: boolean\)/g) ?? []).length,
+        1,
+    );
+    assert.match(
+        siteNavigation,
+        /menuToggle\.setAttribute\("aria-expanded", String\(open\)\)/,
+    );
+    assert.equal(
+        (siteNavigation.match(/aria-hidden="true"/g) ?? []).length,
+        2,
+    );
+    assert.doesNotMatch(layout, /\.condensed-kanji\s*\{|\.mask-linear-right\s*\{|\.mask-none\s*\{/);
+    assert.match(siteNavigation, /\.condensed-kanji\s*\{/);
+    assert.match(siteNavigation, /\.mask-linear-right\s*\{/);
+    assert.doesNotMatch(siteNavigation, /astro:after-swap/);
+    assert.doesNotMatch(siteNavigation, /cloneNode|replaceChild/);
+});
+
+test('Layout delegates explicit content keyboard navigation targets and lifecycle ownership', () => {
+    const layout = readProjectFile('src/layouts/Layout.astro');
+    const row = readProjectFile('src/components/Row.astro');
+    const homePage = readProjectFile('src/pages/index.astro');
+    const folderPage = readProjectFile('src/pages/[folder]/index.astro');
+    const navigationPath = new URL(
+        '../components/ContentKeyboardNavigation.astro',
+        import.meta.url,
+    );
+    const contentKeyboardNavigation = existsSync(navigationPath)
+        ? readFileSync(navigationPath, 'utf8')
+        : '';
+
+    assert.match(
+        layout,
+        /import ContentKeyboardNavigation from ["']\.\.\/components\/ContentKeyboardNavigation\.astro["']/,
+    );
+    assert.match(layout, /<\/main>[\s\S]*<ContentKeyboardNavigation\s*\/>/);
+    assert.doesNotMatch(layout, /ArrowRight|ArrowLeft/);
+    assert.doesNotMatch(layout, /\.photo-row,\s*\.album-card|addEventListener\(["']keydown/);
+
+    assert.match(contentKeyboardNavigation.trim(), /^<script>[\s\S]*<\/script>$/);
+    assert.match(contentKeyboardNavigation, /installPageLifecycle/);
+    assert.match(contentKeyboardNavigation, /new AbortController\(\)/);
+    assert.match(contentKeyboardNavigation, /\[data-keyboard-navigation-target\]/);
+    assert.match(
+        contentKeyboardNavigation,
+        /dialog, input, textarea, select, \[role='textbox'\]/,
+    );
+    assert.match(contentKeyboardNavigation, /\.isContentEditable/);
+    assert.doesNotMatch(contentKeyboardNavigation, /astro:after-swap/);
+    assert.match(contentKeyboardNavigation, /addEventListener\(["']keydown["'][\s\S]*signal: controller\.signal/);
+    assert.match(contentKeyboardNavigation, /controller\.abort\(\)/);
+    assert.doesNotMatch(
+        contentKeyboardNavigation,
+        /querySelectorAll[^;]*(?:\.album-card|\.folder-card|\.photo-row)/,
+    );
+
+    assert.match(
+        row,
+        /<div class="photo-row" data-photo-row data-keyboard-navigation-target>/,
+    );
+    assert.match(
+        homePage,
+        /class="album-card latest-post-card group"[\s\S]*data-catalog-card[\s\S]*data-keyboard-navigation-target/,
+    );
+    assert.match(
+        homePage,
+        /class="album-card folder-card group"[\s\S]*data-catalog-card[\s\S]*data-keyboard-navigation-target/,
+    );
+    assert.match(
+        folderPage,
+        /class="album-card group"[\s\S]*data-catalog-card[\s\S]*data-keyboard-navigation-target/,
+    );
+    assert.equal(
+        (homePage.match(/data-keyboard-navigation-target/g) ?? []).length,
+        (homePage.match(/data-catalog-card/g) ?? []).length,
+    );
+    assert.equal(
+        (folderPage.match(/data-keyboard-navigation-target/g) ?? []).length,
+        (folderPage.match(/data-catalog-card/g) ?? []).length,
+    );
+});
+
+test('media behavior uses page-scoped lifecycle owners with deterministic cleanup', () => {
+    const layout = readProjectFile('src/layouts/Layout.astro');
+    const lightboxPath = new URL('../components/PhotoLightbox.astro', import.meta.url);
+    const photoLightbox = existsSync(lightboxPath)
+        ? readFileSync(lightboxPath, 'utf8')
+        : '';
+    const photo = readProjectFile('src/components/Photo.astro');
+    const row = readProjectFile('src/components/Row.astro');
+    const carousel = readProjectFile('src/components/PhotoCarousel.astro');
+    const mountainProfile = readProjectFile('src/components/MountainProfile.astro');
+
+    assert.match(
+        layout,
+        /import PhotoLightbox from ["']\.\.\/components\/PhotoLightbox\.astro["']/,
+    );
+    assert.match(layout, /<PhotoLightbox\s*\/>/);
+    assert.doesNotMatch(
+        layout,
+        /PhotoSwipeLightbox|pswp-link|initDimensions|initPhotoSwipe|<script>/,
+    );
+
+    assert.match(photoLightbox.trim(), /^<script>[\s\S]*<\/script>$/);
+    assert.match(photoLightbox, /PhotoSwipeLightbox/);
+    assert.match(photoLightbox, /installPageLifecycle/);
+    assert.match(photoLightbox, /\[data-photo-lightbox-link\]/);
+    assert.match(photoLightbox, /if \(!links\.length\) return/);
+    assert.match(photoLightbox, /new AbortController\(\)/);
+    assert.match(photoLightbox, /lightbox\.destroy\(\)/);
+
+    assert.match(
+        photo,
+        /<a[\s\S]*class="pswp-link block"[\s\S]*data-photo-lightbox-link/,
+    );
+    assert.match(photo, /installPageLifecycle/);
+    assert.match(photo, /new AbortController\(\)/);
+    assert.match(photo, /signal: controller\.signal/);
+    assert.doesNotMatch(photo, /astro:after-swap|initPhotoFallbacks\(\);/);
+
+    assert.match(
+        row,
+        /<div class="photo-row" data-photo-row data-keyboard-navigation-target>/,
+    );
+    assert.match(row, /installPageLifecycle/);
+    assert.match(row, /new AbortController\(\)/);
+    assert.match(row, /\[data-photo-row\]/);
+    assert.match(row, /signal: controller\.signal/);
+    assert.doesNotMatch(row, /astro:after-swap|adjustRowHeights\(\);/);
+
+    assert.match(carousel, /installPageLifecycle/);
+    assert.match(carousel, /new AbortController\(\)/);
+    assert.match(carousel, /observer\.disconnect\(\)/);
+    assert.match(carousel, /clearTimeout/);
+    assert.doesNotMatch(carousel, /astro:(?:before|after)-swap|initCarousels\(\);/);
+
+    assert.match(mountainProfile, /installPageLifecycle/);
+    assert.match(mountainProfile, /resizeObserver\.disconnect\(\)/);
+    assert.match(mountainProfile, /panelObserver\.disconnect\(\)/);
+    assert.match(mountainProfile, /cancelAnimationFrame/);
+    assert.doesNotMatch(
+        mountainProfile,
+        /astro:after-swap|initMountainProfileSizing\(\);/,
+    );
+});
+
+test('catalog routes share lifecycle-scoped card interactions', () => {
+    const homePage = readProjectFile('src/pages/index.astro');
+    const folderPage = readProjectFile('src/pages/[folder]/index.astro');
+    const interactionsPath = new URL(
+        '../components/CatalogCardInteractions.astro',
+        import.meta.url,
+    );
+    const interactions = existsSync(interactionsPath)
+        ? readFileSync(interactionsPath, 'utf8')
+        : '';
+
+    assert.match(
+        homePage,
+        /import CatalogCardInteractions from ["']\.\.\/components\/CatalogCardInteractions\.astro["']/,
+    );
+    assert.match(
+        folderPage,
+        /import CatalogCardInteractions from ["']\.\.\/\.\.\/components\/CatalogCardInteractions\.astro["']/,
+    );
+
+    for (const page of [homePage, folderPage]) {
+        assert.equal(
+            (page.match(/<CatalogCardInteractions\s*\/>/g) ?? []).length,
+            1,
+        );
+        assert.match(page, /data-catalog-grid/);
+        assert.match(page, /data-catalog-card/);
+        assert.doesNotMatch(page, /astro:after-swap|initFolderCards|initAlbumCards/);
+    }
+
+    assert.match(
+        homePage,
+        /<div class="pt-6 pb-8" data-catalog-grid>[\s\S]*class="album-card latest-post-card group"[\s\S]*data-catalog-card[\s\S]*<nav[\s\S]*class="folders-grid"[\s\S]*class="album-card folder-card group"[\s\S]*data-catalog-card/,
+    );
+    assert.match(
+        folderPage,
+        /<div class="albums-grid" data-catalog-grid[\s\S]*class="album-card group"[\s\S]*data-catalog-card/,
+    );
+    assert.match(interactions.trim(), /^<script>[\s\S]*<\/script>$/);
+    assert.match(interactions, /installPageLifecycle/);
+    assert.match(interactions, /new AbortController\(\)/);
+    assert.match(interactions, /root\.querySelectorAll[^;]*data-catalog-card/);
+    assert.match(interactions, /const INTERVAL_MS = 5000/);
+    assert.match(interactions, /window\.setInterval/);
+    assert.match(interactions, /clearInterval/);
+    assert.match(interactions, /controller\.abort\(\)/);
+    assert.match(interactions, /classList\.remove\("show-info"\)/);
+    assert.match(
+        interactions,
+        /\(max-width: 768px\) and \(hover: none\)[\s\S]*classList\.contains\("show-info"\)[\s\S]*event\.preventDefault\(\)/,
+    );
+    assert.match(
+        interactions,
+        /card\.contains\(target\)[\s\S]*if \(!isInsideCurrentCard\)/,
+    );
+    assert.doesNotMatch(
+        interactions,
+        /document\.querySelectorAll[^;]*\.album-card/,
+    );
+});
+
+test("covered client scripts do not retain after-swap initializers", () => {
+    const paths = [
+        "src/pages/[folder]/[album].astro",
+        "src/pages/yama/tags/[tag].astro",
+        "src/components/MountainTagGrid.astro",
+        "src/components/DevTool.astro",
+        "src/components/MountainDevTool.astro",
+        "src/components/Photo.astro",
+        "src/components/Row.astro",
+        "src/components/PhotoCarousel.astro",
+        "src/components/MountainProfile.astro",
+    ];
+
+    for (const path of paths) {
+        assert.doesNotMatch(
+            readProjectFile(path),
+            /addEventListener\(["']astro:after-swap/,
+            path,
+        );
+    }
+
+    const mountainTagPage = readProjectFile(
+        "src/pages/yama/tags/[tag].astro",
+    );
+    const albumPage = readProjectFile("src/pages/[folder]/[album].astro");
+    assert.match(albumPage, /data-album-page/);
+    assert.match(
+        albumPage,
+        /installPageLifecycle\(document, \(\) => \{\s*const page = document\.querySelector<HTMLElement>\(\s*"\[data-album-page\]"/,
+    );
+    assert.match(
+        mountainTagPage,
+        /installPageLifecycle\(document, \(\) => \{\s*const page = document\.querySelector<HTMLElement>\(\s*"\.tag-page\[data-tag-name\]"/,
+    );
+    assert.match(
+        mountainTagPage,
+        /fetch\("\/api\/mountain-cover",[\s\S]*signal,[\s\S]*if \(signal\.aborted\) return;/,
+    );
+    assert.match(mountainTagPage, /cancelAnimationFrame\(scrollResetFrame\)/);
+    assert.match(
+        mountainTagPage,
+        /cancelAnimationFrame\(frameId\);[\s\S]*setCoverScrollReset\(false\);/,
+    );
+    assert.match(
+        mountainTagPage,
+        /cancelAnimationFrame\(scrollResetFrame\);[\s\S]*setCoverScrollReset\(false\);/,
+    );
+    assert.match(
+        mountainTagPage,
+        /clearScrollResetHandles\(\);\s*scrollResetFrame = requestAnimationFrame/,
+    );
+    assert.match(
+        mountainTagPage,
+        /return \(\) => \{[\s\S]*candidate\.disabled = Boolean\([\s\S]*status\.textContent = "";/,
+    );
+
+    const mountainTagGrid = readProjectFile(
+        "src/components/MountainTagGrid.astro",
+    );
+    assert.match(
+        mountainTagGrid,
+        /const markReady = \(\) => \{[\s\S]*if \(controller\.signal\.aborted\) return;/,
+    );
+    assert.match(
+        mountainTagGrid,
+        /delete image\.dataset\.contourLoading/,
+    );
+    assert.match(
+        mountainTagGrid,
+        /sortGroups\(\);\s*updateButtons\(\);\s*return \(\) =>/,
+    );
 });

@@ -1,0 +1,18 @@
+---
+const DevTool = import.meta.env.DEV
+	? (await import("./DevTool.astro")).default
+	: null;
+const MountainDevTool = import.meta.env.DEV
+	? (await import("./MountainDevTool.astro")).default
+	: null;
+const currentPath = Astro.url.pathname;
+---
+
+{DevTool && (
+	<>
+		<DevTool />
+		{MountainDevTool && currentPath.startsWith("/yama/tags/") && (
+			<MountainDevTool />
+		)}
+	</>
+)}

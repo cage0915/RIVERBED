@@ -60,7 +60,7 @@ if (finalMB) {
             <RichText text={caption} />
         </div>
     )}
-    <div class="photo-row">
+    <div class="photo-row" data-photo-row data-keyboard-navigation-target>
         <slot />
     </div>
     {caption && parsedPos === 'bottom' && (
@@ -110,8 +110,12 @@ if (finalMB) {
 </style>
 
 <script>
-    const adjustRowHeights = () => {
-        document.querySelectorAll('.photo-row').forEach(row => {
+    import { installPageLifecycle } from "../lib/client-page-lifecycle";
+
+    installPageLifecycle(document, () => {
+        const controller = new AbortController();
+
+        document.querySelectorAll('[data-photo-row]').forEach(row => {
             const items = row.querySelectorAll('.photo-container, :scope > *');
 
             items.forEach(item => {
@@ -131,13 +135,13 @@ if (finalMB) {
                 if (img.complete) {
                     applyRatio();
                 } else {
-                    img.addEventListener('load', applyRatio);
+                    img.addEventListener('load', applyRatio, {
+                        signal: controller.signal,
+                    });
                 }
             });
         });
-    };
 
-    // Initialize on first load and re-run on Astro view transitions
-    adjustRowHeights();
-    document.addEventListener('astro:after-swap', adjustRowHeights);
+        return () => controller.abort();
+    });
 </script>

@@ -31,3 +31,7 @@ pnpm-debug.log*
 
 # generated ASCII aliases for Cloudflare static assets
 /public/contour-assets/
+
+# browser test artifacts
+/test-results/
+/playwright-report/

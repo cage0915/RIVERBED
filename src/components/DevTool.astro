@@ -22,6 +22,7 @@
         isCoverDraftCurrent,
         settleCoverSave,
     } from "../lib/dev-cover-state.js";
+    import { installPageLifecycle } from "../lib/client-page-lifecycle";
 
     // Only run in development
     if (import.meta.env.DEV) {
@@ -891,7 +892,7 @@
                     <div class="tag-marker" style="left: ${tag.x}%; top: ${tag.y}%;">
                         <div class="tag-content">
                             <div class="tag-line"></div>
-                            <a href="/yama/tags/${encodeURIComponent(tag.name)}" class="tag-link">
+                            <a href="/yama/tags/${encodeURIComponent(tag.name)}" class="tag-link" data-mountain-tag-link>
                                 <span class="tag-name" data-name="${escapeHtml(tag.name)}" data-x="${tag.x}" data-y="${tag.y}">${escapeHtml(tag.name)}</span>
                             </a>
                         </div>
@@ -3752,8 +3753,9 @@
                 updateSaveButtonState();
             };
 
-            init();
-            document.addEventListener('astro:after-swap', init);
+            installPageLifecycle(document, () => {
+                init();
+            });
         })();
     }
 </script>

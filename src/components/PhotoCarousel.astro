@@ -96,13 +96,20 @@ const slideWidthPercent = 100 - peekPercent;
 </section>
 
 <script>
-    function initCarousels() {
+    import { installPageLifecycle } from "../lib/client-page-lifecycle";
+
+    installPageLifecycle(document, () => {
+        const controller = new AbortController();
+        const observers: IntersectionObserver[] = [];
+        const initialPositionTimers: number[] = [];
+        const initializedSections: HTMLElement[] = [];
+        const generatedDots: HTMLButtonElement[] = [];
+
         document
             .querySelectorAll<HTMLElement>("[data-carousel]")
             .forEach((section) => {
                 // Guard: skip if already initialised
                 if (section.dataset.carouselReady) return;
-                section.dataset.carouselReady = "true";
 
                 const track = section.querySelector<HTMLElement>(
                     ".carousel-track",
@@ -111,6 +118,8 @@ const slideWidthPercent = 100 - peekPercent;
                     ".carousel-dots",
                 );
                 if (!track) return;
+                section.dataset.carouselReady = "true";
+                initializedSections.push(section);
 
                 const slides = Array.from(track.querySelectorAll<HTMLElement>(":scope > *"));
                 const dots: HTMLButtonElement[] = [];
@@ -122,16 +131,21 @@ const slideWidthPercent = 100 - peekPercent;
                         dot.className = "carousel-dot";
                         dot.setAttribute("aria-label", `Go to slide ${index + 1}`);
 
-                        dot.addEventListener("click", () => {
-                            track.scrollTo({
-                                left: slide.offsetLeft - track.offsetLeft - (track.clientWidth - slide.clientWidth) / 2,
-                                behavior: "smooth"
-                            });
-                        });
+                        dot.addEventListener(
+                            "click",
+                            () => {
+                                track.scrollTo({
+                                    left: slide.offsetLeft - track.offsetLeft - (track.clientWidth - slide.clientWidth) / 2,
+                                    behavior: "smooth"
+                                });
+                            },
+                            { signal: controller.signal },
+                        );
 
                         slide.dataset.slideIndex = index.toString();
                         dotsContainer.appendChild(dot);
                         dots.push(dot);
+                        generatedDots.push(dot);
                     });
                 }
 
@@ -163,10 +177,8 @@ const slideWidthPercent = 100 - peekPercent;
                 // considered "active». 0.6 works well for 85%-wide slides.
                 const observer = new IntersectionObserver(
                     (entries) => {
-                        let foundIntersecting = false;
                         entries.forEach((entry) => {
                             if (entry.isIntersecting) {
-                                foundIntersecting = true;
                                 // Remove active from siblings first
                                 slides.forEach((el) => el.removeAttribute("data-active"));
                                 dots.forEach((dot) => dot.classList.remove("active"));
@@ -192,8 +204,12 @@ const slideWidthPercent = 100 - peekPercent;
                         observer.observe(slide);
                         // We use the `true` flag to attach the listener in the capture phase.
                         // This makes sure our handler runs BEFORE the <a> tag triggers PhotoSwipe.
-                        slide.addEventListener("click", handleSlideClick, true);
+                        slide.addEventListener("click", handleSlideClick, {
+                            capture: true,
+                            signal: controller.signal,
+                        });
                     });
+                observers.push(observer);
 
                 // Setup initial active slide and scroll position
                 const initialIndex = parseInt(section.dataset.initialSlide || "0");
@@ -202,9 +218,10 @@ const slideWidthPercent = 100 - peekPercent;
                 if (targetSlide && initialIndex > 0) {
                     targetSlide.setAttribute("data-active", "");
                     // Wait a moment for layout to properly compute flex sizes and for scroll-snap to be ready
-                    setTimeout(() => {
+                    const timer = window.setTimeout(() => {
                         track.scrollLeft = targetSlide.offsetLeft - track.offsetLeft - (track.clientWidth - targetSlide.clientWidth) / 2;
                     }, 100);
+                    initialPositionTimers.push(timer);
                 } else if (slides[0]) {
                     slides[0].setAttribute("data-active", "");
                 }
@@ -212,27 +229,24 @@ const slideWidthPercent = 100 - peekPercent;
                 // Cleanup on page swap (stored on element for retrieval)
                 (section as any)._carouselObserver = observer;
             });
-    }
 
-    function destroyCarousels() {
-        document
-            .querySelectorAll<HTMLElement>("[data-carousel]")
-            .forEach((section) => {
-                const obs = (section as any)._carouselObserver as
-                    | IntersectionObserver
-                    | undefined;
-                obs?.disconnect();
+        return () => {
+            controller.abort();
+            observers.forEach((observer) => observer.disconnect());
+            initialPositionTimers.forEach((timer) => clearTimeout(timer));
+            generatedDots.forEach((dot) => dot.remove());
+            initializedSections.forEach((section) => {
+                section
+                    .querySelectorAll<HTMLElement>(".carousel-track > *")
+                    .forEach((slide) => {
+                        slide.removeAttribute("data-active");
+                        delete slide.dataset.slideIndex;
+                    });
                 delete (section as any)._carouselObserver;
                 delete section.dataset.carouselReady;
             });
-    }
-
-    // Boot on first load
-    initCarousels();
-
-    // Re-init after Astro View Transitions page swap
-    document.addEventListener("astro:before-swap", destroyCarousels);
-    document.addEventListener("astro:after-swap", initCarousels);
+        };
+    });
 </script>
 
 <style>
