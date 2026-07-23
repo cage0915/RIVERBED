@@ -33,6 +33,7 @@ const fallbackUrl = `${R2_DOMAIN}/${encodedAssetKey}`;
             data-pswp-src={imageUrl}
             target="_blank"
             class="pswp-link block"
+            data-photo-lightbox-link
         >
             <img
                 src={imageUrl}
@@ -194,12 +195,18 @@ const fallbackUrl = `${R2_DOMAIN}/${encodedAssetKey}`;
 </style>
 
 <script>
-    const initPhotoFallbacks = () => {
+    import { installPageLifecycle } from "../lib/client-page-lifecycle";
+
+    installPageLifecycle(document, () => {
+        const controller = new AbortController();
+        const initializedImages: HTMLImageElement[] = [];
+
         document
             .querySelectorAll<HTMLImageElement>("img[data-dev-fallback-url]")
             .forEach((image) => {
                 if (image.dataset.devFallbackReady === "true") return;
                 image.dataset.devFallbackReady = "true";
+                initializedImages.push(image);
 
                 const useFallback = () => {
                     const fallbackUrl = image.dataset.devFallbackUrl;
@@ -215,11 +222,20 @@ const fallbackUrl = `${R2_DOMAIN}/${encodedAssetKey}`;
                     }
                 };
 
-                image.addEventListener("error", useFallback, { once: true });
+                image.addEventListener("error", useFallback, {
+                    once: true,
+                    signal: controller.signal,
+                });
                 if (image.complete && image.naturalWidth === 0) useFallback();
             });
-    };
 
-    initPhotoFallbacks();
-    document.addEventListener("astro:after-swap", initPhotoFallbacks);
+        return () => {
+            controller.abort();
+            initializedImages.forEach((image) => {
+                if (image.dataset.devFallbackUrl) {
+                    delete image.dataset.devFallbackReady;
+                }
+            });
+        };
+    });
 </script>

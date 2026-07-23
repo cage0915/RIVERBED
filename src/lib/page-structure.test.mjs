@@ -341,7 +341,10 @@ test('Layout delegates explicit content keyboard navigation targets and lifecycl
         /querySelectorAll[^;]*(?:\.album-card|\.folder-card|\.photo-row)/,
     );
 
-    assert.match(row, /<div class="photo-row" data-keyboard-navigation-target>/);
+    assert.match(
+        row,
+        /<div class="photo-row" data-photo-row data-keyboard-navigation-target>/,
+    );
     assert.match(
         homePage,
         /class="album-card latest-post-card group"[\s\S]*data-catalog-card[\s\S]*data-keyboard-navigation-target/,
@@ -361,6 +364,70 @@ test('Layout delegates explicit content keyboard navigation targets and lifecycl
     assert.equal(
         (folderPage.match(/data-keyboard-navigation-target/g) ?? []).length,
         (folderPage.match(/data-catalog-card/g) ?? []).length,
+    );
+});
+
+test('media behavior uses page-scoped lifecycle owners with deterministic cleanup', () => {
+    const layout = readProjectFile('src/layouts/Layout.astro');
+    const lightboxPath = new URL('../components/PhotoLightbox.astro', import.meta.url);
+    const photoLightbox = existsSync(lightboxPath)
+        ? readFileSync(lightboxPath, 'utf8')
+        : '';
+    const photo = readProjectFile('src/components/Photo.astro');
+    const row = readProjectFile('src/components/Row.astro');
+    const carousel = readProjectFile('src/components/PhotoCarousel.astro');
+    const mountainProfile = readProjectFile('src/components/MountainProfile.astro');
+
+    assert.match(
+        layout,
+        /import PhotoLightbox from ["']\.\.\/components\/PhotoLightbox\.astro["']/,
+    );
+    assert.match(layout, /<PhotoLightbox\s*\/>/);
+    assert.doesNotMatch(
+        layout,
+        /PhotoSwipeLightbox|pswp-link|initDimensions|initPhotoSwipe|<script>/,
+    );
+
+    assert.match(photoLightbox.trim(), /^<script>[\s\S]*<\/script>$/);
+    assert.match(photoLightbox, /PhotoSwipeLightbox/);
+    assert.match(photoLightbox, /installPageLifecycle/);
+    assert.match(photoLightbox, /\[data-photo-lightbox-link\]/);
+    assert.match(photoLightbox, /if \(!links\.length\) return/);
+    assert.match(photoLightbox, /new AbortController\(\)/);
+    assert.match(photoLightbox, /lightbox\.destroy\(\)/);
+
+    assert.match(
+        photo,
+        /<a[\s\S]*class="pswp-link block"[\s\S]*data-photo-lightbox-link/,
+    );
+    assert.match(photo, /installPageLifecycle/);
+    assert.match(photo, /new AbortController\(\)/);
+    assert.match(photo, /signal: controller\.signal/);
+    assert.doesNotMatch(photo, /astro:after-swap|initPhotoFallbacks\(\);/);
+
+    assert.match(
+        row,
+        /<div class="photo-row" data-photo-row data-keyboard-navigation-target>/,
+    );
+    assert.match(row, /installPageLifecycle/);
+    assert.match(row, /new AbortController\(\)/);
+    assert.match(row, /\[data-photo-row\]/);
+    assert.match(row, /signal: controller\.signal/);
+    assert.doesNotMatch(row, /astro:after-swap|adjustRowHeights\(\);/);
+
+    assert.match(carousel, /installPageLifecycle/);
+    assert.match(carousel, /new AbortController\(\)/);
+    assert.match(carousel, /observer\.disconnect\(\)/);
+    assert.match(carousel, /clearTimeout/);
+    assert.doesNotMatch(carousel, /astro:(?:before|after)-swap|initCarousels\(\);/);
+
+    assert.match(mountainProfile, /installPageLifecycle/);
+    assert.match(mountainProfile, /resizeObserver\.disconnect\(\)/);
+    assert.match(mountainProfile, /panelObserver\.disconnect\(\)/);
+    assert.match(mountainProfile, /cancelAnimationFrame/);
+    assert.doesNotMatch(
+        mountainProfile,
+        /astro:after-swap|initMountainProfileSizing\(\);/,
     );
 });
 

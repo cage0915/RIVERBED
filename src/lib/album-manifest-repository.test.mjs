@@ -88,8 +88,12 @@ test("production Album and Tag rendering read manifests through the catalog", ()
     assert.match(tagPage, /caption=\{photo\.caption\}/);
     assert.doesNotMatch(photoComponent, /\bonerror=/);
     assert.match(photoComponent, /data-dev-fallback-url/);
-    assert.match(photoComponent, /addEventListener\("error"/);
-    assert.match(photoComponent, /\{ once: true \}/);
+    assert.match(
+        photoComponent,
+        /addEventListener\("error", useFallback, \{[\s\S]*once: true,[\s\S]*signal: controller\.signal,[\s\S]*\}\);/,
+    );
+    assert.match(photoComponent, /const controller = new AbortController\(\)/);
+    assert.match(photoComponent, /controller\.abort\(\)/);
     assert.match(tagPage, /getTaggedPhotos\(decodedTag\)/);
     assert.match(tagPage, /sourceAlbumSlug/);
     assert.doesNotMatch(tagPage, /getAllPhotosWithTags|utils\/tags/);
@@ -122,7 +126,7 @@ test("production readers use the manifest catalog instead of frontmatter or orde
     for (const relativePath of [
         "src/pages/index.astro",
         "src/pages/[folder]/index.astro",
-        "src/layouts/Layout.astro",
+        "src/components/SiteNavigation.astro",
         "src/pages/rss.xml.ts",
     ]) {
         const source = fs.readFileSync(path.join(projectRoot, relativePath), "utf8");

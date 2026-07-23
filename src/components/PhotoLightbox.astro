@@ -1,0 +1,60 @@
+<script>
+    import PhotoSwipeLightbox from "photoswipe/lightbox";
+    import { installPageLifecycle } from "../lib/client-page-lifecycle";
+
+    installPageLifecycle(document, () => {
+        const links = Array.from(
+            document.querySelectorAll<HTMLAnchorElement>(
+                "[data-photo-lightbox-link]",
+            ),
+        );
+        if (!links.length) return;
+
+        const controller = new AbortController();
+        const awaitingDimensions = new WeakSet<HTMLImageElement>();
+
+        const hydrateDimensions = (
+            link: HTMLAnchorElement,
+            listenForLoad = false,
+        ) => {
+            if (link.dataset.pswpWidth && link.dataset.pswpHeight) return;
+
+            const image = link.querySelector("img");
+            if (!image) return;
+
+            const applyDimensions = () => {
+                if (!image.naturalWidth || !image.naturalHeight) return;
+                link.dataset.pswpWidth = image.naturalWidth.toString();
+                link.dataset.pswpHeight = image.naturalHeight.toString();
+            };
+
+            if (image.complete) {
+                applyDimensions();
+            } else if (listenForLoad && !awaitingDimensions.has(image)) {
+                awaitingDimensions.add(image);
+                image.addEventListener("load", applyDimensions, {
+                    once: true,
+                    signal: controller.signal,
+                });
+            }
+        };
+
+        links.forEach((link) => hydrateDimensions(link, true));
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallery: ".album-content, .tag-photos, .pswp-gallery, .prose",
+            children: "[data-photo-lightbox-link]",
+            pswpModule: () => import("photoswipe"),
+        });
+
+        lightbox.on("beforeOpen", () => {
+            links.forEach((link) => hydrateDimensions(link));
+        });
+        lightbox.init();
+
+        return () => {
+            controller.abort();
+            lightbox.destroy();
+        };
+    });
+</script>
