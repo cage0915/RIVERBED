@@ -134,11 +134,12 @@ export const POST: APIRoute = async ({ request }) => {
             bounds: fields.bounds,
         };
         config.contexts[fields.id] = context;
+        const proposedContextIds = new Set(Object.keys(config.contexts));
         const mountain = saveMountainDraft(body, config, mountains);
         await Promise.all([
             writeConfig(configFile, config),
             ...(isMountainSourceRegion(body.region)
-                ? [writeMountainRegion(body.region, mountains)]
+                ? [writeMountainRegion(body.region, mountains, proposedContextIds)]
                 : []),
         ]);
         return json({
@@ -183,6 +184,7 @@ export const PUT: APIRoute = async ({ request }) => {
         };
         if (fields.id !== originalId) delete config.contexts[originalId];
         config.contexts[fields.id] = updatedContext;
+        const proposedContextIds = new Set(Object.keys(config.contexts));
 
         let affectedMountains = 0;
         for (const mountain of mountains) {
@@ -206,7 +208,7 @@ export const PUT: APIRoute = async ({ request }) => {
         }
         await Promise.all([
             writeConfig(configFile, config),
-            writeAllMountainRegions(mountains),
+            writeAllMountainRegions(mountains, proposedContextIds),
         ]);
         return json({
             success: true,

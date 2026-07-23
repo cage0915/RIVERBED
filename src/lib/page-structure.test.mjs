@@ -153,3 +153,30 @@ test('cover and folder-order APIs persist only through Album manifests', () => {
     assert.match(picker, /createCoverPickerInventory/);
     assert.doesNotMatch(picker, /readdirSync|\br2Root\b/);
 });
+
+test('Mountain data uses one canonical schema and validated read boundaries', () => {
+    const mountains = readProjectFile('src/lib/mountains.ts');
+    const files = readProjectFile('src/lib/mountain-files.ts');
+
+    assert.match(mountains, /parseMountainRegionSource/);
+    assert.match(files, /parseMountainRegionSource/);
+    assert.doesNotMatch(mountains, /mountain-editor|EditableMountain/);
+    assert.doesNotMatch(files, /mountain-editor|EditableMountain/);
+});
+
+test('Mountain context writes validate against the proposed context set', () => {
+    const contexts = readProjectFile('src/dev-api/mountain-contexts.ts');
+
+    assert.match(
+        contexts,
+        /const proposedContextIds = new Set\(Object\.keys\(config\.contexts\)\)/,
+    );
+    assert.match(
+        contexts,
+        /writeMountainRegion\(body\.region, mountains, proposedContextIds\)/,
+    );
+    assert.match(
+        contexts,
+        /writeAllMountainRegions\(mountains, proposedContextIds\)/,
+    );
+});
