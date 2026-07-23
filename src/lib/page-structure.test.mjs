@@ -244,3 +244,38 @@ test('Layout delegates footer and development tool rendering boundaries', () => 
     );
     assert.doesNotMatch(siteFooter, /rel="alternate"/);
 });
+
+test('Layout delegates navigation rendering and lifecycle ownership', () => {
+    const layout = readProjectFile('src/layouts/Layout.astro');
+    const navigationPath = new URL('../components/SiteNavigation.astro', import.meta.url);
+    const siteNavigation = existsSync(navigationPath)
+        ? readFileSync(navigationPath, 'utf8')
+        : '';
+
+    assert.match(
+        layout,
+        /import SiteNavigation from ["']\.\.\/components\/SiteNavigation\.astro["']/,
+    );
+    assert.match(layout, /<SiteNavigation\s*\/>[\s\S]*<main/);
+
+    for (const ownedNavigationDetail of [
+        /getAlbumSummaries/,
+        /FOLDER_METADATA/,
+        /menu-toggle/,
+        /mobile-menu/,
+        /initNavbar/,
+    ]) {
+        assert.doesNotMatch(layout, ownedNavigationDetail);
+    }
+
+    assert.match(siteNavigation, /getAlbumSummaries/);
+    assert.match(siteNavigation, /FOLDER_METADATA/);
+    assert.match(siteNavigation, /\.sort\(\(a, b\) => a\.order - b\.order\)/);
+    assert.match(siteNavigation, /data-site-navigation/);
+    assert.match(siteNavigation, /data-site-menu-toggle/);
+    assert.match(siteNavigation, /data-site-mobile-menu/);
+    assert.match(siteNavigation, /installPageLifecycle/);
+    assert.match(siteNavigation, /new AbortController\(\)/);
+    assert.doesNotMatch(siteNavigation, /astro:after-swap/);
+    assert.doesNotMatch(siteNavigation, /cloneNode|replaceChild/);
+});

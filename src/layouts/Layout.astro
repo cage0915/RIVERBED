@@ -2,8 +2,7 @@
 import { ViewTransitions } from "astro:transitions";
 import SiteDevTools from "../components/SiteDevTools.astro";
 import SiteFooter from "../components/SiteFooter.astro";
-import { getAlbumSummaries } from "../lib/albums/catalog";
-import { getFolderTitle, getFolderOrder, FOLDER_METADATA } from "../lib/constants";
+import SiteNavigation from "../components/SiteNavigation.astro";
 import "@fontsource/noto-sans-jp/300.css";
 import "@fontsource/noto-sans-jp/400.css";
 import "@fontsource/noto-sans-jp/500.css";
@@ -20,27 +19,6 @@ interface Props {
 }
 
 const { title } = Astro.props;
-
-// Use FOLDER_METADATA keys as the base for navigation
-const metadataSlugs = Object.keys(FOLDER_METADATA);
-
-// Fetch unique folders from album slugs to catch any folders missing from metadata
-const albums = await getAlbumSummaries();
-const albumFolderSlugs = albums.map((album) => album.folder);
-
-// Combine and get unique slugs
-const folderSlugs = [...new Set([...metadataSlugs, ...albumFolderSlugs])];
-
-const sortedFolders = folderSlugs
-	.map((slug) => ({
-		id: slug,
-		title: getFolderTitle(slug),
-		order: getFolderOrder(slug),
-	}))
-	.sort((a, b) => a.order - b.order);
-
-// Get the current path to highlight active link
-const currentPath = Astro.url.pathname;
 ---
 
 <!doctype html>
@@ -58,128 +36,7 @@ const currentPath = Astro.url.pathname;
 	<body
 		class="bg-[#121212] text-zinc-100 min-h-screen antialiased selection:bg-blue-500/50"
 	>
-		<nav
-			id="navbar"
-			class="fixed top-0 left-0 right-0 z-50 bg-[#121212]/80 transition-transform duration-300 ease-in-out"
-		>
-			<div class="mx-auto max-w-[1100px] px-4 sm:px-8 h-24 flex items-center relative">
-				<!-- Menu Toggle - Mobile Only -->
-				<button
-					id="menu-toggle"
-					class="sm:hidden p-1 text-zinc-400 hover:text-white transition-colors"
-					aria-label="Toggle menu"
-				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						width="20"
-						height="20"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="2"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						class="menu-icon"
-						><line x1="3" y1="12" x2="21" y2="12"></line><line
-							x1="3"
-							y1="6"
-							x2="21"
-							y2="6"></line><line x1="3" y1="18" x2="21" y2="18"
-						></line></svg
-					>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						width="20"
-						height="20"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="2"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						class="close-icon hidden"
-						><line x1="18" y1="6" x2="6" y2="18"></line><line
-							x1="6"
-							y1="6"
-							x2="18"
-							y2="18"></line></svg
-					>
-				</button>
-
-				<!-- Navigation -->
-				<div class="hidden sm:flex gap-8">
-					{
-						sortedFolders.map((folder) => {
-							const isActive = currentPath === `/${folder.id}` || currentPath.startsWith(`/${folder.id}/`);
-							return (
-								<a
-									href={`/${folder.id}`}
-									class={`text-base font-sans tracking-wide transition-colors hover:text-white relative py-1 ${
-										isActive
-											? "text-white"
-											: "text-zinc-400"
-									}`}
-								>
-									<span class={folder.id === 'dalin' ? 'condensed-kanji' : ''}>
-										{folder.title}
-									</span>
-									<span
-										class={`absolute bottom-0 left-0 right-0 h-0.5 bg-white rounded-full transition-opacity duration-300 ${isActive ? 'opacity-100' : 'opacity-0'} ${folder.id === 'dalin' ? 'condensed-kanji' : ''}`}
-									/>
-								</a>
-							);
-						})
-					}
-				</div>
-
-				<!-- Logo - Centered -->
-				<div class="absolute left-1/2 -translate-x-1/2">
-					<a
-						href="/"
-						class="text-3xl font-sans tracking-[0.2em] hover:text-white transition-colors"
-					>
-						RIVERBED
-					</a>
-				</div>
-
-			</div>
-
-				</div>
-			</div>
-
-			<!-- Mobile Navigation Dropdown -->
-			<div
-				id="mobile-menu"
-				class="hidden sm:hidden border-t border-white/5 bg-[#121212]/95 backdrop-blur-xl overflow-hidden transition-all duration-300 ease-in-out max-h-0"
-			>
-				<div class="flex items-center px-4">
-					<div class="flex min-w-0 flex-1 flex-row items-center gap-6 overflow-x-auto py-4 scrollbar-none mask-linear-right">
-						{
-							sortedFolders.map((folder) => {
-								const isActive = currentPath === `/${folder.id}` || currentPath.startsWith(`/${folder.id}/`);
-								return (
-									<a
-										href={`/${folder.id}`}
-										class={`text-base font-sans tracking-wide transition-all whitespace-nowrap relative py-1 ${
-											isActive
-												? "text-white"
-												: "text-zinc-400"
-										}`}
-									>
-										<span class={folder.id === 'dalin' ? 'condensed-kanji' : ''}>
-											{folder.title}
-										</span>
-										<span
-											class={`absolute bottom-0 left-0 right-0 h-0.5 bg-white rounded-full transition-opacity duration-300 ${isActive ? 'opacity-100' : 'opacity-0'} ${folder.id === 'dalin' ? 'condensed-kanji' : ''}`}
-										/>
-									</a>
-								);
-							})
-						}
-					</div>
-				</div>
-			</div>
-		</nav>
+		<SiteNavigation />
 
 		<main class="mx-auto max-w-[1100px] px-4 sm:px-8 pt-20 pb-8">
 			<slot />
@@ -189,71 +46,6 @@ const currentPath = Astro.url.pathname;
 		<SiteDevTools />
 
 		<script>
-			let lastScrollY = window.scrollY;
-			let navElements = {
-				navbar: null as HTMLElement | null,
-				menuToggle: null as HTMLElement | null,
-				mobileMenu: null as HTMLElement | null
-			};
-
-			function initNavbar() {
-				navElements.navbar = document.getElementById("navbar");
-				navElements.menuToggle = document.getElementById("menu-toggle");
-				navElements.mobileMenu = document.getElementById("mobile-menu");
-
-				if (!navElements.menuToggle || !navElements.mobileMenu) return;
-
-				// Use a fresh listener by replacing the element (simplest for ViewTransitions)
-				const oldToggle = navElements.menuToggle;
-				const newToggle = oldToggle.cloneNode(true) as HTMLElement;
-				oldToggle.parentNode?.replaceChild(newToggle, oldToggle);
-				navElements.menuToggle = newToggle;
-
-				newToggle.addEventListener("click", () => {
-					const isExpanded = navElements.mobileMenu?.classList.contains("hidden");
-
-					if (isExpanded) {
-						navElements.mobileMenu?.classList.remove("hidden");
-						void navElements.mobileMenu?.offsetWidth;
-						navElements.mobileMenu!.style.maxHeight = "500px";
-						newToggle.querySelector(".menu-icon")?.classList.add("hidden");
-						newToggle.querySelector(".close-icon")?.classList.remove("hidden");
-					} else {
-						navElements.mobileMenu!.style.maxHeight = "0px";
-						newToggle.querySelector(".menu-icon")?.classList.remove("hidden");
-						newToggle.querySelector(".close-icon")?.classList.add("hidden");
-						setTimeout(() => {
-							if (navElements.mobileMenu!.style.maxHeight === "0px") {
-								navElements.mobileMenu?.classList.add("hidden");
-							}
-						}, 300);
-					}
-				});
-			}
-
-			// Window listeners should be added ONCE
-			window.addEventListener("scroll", () => {
-				const currentScrollY = window.scrollY;
-				const { navbar, mobileMenu, menuToggle } = navElements;
-
-				if (mobileMenu && !mobileMenu.classList.contains("hidden")) {
-					mobileMenu.style.maxHeight = "0px";
-					menuToggle?.querySelector(".menu-icon")?.classList.remove("hidden");
-					menuToggle?.querySelector(".close-icon")?.classList.add("hidden");
-					setTimeout(() => {
-						mobileMenu.classList.add("hidden");
-					}, 300);
-				}
-
-				if (currentScrollY > lastScrollY && currentScrollY > 120) {
-					navbar?.classList.add("-translate-y-full");
-				} else {
-					navbar?.classList.remove("-translate-y-full");
-				}
-
-				lastScrollY = currentScrollY;
-			}, { passive: true });
-
 			// Keyboard Navigation
 			window.addEventListener("keydown", (e) => {
 				if (
@@ -379,7 +171,6 @@ const currentPath = Astro.url.pathname;
 			};
 
 			const initAll = () => {
-				initNavbar();
 				initDimensions();
 				initPhotoSwipe();
 			};

@@ -1,0 +1,223 @@
+---
+import { getAlbumSummaries } from "../lib/albums/catalog";
+import { getFolderTitle, getFolderOrder, FOLDER_METADATA } from "../lib/constants";
+
+// Use FOLDER_METADATA keys as the base for navigation
+const metadataSlugs = Object.keys(FOLDER_METADATA);
+
+// Fetch unique folders from album slugs to catch any folders missing from metadata
+const albums = await getAlbumSummaries();
+const albumFolderSlugs = albums.map((album) => album.folder);
+
+// Combine and get unique slugs
+const folderSlugs = [...new Set([...metadataSlugs, ...albumFolderSlugs])];
+
+const sortedFolders = folderSlugs
+	.map((slug) => ({
+		id: slug,
+		title: getFolderTitle(slug),
+		order: getFolderOrder(slug),
+	}))
+	.sort((a, b) => a.order - b.order);
+
+// Get the current path to highlight active link
+const currentPath = Astro.url.pathname;
+---
+
+<nav
+	id="navbar"
+	data-site-navigation
+	class="fixed top-0 left-0 right-0 z-50 bg-[#121212]/80 transition-transform duration-300 ease-in-out"
+>
+	<div class="mx-auto max-w-[1100px] px-4 sm:px-8 h-24 flex items-center relative">
+		<!-- Menu Toggle - Mobile Only -->
+		<button
+			id="menu-toggle"
+			data-site-menu-toggle
+			class="sm:hidden p-1 text-zinc-400 hover:text-white transition-colors"
+			aria-label="Toggle menu"
+		>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				width="20"
+				height="20"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				class="menu-icon"
+				><line x1="3" y1="12" x2="21" y2="12"></line><line
+					x1="3"
+					y1="6"
+					x2="21"
+					y2="6"></line><line x1="3" y1="18" x2="21" y2="18"
+				></line></svg
+			>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				width="20"
+				height="20"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				class="close-icon hidden"
+				><line x1="18" y1="6" x2="6" y2="18"></line><line
+					x1="6"
+					y1="6"
+					x2="18"
+					y2="18"></line></svg
+			>
+		</button>
+
+		<!-- Navigation -->
+		<div class="hidden sm:flex gap-8">
+			{
+				sortedFolders.map((folder) => {
+					const isActive = currentPath === `/${folder.id}` || currentPath.startsWith(`/${folder.id}/`);
+					return (
+						<a
+							href={`/${folder.id}`}
+							class={`text-base font-sans tracking-wide transition-colors hover:text-white relative py-1 ${
+								isActive
+									? "text-white"
+									: "text-zinc-400"
+							}`}
+						>
+							<span class={folder.id === 'dalin' ? 'condensed-kanji' : ''}>
+								{folder.title}
+							</span>
+							<span
+								class={`absolute bottom-0 left-0 right-0 h-0.5 bg-white rounded-full transition-opacity duration-300 ${isActive ? 'opacity-100' : 'opacity-0'} ${folder.id === 'dalin' ? 'condensed-kanji' : ''}`}
+							/>
+						</a>
+					);
+				})
+			}
+		</div>
+
+		<!-- Logo - Centered -->
+		<div class="absolute left-1/2 -translate-x-1/2">
+			<a
+				href="/"
+				class="text-3xl font-sans tracking-[0.2em] hover:text-white transition-colors"
+			>
+				RIVERBED
+			</a>
+		</div>
+
+	</div>
+
+		</div>
+	</div>
+
+	<!-- Mobile Navigation Dropdown -->
+	<div
+		id="mobile-menu"
+		data-site-mobile-menu
+		class="hidden sm:hidden border-t border-white/5 bg-[#121212]/95 backdrop-blur-xl overflow-hidden transition-all duration-300 ease-in-out max-h-0"
+	>
+		<div class="flex items-center px-4">
+			<div class="flex min-w-0 flex-1 flex-row items-center gap-6 overflow-x-auto py-4 scrollbar-none mask-linear-right">
+				{
+					sortedFolders.map((folder) => {
+						const isActive = currentPath === `/${folder.id}` || currentPath.startsWith(`/${folder.id}/`);
+						return (
+							<a
+								href={`/${folder.id}`}
+								class={`text-base font-sans tracking-wide transition-all whitespace-nowrap relative py-1 ${
+									isActive
+										? "text-white"
+										: "text-zinc-400"
+								}`}
+							>
+								<span class={folder.id === 'dalin' ? 'condensed-kanji' : ''}>
+									{folder.title}
+								</span>
+								<span
+									class={`absolute bottom-0 left-0 right-0 h-0.5 bg-white rounded-full transition-opacity duration-300 ${isActive ? 'opacity-100' : 'opacity-0'} ${folder.id === 'dalin' ? 'condensed-kanji' : ''}`}
+								/>
+							</a>
+						);
+					})
+				}
+			</div>
+		</div>
+	</div>
+</nav>
+
+<script>
+	import { installPageLifecycle } from "../lib/client-page-lifecycle";
+
+	installPageLifecycle(document, () => {
+		const navbar = document.querySelector<HTMLElement>("[data-site-navigation]");
+		if (!navbar) return;
+
+		const menuToggle = navbar.querySelector<HTMLElement>("[data-site-menu-toggle]");
+		const mobileMenu = navbar.querySelector<HTMLElement>("[data-site-mobile-menu]");
+		if (!menuToggle || !mobileMenu) return;
+
+		const controller = new AbortController();
+		let closeTimer: number | undefined;
+		let lastScrollY = window.scrollY;
+
+		const clearCloseTimer = () => {
+			if (closeTimer === undefined) return;
+			window.clearTimeout(closeTimer);
+			closeTimer = undefined;
+		};
+
+		const closeMenu = () => {
+			clearCloseTimer();
+			mobileMenu.style.maxHeight = "0px";
+			menuToggle.querySelector(".menu-icon")?.classList.remove("hidden");
+			menuToggle.querySelector(".close-icon")?.classList.add("hidden");
+			closeTimer = window.setTimeout(() => {
+				if (mobileMenu.style.maxHeight === "0px") {
+					mobileMenu.classList.add("hidden");
+				}
+				closeTimer = undefined;
+			}, 300);
+		};
+
+		menuToggle.addEventListener("click", () => {
+			const isExpanded = mobileMenu.classList.contains("hidden");
+
+			if (isExpanded) {
+				clearCloseTimer();
+				mobileMenu.classList.remove("hidden");
+				void mobileMenu.offsetWidth;
+				mobileMenu.style.maxHeight = "500px";
+				menuToggle.querySelector(".menu-icon")?.classList.add("hidden");
+				menuToggle.querySelector(".close-icon")?.classList.remove("hidden");
+			} else {
+				closeMenu();
+			}
+		}, { signal: controller.signal });
+
+		window.addEventListener("scroll", () => {
+			const currentScrollY = window.scrollY;
+
+			if (!mobileMenu.classList.contains("hidden")) {
+				closeMenu();
+			}
+
+			if (currentScrollY > lastScrollY && currentScrollY > 120) {
+				navbar.classList.add("-translate-y-full");
+			} else {
+				navbar.classList.remove("-translate-y-full");
+			}
+
+			lastScrollY = currentScrollY;
+		}, { passive: true, signal: controller.signal });
+
+		return () => {
+			controller.abort();
+			clearCloseTimer();
+		};
+	});
+</script>
