@@ -156,8 +156,9 @@ test("post-cutover configuration validates manifests before contour preparation"
     const contentConfig = fs.readFileSync(path.join(projectRoot, "src/content/config.ts"), "utf8");
     assert.match(contentConfig, /schema:\s*z\.object\(\{\}\)\.strict\(\)/);
     assert.doesNotMatch(contentConfig, /title|coverKey|publishedAt|coverZoom|coverOffset|\border\b|\bgap\b/);
-    assert.equal(packageJson.scripts.prebuild, "node scripts/validate-album-repository.mjs && node scripts/prepare-contour-assets.mjs prepare");
-    assert.equal(packageJson.scripts["albums:validate"], "node scripts/validate-album-repository.mjs");
+    assert.equal(packageJson.scripts.prebuild, "tsx scripts/validate-album-repository.mjs && node scripts/prepare-contour-assets.mjs prepare");
+    assert.equal(packageJson.scripts["albums:validate"], "tsx scripts/validate-album-repository.mjs");
+    assert.match(packageJson.devDependencies.tsx, /^\^/);
 });
 
 test("post-cutover validator accepts paired minimal sources", () => {
