@@ -21,7 +21,6 @@ export const DEV_API_ROUTES = Object.freeze({
     'save-album-cover': './src/dev-api/save-album-cover.ts',
     'save-folder-order': './src/dev-api/save-folder-order.ts',
     'save-page-manager': './src/dev-api/save-page-manager.ts',
-    'save-page-structure': './src/dev-api/save-page-structure.ts',
     'save-tags': './src/dev-api/save-tags.ts',
 });
 

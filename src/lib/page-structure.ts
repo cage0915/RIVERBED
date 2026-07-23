@@ -37,25 +37,16 @@ export function serializePageBody(blocks: PageBlock[]) {
     return body.trim();
 }
 
-export function createPageContent(originalContent: string, blocks: PageBlock[], requestedFrontmatter?: string) {
-    const originalMatch = originalContent.match(/^---\r?\n([\s\S]*?)\r?\n---/);
-    let frontmatter = requestedFrontmatter || originalMatch?.[0] || '';
-    if (frontmatter && !frontmatter.startsWith('---')) frontmatter = `---\n${frontmatter}\n---`;
-    frontmatter = frontmatter.replace(/^order:\s*.*$\n?/m, '');
-    return `${frontmatter}\n\n${serializePageBody(blocks)}\n`;
-}
-
 export function createLayoutOnlyPageContent(blocks: PageBlock[]) {
     return `---\n---\n\n${serializePageBody(blocks)}\n`;
 }
 
-export function referencedLocalNames(blocks: PageBlock[], frontmatter = '') {
+export function referencedLocalNames(blocks: PageBlock[]) {
     const names = new Set<string>();
     const add = (value?: string) => {
         const normalized = String(value || '').replace(/^\/+/, '');
         if (normalized) names.add(normalized.split('/').pop()!);
     };
     for (const block of blocks) for (const photo of block.photos || []) add(photo.itemKey);
-    add(frontmatter.match(/^coverKey:\s*["']([^"']+)["']/m)?.[1]);
     return names;
 }

@@ -27,7 +27,6 @@ const expectedNames = [
     'save-album-cover',
     'save-folder-order',
     'save-page-manager',
-    'save-page-structure',
     'save-tags',
 ];
 

@@ -83,7 +83,7 @@ try {
 const titleSections = extractTitleSections(albumEntry.body);
 ---
 
-<Layout title={`${albumEntry.data.title} - RIVERBED`}>
+<Layout title={`${albumRecord.title} - RIVERBED`}>
     <div class="fixed bottom-8 right-8 z-40 flex flex-col gap-3">
         <button
             onclick="window.scrollTo({top: 0, behavior: 'smooth'})"
@@ -185,18 +185,18 @@ const titleSections = extractTitleSections(albumEntry.body);
             <h1
                 class="text-xl font-sans tracking-widest uppercase mb-1"
             >
-                {albumEntry.data.title}
+                {albumRecord.title}
             </h1>
-            {albumEntry.data.info && (
+            {albumRecord.info && (
                 <p class="text-sm text-zinc-500 font-light tracking-wider uppercase">
-                    {albumEntry.data.info}
+                    {albumRecord.info}
                 </p>
             )}
         </div>
 
         <article
             class="album-content"
-            style={albumEntry.data.gap ? `--album-block-gap: ${albumEntry.data.gap}` : undefined}
+            style={albumRecord.gap ? `--album-block-gap: ${albumRecord.gap}` : undefined}
         >
             <Content components={{ Row, Photo: AlbumPhoto, Text, PhotoCarousel }} />
         </article>

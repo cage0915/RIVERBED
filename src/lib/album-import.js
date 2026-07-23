@@ -25,22 +25,6 @@ export function validateImageFilename(value) {
     return filename;
 }
 
-/**
- * @param {{ title: string, filenames: string[], publishedAt?: string }} options
- */
-export function createAlbumMdx({ title, filenames, publishedAt }) {
-    const safeTitle = String(title || '').trim();
-    if (!safeTitle) throw new Error('Album title is required');
-    const photos = filenames.map(validateImageFilename);
-    if (photos.length === 0) throw new Error('Select at least one photo');
-    if (new Set(photos).size !== photos.length) throw new Error('Duplicate photo filenames are not allowed');
-
-    const date = publishedAt || new Date().toISOString().slice(0, 10);
-    const escapedTitle = safeTitle.replaceAll('\\', '\\\\').replaceAll('"', '\\"');
-    const rows = photos.map((filename) => `<Row>\n  <Photo itemKey="${filename}" />\n</Row>`);
-    return `---\ntitle: "${escapedTitle}"\npublishedAt: ${date}\ncoverKey: "${photos[0]}"\ncoverZoom: 1\ncoverOffset: { x: 50, y: 50 }\n---\n\n${rows.join('\n\n')}\n`;
-}
-
 function createAlbumLayoutMdx(filenames) {
     const photos = filenames.map(validateImageFilename);
     if (photos.length === 0) throw new Error('Select at least one photo');

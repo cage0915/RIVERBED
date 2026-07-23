@@ -472,6 +472,7 @@ export function createLegacyMigrationPlan(projectRoot = process.cwd()) {
             candidates.push({
                 slug: album.albumSlug,
                 mdxPath: album.mdxPath,
+                mdxSource: album.mdxSource,
                 mdxBody: parseLegacyFrontmatter(album.mdxSource).body,
                 manifestPath,
                 manifest,
@@ -525,8 +526,7 @@ export function writeAlbumManifests(plan) {
     return { written: plan.candidates.length - unchanged, unchanged };
 }
 
-export function validateAlbumManifests(projectRoot = process.cwd()) {
-    const plan = createLegacyMigrationPlan(projectRoot);
+export function validateAlbumMigrationPlan(plan) {
     const diagnostics = [...plan.diagnostics];
     const records = [];
     for (const candidate of plan.candidates) {
@@ -578,4 +578,8 @@ export function validateAlbumManifests(projectRoot = process.cwd()) {
         (left.fieldPath ?? "").localeCompare(right.fieldPath ?? "") ||
         left.code.localeCompare(right.code));
     return { albumCount: plan.albumCount, equivalentCount: records.length, diagnostics };
+}
+
+export function validateAlbumManifests(projectRoot = process.cwd()) {
+    return validateAlbumMigrationPlan(createLegacyMigrationPlan(projectRoot));
 }

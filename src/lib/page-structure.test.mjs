@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
 
-import { createLayoutOnlyPageContent, createPageContent, referencedLocalNames } from './page-structure.ts';
+import { createLayoutOnlyPageContent, referencedLocalNames } from './page-structure.ts';
 
 const readProjectFile = (path) => readFileSync(new URL(`../../${path}`, import.meta.url), 'utf8');
 
@@ -55,24 +55,12 @@ test('DevTool classifies static mountain tag routes separately from albums', () 
     assert.doesNotMatch(devTool, /new URLSearchParams\(window\.location\.search\)\.get\('view'\) === 'tags'/);
 });
 
-test('page content preserves unrelated frontmatter while applying the draft', () => {
-    const original = `---\ntitle: "Old"\npublishedAt: 2024-01-02\ncustom: keep\n---\n\n<Row>\n  <Photo itemKey="old.jpg" />\n</Row>\n`;
-    const content = createPageContent(original, [
-        { type: 'Row', props: {}, photos: [{ itemKey: 'new.jpg' }] },
-    ], `title: "New"\npublishedAt: 2024-01-02\ncustom: keep`);
-
-    assert.match(content, /publishedAt: 2024-01-02/);
-    assert.match(content, /custom: keep/);
-    assert.match(content, /<Photo itemKey="new\.jpg" \/>/);
-    assert.doesNotMatch(content, /old\.jpg/);
-});
-
-test('referenced local names include page photos and cover basenames', () => {
+test('referenced local names include only page photos', () => {
     const names = referencedLocalNames([
         { type: 'Row', photos: [{ itemKey: 'one.jpg' }, { itemKey: 'yama/page/two.jpg' }] },
-    ], `title: "Page"\ncoverKey: "yama/page/cover.jpg"`);
+    ]);
 
-    assert.deepEqual([...names], ['one.jpg', 'two.jpg', 'cover.jpg']);
+    assert.deepEqual([...names], ['one.jpg', 'two.jpg']);
 });
 
 test('layout-only Page Manager serialization never writes Album metadata to MDX', () => {
