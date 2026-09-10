@@ -1233,7 +1233,14 @@
                             checked: item.action !== 'unknown',
                         })),
                         ...remoteDownloadKeys.map((key: any) => ({ key, action: 'download', label: 'Download', group: 'download', checked: false })),
-                        ...(plan.remoteExtras || []).filter((item: any) => item.action === 'trash').map((item: any) => ({ key: item.key, action: 'trash', label: 'Move to Trash', group: 'trash', checked: true })),
+                        ...(plan.remoteExtras || []).filter((item: any) => item.action === 'trash').map((item: any) => ({
+                            key: item.key,
+                            action: 'trash',
+                            etag: item.etag,
+                            label: 'Move to Trash',
+                            group: 'trash',
+                            checked: true,
+                        })),
                     ] : [];
                 const missing = (plan.required || []).filter((item: any) => item.action === 'missing');
                 const protectedItems = (plan.remoteExtras || []).filter((item: any) => item.action === 'protected');

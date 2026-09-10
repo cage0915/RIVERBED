@@ -90,6 +90,15 @@ test('Page Manager route and UI use structured manifest metadata without frontma
     assert.doesNotMatch(devTool, /frontmatter:\s*newFM|parseFM\(data\.frontmatter\)/);
 });
 
+test('Album R2 trash actions preserve the dry-run ETag', () => {
+    const devTool = readProjectFile('src/components/DevTool.astro');
+
+    assert.match(
+        devTool,
+        /item\.action === 'trash'\)\.map\(\(item: any\) => \(\{\s*key: item\.key,\s*action: 'trash',\s*etag: item\.etag,/,
+    );
+});
+
 test('tag and photo-caption APIs persist metadata only through Album manifests', () => {
     const getData = readProjectFile('src/dev-api/get-data.ts');
     const saveTags = readProjectFile('src/dev-api/save-tags.ts');
