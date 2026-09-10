@@ -5,8 +5,9 @@ import Row from "../../components/Row.astro";
 import AlbumPhoto from "../../components/AlbumPhoto.astro";
 import PhotoCarousel from "../../components/PhotoCarousel.astro";
 import Text from "../../components/Text.astro";
+import AlbumPagination from "../../components/AlbumPagination.astro";
 import { albumPathParams } from "../../lib/static-paths";
-import { getAlbumBySlug } from "../../lib/albums/catalog";
+import { getAlbumBySlug, getAlbumSummaries } from "../../lib/albums/catalog";
 
 export async function getStaticPaths() {
     const albums = await getCollection("albums");
@@ -64,6 +65,15 @@ const albumRecord = await getAlbumBySlug(albumEntry.slug);
 if (!albumRecord) {
     throw new Error(`Album manifest record not found: ${albumEntry.slug}`);
 }
+
+const folderAlbums = (await getAlbumSummaries())
+    .filter((candidate) => candidate.folder === folder)
+    .sort((left, right) => left.order - right.order || left.slug.localeCompare(right.slug));
+const albumIndex = folderAlbums.findIndex((candidate) => candidate.slug === albumEntry.slug);
+const previousAlbum = albumIndex > 0 ? folderAlbums[albumIndex - 1] : undefined;
+const nextAlbum = albumIndex >= 0 && albumIndex < folderAlbums.length - 1
+    ? folderAlbums[albumIndex + 1]
+    : undefined;
 Astro.locals.albumPhotoContext = {
     sourceAlbumSlug: albumRecord.slug,
     photos: new Map(albumRecord.photos.map((photo) => [photo.filename, photo])),
@@ -201,6 +211,8 @@ const titleSections = extractTitleSections(albumEntry.body);
         >
             <Content components={{ Row, Photo: AlbumPhoto, Text, PhotoCarousel }} />
         </article>
+
+        <AlbumPagination previous={previousAlbum} next={nextAlbum} />
     </div>
 </Layout>
 
