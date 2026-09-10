@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { lstat, mkdtemp, mkdir, readFile, readdir, symlink, writeFile } from "node:fs/promises";
+import { lstat, mkdtemp, mkdir, readFile, readdir, realpath, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -492,8 +492,8 @@ test("folder reorder serializes with overlapping single-manifest mutations", asy
 
 test("multi-manifest replacement rolls back an earlier replacement when a later rename fails", async () => {
     const project = await folderProject();
-    const firstFile = project.file;
-    const secondFile = path.join(path.dirname(project.file), "second.json");
+    const firstFile = await realpath(project.file);
+    const secondFile = await realpath(path.join(path.dirname(project.file), "second.json"));
     const firstBefore = await readFile(firstFile, "utf8");
     const secondBefore = await readFile(secondFile, "utf8");
     const { rename: realRename, unlink: realUnlink } = await import("node:fs/promises");
@@ -525,8 +525,8 @@ test("multi-manifest replacement rolls back an earlier replacement when a later 
 
 test("rollback failure is explicit and preserves the original backup for recovery", async () => {
     const project = await folderProject();
-    const firstFile = project.file;
-    const secondFile = path.join(path.dirname(project.file), "second.json");
+    const firstFile = await realpath(project.file);
+    const secondFile = await realpath(path.join(path.dirname(project.file), "second.json"));
     const firstBefore = await readFile(firstFile, "utf8");
     const { rename: realRename, unlink: realUnlink } = await import("node:fs/promises");
     let replacementFailed = false;

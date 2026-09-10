@@ -3,6 +3,7 @@ import {
     mkdir,
     mkdtemp,
     readFile,
+    realpath,
     rm,
     writeFile,
 } from "node:fs/promises";
@@ -35,9 +36,10 @@ test("filesystem JSON errors identify the Mountain source path", async (t) => {
     const root = await project(t);
     const file = path.join(root, "src/mountains/taiwan.json");
     await writeFile(file, "not-json");
+    const resolvedFile = await realpath(file);
 
     await assert.rejects(readMountainRegion("taiwan"), new RegExp(
-        `Invalid Mountain source ${file.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`,
+        `Invalid Mountain source ${resolvedFile.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`,
     ));
 });
 

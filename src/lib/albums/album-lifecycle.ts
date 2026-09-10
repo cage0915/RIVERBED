@@ -270,10 +270,11 @@ async function assertSafeWorkspacePath(
     candidateInput: string,
     label: string,
 ): Promise<void> {
-    const root = await realpath(path.resolve(projectRoot));
+    const requestedRoot = path.resolve(projectRoot);
     const candidate = path.resolve(candidateInput);
-    if (!isContained(root, candidate)) throw new Error(`${label} escapes the project root`);
-    const relative = path.relative(root, candidate);
+    if (!isContained(requestedRoot, candidate)) throw new Error(`${label} escapes the project root`);
+    const relative = path.relative(requestedRoot, candidate);
+    const root = await realpath(requestedRoot);
     let current = root;
     for (const segment of relative.split(path.sep).filter(Boolean)) {
         current = path.join(current, segment);
