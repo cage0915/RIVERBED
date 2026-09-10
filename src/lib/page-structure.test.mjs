@@ -99,6 +99,16 @@ test('Album R2 trash actions preserve the dry-run ETag', () => {
     );
 });
 
+test('Page Manager block spacing updates its draft during input', () => {
+    const devTool = readProjectFile('src/components/DevTool.astro');
+
+    assert.match(
+        devTool,
+        /marginBlockInput\?\.addEventListener\('input',[\s\S]*?block\.props\.blockMargin = marginBlockInput\.value\.trim\(\)/,
+    );
+    assert.doesNotMatch(devTool, /marginBlockInput\?\.addEventListener\('change'/);
+});
+
 test('tag and photo-caption APIs persist metadata only through Album manifests', () => {
     const getData = readProjectFile('src/dev-api/get-data.ts');
     const saveTags = readProjectFile('src/dev-api/save-tags.ts');

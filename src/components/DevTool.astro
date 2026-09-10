@@ -2052,7 +2052,7 @@
                         });
 
                         const marginBlockInput = blockEl.querySelector('.block-margin-block') as HTMLInputElement;
-                        marginBlockInput?.addEventListener('change', () => {
+                        marginBlockInput?.addEventListener('input', () => {
                             block.props.blockMargin = marginBlockInput.value.trim();
                         });
                         blockEl.querySelector('.margin-block-reset')?.addEventListener('click', (e) => {
