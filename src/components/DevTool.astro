@@ -2053,7 +2053,7 @@
                                     const renderEditor = (vpos: 'top' | 'bottom') => `
                                         <div class="dev-pm-caption-editor" style="padding: 0.75rem; background: #fdfdfd; border: 1px dashed #ddd; border-radius: 8px; margin: 0.5rem 0; display: flex; flex-direction: column; gap: 0.75rem; box-shadow: inset 0 1px 3px rgba(0,0,0,0.02);">
                                             <div style="display: flex; gap: 0.25rem; align-items: center;">
-                                                <input class="block-caption" type="text" placeholder="Caption or [text](link)..." value="${block.props.caption || ''}" style="flex: 1; box-sizing:border-box; padding:6px; border:1px solid #ddd; border-radius:4px; font-size:0.85rem;" />
+                                                <textarea class="block-caption" rows="4" wrap="soft" placeholder="Caption or [text](link)..." style="flex: 1; box-sizing:border-box; min-width:0; padding:6px; border:1px solid #ddd; border-radius:4px; font-size:0.85rem; line-height:1.4; overflow-wrap:anywhere; resize:none;">${block.props.caption || ''}</textarea>
                                                 <button class="caption-delete" title="Delete Caption" style="background: none; border: none; cursor: pointer; color: #ef4444; opacity: 0.6; display: flex; align-items: center;">${ICONS.trash}</button>
                                             </div>
 
@@ -2125,7 +2125,7 @@
                         });
 
                         // Block events
-                        const capInput = blockEl.querySelector('.block-caption') as HTMLInputElement;
+                        const capInput = blockEl.querySelector<HTMLTextAreaElement>('.block-caption');
                         const alignSel = blockEl.querySelector('.block-align') as HTMLSelectElement;
                         const vposSel = blockEl.querySelector('.block-vpos') as HTMLSelectElement;
                         const captionToggle = blockEl.querySelector('.block-caption-toggle');
@@ -2152,7 +2152,7 @@
                         let isComposing = false;
                         capInput?.addEventListener('compositionstart', () => { isComposing = true; });
                         const refocusCaptionInput = () => {
-                            const newInput = treeContainer.querySelector(`[data-idx="${bIdx}"] .block-caption`) as HTMLInputElement;
+                            const newInput = treeContainer.querySelector<HTMLTextAreaElement>(`[data-idx="${bIdx}"] .block-caption`);
                             if (newInput) {
                                 newInput.focus();
                                 const len = newInput.value.length;

@@ -199,6 +199,16 @@ test('Page Manager marks caption alignment changes as pending', () => {
     );
 });
 
+test('Page Manager caption input is a fixed four-line field that wraps long text', () => {
+    const devTool = readProjectFile('src/components/DevTool.astro');
+
+    assert.match(
+        devTool,
+        /<textarea class="block-caption" rows="4" wrap="soft"[\s\S]*?overflow-wrap:anywhere; resize:none;/,
+    );
+    assert.doesNotMatch(devTool, /autoResizeCaptionInput|scrollHeight/);
+});
+
 test('Page Manager edits every rem spacing field as a unitless number', () => {
     const devTool = readProjectFile('src/components/DevTool.astro');
 
