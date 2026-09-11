@@ -405,8 +405,7 @@
                         height: 1.1rem;
                         align-items: center;
                         justify-content: center;
-                        opacity: 0;
-                        transition: opacity 120ms ease;
+                        transition: background 120ms ease;
                     }
                     .dev-pm-inline-add-zone--before {
                         top: -0.55rem;
@@ -415,7 +414,6 @@
                     .dev-pm-inline-add-zone:hover,
                     .dev-pm-inline-add-zone:focus-within,
                     .dev-pm-inline-add-zone.is-active {
-                        opacity: 1;
                         background: linear-gradient(transparent calc(50% - 0.5px), #93c5fd calc(50% - 0.5px), #93c5fd calc(50% + 0.5px), transparent calc(50% + 0.5px));
                     }
                     .dev-pm-inline-add-button {
@@ -430,6 +428,102 @@
                         background: white;
                         color: #2563eb;
                         cursor: pointer;
+                        opacity: 0;
+                        transition: opacity 120ms ease;
+                    }
+                    .dev-pm-inline-add-zone:hover .dev-pm-inline-add-button,
+                    .dev-pm-inline-add-zone:focus-within .dev-pm-inline-add-button,
+                    .dev-pm-inline-add-zone.is-active .dev-pm-inline-add-button {
+                        opacity: 1;
+                    }
+                    .dev-pm-margin-control {
+                        position: absolute;
+                        right: 1rem;
+                        z-index: 10;
+                        display: flex;
+                        height: 1.1rem;
+                        align-items: center;
+                        opacity: 0;
+                        transition: opacity 120ms ease;
+                    }
+                    .dev-pm-margin-control:hover,
+                    .dev-pm-margin-control:focus-within,
+                    .dev-pm-inline-add-zone:hover .dev-pm-margin-control,
+                    .dev-pm-inline-add-zone:focus-within .dev-pm-margin-control,
+                    .dev-pm-margin-control.has-custom {
+                        opacity: 1;
+                    }
+                    .dev-pm-margin-pill {
+                        display: flex;
+                        height: 22px;
+                        box-sizing: border-box;
+                        align-items: center;
+                        gap: 2px;
+                        padding: 0 4px;
+                        border: 1px solid #93c5fd;
+                        border-radius: 999px;
+                        background: white;
+                        color: #64748b;
+                        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12);
+                    }
+                    .dev-pm-margin-control.has-custom .dev-pm-margin-pill {
+                        border-color: #60a5fa;
+                        color: #2563eb;
+                    }
+                    .dev-pm-margin-icon {
+                        display: flex;
+                        width: 11px;
+                        height: 11px;
+                        padding: 0;
+                        align-items: center;
+                        justify-content: center;
+                        border: 0;
+                        background: none;
+                        color: inherit;
+                        cursor: pointer;
+                        flex-shrink: 0;
+                    }
+                    .dev-pm-margin-icon:disabled {
+                        cursor: default;
+                    }
+                    .dev-pm-margin-icon > span {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    }
+                    .dev-pm-margin-icon svg {
+                        width: 11px;
+                        height: 11px;
+                    }
+                    .dev-pm-margin-icon-reset {
+                        display: none !important;
+                        color: #ef4444;
+                    }
+                    .dev-pm-margin-control.has-custom .dev-pm-margin-icon:hover .dev-pm-margin-icon-direction,
+                    .dev-pm-margin-control.has-custom .dev-pm-margin-icon:focus-visible .dev-pm-margin-icon-direction {
+                        display: none;
+                    }
+                    .dev-pm-margin-control.has-custom .dev-pm-margin-icon:hover .dev-pm-margin-icon-reset,
+                    .dev-pm-margin-control.has-custom .dev-pm-margin-icon:focus-visible .dev-pm-margin-icon-reset {
+                        display: flex !important;
+                    }
+                    .dev-pm-margin-pill input[type=number] {
+                        width: 34px;
+                        padding: 0;
+                        border: 0;
+                        outline: 0;
+                        background: transparent;
+                        color: #334155;
+                        font: 0.68rem/1 sans-serif;
+                        text-align: center;
+                    }
+                    .dev-pm-margin-pill input[type=number]::placeholder {
+                        color: #94a3b8;
+                        opacity: 1;
+                    }
+                    .dev-pm-margin-unit {
+                        color: #94a3b8;
+                        font: 0.58rem/1 sans-serif;
                     }
                     .dev-pm-block-header {
                         display: flex;
@@ -1810,6 +1904,66 @@
                     const gapButtonIcon = gapSelectionMode ? ICONS.arrowRight : ICONS.plus;
                     currentBlocks.forEach((block: any, bIdx: number) => {
                         const isCollapsed = collapsedBlocks.has(bIdx);
+                        const renderBoundaryMargin = ({
+                            edge,
+                            property,
+                            resetClass,
+                            label,
+                            defaultValue,
+                        }: {
+                            edge: 'top' | 'bottom';
+                            property: 'mt' | 'mb' | 'blockMargin';
+                            resetClass: string;
+                            label: string;
+                            defaultValue: string;
+                        }) => {
+                            const value = remValueForInput(block.props[property]);
+                            const hasCustomValue = Boolean(value && value !== defaultValue);
+                            const icon = edge === 'top'
+                                ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="4" x2="19" y2="4"/><polyline points="12 8 12 20"/><polyline points="8 12 12 8 16 12"/></svg>`
+                                : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="20" x2="19" y2="20"/><polyline points="12 16 12 4"/><polyline points="8 12 12 16 16 12"/></svg>`;
+                            const input = property === 'mt'
+                                ? `<input class="text-block-mt" type="number" step="0.1" inputmode="decimal" placeholder="${defaultValue}" value="${hasCustomValue ? value : ''}" aria-label="${label} in rem" />`
+                                : property === 'mb'
+                                    ? `<input class="text-block-mb" type="number" step="0.1" inputmode="decimal" placeholder="${defaultValue}" value="${hasCustomValue ? value : ''}" aria-label="${label} in rem" />`
+                                    : `<input class="block-margin-block" type="number" step="0.1" inputmode="decimal" placeholder="${defaultValue}" value="${hasCustomValue ? value : ''}" aria-label="${label} in rem" />`;
+                            return `
+                                <div class="dev-pm-margin-control dev-pm-margin-control--${edge}${hasCustomValue ? ' has-custom' : ''}" data-margin-property="${property}" data-margin-default="${defaultValue}">
+                                    <div class="dev-pm-margin-pill" title="${label}">
+                                        <button class="dev-pm-margin-icon dev-pm-margin-reset ${resetClass}" type="button" ${hasCustomValue ? `title="Use default ${defaultValue}rem" aria-label="Reset ${label}"` : 'disabled aria-hidden="true" tabindex="-1"'}>
+                                            <span class="dev-pm-margin-icon-direction">${icon}</span>
+                                            <span class="dev-pm-margin-icon-reset">${ICONS.minus}</span>
+                                        </button>
+                                        ${input}
+                                        <span class="dev-pm-margin-unit">rem</span>
+                                    </div>
+                                </div>
+                            `;
+                        };
+                        const topMarginControl = block.type === 'Text'
+                            ? renderBoundaryMargin({
+                                edge: 'top',
+                                property: 'mt',
+                                resetClass: 'margin-text-mt-reset',
+                                label: 'Top margin',
+                                defaultValue: '2',
+                            })
+                            : '';
+                        const bottomMarginControl = block.type === 'Text'
+                            ? renderBoundaryMargin({
+                                edge: 'bottom',
+                                property: 'mb',
+                                resetClass: 'margin-text-mb-reset',
+                                label: 'Bottom margin',
+                                defaultValue: '0.5',
+                            })
+                            : renderBoundaryMargin({
+                                edge: 'bottom',
+                                property: 'blockMargin',
+                                resetClass: 'margin-block-reset',
+                                label: 'Block margin',
+                                defaultValue: block.type === 'PhotoCarousel' ? '2' : (fGap.value || '0.5'),
+                            });
                         const blockEl = document.createElement('div');
                         blockEl.className = `dev-pm-block ${isCollapsed ? 'collapsed' : ''}`;
                         blockEl.dataset.idx = bIdx.toString();
@@ -1843,8 +1997,6 @@
                                 ${block.type === 'Text' ? (() => {
                                     const align = block.props.align || 'center';
                                     const size = block.props.size || 'caption';
-                                    const mt = remValueForInput(block.props.mt);
-                                    const mb = remValueForInput(block.props.mb);
                                     return `
                                         <div style="display: flex; flex-direction: column; gap: 0.5rem; padding: 0.5rem 0;">
                                             <textarea class="text-block-content" placeholder="Enter text... Links: [text](/path) or [text](https://example.com)" style="width: 100%; box-sizing: border-box; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 0.85rem; min-height: 60px; resize: vertical; font-family: inherit;">${block.text || ''}</textarea>
@@ -1858,12 +2010,6 @@
                                                     <option value="caption" ${size === 'caption' ? 'selected' : ''}>Caption</option>
                                                     <option value="title" ${size === 'title' ? 'selected' : ''}>Title</option>
                                                 </select>
-                                                <div style="display: flex; gap: 0.25rem; align-items: center; border-left: 1px solid #eee; padding-left: 0.5rem;">
-                                                    <span style="color: #999; display:flex; align-items:center;" title="Margin top"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="4" x2="19" y2="4"/><polyline points="12 8 12 20"/><polyline points="8 12 12 8 16 12"/></svg></span>
-                                                    <input class="text-block-mt" type="number" step="0.1" inputmode="decimal" placeholder="2" value="${mt}" style="width: 58px; padding: 4px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.75rem; text-align: center;" />
-                                                    <span style="color: #999; display:flex; align-items:center;" title="Margin bottom"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="20" x2="19" y2="20"/><polyline points="12 16 12 4"/><polyline points="8 12 12 16 16 12"/></svg></span>
-                                                    <input class="text-block-mb" type="number" step="0.1" inputmode="decimal" placeholder="0.5" value="${mb}" style="width: 58px; padding: 4px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.75rem; text-align: center;" />
-                                                </div>
                                             </div>
                                         </div>
                                     `;
@@ -1952,19 +2098,15 @@
                                             `).join('')}
                                         </div>
                                         ${captionAreaBottom}
-
-                                        <div style="display: flex; align-items: center; gap: 0.4rem; justify-content: center; padding-top: 0.5rem; border-top: 1px dashed #eee; margin-top: 0.5rem;">
-                                            <span style="color: #999; display: flex; align-items: center; opacity: 0.6;" title="Block Spacing"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="20" x2="19" y2="20"/><polyline points="12 16 12 4"/><polyline points="8 12 12 16 16 12"/></svg></span>
-                                            <input class="block-margin-block" type="number" step="0.1" inputmode="decimal" placeholder="${block.type === 'PhotoCarousel' ? '2' : (fGap.value || '0.5')}" title="Block Margin" value="${remValueForInput(block.props.blockMargin)}" style="width:58px; padding:2px 4px; border:1px solid #ddd; border-radius:3px; font-size:0.7rem; text-align:center;" />
-                                            ${block.props.blockMargin ? `
-                                                <button class="margin-block-reset" title="Clear spacing" style="background:none; border:none; padding:2px; cursor:pointer; color:#ef4444; opacity:0.8; display:flex; align-items:center;">${ICONS.minus}</button>
-                                            ` : ''}
-                                        </div>
                                     `;
                                 })()}
                             </div>
-                            ${bIdx === 0 ? `<div class="dev-pm-inline-add-zone dev-pm-inline-add-zone--before${gapSelectionMode ? ' is-active' : ''}"><button class="dev-pm-inline-add-button" type="button" data-page-gap-index="0" title="${gapSelectionMode ? 'Move here' : 'Add block before'}">${gapButtonIcon}</button></div>` : ''}
-                            <div class="dev-pm-inline-add-zone${gapSelectionMode ? ' is-active' : ''}"><button class="dev-pm-inline-add-button" type="button" data-page-gap-index="${bIdx + 1}" title="${gapSelectionMode ? 'Move here' : 'Add block here'}">${gapButtonIcon}</button></div>
+                            ${bIdx === 0
+                                ? `<div class="dev-pm-inline-add-zone dev-pm-inline-add-zone--before${gapSelectionMode ? ' is-active' : ''}"><button class="dev-pm-inline-add-button" type="button" data-page-gap-index="0" title="${gapSelectionMode ? 'Move here' : 'Add block before'}">${gapButtonIcon}</button>${topMarginControl}</div>`
+                                : topMarginControl
+                                    ? `<div class="dev-pm-inline-add-zone dev-pm-inline-add-zone--before">${topMarginControl}</div>`
+                                    : ''}
+                            <div class="dev-pm-inline-add-zone${gapSelectionMode ? ' is-active' : ''}"><button class="dev-pm-inline-add-button" type="button" data-page-gap-index="${bIdx + 1}" title="${gapSelectionMode ? 'Move here' : 'Add block here'}">${gapButtonIcon}</button>${bottomMarginControl}</div>
                         `;
 
                         // Block events
@@ -2056,14 +2198,36 @@
                             renderTree();
                         });
 
+                        const syncBoundaryMarginControl = (input: HTMLInputElement, property: 'mt' | 'mb' | 'blockMargin') => {
+                            const control = input.closest('.dev-pm-margin-control') as HTMLElement | null;
+                            const defaultValue = control?.dataset.marginDefault || '';
+                            const hasCustomValue = Boolean(block.props[property]
+                                && remValueForInput(block.props[property]) !== defaultValue);
+                            if (!hasCustomValue) block.props[property] = "";
+                            control?.classList.toggle('has-custom', hasCustomValue);
+                            const reset = control?.querySelector('.dev-pm-margin-reset') as HTMLButtonElement | null;
+                            if (reset) {
+                                reset.disabled = !hasCustomValue;
+                                reset.tabIndex = hasCustomValue ? 0 : -1;
+                                reset.setAttribute('aria-hidden', String(!hasCustomValue));
+                                reset.title = hasCustomValue ? `Use default ${defaultValue}rem` : '';
+                            }
+                        };
+
                         const marginBlockInput = blockEl.querySelector('.block-margin-block') as HTMLInputElement;
                         marginBlockInput?.addEventListener('input', () => {
                             block.props.blockMargin = remValueFromInput(marginBlockInput.value);
+                            syncBoundaryMarginControl(marginBlockInput, 'blockMargin');
                         });
                         blockEl.querySelector('.margin-block-reset')?.addEventListener('click', (e) => {
                             e.stopPropagation();
                             block.props.blockMargin = "";
-                            renderTree();
+                            if (marginBlockInput) {
+                                marginBlockInput.value = '';
+                                syncBoundaryMarginControl(marginBlockInput, 'blockMargin');
+                                marginBlockInput.focus();
+                            }
+                            updatePageDirtyState();
                         });
 
                         blockEl.querySelector('.caption-delete')?.addEventListener('click', (e) => {
@@ -2128,8 +2292,30 @@
                             textArea?.addEventListener('input', () => { block.text = textArea.value; });
                             alignSel?.addEventListener('change', () => { block.props.align = alignSel.value; });
                             sizeSel?.addEventListener('change', () => { block.props.size = sizeSel.value; });
-                            mtInput?.addEventListener('change', () => { block.props.mt = remValueFromInput(mtInput.value); });
-                            mbInput?.addEventListener('change', () => { block.props.mb = remValueFromInput(mbInput.value); });
+                            mtInput?.addEventListener('input', () => {
+                                block.props.mt = remValueFromInput(mtInput.value);
+                                syncBoundaryMarginControl(mtInput, 'mt');
+                            });
+                            mbInput?.addEventListener('input', () => {
+                                block.props.mb = remValueFromInput(mbInput.value);
+                                syncBoundaryMarginControl(mbInput, 'mb');
+                            });
+                            blockEl.querySelector('.margin-text-mt-reset')?.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                block.props.mt = "";
+                                mtInput.value = '';
+                                syncBoundaryMarginControl(mtInput, 'mt');
+                                mtInput.focus();
+                                updatePageDirtyState();
+                            });
+                            blockEl.querySelector('.margin-text-mb-reset')?.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                block.props.mb = "";
+                                mbInput.value = '';
+                                syncBoundaryMarginControl(mbInput, 'mb');
+                                mbInput.focus();
+                                updatePageDirtyState();
+                            });
                         }
                         blockEl.querySelector('.block-add-photos')?.addEventListener('click', (event) => {
                             event.stopPropagation();

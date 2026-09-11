@@ -109,6 +109,18 @@ test('Page Manager block spacing updates its draft during input', () => {
     assert.doesNotMatch(devTool, /marginBlockInput\?\.addEventListener\('change'/);
 });
 
+test('Page Manager exposes spacing controls from the full block boundary', () => {
+    const devTool = readProjectFile('src/components/DevTool.astro');
+
+    assert.match(devTool, /dev-pm-inline-add-zone:hover \.dev-pm-margin-control/);
+    assert.match(devTool, /dev-pm-margin-control\.has-custom[\s\S]*?opacity: 1/);
+    assert.match(devTool, /has-custom \.dev-pm-margin-icon:hover \.dev-pm-margin-icon-reset/);
+    assert.match(devTool, /dev-pm-inline-add-button[\s\S]*?opacity: 0/);
+    assert.match(devTool, /<button class="dev-pm-inline-add-button"[\s\S]*?\$\{bottomMarginControl\}<\/div>/);
+    assert.match(devTool, /edge: 'top',\s*property: 'mt'/);
+    assert.match(devTool, /edge: 'bottom',\s*property: 'mb'/);
+});
+
 test('Page Manager edits every rem spacing field as a unitless number', () => {
     const devTool = readProjectFile('src/components/DevTool.astro');
 
