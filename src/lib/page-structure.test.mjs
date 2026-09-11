@@ -190,6 +190,15 @@ test('Page Manager exposes spacing controls from the full block boundary', () =>
     assert.match(devTool, /edge: 'bottom',\s*property: 'mb'/);
 });
 
+test('Page Manager marks caption alignment changes as pending', () => {
+    const devTool = readProjectFile('src/components/DevTool.astro');
+
+    assert.match(
+        devTool,
+        /alignSel\?\.addEventListener\('change', \(\) => \{[\s\S]*?block\.props\.captionPosition = `\$\{alignSel\.value\} \$\{getVPos\(\)\}`;[\s\S]*?updatePageDirtyState\(\);/,
+    );
+});
+
 test('Page Manager edits every rem spacing field as a unitless number', () => {
     const devTool = readProjectFile('src/components/DevTool.astro');
 

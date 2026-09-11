@@ -2196,6 +2196,7 @@
 
                         alignSel?.addEventListener('change', () => {
                             block.props.captionPosition = `${alignSel.value} ${getVPos()}`;
+                            updatePageDirtyState();
                         });
 
                         vposSel?.addEventListener('change', () => {
