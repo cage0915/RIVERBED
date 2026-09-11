@@ -351,29 +351,6 @@
       "tags": []
     },
     {
-      "filename": "KCS07059.jpg",
-      "tags": [
-        {
-          "name": "大天井岳",
-          "x": 51.6,
-          "y": 17.36
-        },
-        {
-          "name": "東天井岳",
-          "x": 8.25,
-          "y": 26.25
-        }
-      ]
-    },
-    {
-      "filename": "KCS07061.jpg",
-      "tags": []
-    },
-    {
-      "filename": "KCS07060.jpg",
-      "tags": []
-    },
-    {
       "filename": "KCS07065.jpg",
       "tags": []
     },
@@ -408,6 +385,25 @@
       ]
     },
     {
+      "filename": "KCS07061.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS07059.jpg",
+      "tags": [
+        {
+          "name": "大天井岳",
+          "x": 51.6,
+          "y": 17.36
+        },
+        {
+          "name": "東天井岳",
+          "x": 8.25,
+          "y": 26.25
+        }
+      ]
+    },
+    {
       "filename": "KCS07094.jpg",
       "tags": [
         {
@@ -428,11 +424,11 @@
       ]
     },
     {
-      "filename": "KCS07120.jpg",
+      "filename": "KCS07121.jpg",
       "tags": []
     },
     {
-      "filename": "KCS07121.jpg",
+      "filename": "KCS07120.jpg",
       "tags": []
     },
     {
@@ -537,11 +533,11 @@
       ]
     },
     {
-      "filename": "KCS07179.jpg",
+      "filename": "KCS07185.jpg",
       "tags": []
     },
     {
-      "filename": "KCS07185.jpg",
+      "filename": "KCS07179.jpg",
       "tags": []
     },
     {

@@ -113,6 +113,10 @@
       "tags": []
     },
     {
+      "filename": "KCS06660.jpg",
+      "tags": []
+    },
+    {
       "filename": "KCS06515.jpg",
       "tags": [
         {
@@ -216,16 +220,6 @@
       ]
     },
     {
-      "filename": "KCS06507.jpg",
-      "tags": [
-        {
-          "name": "野口五郎岳",
-          "x": 47.68,
-          "y": 31.75
-        }
-      ]
-    },
-    {
       "filename": "KCS06533.jpg",
       "tags": [
         {
@@ -252,6 +246,10 @@
       "tags": []
     },
     {
+      "filename": "KCS06719.jpg",
+      "tags": []
+    },
+    {
       "filename": "KCS06637.jpg",
       "tags": [
         {
@@ -272,20 +270,6 @@
       ]
     },
     {
-      "filename": "KCS06644.jpg",
-      "tags": [
-        {
-          "name": "燕岳",
-          "x": 63.62,
-          "y": 9.13
-        }
-      ]
-    },
-    {
-      "filename": "KCS06660.jpg",
-      "tags": []
-    },
-    {
       "filename": "KCS06671.jpg",
       "tags": [
         {
@@ -296,10 +280,6 @@
       ]
     },
     {
-      "filename": "KCS06685.jpg",
-      "tags": []
-    },
-    {
       "filename": "KCS06721.jpg",
       "tags": [
         {
@@ -308,6 +288,10 @@
           "y": 27.93
         }
       ]
+    },
+    {
+      "filename": "KCS06685.jpg",
+      "tags": []
     },
     {
       "filename": "KCS06705.jpg",
@@ -350,20 +334,6 @@
       ]
     },
     {
-      "filename": "KCS06719.jpg",
-      "tags": []
-    },
-    {
-      "filename": "KCS06726.jpg",
-      "tags": [
-        {
-          "name": "燕岳",
-          "x": 62.18,
-          "y": 20.96
-        }
-      ]
-    },
-    {
       "filename": "KCS06724.jpg",
       "tags": [
         {
@@ -399,12 +369,14 @@
       ]
     },
     {
-      "filename": "KCS06729.jpg",
-      "tags": []
-    },
-    {
-      "filename": "KCS06739.jpg",
-      "tags": []
+      "filename": "KCS06726.jpg",
+      "tags": [
+        {
+          "name": "燕岳",
+          "x": 62.18,
+          "y": 20.96
+        }
+      ]
     },
     {
       "filename": "KCS06741.jpg",
@@ -425,6 +397,14 @@
           "y": 52.71
         }
       ]
+    },
+    {
+      "filename": "KCS06729.jpg",
+      "tags": []
+    },
+    {
+      "filename": "KCS06739.jpg",
+      "tags": []
     },
     {
       "filename": "KCS06748.jpg",
@@ -488,26 +468,6 @@
           "name": "北穂高岳",
           "x": 52.72,
           "y": 41.89
-        }
-      ]
-    },
-    {
-      "filename": "KCS06749.jpg",
-      "tags": [
-        {
-          "name": "槍ヶ岳",
-          "x": 47.84,
-          "y": 27.53
-        },
-        {
-          "name": "大喰岳",
-          "x": 38.22,
-          "y": 31.37
-        },
-        {
-          "name": "中岳",
-          "x": 26.28,
-          "y": 33.54
         }
       ]
     },

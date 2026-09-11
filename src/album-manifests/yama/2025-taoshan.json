@@ -315,6 +315,21 @@
       ]
     },
     {
+      "filename": "KCS02697.jpg",
+      "tags": [
+        {
+          "name": "品田山",
+          "x": 56.89,
+          "y": 23.99
+        },
+        {
+          "name": "穆特勒布山",
+          "x": 38.62,
+          "y": 25.2
+        }
+      ]
+    },
+    {
       "filename": "KCS02588.jpg",
       "tags": []
     },
@@ -369,6 +384,10 @@
       ]
     },
     {
+      "filename": "KCS02812.jpg",
+      "tags": []
+    },
+    {
       "filename": "KCS02650.jpg",
       "tags": []
     },
@@ -391,21 +410,6 @@
     {
       "filename": "KCS02694.jpg",
       "tags": []
-    },
-    {
-      "filename": "KCS02697.jpg",
-      "tags": [
-        {
-          "name": "品田山",
-          "x": 56.89,
-          "y": 23.99
-        },
-        {
-          "name": "穆特勒布山",
-          "x": 38.62,
-          "y": 25.2
-        }
-      ]
     },
     {
       "filename": "KCS02789.jpg",
@@ -461,10 +465,6 @@
           "y": 70.15
         }
       ]
-    },
-    {
-      "filename": "KCS02812.jpg",
-      "tags": []
     },
     {
       "filename": "KCS02835.jpg",
