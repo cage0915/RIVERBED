@@ -119,6 +119,36 @@ const titleSections = extractTitleSections(albumEntry.body);
             </div>
         </button>
         <button
+            class="album-grid-toggle group text-zinc-500 hover:text-white transition-all duration-300"
+            id="toggle-photo-grid"
+            aria-label="Show photo grid"
+            aria-pressed="false"
+            data-active="false"
+            type="button"
+        >
+            <div
+                class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center group-hover:border-white/30 transition-colors bg-white/20 backdrop-blur-sm"
+            >
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                >
+                    <rect width="7" height="7" x="3" y="3" rx="1"></rect>
+                    <rect width="7" height="7" x="14" y="3" rx="1"></rect>
+                    <rect width="7" height="7" x="3" y="14" rx="1"></rect>
+                    <rect width="7" height="7" x="14" y="14" rx="1"></rect>
+                </svg>
+            </div>
+        </button>
+        <button
             class="album-tags-toggle group text-zinc-500 hover:text-white transition-all duration-300"
             id="toggle-all-tags"
             aria-label="Toggle all photo tags"
@@ -174,7 +204,10 @@ const titleSections = extractTitleSections(albumEntry.body);
         data-has-breadcrumb={titleSections.length > 0 ? "true" : undefined}
     >
         {titleSections.length > 0 && (
-            <div class="pointer-events-none fixed left-8 top-28 z-30 hidden xl:block">
+            <div
+                class="pointer-events-none fixed left-8 top-28 z-30 hidden xl:block"
+                data-album-breadcrumb-rail
+            >
                 <nav
                     aria-label="Album sections"
                     class="pointer-events-auto flex max-w-28 flex-col items-start gap-2 text-left"
@@ -267,8 +300,18 @@ const titleSections = extractTitleSections(albumEntry.body);
         color: rgba(255, 255, 255, 0.9);
     }
 
+    .album-grid-toggle[data-active="true"] > div {
+        background: rgba(37, 99, 235, 0.8);
+        color: white;
+        border-color: rgba(37, 99, 235, 0.95);
+    }
+
     .album-tags-toggle {
         display: none;
+    }
+
+    .album-tags-toggle[data-grid-hidden="true"] {
+        display: none !important;
     }
 
     .album-tags-toggle[data-active="true"] > div {
@@ -277,9 +320,80 @@ const titleSections = extractTitleSections(albumEntry.body);
         border-color: rgba(37, 99, 235, 0.95);
     }
 
+    .album-page[data-grid-active="true"] [data-album-breadcrumb-rail],
+    .album-page[data-grid-active="true"] :global(.album-pagination) {
+        display: none !important;
+    }
+
+    .album-content[data-grid-active="true"] > :global(:not([data-album-photo-grid])) {
+        display: none !important;
+    }
+
+    .album-content :global(.album-photo-grid) {
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+        width: 100%;
+    }
+
+    .album-content :global(.album-photo-grid__row) {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.3rem;
+        width: 100%;
+    }
+
+    .album-content :global(.album-photo-grid__row > .photo-container) {
+        flex: var(--album-grid-ratio, 1) 1 0% !important;
+        min-width: 0;
+    }
+
+    .album-content :global(.album-photo-grid__spacer) {
+        flex: 1 1 0%;
+        min-width: 0;
+    }
+
+    .album-content :global(.album-photo-grid .photo-wrapper) {
+        aspect-ratio: var(--album-grid-ratio, 1);
+        overflow: hidden;
+        border-radius: 0;
+        background: #1a1a1a;
+    }
+
+    .album-content :global(.album-photo-grid .pswp-link) {
+        width: 100%;
+        height: 100%;
+    }
+
+    .album-content :global(.album-photo-grid .photo-img) {
+        width: 100%;
+        height: 100% !important;
+        object-fit: contain;
+        border-radius: 0 !important;
+    }
+
+    .album-content :global(.album-photo-grid .tags-overlay),
+    .album-content :global(.album-photo-grid .photo-caption) {
+        display: none !important;
+    }
+
+    .album-content :global(.album-photo-grid [data-photo-lightbox-link]) {
+        cursor: pointer;
+    }
+
     @media (max-width: 768px) and (hover: none) {
         .album-tags-toggle[data-visible="true"] {
             display: block;
+        }
+    }
+
+    @media (max-width: 767px) {
+        .album-content :global(.album-photo-grid) {
+            gap: 2px;
+        }
+
+        .album-content :global(.album-photo-grid__row) {
+            gap: 2px;
         }
     }
 </style>
@@ -380,6 +494,279 @@ const titleSections = extractTitleSections(albumEntry.body);
         syncAlbumTagToggle();
     };
 
+    const initAlbumPhotoGrid = (signal: AbortSignal) => {
+        const page = document.querySelector<HTMLElement>("[data-album-page]");
+        const article = page?.querySelector<HTMLElement>(".album-content");
+        const toggleButton = document.getElementById(
+            "toggle-photo-grid",
+        ) as HTMLButtonElement | null;
+        const tagToggleButton = document.getElementById(
+            "toggle-all-tags",
+        ) as HTMLButtonElement | null;
+        if (!page || !article || !toggleButton) return;
+
+        const photos = Array.from(
+            article.querySelectorAll<HTMLElement>(".photo-container"),
+        );
+        if (photos.length === 0) {
+            toggleButton.hidden = true;
+            return;
+        }
+
+        const mobileQuery = window.matchMedia("(max-width: 767px)");
+        const placeholders = new Map<HTMLElement, Comment>();
+        let grid: HTMLElement | undefined;
+        let gridActive = false;
+        let readingScrollY = 0;
+        let scrollFrame: number | undefined;
+        let scrollFollowFrame: number | undefined;
+        let scrollFollowDelay: number | undefined;
+        let scrollFollowTimer: number | undefined;
+        let scrollObserver: ResizeObserver | undefined;
+
+        const stopScrollTracking = () => {
+            if (scrollFrame !== undefined) cancelAnimationFrame(scrollFrame);
+            if (scrollFollowFrame !== undefined) {
+                cancelAnimationFrame(scrollFollowFrame);
+            }
+            if (scrollFollowDelay !== undefined) {
+                window.clearTimeout(scrollFollowDelay);
+            }
+            if (scrollFollowTimer !== undefined) {
+                window.clearTimeout(scrollFollowTimer);
+            }
+            scrollObserver?.disconnect();
+            scrollFrame = undefined;
+            scrollFollowFrame = undefined;
+            scrollFollowDelay = undefined;
+            scrollFollowTimer = undefined;
+            scrollObserver = undefined;
+        };
+
+        const targetScrollTop = (photo: HTMLElement) => {
+            const rect = photo.getBoundingClientRect();
+            const navigation = document.querySelector<HTMLElement>(
+                "[data-site-navigation]",
+            );
+            const navigationBottom = Math.max(
+                0,
+                navigation?.getBoundingClientRect().bottom ?? 0,
+            );
+            const topInset = Math.max(16, navigationBottom + 16);
+            const availableHeight = Math.max(
+                0,
+                window.innerHeight - topInset - 16,
+            );
+            const offset = rect.height < availableHeight
+                ? (availableHeight - rect.height) / 2
+                : 0;
+            return Math.max(
+                0,
+                window.scrollY + rect.top - topInset - offset,
+            );
+        };
+
+        const scrollInstantly = (top: number) => {
+            const root = document.documentElement;
+            const previousBehavior = root.style.scrollBehavior;
+            root.style.scrollBehavior = "auto";
+            window.scrollTo({ top, behavior: "auto" });
+            root.style.scrollBehavior = previousBehavior;
+        };
+
+        const followPhotoPosition = (photo: HTMLElement) => {
+            stopScrollTracking();
+            window.scrollTo({
+                top: targetScrollTop(photo),
+                behavior: "smooth",
+            });
+
+            scrollFollowDelay = window.setTimeout(() => {
+                const keepPhotoPositioned = () => {
+                    if (scrollFollowFrame !== undefined) return;
+                    scrollFollowFrame = requestAnimationFrame(() => {
+                        scrollFollowFrame = undefined;
+                        scrollInstantly(targetScrollTop(photo));
+                    });
+                };
+
+                scrollObserver = new ResizeObserver(keepPhotoPositioned);
+                scrollObserver.observe(article);
+                keepPhotoPositioned();
+                scrollFollowTimer = window.setTimeout(
+                    stopScrollTracking,
+                    1400,
+                );
+            }, 450);
+        };
+
+        const syncGridRatio = (photo: HTMLElement) => {
+            const image = photo.querySelector<HTMLImageElement>(".photo-img");
+            if (!image?.naturalWidth || !image.naturalHeight) return;
+            photo.style.setProperty(
+                "--album-grid-ratio",
+                String(image.naturalWidth / image.naturalHeight),
+            );
+        };
+
+        photos.forEach((photo) => {
+            const image = photo.querySelector<HTMLImageElement>(".photo-img");
+            if (!image) return;
+            if (image.complete) syncGridRatio(photo);
+            image.addEventListener("load", () => syncGridRatio(photo), {
+                signal,
+            });
+        });
+
+        const renderGridRows = () => {
+            if (!grid) return;
+            const photosPerRow = mobileQuery.matches ? 3 : 5;
+            const rows: HTMLElement[] = [];
+
+            for (let index = 0; index < photos.length; index += photosPerRow) {
+                const row = document.createElement("div");
+                row.className = "album-photo-grid__row";
+                row.dataset.keyboardNavigationTarget = "";
+                const chunk = photos.slice(index, index + photosPerRow);
+                row.append(...chunk);
+
+                if (!mobileQuery.matches && chunk.length < photosPerRow) {
+                    for (
+                        let spacerIndex = chunk.length;
+                        spacerIndex < photosPerRow;
+                        spacerIndex += 1
+                    ) {
+                        const spacer = document.createElement("span");
+                        spacer.className = "album-photo-grid__spacer";
+                        spacer.setAttribute("aria-hidden", "true");
+                        row.append(spacer);
+                    }
+                }
+                rows.push(row);
+            }
+            grid.replaceChildren(...rows);
+        };
+
+        const syncGridControls = () => {
+            toggleButton.dataset.active = gridActive ? "true" : "false";
+            toggleButton.setAttribute(
+                "aria-pressed",
+                gridActive ? "true" : "false",
+            );
+            toggleButton.setAttribute(
+                "aria-label",
+                gridActive ? "Return to album layout" : "Show photo grid",
+            );
+            if (tagToggleButton) {
+                tagToggleButton.dataset.gridHidden = gridActive
+                    ? "true"
+                    : "false";
+            }
+        };
+
+        const restoreAlbumLayout = (
+            targetPhoto?: HTMLElement,
+            restoreScroll = true,
+        ) => {
+            if (!gridActive) return;
+            gridActive = false;
+
+            photos.forEach((photo) => {
+                const placeholder = placeholders.get(photo);
+                placeholder?.parentNode?.insertBefore(photo, placeholder);
+                placeholder?.remove();
+                photo.style.removeProperty("--album-grid-ratio");
+            });
+            placeholders.clear();
+            grid?.remove();
+            grid = undefined;
+            article.removeAttribute("data-grid-active");
+            page.removeAttribute("data-grid-active");
+            syncGridControls();
+
+            if (!restoreScroll) return;
+            scrollFrame = requestAnimationFrame(() => {
+                scrollFrame = requestAnimationFrame(() => {
+                    scrollFrame = undefined;
+                    if (targetPhoto) {
+                        followPhotoPosition(targetPhoto);
+                    } else {
+                        window.scrollTo({
+                            top: readingScrollY,
+                            behavior: "smooth",
+                        });
+                    }
+                });
+            });
+        };
+
+        const showPhotoGrid = () => {
+            if (gridActive) return;
+            stopScrollTracking();
+            readingScrollY = window.scrollY;
+            gridActive = true;
+            grid = document.createElement("div");
+            grid.className = "album-photo-grid";
+            grid.dataset.albumPhotoGrid = "";
+
+            photos.forEach((photo) => {
+                const placeholder = document.createComment("album-photo-grid");
+                photo.parentNode?.insertBefore(placeholder, photo);
+                placeholders.set(photo, placeholder);
+                syncGridRatio(photo);
+            });
+
+            renderGridRows();
+            article.append(grid);
+            article.dataset.gridActive = "true";
+            page.dataset.gridActive = "true";
+            syncGridControls();
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        };
+
+        toggleButton.addEventListener("click", () => {
+            if (gridActive) restoreAlbumLayout();
+            else showPhotoGrid();
+        }, { signal });
+
+        article.addEventListener("click", (event) => {
+            if (!gridActive || !grid) return;
+            const eventTarget = event.target instanceof Element
+                ? event.target
+                : null;
+            const link = eventTarget?.closest<HTMLAnchorElement>(
+                "[data-photo-lightbox-link]",
+            );
+            const targetPhoto = link?.closest<HTMLElement>(".photo-container");
+            if (!link || !targetPhoto || !grid.contains(targetPhoto)) return;
+
+            event.preventDefault();
+            event.stopPropagation();
+            restoreAlbumLayout(targetPhoto);
+        }, { capture: true, signal });
+
+        mobileQuery.addEventListener("change", () => {
+            if (gridActive) renderGridRows();
+        }, { signal });
+
+        syncGridControls();
+
+        return () => {
+            stopScrollTracking();
+            restoreAlbumLayout(undefined, false);
+            photos.forEach((photo) => {
+                photo.style.removeProperty("--album-grid-ratio");
+            });
+            toggleButton.hidden = false;
+            toggleButton.dataset.active = "false";
+            toggleButton.setAttribute("aria-pressed", "false");
+            toggleButton.setAttribute("aria-label", "Show photo grid");
+            if (tagToggleButton) {
+                tagToggleButton.dataset.gridHidden = "false";
+            }
+        };
+    };
+
     const handleScroll = () => {
         const backToTop = document.getElementById("back-to-top");
         const scrollToBottom = document.getElementById("scroll-to-bottom");
@@ -416,6 +803,7 @@ const titleSections = extractTitleSections(albumEntry.body);
         areAllTagsVisible = false;
         const breadcrumbObserver = initAlbumBreadcrumbs();
         initAlbumTagToggle(controller.signal);
+        const cleanupPhotoGrid = initAlbumPhotoGrid(controller.signal);
         handleScroll();
         window.addEventListener("scroll", handleScroll, {
             passive: true,
@@ -425,6 +813,7 @@ const titleSections = extractTitleSections(albumEntry.body);
         return () => {
             controller.abort();
             breadcrumbObserver?.disconnect();
+            cleanupPhotoGrid?.();
             areAllTagsVisible = false;
         };
     });

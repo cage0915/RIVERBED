@@ -190,6 +190,94 @@ test.describe("album lifecycle", () => {
         await waitForPhotoSwipeOpen(page);
         await expect(photoSwipe.root).toHaveCount(1);
     });
+
+    test("photo grid flattens the Album and returns to the selected photo", async ({
+        page,
+    }) => {
+        await page.goto("/yama/2024-beinandawu");
+
+        const toggle = page.locator("#toggle-photo-grid");
+        const originalPhotos = page.locator(".album-content .photo-container");
+        const originalPhotoCount = await originalPhotos.count();
+        const selectedPhoto = originalPhotos.nth(7);
+        const selectedKey = await selectedPhoto
+            .locator(".photo-wrapper")
+            .getAttribute("data-item-key");
+        expect(selectedKey).toBeTruthy();
+
+        await toggle.click();
+        const grid = page.locator("[data-album-photo-grid]");
+        await expect(toggle).toHaveAttribute("aria-pressed", "true");
+        await expect(grid.locator(".photo-container")).toHaveCount(
+            originalPhotoCount,
+        );
+        await expect(
+            grid.locator(".album-photo-grid__row").first()
+                .locator(":scope > .photo-container"),
+        ).toHaveCount(3);
+
+        const firstCell = grid.locator(".photo-container").first();
+        await expect(firstCell.locator(".photo-img")).toHaveCSS(
+            "object-fit",
+            "contain",
+        );
+        await expect(firstCell.locator(".photo-img")).toHaveCSS(
+            "border-radius",
+            "0px",
+        );
+        await expect(
+            grid.locator(".album-photo-grid__row").first(),
+        ).toHaveCSS("gap", "2px");
+        await expect(grid.locator(".tags-overlay").first()).toBeHidden();
+
+        await grid.locator(".photo-container").nth(7)
+            .locator("[data-photo-lightbox-link]")
+            .click();
+
+        await expect(grid).toHaveCount(0);
+        await expect(toggle).toHaveAttribute("aria-pressed", "false");
+        await expect(page.locator(".pswp")).toHaveCount(0);
+        await expect.poll(async () => {
+            const position = await page
+                .locator(`.photo-wrapper[data-item-key="${selectedKey}"]`)
+                .boundingBox();
+            return Boolean(
+                position &&
+                position.y < PIXEL_5_TOUCH.viewport.height &&
+                position.y + position.height > 0,
+            );
+        }).toBe(true);
+    });
+});
+
+test.describe("desktop Album photo grid", () => {
+    test.use({ viewport: { width: 1280, height: 900 } });
+
+    test.beforeEach(async ({ page }) => {
+        await isolateRemotePhotos(page);
+    });
+
+    test("groups five original-ratio photos into aligned rows", async ({
+        page,
+    }) => {
+        await page.goto("/yama/2024-beinandawu");
+        await page.locator("#toggle-photo-grid").click();
+
+        const firstRowPhotos = page
+            .locator(".album-photo-grid__row")
+            .first()
+            .locator(":scope > .photo-container");
+        await expect(firstRowPhotos).toHaveCount(5);
+        await expect(
+            page.locator(".album-photo-grid__row").first(),
+        ).toHaveCSS("gap", "4.8px");
+        await expect.poll(async () => {
+            const heights = await firstRowPhotos.evaluateAll((photos) =>
+                photos.map((photo) => photo.getBoundingClientRect().height)
+            );
+            return Math.max(...heights) - Math.min(...heights);
+        }).toBeLessThan(1);
+    });
 });
 
 test.describe("keyboard lifecycle", () => {

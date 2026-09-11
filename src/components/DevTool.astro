@@ -3682,7 +3682,11 @@
                 const target = e.target as HTMLElement;
                 const wrapper = target.closest('.photo-wrapper');
                 // Ensure clicks on toolbar elements get native menus or nothing
-                if (target.closest('.dev-block-toolbar') || target.closest('.dev-tag-edit-btn')) return;
+                if (
+                    target.closest('.dev-block-toolbar') ||
+                    target.closest('.dev-tag-edit-btn') ||
+                    target.closest('[data-album-photo-grid]')
+                ) return;
 
                 if (wrapper) {
                     e.preventDefault();

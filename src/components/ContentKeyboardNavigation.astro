@@ -31,7 +31,7 @@
                 document.querySelectorAll<HTMLElement>(
                     "[data-keyboard-navigation-target]",
                 ),
-            );
+            ).filter((target) => target.getClientRects().length > 0);
             if (targets.length === 0) return;
 
             const navbarHeight = 110;
