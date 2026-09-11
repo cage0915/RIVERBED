@@ -144,6 +144,21 @@ test('Page Manager route and UI use structured manifest metadata without frontma
     assert.doesNotMatch(devTool, /frontmatter:\s*newFM|parseFM\(data\.frontmatter\)/);
 });
 
+test('Page Manager photo thumbnails fall back from missing local assets to R2', () => {
+    const devTool = readProjectFile('src/components/DevTool.astro');
+
+    assert.match(devTool, /import \{ R2_DOMAIN \} from ["']\.\.\/lib\/constants["']/);
+    assert.match(
+        devTool,
+        /src="\/r2\/\$\{encodedKey\}" data-pm-fallback-url="\$\{R2_DOMAIN\}\/\$\{encodedKey\}"/,
+    );
+    assert.match(
+        devTool,
+        /querySelectorAll<HTMLImageElement>\('img\[data-pm-fallback-url\]'\)[\s\S]*?delete image\.dataset\.pmFallbackUrl;[\s\S]*?image\.src = fallbackUrl;/,
+    );
+    assert.match(devTool, /addEventListener\('error', useFallback, \{ once: true \}\)/);
+});
+
 test('Album R2 trash actions preserve the dry-run ETag', () => {
     const devTool = readProjectFile('src/components/DevTool.astro');
 

@@ -28,6 +28,7 @@
         remValueFromInput,
     } from "../lib/rem-spacing";
     import { applyDefaultCaptionBoundaryMargin } from "../lib/page-structure";
+    import { R2_DOMAIN } from "../lib/constants";
 
     // Only run in development
     if (import.meta.env.DEV) {
@@ -1698,7 +1699,7 @@
                 const localPhotos: Array<{ name: string; size: number; modified: string }> = data.localPhotos || [];
                 const importObjectUrls = new Map<File, string>();
                 const basename = (value: string) => value.replace(/^\/+/, '').split('/').pop() || value;
-                const photoPreviewUrl = (itemKey: string) => {
+                const photoPreviewAttributes = (itemKey: string) => {
                     const name = basename(itemKey);
                     const stagedFile = pendingPageImports.find((file) => file.name === name);
                     if (stagedFile) {
@@ -1707,10 +1708,11 @@
                             url = URL.createObjectURL(stagedFile);
                             importObjectUrls.set(stagedFile, url);
                         }
-                        return url;
+                        return `src="${url}"`;
                     }
                     const fullKey = itemKey.includes('/') ? itemKey : `${albumSlug}/${itemKey}`;
-                    return `/r2/${fullKey.split('/').map(encodeURIComponent).join('/')}`;
+                    const encodedKey = fullKey.split('/').map(encodeURIComponent).join('/');
+                    return `src="/r2/${encodedKey}" data-pm-fallback-url="${R2_DOMAIN}/${encodedKey}"`;
                 };
                 const localCoverName = () => fmData.coverKey.startsWith(`${albumSlug}/`)
                     ? basename(fmData.coverKey)
@@ -2001,7 +2003,7 @@
                                     ${block.photos.map((p: any, pIdx: number) => {
                                         const isSel = selectedPhoto?.bIdx === bIdx && selectedPhoto?.pIdx === pIdx;
                                         const isTarget = selectedPhoto && !(selectedPhoto.bIdx === bIdx && selectedPhoto.pIdx === pIdx);
-                                        return `<img src="${photoPreviewUrl(p.itemKey)}" loading="lazy" title="${p.itemKey.split('/').pop()}" data-bidx="${bIdx}" data-pidx="${pIdx}" class="pm-thumb-click${isSel ? ' pm-photo-selected' : ''}${isTarget ? ' pm-move-target' : ''}" style="cursor:${selectedPhoto ? 'copy' : 'pointer'};${isSel ? 'outline:2px solid #2563eb;outline-offset:1px;opacity:1;' : ''}" />`;
+                                        return `<img ${photoPreviewAttributes(p.itemKey)} loading="lazy" title="${p.itemKey.split('/').pop()}" data-bidx="${bIdx}" data-pidx="${pIdx}" class="pm-thumb-click${isSel ? ' pm-photo-selected' : ''}${isTarget ? ' pm-move-target' : ''}" style="cursor:${selectedPhoto ? 'copy' : 'pointer'};${isSel ? 'outline:2px solid #2563eb;outline-offset:1px;opacity:1;' : ''}" />`;
                                     }).join('')}
                                 </div>` : '<div style="flex:1;"></div>'}
                                 <div style="display:flex; align-items:center; gap:0.25rem; flex-shrink:0;">
@@ -2078,7 +2080,7 @@
                                             ${block.photos.map((p: any, pIdx: number) => `
                                                 <div class="dev-pm-photo${selectedPhoto && !(selectedPhoto.bIdx === bIdx && selectedPhoto.pIdx === pIdx) ? ' pm-move-target' : ''}${selectedPhoto?.bIdx === bIdx && selectedPhoto?.pIdx === pIdx ? ' pm-photo-selected' : ''}" data-p-idx="${pIdx}">
                                                     <span style="color: #999;">${ICONS.drag}</span>
-                                                    ${isLocalhost ? `<img src="${photoPreviewUrl(p.itemKey)}" loading="lazy" style="width:40px;height:30px;object-fit:cover;border-radius:3px;flex-shrink:0;" />` : ''}
+                                                    ${isLocalhost ? `<img ${photoPreviewAttributes(p.itemKey)} loading="lazy" style="width:40px;height:30px;object-fit:cover;border-radius:3px;flex-shrink:0;" />` : ''}
                                                     <span style="flex: 1;">${p.itemKey.split('/').pop()}</span>
                                                     ${block.type === 'PhotoCarousel' && pIdx === (block.props.initialSlide ?? 0) ? `<span style="display: flex; align-items: center; margin-right: 4px; color: #2563eb;" title="Initial Slide">${ICONS.slideOne}</span>` : ''}
                                                     ${block.type === 'PhotoCarousel' || block.photos.length > 1 ? `<div style="position: relative;">
@@ -2110,6 +2112,17 @@
                                     : ''}
                             <div class="dev-pm-inline-add-zone${gapSelectionMode ? ' is-active' : ''}"><button class="dev-pm-inline-add-button" type="button" data-page-gap-index="${bIdx + 1}" title="${gapSelectionMode ? 'Move here' : 'Add block here'}">${gapButtonIcon}</button>${bottomMarginControl}</div>
                         `;
+
+                        blockEl.querySelectorAll<HTMLImageElement>('img[data-pm-fallback-url]').forEach((image) => {
+                            const useFallback = () => {
+                                const fallbackUrl = image.dataset.pmFallbackUrl;
+                                if (!fallbackUrl) return;
+                                delete image.dataset.pmFallbackUrl;
+                                image.src = fallbackUrl;
+                            };
+                            image.addEventListener('error', useFallback, { once: true });
+                            if (image.complete && image.naturalWidth === 0) useFallback();
+                        });
 
                         // Block events
                         const capInput = blockEl.querySelector('.block-caption') as HTMLInputElement;
