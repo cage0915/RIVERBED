@@ -701,3 +701,16 @@ test("covered client scripts do not retain after-swap initializers", () => {
         /sortGroups\(\);\s*updateButtons\(\);\s*return \(\) =>/,
     );
 });
+
+test("album photo grid keeps the shared previous and next navigation visible", () => {
+    const albumPage = readProjectFile("src/pages/[folder]/[album].astro");
+
+    assert.match(
+        albumPage,
+        /<AlbumPagination previous=\{previousAlbum\} next=\{nextAlbum\} \/>/,
+    );
+    assert.doesNotMatch(
+        albumPage,
+        /\.album-page\[data-grid-active="true"\][\s\S]{0,160}:global\(\.album-pagination\)\s*\{[\s\S]{0,80}display:\s*none/,
+    );
+});
