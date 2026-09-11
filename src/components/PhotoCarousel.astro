@@ -41,13 +41,11 @@ const hasBottomCaption = caption && parsedPos === 'bottom';
 const styles = [];
 
 // Determine final margins
-const finalMT = mt || (hasTopCaption ? captionMargin : undefined);
+const finalMT = mt || (hasTopCaption ? captionMargin : undefined) || "1.5rem";
 const finalMB = mb || blockMargin || (hasBottomCaption ? captionMargin : "2rem");
 
 if (finalMT) {
     styles.push(`margin-top: ${finalMT} !important;`);
-} else if (hasTopCaption) {
-    styles.push("margin-top: 2rem;");
 }
 
 if (finalMB) {

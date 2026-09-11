@@ -23,6 +23,10 @@
         settleCoverSave,
     } from "../lib/dev-cover-state.js";
     import { installPageLifecycle } from "../lib/client-page-lifecycle";
+    import {
+        remValueForInput,
+        remValueFromInput,
+    } from "../lib/rem-spacing";
 
     // Only run in development
     if (import.meta.env.DEV) {
@@ -1479,7 +1483,7 @@
                                     </div>
                                     <label style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.75rem; color: #64748b;">
                                         Block Gap
-                                        <input type="text" id="dev-pm-gap" placeholder="0.5rem" style="width: 100%; box-sizing: border-box; padding: 0.4rem 0.6rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;" />
+                                        <input type="number" id="dev-pm-gap" step="0.1" inputmode="decimal" placeholder="0.5" style="width: 100%; box-sizing: border-box; padding: 0.4rem 0.6rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;" />
                                     </label>
                                 </div>
                             </div>
@@ -1551,7 +1555,7 @@
                 fInfo.value = fmData.info;
 
                 const fGap = dialog.querySelector("#dev-pm-gap") as HTMLInputElement;
-                fGap.value = String(data.metadata?.gap || '');
+                fGap.value = remValueForInput(data.metadata?.gap);
 
                 const fmSection = dialog.querySelector("#dev-pm-fm-section") as HTMLElement;
                 const fmToggle = dialog.querySelector("#dev-pm-fm-toggle") as HTMLButtonElement;
@@ -1644,7 +1648,7 @@
                     metadata: {
                         title: fTitle.value.trim(),
                         info: fInfo.value.trim(),
-                        gap: fGap.value.trim(),
+                        gap: remValueFromInput(fGap.value),
                     },
                     blocks: currentBlocks,
                     imports: pendingPageImports.map((file) => `${file.name}:${file.size}:${file.lastModified}`),
@@ -1839,8 +1843,8 @@
                                 ${block.type === 'Text' ? (() => {
                                     const align = block.props.align || 'center';
                                     const size = block.props.size || 'caption';
-                                    const mt = block.props.mt || '';
-                                    const mb = block.props.mb || '';
+                                    const mt = remValueForInput(block.props.mt);
+                                    const mb = remValueForInput(block.props.mb);
                                     return `
                                         <div style="display: flex; flex-direction: column; gap: 0.5rem; padding: 0.5rem 0;">
                                             <textarea class="text-block-content" placeholder="Enter text... Links: [text](/path) or [text](https://example.com)" style="width: 100%; box-sizing: border-box; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 0.85rem; min-height: 60px; resize: vertical; font-family: inherit;">${block.text || ''}</textarea>
@@ -1856,9 +1860,9 @@
                                                 </select>
                                                 <div style="display: flex; gap: 0.25rem; align-items: center; border-left: 1px solid #eee; padding-left: 0.5rem;">
                                                     <span style="color: #999; display:flex; align-items:center;" title="Margin top"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="4" x2="19" y2="4"/><polyline points="12 8 12 20"/><polyline points="8 12 12 8 16 12"/></svg></span>
-                                                    <input class="text-block-mt" type="text" placeholder="2rem" value="${mt}" style="width: 45px; padding: 4px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.75rem; text-align: center;" />
+                                                    <input class="text-block-mt" type="number" step="0.1" inputmode="decimal" placeholder="2" value="${mt}" style="width: 58px; padding: 4px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.75rem; text-align: center;" />
                                                     <span style="color: #999; display:flex; align-items:center;" title="Margin bottom"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="20" x2="19" y2="20"/><polyline points="12 16 12 4"/><polyline points="8 12 12 16 16 12"/></svg></span>
-                                                    <input class="text-block-mb" type="text" placeholder="0.5rem" value="${mb}" style="width: 45px; padding: 4px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.75rem; text-align: center;" />
+                                                    <input class="text-block-mb" type="number" step="0.1" inputmode="decimal" placeholder="0.5" value="${mb}" style="width: 58px; padding: 4px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.75rem; text-align: center;" />
                                                 </div>
                                             </div>
                                         </div>
@@ -1869,7 +1873,7 @@
 
                                     const renderPreview = () => {
                                         if (!block.props.caption) return '';
-                                        const val = block.props.captionMargin || '';
+                                        const val = remValueForInput(block.props.captionMargin);
                                         const marginInfo = val ? ` <span style="opacity: 0.5; font-size: 0.65rem;">(${val})</span>` : '';
                                         return `
                                             <div class="tree-caption-preview" style="font-size: 0.75rem; color: #000; padding: 0.25rem 0.5rem; border-left: 2px solid #22c55e; margin: 0.25rem 0; font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
@@ -1908,7 +1912,7 @@
                                                         ? `<span style="color: #999; display: flex; align-items: center; opacity: 0.6;" title="Caption Margin (above caption)"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="4" x2="19" y2="4"/><polyline points="12 8 12 20"/><polyline points="8 12 12 8 16 12"/></svg></span>`
                                                         : `<span style="color: #999; display: flex; align-items: center; opacity: 0.6;" title="Caption Margin (below caption)"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="20" x2="19" y2="20"/><polyline points="12 16 12 4"/><polyline points="8 12 12 16 16 12"/></svg></span>`
                                                     }
-                                                    <input class="block-margin-caption" type="text" placeholder="2rem" title="Caption Margin" value="${block.props.captionMargin || ''}" style="width: 45px; box-sizing:border-box; padding:4px; border:1px solid #ddd; border-radius:4px; font-size:0.75rem; text-align: center;" />
+                                                    <input class="block-margin-caption" type="number" step="0.1" inputmode="decimal" placeholder="2" title="Caption Margin" value="${remValueForInput(block.props.captionMargin)}" style="width: 58px; box-sizing:border-box; padding:4px; border:1px solid #ddd; border-radius:4px; font-size:0.75rem; text-align: center;" />
                                                     ${block.props.captionMargin ? `
                                                         <button class="margin-caption-reset" title="Clear margin" style="background: none; border: none; padding: 2px; cursor: pointer; color: #ef4444; opacity: 0.8; display:flex; align-items:center;">${ICONS.minus}</button>
                                                     ` : ''}
@@ -1951,7 +1955,7 @@
 
                                         <div style="display: flex; align-items: center; gap: 0.4rem; justify-content: center; padding-top: 0.5rem; border-top: 1px dashed #eee; margin-top: 0.5rem;">
                                             <span style="color: #999; display: flex; align-items: center; opacity: 0.6;" title="Block Spacing"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="20" x2="19" y2="20"/><polyline points="12 16 12 4"/><polyline points="8 12 12 16 16 12"/></svg></span>
-                                            <input class="block-margin-block" type="text" placeholder="${block.type === 'PhotoCarousel' ? '2rem' : (fGap.value || '0.5rem')}" title="Block Margin" value="${block.props.blockMargin || ''}" style="width:45px; padding:2px 4px; border:1px solid #ddd; border-radius:3px; font-size:0.7rem; text-align:center;" />
+                                            <input class="block-margin-block" type="number" step="0.1" inputmode="decimal" placeholder="${block.type === 'PhotoCarousel' ? '2' : (fGap.value || '0.5')}" title="Block Margin" value="${remValueForInput(block.props.blockMargin)}" style="width:58px; padding:2px 4px; border:1px solid #ddd; border-radius:3px; font-size:0.7rem; text-align:center;" />
                                             ${block.props.blockMargin ? `
                                                 <button class="margin-block-reset" title="Clear spacing" style="background:none; border:none; padding:2px; cursor:pointer; color:#ef4444; opacity:0.8; display:flex; align-items:center;">${ICONS.minus}</button>
                                             ` : ''}
@@ -2025,7 +2029,8 @@
                             // Otherwise update preview directly for performance
                             const preview = blockEl.querySelector('.tree-caption-preview');
                             if (preview) {
-                                preview.innerHTML = `${block.props.caption}${block.props.captionMargin ? ` <span style="opacity: 0.5; font-size: 0.65rem;">(${block.props.captionMargin})</span>` : ''}`;
+                                const captionMargin = remValueForInput(block.props.captionMargin);
+                                preview.innerHTML = `${block.props.caption}${captionMargin ? ` <span style="opacity: 0.5; font-size: 0.65rem;">(${captionMargin})</span>` : ''}`;
                             }
                         });
 
@@ -2043,7 +2048,7 @@
 
                         const marginCaptionInput = blockEl.querySelector('.block-margin-caption') as HTMLInputElement;
                         marginCaptionInput?.addEventListener('change', () => {
-                            block.props.captionMargin = marginCaptionInput.value.trim();
+                            block.props.captionMargin = remValueFromInput(marginCaptionInput.value);
                         });
                         blockEl.querySelector('.margin-caption-reset')?.addEventListener('click', (e) => {
                             e.stopPropagation();
@@ -2053,7 +2058,7 @@
 
                         const marginBlockInput = blockEl.querySelector('.block-margin-block') as HTMLInputElement;
                         marginBlockInput?.addEventListener('input', () => {
-                            block.props.blockMargin = marginBlockInput.value.trim();
+                            block.props.blockMargin = remValueFromInput(marginBlockInput.value);
                         });
                         blockEl.querySelector('.margin-block-reset')?.addEventListener('click', (e) => {
                             e.stopPropagation();
@@ -2123,8 +2128,8 @@
                             textArea?.addEventListener('input', () => { block.text = textArea.value; });
                             alignSel?.addEventListener('change', () => { block.props.align = alignSel.value; });
                             sizeSel?.addEventListener('change', () => { block.props.size = sizeSel.value; });
-                            mtInput?.addEventListener('change', () => { block.props.mt = mtInput.value.trim(); });
-                            mbInput?.addEventListener('change', () => { block.props.mb = mbInput.value.trim(); });
+                            mtInput?.addEventListener('change', () => { block.props.mt = remValueFromInput(mtInput.value); });
+                            mbInput?.addEventListener('change', () => { block.props.mb = remValueFromInput(mbInput.value); });
                         }
                         blockEl.querySelector('.block-add-photos')?.addEventListener('click', (event) => {
                             event.stopPropagation();
@@ -2298,7 +2303,7 @@
                             metadata: {
                                 title: fTitle.value.trim(),
                                 info: fInfo.value.trim() || undefined,
-                                gap: fGap.value.trim() || undefined,
+                                gap: remValueFromInput(fGap.value) || undefined,
                             },
                             removeLocal: [...pendingLocalRemovals],
                         }));

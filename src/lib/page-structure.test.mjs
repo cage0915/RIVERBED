@@ -104,9 +104,28 @@ test('Page Manager block spacing updates its draft during input', () => {
 
     assert.match(
         devTool,
-        /marginBlockInput\?\.addEventListener\('input',[\s\S]*?block\.props\.blockMargin = marginBlockInput\.value\.trim\(\)/,
+        /marginBlockInput\?\.addEventListener\('input',[\s\S]*?block\.props\.blockMargin = remValueFromInput\(marginBlockInput\.value\)/,
     );
     assert.doesNotMatch(devTool, /marginBlockInput\?\.addEventListener\('change'/);
+});
+
+test('Page Manager edits every rem spacing field as a unitless number', () => {
+    const devTool = readProjectFile('src/components/DevTool.astro');
+
+    for (const className of [
+        'text-block-mt',
+        'text-block-mb',
+        'block-margin-caption',
+        'block-margin-block',
+    ]) {
+        assert.match(
+            devTool,
+            new RegExp(`class="${className}" type="number"`),
+        );
+    }
+    assert.match(devTool, /type="number" id="dev-pm-gap"/);
+    assert.match(devTool, /gap: remValueFromInput\(fGap\.value\)/);
+    assert.match(devTool, /gap: remValueFromInput\(fGap\.value\) \|\| undefined/);
 });
 
 test('tag and photo-caption APIs persist metadata only through Album manifests', () => {
@@ -508,6 +527,24 @@ test('catalog routes share lifecycle-scoped card interactions', () => {
     assert.doesNotMatch(
         interactions,
         /document\.querySelectorAll[^;]*\.album-card/,
+    );
+});
+
+test('album blocks use native margin collapsing for predictable spacing', () => {
+    const albumPage = readProjectFile('src/pages/[folder]/[album].astro');
+    const carousel = readProjectFile('src/components/PhotoCarousel.astro');
+
+    assert.match(
+        albumPage,
+        /\.album-content\s*\{[^}]*display:\s*flow-root;/,
+    );
+    assert.doesNotMatch(
+        albumPage,
+        /\.album-content\s*\{[^}]*display:\s*flex;/,
+    );
+    assert.match(
+        carousel,
+        /const finalMT = mt \|\| \(hasTopCaption \? captionMargin : undefined\) \|\| ["']1\.5rem["'];/,
     );
 });
 
