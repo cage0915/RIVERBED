@@ -27,6 +27,7 @@
         remValueForInput,
         remValueFromInput,
     } from "../lib/rem-spacing";
+    import { applyDefaultCaptionBoundaryMargin } from "../lib/page-structure";
 
     // Only run in development
     if (import.meta.env.DEV) {
@@ -1671,22 +1672,21 @@
                 updateFMState();
 
                 let currentBlocks = JSON.parse(JSON.stringify(data.blocks)).map((b: any) => {
-                    // Migrate legacy props to semantic ones on load
-                    if (b.props.mt && b.props.caption && !b.props.captionMargin) {
-                        b.props.captionMargin = b.props.mt;
-                        delete b.props.mt;
-                    }
-                    if (b.props.mb && b.props.caption && !b.props.captionMargin && !b.props.captionPosition?.includes('top')) {
-                        // If it's a bottom caption, mb might have been intended for it
-                        b.props.captionMargin = b.props.mb;
-                        delete b.props.mb;
-                    }
+                    // Retire legacy media-block spacing props on load.
                     if (b.props.mb && !b.props.blockMargin) {
                         b.props.blockMargin = b.props.mb;
+                    }
+                    if (b.type !== 'Text') {
+                        delete b.props.mt;
                         delete b.props.mb;
+                        delete b.props.captionMargin;
                     }
                     return b;
                 });
+                const applyCaptionSpacing = (blockIndex: number) => applyDefaultCaptionBoundaryMargin(
+                    currentBlocks,
+                    blockIndex,
+                );
                 let collapsedBlocks: Set<number> = new Set(
                     currentBlocks.map((_: any, i: number) => i),
                 ); // All collapsed by default
@@ -1749,6 +1749,9 @@
                     removeLocal: [...pendingLocalRemovals].sort(),
                 });
                 let initialPageSnapshot = pageStateSnapshot();
+                currentBlocks.forEach((block: any, index: number) => {
+                    if (block.props.caption) applyCaptionSpacing(index);
+                });
                 const updatePageDirtyState = () => {
                     const dirty = pageStateSnapshot() !== initialPageSnapshot;
                     confirmBtn.disabled = !dirty;
@@ -1910,12 +1913,14 @@
                             resetClass,
                             label,
                             defaultValue,
+                            persistDefault = false,
                         }: {
                             edge: 'top' | 'bottom';
                             property: 'mt' | 'mb' | 'blockMargin';
                             resetClass: string;
                             label: string;
                             defaultValue: string;
+                            persistDefault?: boolean;
                         }) => {
                             const value = remValueForInput(block.props[property]);
                             const hasCustomValue = Boolean(value && value !== defaultValue);
@@ -1928,7 +1933,7 @@
                                     ? `<input class="text-block-mb" type="number" step="0.1" inputmode="decimal" placeholder="${defaultValue}" value="${hasCustomValue ? value : ''}" aria-label="${label} in rem" />`
                                     : `<input class="block-margin-block" type="number" step="0.1" inputmode="decimal" placeholder="${defaultValue}" value="${hasCustomValue ? value : ''}" aria-label="${label} in rem" />`;
                             return `
-                                <div class="dev-pm-margin-control dev-pm-margin-control--${edge}${hasCustomValue ? ' has-custom' : ''}" data-margin-property="${property}" data-margin-default="${defaultValue}">
+                                <div class="dev-pm-margin-control dev-pm-margin-control--${edge}${hasCustomValue ? ' has-custom' : ''}" data-margin-property="${property}" data-margin-default="${defaultValue}" data-margin-persist-default="${persistDefault}">
                                     <div class="dev-pm-margin-pill" title="${label}">
                                         <button class="dev-pm-margin-icon dev-pm-margin-reset ${resetClass}" type="button" ${hasCustomValue ? `title="Use default ${defaultValue}rem" aria-label="Reset ${label}"` : 'disabled aria-hidden="true" tabindex="-1"'}>
                                             <span class="dev-pm-margin-icon-direction">${icon}</span>
@@ -1949,20 +1954,32 @@
                                 defaultValue: '2',
                             })
                             : '';
+                        const hasBottomCaption = Boolean(block.props.caption
+                            && !block.props.captionPosition?.includes('top'));
+                        const nextBlock = currentBlocks[bIdx + 1];
+                        const nextHasTopCaption = Boolean(nextBlock?.props.caption
+                            && nextBlock.props.captionPosition?.includes('top'));
+                        const usesCaptionSpacing = bIdx < currentBlocks.length - 1
+                            && (hasBottomCaption || nextHasTopCaption);
+                        const defaultBottomMargin = block.type === 'Text'
+                            ? '0.5'
+                            : block.type === 'PhotoCarousel' ? '2' : (fGap.value || '0.5');
                         const bottomMarginControl = block.type === 'Text'
                             ? renderBoundaryMargin({
                                 edge: 'bottom',
                                 property: 'mb',
                                 resetClass: 'margin-text-mb-reset',
                                 label: 'Bottom margin',
-                                defaultValue: '0.5',
+                                defaultValue: defaultBottomMargin,
+                                persistDefault: usesCaptionSpacing,
                             })
                             : renderBoundaryMargin({
                                 edge: 'bottom',
                                 property: 'blockMargin',
                                 resetClass: 'margin-block-reset',
                                 label: 'Block margin',
-                                defaultValue: block.type === 'PhotoCarousel' ? '2' : (fGap.value || '0.5'),
+                                defaultValue: defaultBottomMargin,
+                                persistDefault: usesCaptionSpacing,
                             });
                         const blockEl = document.createElement('div');
                         blockEl.className = `dev-pm-block ${isCollapsed ? 'collapsed' : ''}`;
@@ -2019,11 +2036,9 @@
 
                                     const renderPreview = () => {
                                         if (!block.props.caption) return '';
-                                        const val = remValueForInput(block.props.captionMargin);
-                                        const marginInfo = val ? ` <span style="opacity: 0.5; font-size: 0.65rem;">(${val})</span>` : '';
                                         return `
                                             <div class="tree-caption-preview" style="font-size: 0.75rem; color: #000; padding: 0.25rem 0.5rem; border-left: 2px solid #22c55e; margin: 0.25rem 0; font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                                ${block.props.caption}${marginInfo}
+                                                ${block.props.caption}
                                             </div>
                                         `;
                                     };
@@ -2040,8 +2055,7 @@
                                                 <button class="caption-delete" title="Delete Caption" style="background: none; border: none; cursor: pointer; color: #ef4444; opacity: 0.6; display: flex; align-items: center;">${ICONS.trash}</button>
                                             </div>
 
-                                            <div style="display: flex; gap: 0.5rem; align-items: center;">
-                                                <div style="display: flex; gap: 0.25rem; flex: 1;">
+                                            <div style="display: flex; gap: 0.25rem; align-items: center;">
                                                     <select class="block-align" style="flex: 1; font-size:0.75rem; padding:4px; border:1px solid #ddd; border-radius:4px; background: white;">
                                                         <option value="left" ${block.props.captionPosition?.includes('left') ? 'selected' : ''}>Left</option>
                                                         <option value="center" ${(!block.props.captionPosition || block.props.captionPosition.includes('center')) ? 'selected' : ''}>Center</option>
@@ -2051,18 +2065,6 @@
                                                         <option value="top" ${vpos === 'top' ? 'selected' : ''}>Top</option>
                                                         <option value="bottom" ${vpos === 'bottom' ? 'selected' : ''}>Bottom</option>
                                                     </select>
-                                                </div>
-
-                                                <div style="display: flex; gap: 0.25rem; align-items: center; border-left: 1px solid #eee; padding-left: 0.5rem;">
-                                                    ${vpos === 'top'
-                                                        ? `<span style="color: #999; display: flex; align-items: center; opacity: 0.6;" title="Caption Margin (above caption)"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="4" x2="19" y2="4"/><polyline points="12 8 12 20"/><polyline points="8 12 12 8 16 12"/></svg></span>`
-                                                        : `<span style="color: #999; display: flex; align-items: center; opacity: 0.6;" title="Caption Margin (below caption)"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="20" x2="19" y2="20"/><polyline points="12 16 12 4"/><polyline points="8 12 12 16 16 12"/></svg></span>`
-                                                    }
-                                                    <input class="block-margin-caption" type="number" step="0.1" inputmode="decimal" placeholder="2" title="Caption Margin" value="${remValueForInput(block.props.captionMargin)}" style="width: 58px; box-sizing:border-box; padding:4px; border:1px solid #ddd; border-radius:4px; font-size:0.75rem; text-align: center;" />
-                                                    ${block.props.captionMargin ? `
-                                                        <button class="margin-caption-reset" title="Clear margin" style="background: none; border: none; padding: 2px; cursor: pointer; color: #ef4444; opacity: 0.8; display:flex; align-items:center;">${ICONS.minus}</button>
-                                                    ` : ''}
-                                                </div>
                                             </div>
                                         </div>
                                     `;
@@ -2149,6 +2151,7 @@
                             // Trigger re-render now that IME composition is committed
                             const oldVal = block.props.caption;
                             block.props.caption = capInput.value.trim();
+                            if (!oldVal && block.props.caption) applyCaptionSpacing(bIdx);
                             if (!oldVal || !block.props.caption) {
                                 renderTree();
                                 refocusCaptionInput();
@@ -2160,6 +2163,7 @@
 
                             const oldVal = block.props.caption;
                             block.props.caption = capInput.value.trim();
+                            if (!oldVal && block.props.caption) applyCaptionSpacing(bIdx);
 
                             // If first character or cleared, re-render to create/remove the preview element
                             if (!oldVal || !block.props.caption) {
@@ -2171,8 +2175,7 @@
                             // Otherwise update preview directly for performance
                             const preview = blockEl.querySelector('.tree-caption-preview');
                             if (preview) {
-                                const captionMargin = remValueForInput(block.props.captionMargin);
-                                preview.innerHTML = `${block.props.caption}${captionMargin ? ` <span style="opacity: 0.5; font-size: 0.65rem;">(${captionMargin})</span>` : ''}`;
+                                preview.textContent = block.props.caption;
                             }
                         });
 
@@ -2185,25 +2188,19 @@
                         vposSel?.addEventListener('change', () => {
                             const align = alignSel?.value || (block.props.captionPosition?.includes('right') ? 'right' : block.props.captionPosition?.includes('left') ? 'left' : 'center');
                             block.props.captionPosition = `${align} ${vposSel.value}`;
+                            applyCaptionSpacing(bIdx);
                             renderTree(); // Shift editor position
-                        });
-
-                        const marginCaptionInput = blockEl.querySelector('.block-margin-caption') as HTMLInputElement;
-                        marginCaptionInput?.addEventListener('change', () => {
-                            block.props.captionMargin = remValueFromInput(marginCaptionInput.value);
-                        });
-                        blockEl.querySelector('.margin-caption-reset')?.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            block.props.captionMargin = "";
-                            renderTree();
                         });
 
                         const syncBoundaryMarginControl = (input: HTMLInputElement, property: 'mt' | 'mb' | 'blockMargin') => {
                             const control = input.closest('.dev-pm-margin-control') as HTMLElement | null;
                             const defaultValue = control?.dataset.marginDefault || '';
+                            const persistDefault = control?.dataset.marginPersistDefault === 'true';
                             const hasCustomValue = Boolean(block.props[property]
                                 && remValueForInput(block.props[property]) !== defaultValue);
-                            if (!hasCustomValue) block.props[property] = "";
+                            if (!hasCustomValue) {
+                                block.props[property] = persistDefault ? `${defaultValue}rem` : "";
+                            }
                             control?.classList.toggle('has-custom', hasCustomValue);
                             const reset = control?.querySelector('.dev-pm-margin-reset') as HTMLButtonElement | null;
                             if (reset) {
@@ -2233,7 +2230,6 @@
                         blockEl.querySelector('.caption-delete')?.addEventListener('click', (e) => {
                             e.stopPropagation();
                             block.props.caption = "";
-                            block.props.captionMargin = "";
                             block.props.captionPosition = "center bottom";
                             captionOpenBlocks.delete(bIdx);
                             renderTree();

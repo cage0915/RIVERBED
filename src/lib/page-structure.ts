@@ -5,6 +5,36 @@ type PageBlock = {
     text?: string;
 };
 
+function remNumber(value: unknown) {
+    const text = String(value ?? '').trim().replace(/rem$/i, '').trim();
+    if (!/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(text)) return '';
+    const number = Number(text);
+    return Number.isFinite(number) ? String(Object.is(number, -0) ? 0 : number) : '';
+}
+
+export function applyDefaultCaptionBoundaryMargin(
+    blocks: PageBlock[],
+    blockIndex: number,
+) {
+    const block = blocks[blockIndex];
+    if (!block || block.type === 'Text') return false;
+
+    const captionIsTop = block.props?.captionPosition?.includes('top');
+    const targetIndex = captionIsTop ? blockIndex - 1 : blockIndex;
+    const hasAdjacentBlock = captionIsTop ? blockIndex > 0 : blockIndex < blocks.length - 1;
+    if (!hasAdjacentBlock) return false;
+
+    const target = blocks[targetIndex];
+    target.props ||= {};
+    const property = target.type === 'Text' ? 'mb' : 'blockMargin';
+    const currentValue = remNumber(target.props[property]);
+
+    // Initialize caption spacing without replacing a margin the user customized.
+    if (currentValue) return false;
+    target.props[property] = '1.5rem';
+    return true;
+}
+
 export function serializePageBody(blocks: PageBlock[]) {
     let body = '';
     for (const block of blocks) {
@@ -14,7 +44,7 @@ export function serializePageBody(blocks: PageBlock[]) {
             if (props.align && props.align !== 'center') propsText += `\n  align="${props.align}"`;
             if (props.size && props.size !== 'caption') propsText += `\n  size="${props.size}"`;
             if (props.mt && props.mt !== '2rem') propsText += `\n  mt="${props.mt}"`;
-            if (props.mb && props.mb !== '0.5rem') propsText += `\n  mb="${props.mb}"`;
+            if (props.mb) propsText += `\n  mb="${props.mb}"`;
             body += `<Text${propsText}>\n  ${block.text || ''}\n</Text>\n\n`;
             continue;
         }
@@ -22,11 +52,9 @@ export function serializePageBody(blocks: PageBlock[]) {
         let propsText = '';
         if (props.caption) propsText += `\n  caption="${props.caption}"`;
         if (props.captionPosition && props.captionPosition !== 'center bottom') propsText += `\n  captionPosition="${props.captionPosition}"`;
-        if (props.captionMargin) propsText += `\n  captionMargin="${props.captionMargin}"`;
         if (props.blockMargin) propsText += `\n  blockMargin="${props.blockMargin}"`;
         if (block.type === 'PhotoCarousel' && props.initialSlide) propsText += `\n  initialSlide={${props.initialSlide}}`;
-        if (!props.captionMargin && props.caption && props.mt) propsText += `\n  captionMargin="${props.mt}"`;
-        if (!props.blockMargin && !props.captionMargin && props.mb) propsText += `\n  blockMargin="${props.mb}"`;
+        if (!props.blockMargin && props.mb) propsText += `\n  blockMargin="${props.mb}"`;
 
         body += `<${block.type}${propsText}>\n`;
         for (const photo of block.photos || []) {

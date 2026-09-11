@@ -2,7 +2,11 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
 
-import { createLayoutOnlyPageContent, referencedLocalNames } from './page-structure.ts';
+import {
+    applyDefaultCaptionBoundaryMargin,
+    createLayoutOnlyPageContent,
+    referencedLocalNames,
+} from './page-structure.ts';
 
 const readProjectFile = (path) => readFileSync(new URL(`../../${path}`, import.meta.url), 'utf8');
 
@@ -74,6 +78,56 @@ test('layout-only Page Manager serialization never writes Album metadata to MDX'
     );
 });
 
+test('caption spacing initializes the adjacent block bottom margin without replacing custom spacing', () => {
+    const topBlocks = [
+        { type: 'Row', props: {}, photos: [] },
+        { type: 'Row', props: { caption: 'Top', captionPosition: 'center top' }, photos: [] },
+    ];
+    assert.equal(applyDefaultCaptionBoundaryMargin(topBlocks, 1), true);
+    assert.equal(topBlocks[0].props.blockMargin, '1.5rem');
+
+    const bottomBlocks = [
+        { type: 'Row', props: {}, photos: [] },
+        { type: 'Row', props: { caption: 'Bottom', blockMargin: '3rem' }, photos: [] },
+        { type: 'Text', props: {}, text: 'Next' },
+    ];
+    assert.equal(applyDefaultCaptionBoundaryMargin(bottomBlocks, 1), false);
+    assert.equal(bottomBlocks[1].props.blockMargin, '3rem');
+
+    bottomBlocks[1].props.blockMargin = '0.5rem';
+    assert.equal(applyDefaultCaptionBoundaryMargin(bottomBlocks, 1), false);
+    assert.equal(bottomBlocks[1].props.blockMargin, '0.5rem');
+    delete bottomBlocks[1].props.blockMargin;
+    assert.equal(applyDefaultCaptionBoundaryMargin(bottomBlocks, 1), true);
+    assert.equal(bottomBlocks[1].props.blockMargin, '1.5rem');
+    assert.equal(applyDefaultCaptionBoundaryMargin(bottomBlocks, 2), false);
+});
+
+test('Page Manager serialization retires captionMargin', () => {
+    const content = createLayoutOnlyPageContent([
+        {
+            type: 'Row',
+            props: { caption: 'Caption', captionMargin: '3rem', blockMargin: '1.5rem' },
+            photos: [{ itemKey: 'one.jpg' }],
+        },
+    ]);
+    assert.doesNotMatch(content, /captionMargin/);
+    assert.match(content, /blockMargin="1\.5rem"/);
+});
+
+test('existing caption spacing is a pending explicit Page Manager change', () => {
+    const devTool = readProjectFile('src/components/DevTool.astro');
+
+    assert.match(
+        devTool,
+        /let initialPageSnapshot = pageStateSnapshot\(\);\s*currentBlocks\.forEach\([\s\S]*?applyCaptionSpacing\(index\)/,
+    );
+    assert.match(
+        devTool,
+        /persistDefault = control\?\.dataset\.marginPersistDefault === 'true'[\s\S]*?persistDefault \? `\$\{defaultValue\}rem`/,
+    );
+});
+
 test('Page Manager route and UI use structured manifest metadata without frontmatter writeback', () => {
     const getStructure = readProjectFile('src/dev-api/get-page-structure.ts');
     const saveManager = readProjectFile('src/dev-api/save-page-manager.ts');
@@ -127,7 +181,6 @@ test('Page Manager edits every rem spacing field as a unitless number', () => {
     for (const className of [
         'text-block-mt',
         'text-block-mb',
-        'block-margin-caption',
         'block-margin-block',
     ]) {
         assert.match(
@@ -138,6 +191,7 @@ test('Page Manager edits every rem spacing field as a unitless number', () => {
     assert.match(devTool, /type="number" id="dev-pm-gap"/);
     assert.match(devTool, /gap: remValueFromInput\(fGap\.value\)/);
     assert.match(devTool, /gap: remValueFromInput\(fGap\.value\) \|\| undefined/);
+    assert.doesNotMatch(devTool, /block-margin-caption/);
 });
 
 test('tag and photo-caption APIs persist metadata only through Album manifests', () => {

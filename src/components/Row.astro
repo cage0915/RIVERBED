@@ -36,14 +36,10 @@ const finalMB = mb || blockMargin || (hasBottomCaption ? captionMargin : undefin
 
 if (finalMT) {
     styles.push(`margin-top: ${finalMT} !important;`);
-} else if (hasTopCaption) {
-    styles.push("margin-top: 2rem;");
 }
 
 if (finalMB) {
     styles.push(`margin-bottom: ${finalMB} !important;`);
-} else if (hasBottomCaption) {
-    styles.push("margin-bottom: 2rem;");
 }
 ---
 
