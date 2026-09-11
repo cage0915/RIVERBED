@@ -290,10 +290,6 @@
       "tags": []
     },
     {
-      "filename": "KCS07554.jpg",
-      "tags": []
-    },
-    {
       "filename": "KCS07564.jpg",
       "tags": []
     },
@@ -347,26 +343,6 @@
       ]
     },
     {
-      "filename": "KCS07651.jpg",
-      "tags": [
-        {
-          "name": "槍ヶ岳",
-          "x": 46.33,
-          "y": 31.89
-        }
-      ]
-    },
-    {
-      "filename": "KCS07687.jpg",
-      "tags": [
-        {
-          "name": "槍ヶ岳",
-          "x": 24.18,
-          "y": 9.04
-        }
-      ]
-    },
-    {
       "filename": "KCS07690.jpg",
       "tags": [
         {
@@ -413,31 +389,6 @@
     {
       "filename": "KCS07787.jpg",
       "tags": []
-    },
-    {
-      "filename": "KCS07721.jpg",
-      "tags": [
-        {
-          "name": "大天井岳",
-          "x": 20.04,
-          "y": 19.51
-        },
-        {
-          "name": "東天井岳",
-          "x": 57.93,
-          "y": 23.29
-        },
-        {
-          "name": "横通岳",
-          "x": 85.13,
-          "y": 23.29
-        },
-        {
-          "name": "赤岩岳",
-          "x": 73.66,
-          "y": 28.78
-        }
-      ]
     },
     {
       "filename": "KCS07768.jpg",
@@ -619,10 +570,6 @@
     },
     {
       "filename": "KCS07964.jpg",
-      "tags": []
-    },
-    {
-      "filename": "KCS07878.jpg",
       "tags": []
     },
     {

@@ -1,7 +1,6 @@
 {
   "schemaVersion": 1,
   "title": "２０２４",
-  "info": "",
   "order": 20,
   "cover": {
     "photo": {
@@ -17,10 +16,6 @@
   "photos": [
     {
       "filename": "KCS00491.jpg",
-      "tags": []
-    },
-    {
-      "filename": "KCS00502.jpg",
       "tags": []
     },
     {
