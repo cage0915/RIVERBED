@@ -141,10 +141,12 @@ test('caption serialization and pending preview preserve manual line breaks', ()
 test('Text serialization uses one bottom block margin and retires legacy Text margins', () => {
     const content = createLayoutOnlyPageContent([
         { type: 'Text', props: { align: 'left', size: 'title', mt: '2rem', mb: '1.5rem' }, text: 'Section' },
+        { type: 'Row', props: { blockMargin: '0.5rem' }, photos: [{ itemKey: 'one.jpg' }] },
     ]);
 
     assert.match(content, /<Text\s+align="left"\s+size="title"\s+blockMargin="1\.5rem">/);
     assert.doesNotMatch(content, /\smt=|\smb=/);
+    assert.doesNotMatch(content, /blockMargin="0\.5rem"/);
 });
 
 test('caption spacing is applied when direct block changes are saved', () => {
@@ -153,6 +155,41 @@ test('caption spacing is applied when direct block changes are saved', () => {
     assert.match(
         devTool,
         /structure\.blocks\[targetIndex\]\.props = props;\s*if \(change\.caption\) applyDefaultCaptionBoundaryMargin\(structure\.blocks, targetIndex\)/,
+    );
+});
+
+test('new pending captions immediately stage their 1.5rem boundary margin', () => {
+    const devTool = readProjectFile('src/components/DevTool.astro');
+
+    assert.match(devTool, /automaticSpacingKey\?: string/);
+    assert.match(
+        devTool,
+        /const reconcileAutomaticBlockMargins = \(\) => \{[\s\S]*?collectRequiredBoundaries[\s\S]*?captionPosition\.includes\('top'\)[\s\S]*?action: isRequired \? 'set' : 'remove'/,
+    );
+    assert.match(
+        devTool,
+        /if \(pendingMarginEntry && !pendingMarginEntry\[1\]\.automaticSpacingKey\)[\s\S]*?stageBlockMargin\('1\.5rem', detail\.spacingKey, true\)/,
+    );
+    assert.match(
+        devTool,
+        /updateCaptionPreview\(caption, captionPosition, matchesFile\);\s*reconcileAutomaticBlockMargins\(\)/,
+    );
+});
+
+test('deleting a persisted caption restores its default boundary margin as pending', () => {
+    const devTool = readProjectFile('src/components/DevTool.astro');
+
+    assert.match(
+        devTool,
+        /const sourceBoundaries = collectRequiredBoundaries\(false\);\s*const pendingBoundaries = collectRequiredBoundaries\(true\)/,
+    );
+    assert.match(
+        devTool,
+        /if \(detail\.action === 'remove'\) \{[\s\S]*?remValueFromInput\(originalBlockMargin\) === '1\.5rem'[\s\S]*?stageBlockMargin\('', detail\.spacingKey, true\)/,
+    );
+    assert.match(
+        devTool,
+        /if \(change\.blockMargin && change\.blockMargin !== '0\.5rem'\) props\.blockMargin = change\.blockMargin;\s*else delete props\.blockMargin/,
     );
 });
 
@@ -203,16 +240,16 @@ test('direct block margin control stages changes for the shared save action', ()
         devTool,
         /dev-inline-margin-control[\s\S]*?dev-inline-margin-input[\s\S]*?dev-inline-margin-save/,
     );
-    assert.match(devTool, /pendingBlockMarginChanges\.set\(marginChangeKey/);
+    assert.match(devTool, /pendingBlockMarginChanges\.set\(pendingMarginKey/);
     assert.match(
         devTool,
         /const fileEffectiveMargin = remValueFromInput\(remValueForInput\(originalBlockMargin \|\| visibleMargin\)\)/,
     );
     assert.match(devTool, /const expectedEffectiveMargin = originalBlockMargin[\s\S]*?defaultMarginForType\(displayedType\)/);
     assert.match(devTool, /const matchesFile = blockMargin === expectedEffectiveMargin/);
-    assert.match(devTool, /if \(matchesFile\) \{\s*pendingBlockMarginChanges\.delete\(marginChangeKey\)/);
+    assert.match(devTool, /if \(matchesFile\) \{\s*if \(pendingMarginEntry\) pendingBlockMarginChanges\.delete\(pendingMarginEntry\[0\]\)/);
     assert.match(devTool, /updateMarginPreview\(matchesFile \? originalBlockMargin : blockMargin\)/);
-    assert.match(devTool, /savePendingBlockChanges/);
+    assert.match(devTool, /savePendingPageChanges/);
     assert.match(devTool, /dev-inline-margin-control\.has-data:hover[\s\S]*?background: rgba\(59, 130, 246, 0\.8\)/);
     assert.match(devTool, /activeMarginControl && activeMarginControl !== marginControl[\s\S]*?classList\.remove\('is-open'\)/);
     assert.doesNotMatch(devTool, /block-margin-block|margin-block-reset/);
@@ -226,7 +263,7 @@ test('Page Manager delegates all Text settings to the direct Text toolbar', () =
     assert.doesNotMatch(devTool, /dev-pm-margin-control|text-block-mt|text-block-mb|text-block-content|text-block-align|text-block-size/);
     assert.match(devTool, /dev-btn-text[\s\S]*?dev-toolbar-text-icon[\s\S]*?>T</);
     assert.match(devTool, /dev-inline-text-input[\s\S]*?dev-inline-text-align[\s\S]*?dev-inline-text-type/);
-    assert.match(devTool, /pendingTextChanges\.set\(textChangeKey/);
+    assert.match(devTool, /pendingTextChanges\.set\(pendingTextKey/);
     assert.match(devTool, /textButton\?\.classList\.toggle\('has-pending', !matchesFile\)/);
     assert.match(text, /data-dev-block=\{isDev \? "text" : undefined\}/);
     assert.match(text, /margin-bottom: \$\{finalBlockMargin\}/);
@@ -257,6 +294,8 @@ test('development block toolbar stacks tag editing above a bottom-aligned captio
     assert.match(devTool, /const setBlockTagMode = \(block: HTMLElement\)/);
     assert.match(devTool, /activeTagBlock === block[\s\S]*?closeActiveTagBlock\(\)/);
     assert.match(devTool, /dev-block-overlay\.dev-tag-mode \.tags-overlay/);
+    assert.match(devTool, /\.dev-block-overlay\.dev-tag-mode \.photo-wrapper[\s\S]*?cursor: crosshair/);
+    assert.doesNotMatch(devTool, /\n\s+\.photo-wrapper\s*\{\s*cursor: crosshair/);
     assert.match(devTool, /if \(!wrapper\.closest\('\.dev-tag-mode'\)\) return;/);
     assert.match(devTool, /editor\.className = 'dev-inline-caption-editor';/);
     assert.match(devTool, /blockElement\.insertBefore\(editor, captionAnchor\);/);
@@ -265,6 +304,21 @@ test('development block toolbar stacks tag editing above a bottom-aligned captio
     assert.match(devTool, /if \(matchesFile\) \{\s*pendingCaptionChanges\.delete\(captionChangeKey\)/);
     assert.match(devTool, /saveBtn\.addEventListener\('click', savePendingChanges\)/);
     assert.match(devTool, /sessionStorage\.setItem\('dev-caption-save-scroll-y'/);
+});
+
+test('pending captions share the component presentation used by persisted captions', () => {
+    const devTool = readProjectFile('src/components/DevTool.astro');
+    const row = readProjectFile('src/components/Row.astro');
+    const carousel = readProjectFile('src/components/PhotoCarousel.astro');
+
+    assert.match(row, /:global\(\.row-wrapper > \.photo-caption\)/);
+    assert.match(carousel, /:global\(\.carousel-section > \.photo-caption\)/);
+    assert.match(devTool, /preview\.classList\.toggle\('dev-caption-generated-preview', isGeneratedPreview\)/);
+    assert.doesNotMatch(devTool, /\.dev-caption-generated-preview\s*\{[\s\S]*?color:/);
+    assert.doesNotMatch(devTool, /\.dev-page-structure-preview > \.photo-caption\s*\{[\s\S]*?color:/);
+    assert.doesNotMatch(devTool, /\.dev-block-overlay > \.photo-caption\s*\{\s*color:/);
+    assert.match(devTool, /let style = document\.getElementById\('dev-tool-styles'\)[\s\S]*?if \(!style\)[\s\S]*?style\.textContent = `/);
+    assert.doesNotMatch(devTool, /if \(document\.getElementById\('dev-tool-styles'\)\) return/);
 });
 
 test('media block type toggle is always last and saves through shared pending changes', () => {
@@ -285,10 +339,13 @@ test('media block type toggle is always last and saves through shared pending ch
     assert.match(devTool, /image\.naturalWidth \/ image\.naturalHeight/);
     assert.match(devTool, /restoreOriginalLayout\(\)/);
     assert.match(devTool, /const rowDefaultMargin = isLastAlbumBlock \? '0rem' : \(albumGap \|\| '0\.5rem'\)/);
-    assert.match(devTool, /if \(blockType === 'PhotoCarousel'\) return '2rem'/);
+    assert.match(devTool, /if \(blockType === 'PhotoCarousel' \|\| blockType === 'Text'\) return '0\.5rem'/);
+    assert.match(devTool, /if \(targetType === 'PhotoCarousel'\) \{\s*if \(index > 0\) required\.add\(index - 1\);\s*required\.add\(index\)/);
+    assert.match(devTool, /updateBlockTypePreview\(targetType, matchesFile\);\s*reconcileAutomaticBlockMargins\(\)/);
+    assert.match(devTool, /syncManagedSpecialMargins\(\[bIdx - 1, bIdx\]\)/);
     assert.match(
         devTool,
-        /updateMarginPreview\(pendingBlockMarginChanges\.get\(marginChangeKey\)\?\.blockMargin \|\| originalBlockMargin\)/,
+        /updateMarginPreview\(findPendingMarginEntry\(\)\?\.\[1\]\.blockMargin \|\| originalBlockMargin\)/,
     );
     assert.match(devTool, /\.dev-block-toolbar \.dev-btn-block-type \{ --dev-toolbar-order: 4; \}/);
     assert.match(
@@ -301,6 +358,10 @@ test('media block type toggle is always last and saves through shared pending ch
     );
     assert.match(devTool, /blockTypeButton\.classList\.toggle\('has-pending', !matchesFile\)/);
     assert.match(devTool, /blockEl\.querySelector\('\.block-toggle'\)\?\.addEventListener\('click'/);
+    assert.match(
+        devTool,
+        /blockElement\.addEventListener\('click',[\s\S]*?dev-preview-as-carousel[\s\S]*?slide\.hasAttribute\('data-active'\)[\s\S]*?event\.preventDefault\(\);\s*event\.stopImmediatePropagation\(\);[\s\S]*?track\.scrollTo/,
+    );
 });
 
 test('pending block controls and the shared save action use the yellow state', () => {
@@ -320,6 +381,49 @@ test('pending block controls and the shared save action use the yellow state', (
     assert.match(devTool, /dev-btn-tag'\)\?\.classList\.toggle\('has-pending', hasPendingTags\)/);
     assert.match(devTool, /saveBtn\.classList\.toggle\('has-pending', hasPendingChanges\)/);
     assert.match(devTool, /\.dev-block-toolbar\.has-pending/);
+});
+
+test('pending inline edits warn before full loads and Astro page transitions', () => {
+    const devTool = readProjectFile('src/components/DevTool.astro');
+
+    assert.match(
+        devTool,
+        /const hasPendingChanges = \(\) => \([\s\S]*?pendingCaptionChanges\.size > 0[\s\S]*?pendingTextChanges\.size > 0[\s\S]*?pendingBlockMarginChanges\.size > 0[\s\S]*?pendingBlockTypeChanges\.size > 0/,
+    );
+    assert.match(devTool, /window\.addEventListener\('beforeunload', handlePendingBeforeUnload\)/);
+    assert.match(devTool, /event\.preventDefault\(\);\s*\(event as any\)\.returnValue = ''/);
+    assert.match(devTool, /document\.addEventListener\('astro:before-preparation', handlePendingBeforePreparation\)/);
+    assert.match(
+        devTool,
+        /const handlePendingBeforePreparation[\s\S]*?if \(pendingSaveInProgress \|\| !hasPendingChanges\(\)\) return;[\s\S]*?event\.preventDefault\(\)/,
+    );
+    assert.match(devTool, /pendingSaveInProgress = true;\s*updateSaveButtonState\(true\)/);
+    assert.match(devTool, /const blocksSaved = tagsSaved && await savePendingPageChanges\(albumSlug\);\s*pendingSaveInProgress = false/);
+});
+
+test('Page Manager stages structure changes for the shared pending save action', () => {
+    const devTool = readProjectFile('src/components/DevTool.astro');
+
+    assert.match(devTool, /type PendingPageStructureChange = \{[\s\S]*?draft: PageStructureDraft;[\s\S]*?imports: File\[\]/);
+    assert.match(devTool, /pendingPageStructureChange !== null/);
+    assert.match(devTool, /pendingPageStructureChange = \{\s*albumSlug,\s*draft: JSON\.parse\(JSON\.stringify\(draft\)\),\s*imports: \[\.\.\.pendingPageImports\]/);
+    assert.match(devTool, /structureChange\?\.imports\.forEach\(\(file\) => form\.append\('photos', file, file\.name\)\)/);
+    assert.match(devTool, /removeLocal: structureChange\?\.draft\.removeLocal \|\| \[\]/);
+    assert.match(devTool, /renderPendingPageStructure\(albumSlug, pendingPageStructureChange\.draft, pendingPageStructureChange\.imports\)/);
+    assert.match(devTool, /type: 'Text',[\s\S]*?__devKey: `pending-\$\{crypto\.randomUUID\(\)\}`,[\s\S]*?props: \{ blockMargin: '1\.5rem' \}/);
+    assert.match(devTool, /text\.style\.marginBottom = props\.blockMargin \|\| props\.mb \|\| '0\.5rem'/);
+    assert.doesNotMatch(devTool, /const confirmHandler = async \(\) => \{[\s\S]{0,1500}?fetch\("\/api\/save-page-manager"/);
+});
+
+test('pending Text presentation follows its block identity after structure reordering', () => {
+    const devTool = readProjectFile('src/components/DevTool.astro');
+
+    assert.match(devTool, /block\.__devKey \|\|= `persisted-\$\{index\}`/);
+    assert.match(devTool, /text\.dataset\.devBlockKey = block\.__devKey/);
+    assert.match(devTool, /const textIdentityMatches = \(change: PendingTextChange\) => \([\s\S]*?change\.blockKey === blockKey[\s\S]*?change\.originalText === fileText/);
+    assert.match(devTool, /const stagedText = findPendingTextEntry\(\)\?\.\[1\]/);
+    assert.match(devTool, /appendPendingRichText\(textContent, text\)/);
+    assert.match(devTool, /const \{ __devKey: _devKey, \.\.\.persistedBlock \} = block/);
 });
 
 test('persistent toolbar controls match the resting appearance of hovered empty controls', () => {
@@ -794,8 +898,17 @@ test('album blocks use native margin collapsing for predictable spacing', () => 
     );
     assert.match(
         carousel,
-        /const finalMT = mt \|\| \(hasTopCaption \? captionMargin : undefined\) \|\| ["']1\.5rem["'];/,
+        /const finalMT = mt \|\| \(hasTopCaption \? captionMargin : undefined\);/,
     );
+    assert.match(
+        carousel,
+        /const finalMB = mb \|\| blockMargin \|\| \(hasBottomCaption \? captionMargin : undefined\);/,
+    );
+    assert.match(
+        albumPage,
+        /\*:has\(\+ \.carousel-section:not\(\.dev-preview-as-row\)\)[\s\S]*?margin-bottom:\s*1\.5rem/,
+    );
+    assert.doesNotMatch(carousel, /["']2rem["']/);
     assert.match(text, /const finalBlockMargin = blockMargin \|\| mb \|\| '0\.5rem'/);
     assert.doesNotMatch(text, /\bmt\??:|margin-top:/);
 });

@@ -225,14 +225,15 @@ const titleSections = extractTitleSections(albumEntry.body);
             </div>
         )}
 
-        <div class="mb-8 text-center">
+        <div class="mb-8 text-center" data-album-heading>
             <h1
                 class="text-xl font-sans tracking-widest uppercase mb-1"
+                data-album-title
             >
                 {albumRecord.title}
             </h1>
             {albumRecord.info && (
-                <p class="text-sm text-zinc-500 font-light tracking-wider uppercase">
+                <p class="text-sm text-zinc-500 font-light tracking-wider uppercase" data-album-info>
                     {albumRecord.info}
                 </p>
             )}
@@ -283,6 +284,15 @@ const titleSections = extractTitleSections(albumEntry.body);
 
     .album-content > :global(*:last-child) {
         margin-bottom: 0;
+    }
+
+    /*
+     * Row and Carousel share the 0.5rem base gap. A Carousel promotes both
+     * adjacent boundaries to 1.5rem; explicit inline block margins still win.
+     */
+    .album-content > :global(*:has(+ .carousel-section:not(.dev-preview-as-row))),
+    .album-content > :global(.carousel-section:not(.dev-preview-as-row)) {
+        margin-bottom: 1.5rem;
     }
 
     .album-content :global(h2) {

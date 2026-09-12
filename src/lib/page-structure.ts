@@ -43,8 +43,12 @@ export function serializePageBody(blocks: PageBlock[]) {
             let propsText = '';
             if (props.align && props.align !== 'center') propsText += `\n  align="${props.align}"`;
             if (props.size && props.size !== 'caption') propsText += `\n  size="${props.size}"`;
-            if (props.blockMargin) propsText += `\n  blockMargin="${props.blockMargin}"`;
-            if (!props.blockMargin && props.mb) propsText += `\n  blockMargin="${props.mb}"`;
+            if (remNumber(props.blockMargin) && remNumber(props.blockMargin) !== '0.5') {
+                propsText += `\n  blockMargin="${props.blockMargin}"`;
+            }
+            if (!props.blockMargin && remNumber(props.mb) && remNumber(props.mb) !== '0.5') {
+                propsText += `\n  blockMargin="${props.mb}"`;
+            }
             body += `<Text${propsText}>\n  ${block.text || ''}\n</Text>\n\n`;
             continue;
         }
@@ -52,9 +56,13 @@ export function serializePageBody(blocks: PageBlock[]) {
         let propsText = '';
         if (props.caption) propsText += `\n  caption="${props.caption}"`;
         if (props.captionPosition && props.captionPosition !== 'center bottom') propsText += `\n  captionPosition="${props.captionPosition}"`;
-        if (props.blockMargin) propsText += `\n  blockMargin="${props.blockMargin}"`;
+        if (remNumber(props.blockMargin) && remNumber(props.blockMargin) !== '0.5') {
+            propsText += `\n  blockMargin="${props.blockMargin}"`;
+        }
         if (block.type === 'PhotoCarousel' && props.initialSlide) propsText += `\n  initialSlide={${props.initialSlide}}`;
-        if (!props.blockMargin && props.mb) propsText += `\n  blockMargin="${props.mb}"`;
+        if (!props.blockMargin && remNumber(props.mb) && remNumber(props.mb) !== '0.5') {
+            propsText += `\n  blockMargin="${props.mb}"`;
+        }
 
         body += `<${block.type}${propsText}>\n`;
         for (const photo of block.photos || []) {

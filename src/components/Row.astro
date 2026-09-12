@@ -86,24 +86,21 @@ if (finalMB) {
         min-width: 0;
     }
 
-    .photo-caption {
+    /* Caption nodes can also be created by the pending page-structure preview,
+       so this presentation must not depend on Astro's scoped attribute. */
+    :global(.row-wrapper > .photo-caption) {
         font-size: 0.875rem;
-        color: #71717a;
+        color: #898989;
     }
 
-    .photo-caption.top {
+    :global(.row-wrapper > .photo-caption.top) {
         margin-bottom: 0.5rem;
     }
 
-    .photo-caption.bottom {
+    :global(.row-wrapper > .photo-caption.bottom) {
         margin-top: 0.5rem;
     }
 
-    @media (prefers-color-scheme: dark) {
-        .photo-caption {
-            color: #c4c4cc;
-        }
-    }
 </style>
 
 <script>

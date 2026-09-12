@@ -41,18 +41,14 @@ const hasBottomCaption = caption && parsedPos === 'bottom';
 const styles = [];
 
 // Determine final margins
-const finalMT = mt || (hasTopCaption ? captionMargin : undefined) || "1.5rem";
-const finalMB = mb || blockMargin || (hasBottomCaption ? captionMargin : "2rem");
+const finalMT = mt || (hasTopCaption ? captionMargin : undefined);
+const finalMB = mb || blockMargin || (hasBottomCaption ? captionMargin : undefined);
 
 if (finalMT) {
     styles.push(`margin-top: ${finalMT} !important;`);
 }
 
-if (finalMB) {
-    styles.push(`margin-bottom: ${finalMB} !important;`);
-} else if (hasBottomCaption) {
-    styles.push("margin-bottom: 2rem;");
-}
+if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
 
 // Each slide occupies (100 - peekPercent)% of the scroll container width.
 // Half the remaining is distributed to each side as a "peek".
@@ -362,21 +358,21 @@ const slideWidthPercent = 100 - peekPercent;
         .carousel-section :global(.carousel-dot.active) {
             background: rgba(255, 255, 255, 0.8);
         }
-        .photo-caption {
-            color: #c4c4cc;
-        }
     }
 
-    .photo-caption {
+    /* Caption nodes can also be created by the pending page-structure preview,
+       so this presentation must not depend on Astro's scoped attribute. */
+    :global(.carousel-section > .photo-caption) {
         font-size: 0.875rem;
-        color: #71717a;
+        color: #898989;
     }
 
-    .photo-caption.top {
+    :global(.carousel-section > .photo-caption.top) {
         margin-bottom: 0.5rem;
     }
 
-    .photo-caption.bottom {
+    :global(.carousel-section > .photo-caption.bottom) {
         margin-top: 0.5rem;
     }
+
 </style>

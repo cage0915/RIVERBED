@@ -28,6 +28,7 @@
         remValueFromInput,
     } from "../lib/rem-spacing";
     import { applyDefaultCaptionBoundaryMargin } from "../lib/page-structure";
+    import { parseRichText } from "../lib/rich-text";
     import { R2_DOMAIN } from "../lib/constants";
 
     // Only run in development
@@ -52,6 +53,7 @@
             };
             type PendingTextChange = {
                 sourceType: 'Text';
+                blockKey?: string;
                 blockIndex: number;
                 text: string;
                 align: 'left' | 'center' | 'right';
@@ -63,16 +65,33 @@
             };
             type PendingBlockMarginChange = {
                 sourceType: 'Row' | 'PhotoCarousel' | 'Text';
+                blockKey?: string;
                 blockIndex: number;
                 photoNames: string[];
                 blockMargin: string;
                 originalBlockMargin: string;
+                originalText?: string;
+                automaticSpacingKey?: string;
             };
             type PendingBlockTypeChange = {
                 sourceType: 'Row' | 'PhotoCarousel';
                 targetType: 'Row' | 'PhotoCarousel';
                 blockIndex: number;
                 photoNames: string[];
+            };
+            type PageStructureDraft = {
+                blocks: any[];
+                metadata: {
+                    title: string;
+                    info?: string;
+                    gap?: string;
+                };
+                removeLocal: string[];
+            };
+            type PendingPageStructureChange = {
+                albumSlug: string;
+                draft: PageStructureDraft;
+                imports: File[];
             };
             let mountainCache: CachedMountain[] = [];
             let mountainRegions: MountainRegionDefinition[] = [];
@@ -83,15 +102,22 @@
             const pendingTextChanges = new Map<string, PendingTextChange>();
             const pendingBlockMarginChanges = new Map<string, PendingBlockMarginChange>();
             const pendingBlockTypeChanges = new Map<string, PendingBlockTypeChange>();
+            let pendingPageStructureChange: PendingPageStructureChange | null = null;
+            let pendingStructurePhotoNodes: Map<string, HTMLElement> | null = null;
+            const pendingStructureObjectUrls = new Map<File, string>();
+            let pendingSaveInProgress = false;
             let activeTagBlock: HTMLElement | null = null;
             let activeMarginControl: HTMLElement | null = null;
             const isLocalhost = ['localhost', '127.0.0.1'].includes(location.hostname);
 
             // Ensure we have CSS for the toolbar and interaction states
             const injectStyles = () => {
-                if (document.getElementById('dev-tool-styles')) return;
-                const style = document.createElement('style');
-                style.id = 'dev-tool-styles';
+                let style = document.getElementById('dev-tool-styles') as HTMLStyleElement | null;
+                if (!style) {
+                    style = document.createElement('style');
+                    style.id = 'dev-tool-styles';
+                    document.head.appendChild(style);
+                }
                 style.textContent = `
                     .dev-manager-header-actions {
                         display: flex;
@@ -396,6 +422,106 @@
                     .dev-toolbar-text-icon {
                         font: 600 0.8rem/1 sans-serif;
                     }
+                    .dev-page-structure-preview.row-wrapper,
+                    .dev-page-structure-preview.carousel-section,
+                    .dev-page-structure-preview.text-block {
+                        width: 100%;
+                    }
+                    .dev-page-structure-preview.row-wrapper,
+                    .dev-page-structure-preview.carousel-section {
+                        display: flex;
+                        flex-direction: column;
+                    }
+                    .dev-page-structure-preview.text-block {
+                        min-height: 2rem;
+                        font-family: "PT Sans", "Noto Sans TC", "Noto Sans JP", sans-serif;
+                    }
+                    .dev-page-structure-preview.text-block--caption {
+                        color: #898989;
+                        font-size: 0.875rem;
+                        font-weight: 300;
+                        letter-spacing: 0.05em;
+                    }
+                    .dev-page-structure-preview.text-block--title {
+                        color: rgba(255, 255, 255, 0.72);
+                        font-size: 1.125rem;
+                        font-weight: 400;
+                        letter-spacing: 0.05em;
+                    }
+                    .dev-page-structure-preview .photo-row,
+                    .dev-page-structure-preview .carousel-track {
+                        display: flex;
+                        width: 100%;
+                    }
+                    .dev-page-structure-preview .photo-row { gap: 0.5rem; }
+                    .dev-page-structure-preview .photo-row > * {
+                        flex: 1 1 0%;
+                        min-width: 0;
+                    }
+                    .dev-page-structure-preview .carousel-track {
+                        flex-direction: row;
+                        gap: 1rem;
+                        padding-inline: 5%;
+                        padding-block: 3.5rem;
+                        margin-block: -3.5rem;
+                        overflow-x: auto;
+                        scroll-snap-type: x mandatory;
+                        scroll-padding-inline: 5%;
+                        scrollbar-width: none;
+                    }
+                    .dev-page-structure-preview .carousel-track::-webkit-scrollbar { display: none; }
+                    .dev-page-structure-preview .carousel-track > * {
+                        flex: 0 0 90%;
+                        min-width: 0;
+                        opacity: 0.65;
+                        transform: scale(0.95);
+                        scroll-snap-align: center;
+                        transition: opacity 0.4s ease, transform 0.4s ease;
+                    }
+                    .dev-page-structure-preview .carousel-track > [data-active],
+                    .dev-page-structure-preview .carousel-track > :hover,
+                    .dev-page-structure-preview .carousel-track > :focus-within {
+                        opacity: 1;
+                        transform: scale(1);
+                    }
+                    .dev-page-structure-preview .carousel-dots {
+                        display: flex;
+                        min-height: 1.5rem;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 0.35rem;
+                    }
+                    .dev-page-structure-preview .carousel-dot {
+                        width: 6px;
+                        height: 6px;
+                        padding: 0;
+                        border: 0;
+                        border-radius: 9999px;
+                        background: rgba(200, 200, 200, 0.25);
+                    }
+                    .dev-page-structure-preview .carousel-dot.active {
+                        width: 18px;
+                        background: rgba(255, 255, 255, 0.8);
+                    }
+                    .dev-page-structure-preview .rich-text__link {
+                        color: inherit;
+                        text-decoration: underline;
+                        text-decoration-color: rgba(161, 161, 170, 0.7);
+                        text-underline-offset: 0.2em;
+                    }
+                    .dev-page-structure-preview .rich-text strong { font-weight: 700; }
+                    .dev-page-structure-preview .rich-text em { font-style: italic; }
+                    .dev-pending-photo-container,
+                    .dev-pending-photo-container .photo-wrapper {
+                        width: 100%;
+                    }
+                    .dev-pending-photo-container .photo-wrapper { position: relative; }
+                    .dev-pending-photo-container img {
+                        display: block;
+                        width: 100%;
+                        height: auto;
+                        border-radius: 4px;
+                    }
                     .dev-preview-as-carousel > .photo-row {
                         display: flex;
                         flex-direction: row;
@@ -542,11 +668,11 @@
                             width: 8rem;
                         }
                     }
-                    /* Turn all dev mode photo wrappers into tagging areas */
-                    .photo-wrapper {
+                    /* Show the tagging cursor only after the block enters Tag mode. */
+                    .dev-block-overlay.dev-tag-mode .photo-wrapper {
                         cursor: crosshair !important;
                     }
-                    .photo-wrapper img {
+                    .dev-block-overlay.dev-tag-mode .photo-wrapper img {
                         cursor: crosshair !important;
                     }
                     .tags-overlay {
@@ -1071,7 +1197,6 @@
                         white-space: nowrap;
                     }
                 `;
-                document.head.appendChild(style);
             };
 
             const ICONS = {
@@ -1177,6 +1302,31 @@
                 document.querySelectorAll<HTMLElement>('[data-dev-block]').forEach(updateBlockTagPendingIndicator);
             };
 
+            const hasPendingChanges = () => (
+                serializeTagMap(currentAlbumTagMap) !== serializeTagMap(savedAlbumTagMap)
+                || pendingCaptionChanges.size > 0
+                || pendingTextChanges.size > 0
+                || pendingBlockMarginChanges.size > 0
+                || pendingBlockTypeChanges.size > 0
+                || pendingPageStructureChange !== null
+            );
+
+            const handlePendingBeforeUnload = (event: BeforeUnloadEvent) => {
+                if (pendingSaveInProgress || !hasPendingChanges()) return;
+                event.preventDefault();
+                (event as any).returnValue = '';
+            };
+
+            const handlePendingBeforePreparation = (event: Event) => {
+                if (pendingSaveInProgress || !hasPendingChanges()) return;
+                // Let the browser's native beforeunload confirmation own the
+                // decision by forcing Astro's client transition to fall back.
+                event.preventDefault();
+            };
+
+            window.addEventListener('beforeunload', handlePendingBeforeUnload);
+            document.addEventListener('astro:before-preparation', handlePendingBeforePreparation);
+
             const updateSaveButtonState = (isSaving = false) => {
                 const saveBtn = document.getElementById('dev-save-btn') as HTMLButtonElement | null;
                 if (!saveBtn) return;
@@ -1186,10 +1336,12 @@
                 const hasPendingTextChanges = pendingTextChanges.size > 0;
                 const hasPendingMarginChanges = pendingBlockMarginChanges.size > 0;
                 const hasPendingTypeChanges = pendingBlockTypeChanges.size > 0;
+                const hasPendingStructureChanges = pendingPageStructureChange !== null;
                 const hasPendingBlockChanges = hasPendingCaptionChanges
                     || hasPendingTextChanges
                     || hasPendingMarginChanges
-                    || hasPendingTypeChanges;
+                    || hasPendingTypeChanges
+                    || hasPendingStructureChanges;
                 const hasPendingChanges = hasPendingTagChanges || hasPendingBlockChanges;
                 saveBtn.disabled = isSaving || !hasPendingChanges;
                 saveBtn.classList.toggle('has-pending', hasPendingChanges);
@@ -1320,38 +1472,72 @@
                 }
             };
 
-            const savePendingBlockChanges = async (albumSlug: string) => {
+            const savePendingPageChanges = async (albumSlug: string) => {
                 const captionChanges = [...pendingCaptionChanges.entries()];
                 const textChanges = [...pendingTextChanges.entries()];
                 const marginChanges = [...pendingBlockMarginChanges.entries()];
                 const typeChanges = [...pendingBlockTypeChanges.entries()];
+                const structureChange = pendingPageStructureChange?.albumSlug === albumSlug
+                    ? pendingPageStructureChange
+                    : null;
                 if (captionChanges.length === 0
                     && textChanges.length === 0
                     && marginChanges.length === 0
-                    && typeChanges.length === 0) return true;
+                    && typeChanges.length === 0
+                    && !structureChange) return true;
 
                 try {
-                    const structureResponse = await fetch(`/api/get-page-structure?albumSlug=${encodeURIComponent(albumSlug)}`);
-                    if (!structureResponse.ok) throw new Error('Failed to load page structure');
-                    const structure = await structureResponse.json();
+                    let structure: any;
+                    if (structureChange) {
+                        structure = {
+                            blocks: JSON.parse(JSON.stringify(structureChange.draft.blocks)),
+                            metadata: { ...structureChange.draft.metadata },
+                        };
+                    } else {
+                        const structureResponse = await fetch(`/api/get-page-structure?albumSlug=${encodeURIComponent(albumSlug)}`);
+                        if (!structureResponse.ok) throw new Error('Failed to load page structure');
+                        structure = await structureResponse.json();
+                    }
 
-                    const findBlock = (sourceType: string, photoNames: string[], blockIndex: number) => {
+                    const findBlock = (
+                        sourceType: string,
+                        photoNames: string[],
+                        blockIndex: number,
+                        originalText?: string,
+                        blockKey?: string,
+                    ) => {
+                        if (blockKey) {
+                            const keyedIndex = structure.blocks.findIndex((candidate: any) => candidate.__devKey === blockKey);
+                            if (keyedIndex >= 0) return keyedIndex;
+                        }
                         const indexedCandidate = structure.blocks[blockIndex];
-                        if (indexedCandidate?.type === sourceType && (sourceType === 'Text'
-                            || (indexedCandidate.photos?.length === photoNames.length
-                                && indexedCandidate.photos.every((photo: any, index: number) => photo.itemKey === photoNames[index])))) {
+                        if (sourceType === 'Text') {
+                            if (indexedCandidate?.type === 'Text'
+                                && (originalText === undefined || String(indexedCandidate.text || '').trim() === originalText)) {
+                                return blockIndex;
+                            }
+                            return originalText !== undefined
+                                ? structure.blocks.findIndex((candidate: any) =>
+                                    candidate.type === 'Text' && String(candidate.text || '').trim() === originalText)
+                                : -1;
+                        }
+                        if (indexedCandidate && indexedCandidate.type !== 'Text'
+                            && indexedCandidate.photos?.length === photoNames.length
+                            && indexedCandidate.photos.every((photo: any, index: number) => photo.itemKey === photoNames[index])) {
                             return blockIndex;
                         }
-                        if (sourceType === 'Text') return -1;
                         return structure.blocks.findIndex((candidate: any) =>
-                            candidate.type === sourceType
+                            candidate.type !== 'Text'
                             && candidate.photos?.length === photoNames.length
                             && candidate.photos.every((photo: any, index: number) => photo.itemKey === photoNames[index]),
                         );
                     };
                     for (const [, change] of captionChanges) {
                         const targetIndex = findBlock(change.sourceType, change.photoNames, change.blockIndex);
-                        if (targetIndex < 0) throw new Error('Could not identify a caption block');
+                        if (targetIndex < 0) {
+                            if (structureChange) continue;
+                            throw new Error('Could not identify a caption block');
+                        }
 
                         const props = { ...(structure.blocks[targetIndex].props || {}) };
                         if (change.caption) {
@@ -1366,8 +1552,11 @@
                     }
                     for (const [, change] of textChanges) {
                         if (change.deleted) continue;
-                        const targetIndex = findBlock(change.sourceType, [], change.blockIndex);
-                        if (targetIndex < 0) throw new Error('Could not identify a text block');
+                        const targetIndex = findBlock(change.sourceType, [], change.blockIndex, change.originalText, change.blockKey);
+                        if (targetIndex < 0) {
+                            if (structureChange) continue;
+                            throw new Error('Could not identify a text block');
+                        }
                         const target = structure.blocks[targetIndex];
                         target.text = change.text;
                         target.props = { ...(target.props || {}) };
@@ -1377,10 +1566,13 @@
                         else target.props.size = change.textType;
                     }
                     for (const [, change] of marginChanges) {
-                        const targetIndex = findBlock(change.sourceType, change.photoNames, change.blockIndex);
-                        if (targetIndex < 0) throw new Error('Could not identify a margin block');
+                        const targetIndex = findBlock(change.sourceType, change.photoNames, change.blockIndex, change.originalText, change.blockKey);
+                        if (targetIndex < 0) {
+                            if (structureChange) continue;
+                            throw new Error('Could not identify a margin block');
+                        }
                         const props = { ...(structure.blocks[targetIndex].props || {}) };
-                        if (change.blockMargin) props.blockMargin = change.blockMargin;
+                        if (change.blockMargin && change.blockMargin !== '0.5rem') props.blockMargin = change.blockMargin;
                         else delete props.blockMargin;
                         if (change.sourceType === 'Text') {
                             delete props.mt;
@@ -1390,29 +1582,43 @@
                     }
                     for (const [, change] of typeChanges) {
                         const targetIndex = findBlock(change.sourceType, change.photoNames, change.blockIndex);
-                        if (targetIndex < 0) throw new Error('Could not identify a media block');
+                        if (targetIndex < 0) {
+                            if (structureChange) continue;
+                            throw new Error('Could not identify a media block');
+                        }
                         structure.blocks[targetIndex].type = change.targetType;
                     }
                     textChanges
                         .filter(([, change]) => change.deleted)
                         .sort(([, left], [, right]) => right.blockIndex - left.blockIndex)
                         .forEach(([, change]) => {
-                            const targetIndex = findBlock(change.sourceType, [], change.blockIndex);
-                            if (targetIndex < 0) throw new Error('Could not identify a text block');
+                            const targetIndex = findBlock(change.sourceType, [], change.blockIndex, change.originalText, change.blockKey);
+                            if (targetIndex < 0) {
+                                if (structureChange) return;
+                                throw new Error('Could not identify a text block');
+                            }
                             structure.blocks.splice(targetIndex, 1);
                         });
+                    structure.blocks = structure.blocks.filter((block: any) =>
+                        block.type !== 'Text' || String(block.text || '').trim(),
+                    );
+                    const blocksToPersist = structure.blocks.map((block: any) => {
+                        const { __devKey: _devKey, ...persistedBlock } = block;
+                        return persistedBlock;
+                    });
 
                     const form = new FormData();
                     form.set('albumSlug', albumSlug);
                     form.set('draft', JSON.stringify({
-                        blocks: structure.blocks,
+                        blocks: blocksToPersist,
                         metadata: {
                             title: structure.metadata.title,
                             info: structure.metadata.info || undefined,
                             gap: structure.metadata.gap || undefined,
                         },
-                        removeLocal: [],
+                        removeLocal: structureChange?.draft.removeLocal || [],
                     }));
+                    structureChange?.imports.forEach((file) => form.append('photos', file, file.name));
                     const saveResponse = await fetch('/api/save-page-manager', {
                         method: 'POST',
                         body: form,
@@ -1433,6 +1639,7 @@
                     typeChanges.forEach(([key, change]) => {
                         if (pendingBlockTypeChanges.get(key) === change) pendingBlockTypeChanges.delete(key);
                     });
+                    if (pendingPageStructureChange === structureChange) pendingPageStructureChange = null;
                     return true;
                 } catch (error) {
                     showToast(`❌ ${error instanceof Error ? error.message : 'Failed to save block changes'}`);
@@ -1446,17 +1653,20 @@
                 const hasPendingBlockChanges = pendingCaptionChanges.size > 0
                     || pendingTextChanges.size > 0
                     || pendingBlockMarginChanges.size > 0
-                    || pendingBlockTypeChanges.size > 0;
+                    || pendingBlockTypeChanges.size > 0
+                    || pendingPageStructureChange !== null;
                 const hasPendingTags = serializeTagMap(currentAlbumTagMap) !== serializeTagMap(savedAlbumTagMap);
                 if (!hasPendingBlockChanges && !hasPendingTags) return showToast('ℹ️ No pending changes');
 
+                pendingSaveInProgress = true;
                 updateSaveButtonState(true);
                 const tagsSaved = await savePendingTagChanges(albumSlug);
                 if (tagsSaved && hasPendingBlockChanges) {
                     // The dev server can apply an MDX update before the response returns.
                     sessionStorage.setItem('dev-caption-save-scroll-y', String(window.scrollY));
                 }
-                const blocksSaved = tagsSaved && await savePendingBlockChanges(albumSlug);
+                const blocksSaved = tagsSaved && await savePendingPageChanges(albumSlug);
+                pendingSaveInProgress = false;
                 updateSaveButtonState();
                 if (!tagsSaved || !blocksSaved) {
                     if (!blocksSaved) sessionStorage.removeItem('dev-caption-save-scroll-y');
@@ -1951,6 +2161,266 @@
                 dialog.showModal();
             }
 
+            const appendPendingRichText = (container: HTMLElement, value: string) => {
+                const richText = document.createElement('span');
+                richText.className = 'rich-text';
+                parseRichText(value).forEach((token) => {
+                    if (token.type === 'break') {
+                        richText.appendChild(document.createElement('br'));
+                        return;
+                    }
+                    if (token.type === 'text') {
+                        richText.appendChild(document.createTextNode(token.value));
+                        return;
+                    }
+                    if (token.type === 'strong' || token.type === 'emphasis') {
+                        const emphasis = document.createElement(token.type === 'strong' ? 'strong' : 'em');
+                        emphasis.textContent = token.value;
+                        richText.appendChild(emphasis);
+                        return;
+                    }
+                    const link = document.createElement('a');
+                    link.className = 'rich-text__link';
+                    link.href = token.href;
+                    link.textContent = token.label;
+                    if (token.external) {
+                        link.target = '_blank';
+                        link.rel = 'noopener noreferrer';
+                    }
+                    richText.appendChild(link);
+                });
+                container.appendChild(richText);
+            };
+
+            const renderPendingPageStructure = (
+                albumSlug: string,
+                draft: PageStructureDraft,
+                imports: File[],
+            ) => {
+                const albumContent = document.querySelector<HTMLElement>('.album-content');
+                if (!albumContent) return;
+
+                const gridToggle = document.getElementById('toggle-photo-grid') as HTMLButtonElement | null;
+                if (albumContent.dataset.gridActive === 'true') gridToggle?.click();
+
+                const basename = (value: string) => value.replace(/^\/+/, '').split('/').pop() || value;
+                if (!pendingStructurePhotoNodes) {
+                    pendingStructurePhotoNodes = new Map(
+                        Array.from(albumContent.querySelectorAll<HTMLElement>('.photo-container'))
+                            .flatMap((photo) => {
+                                const itemKey = photo.querySelector<HTMLElement>('.photo-wrapper[data-item-key]')?.dataset.itemKey;
+                                if (!itemKey) return [];
+                                const cleanPhoto = photo.cloneNode(true) as HTMLElement;
+                                cleanPhoto.querySelectorAll('.dev-tag-edit-btn').forEach((button) => button.remove());
+                                delete cleanPhoto.dataset.slideIndex;
+                                cleanPhoto.removeAttribute('data-active');
+                                return [[basename(itemKey), cleanPhoto] as const];
+                            }),
+                    );
+                }
+
+                const importedByName = new Map(imports.map((file) => [file.name, file]));
+                pendingStructureObjectUrls.forEach((url, file) => {
+                    if (imports.includes(file)) return;
+                    URL.revokeObjectURL(url);
+                    pendingStructureObjectUrls.delete(file);
+                    const photo = pendingStructurePhotoNodes?.get(file.name);
+                    if (photo?.classList.contains('dev-pending-photo-container')) {
+                        pendingStructurePhotoNodes?.delete(file.name);
+                    }
+                });
+
+                const getPhotoNode = (itemKey: string) => {
+                    const name = basename(itemKey);
+                    const existing = pendingStructurePhotoNodes?.get(name);
+                    if (existing) return existing;
+
+                    const file = importedByName.get(name);
+                    if (!file) return null;
+                    let objectUrl = pendingStructureObjectUrls.get(file);
+                    if (!objectUrl) {
+                        objectUrl = URL.createObjectURL(file);
+                        pendingStructureObjectUrls.set(file, objectUrl);
+                    }
+
+                    const photo = document.createElement('div');
+                    photo.className = 'photo-container dev-pending-photo-container';
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'photo-wrapper';
+                    wrapper.dataset.itemKey = `${albumSlug}/${name}`;
+                    wrapper.dataset.dev = 'true';
+                    const link = document.createElement('a');
+                    link.href = objectUrl;
+                    link.target = '_blank';
+                    link.className = 'pswp-link block';
+                    link.dataset.pswpSrc = objectUrl;
+                    link.dataset.photoLightboxLink = '';
+                    const image = document.createElement('img');
+                    image.src = objectUrl;
+                    image.alt = '';
+                    image.className = 'photo-img';
+                    image.addEventListener('load', () => {
+                        link.dataset.pswpWidth = String(image.naturalWidth);
+                        link.dataset.pswpHeight = String(image.naturalHeight);
+                    }, { once: true });
+                    link.appendChild(image);
+                    wrapper.appendChild(link);
+                    photo.appendChild(wrapper);
+                    pendingStructurePhotoNodes?.set(name, photo);
+                    return photo;
+                };
+
+                const createCaption = (caption: string, position: string) => {
+                    const captionNode = document.createElement('div');
+                    const vertical = position.includes('top') ? 'top' : 'bottom';
+                    const align = position.includes('left') ? 'left' : position.includes('right') ? 'right' : 'center';
+                    captionNode.className = `photo-caption ${vertical}`;
+                    captionNode.style.textAlign = align;
+                    appendPendingRichText(captionNode, caption);
+                    return captionNode;
+                };
+
+                const fragment = document.createDocumentFragment();
+                draft.blocks.forEach((block: any) => {
+                    const props = block.props || {};
+                    if (block.type === 'Text') {
+                        const align = props.align || 'center';
+                        const size = props.size || 'caption';
+                        const text = document.createElement('div');
+                        text.className = `text-block text-block--${size} dev-page-structure-preview`;
+                        text.dataset.devBlock = 'text';
+                        text.dataset.devBlockKey = block.__devKey || '';
+                        text.dataset.devTextAlign = align;
+                        text.dataset.devTextType = size;
+                        if (props.blockMargin || props.mb) text.dataset.devBlockMargin = props.blockMargin || props.mb;
+                        text.style.marginBottom = props.blockMargin || props.mb || '0.5rem';
+                        text.style.textAlign = align;
+                        const content = document.createElement('div');
+                        content.className = 'text-block__content';
+                        appendPendingRichText(content, String(block.text || ''));
+                        text.appendChild(content);
+                        fragment.appendChild(text);
+                        return;
+                    }
+
+                    const isCarousel = block.type === 'PhotoCarousel';
+                    const media = document.createElement(isCarousel ? 'section' : 'div');
+                    media.className = `${isCarousel ? 'carousel-section group' : 'row-wrapper'} dev-page-structure-preview`;
+                    media.dataset.devBlock = isCarousel ? 'carousel' : 'row';
+                    media.dataset.devBlockKey = block.__devKey || '';
+                    const caption = String(props.caption || '');
+                    const captionPosition = String(props.captionPosition || 'center bottom');
+                    if (caption) media.dataset.devCaption = caption;
+                    media.dataset.devCaptionPos = captionPosition;
+                    if (props.blockMargin || props.mb) media.dataset.devBlockMargin = props.blockMargin || props.mb;
+
+                    if (isCarousel) {
+                        media.dataset.carousel = '';
+                        media.dataset.initialSlide = String(props.initialSlide || 0);
+                        const topMargin = props.mt || (caption && captionPosition.includes('top') ? props.captionMargin : '');
+                        const bottomMargin = props.mb || props.blockMargin || (caption && captionPosition.includes('bottom') ? props.captionMargin : '');
+                        if (topMargin) media.style.setProperty('margin-top', topMargin, 'important');
+                        if (bottomMargin) media.style.setProperty('margin-bottom', bottomMargin, 'important');
+                    } else {
+                        const topMargin = props.mt || (caption && captionPosition.includes('top') ? props.captionMargin : '');
+                        const bottomMargin = props.mb || props.blockMargin || (caption && captionPosition.includes('bottom') ? props.captionMargin : '');
+                        if (topMargin) media.style.setProperty('margin-top', topMargin, 'important');
+                        if (bottomMargin) media.style.setProperty('margin-bottom', bottomMargin, 'important');
+                    }
+
+                    if (caption && captionPosition.includes('top')) media.appendChild(createCaption(caption, captionPosition));
+                    const track = document.createElement('div');
+                    track.className = isCarousel ? 'carousel-track' : 'photo-row';
+                    if (!isCarousel) track.dataset.photoRow = '';
+                    (block.photos || []).forEach((photo: any) => {
+                        const photoNode = getPhotoNode(photo.itemKey);
+                        if (photoNode) {
+                            photoNode.style.removeProperty('flex');
+                            photoNode.removeAttribute('data-active');
+                            track.appendChild(photoNode);
+                        }
+                    });
+                    media.appendChild(track);
+
+                    if (isCarousel) {
+                        const dots = document.createElement('div');
+                        dots.className = 'carousel-dots';
+                        const slides = Array.from(track.children) as HTMLElement[];
+                        const initialIndex = Math.min(Number(props.initialSlide) || 0, Math.max(0, slides.length - 1));
+                        slides.forEach((slide, index) => {
+                            slide.toggleAttribute('data-active', index === initialIndex);
+                            if (slides.length < 2) return;
+                            const dot = document.createElement('button');
+                            dot.type = 'button';
+                            dot.className = `carousel-dot${index === initialIndex ? ' active' : ''}`;
+                            dot.setAttribute('aria-label', `Go to slide ${index + 1}`);
+                            dot.addEventListener('click', () => {
+                                slides.forEach((candidate) => candidate.removeAttribute('data-active'));
+                                dots.querySelectorAll('.carousel-dot').forEach((candidate) => candidate.classList.remove('active'));
+                                slide.setAttribute('data-active', '');
+                                dot.classList.add('active');
+                                track.scrollTo({ left: slide.offsetLeft - track.offsetLeft - (track.clientWidth - slide.clientWidth) / 2, behavior: 'smooth' });
+                            });
+                            dots.appendChild(dot);
+                        });
+                        media.appendChild(dots);
+                    } else {
+                        Array.from(track.children).forEach((photo) => {
+                            photo.removeAttribute('data-active');
+                            const image = photo.querySelector<HTMLImageElement>('img');
+                            const applyRatio = () => {
+                                if (!image?.naturalWidth || !image.naturalHeight) return;
+                                (photo as HTMLElement).style.flex = `${(image.naturalWidth / image.naturalHeight) * 100} 1 0%`;
+                            };
+                            if (image?.complete) applyRatio();
+                            else image?.addEventListener('load', applyRatio, { once: true });
+                        });
+                    }
+                    if (caption && captionPosition.includes('bottom')) media.appendChild(createCaption(caption, captionPosition));
+                    fragment.appendChild(media);
+                });
+
+                albumContent.replaceChildren(fragment);
+                albumContent.querySelectorAll<HTMLImageElement>('img[data-dev-fallback-url]').forEach((image) => {
+                    delete image.dataset.devFallbackReady;
+                    const useFallback = () => {
+                        const fallbackUrl = image.dataset.devFallbackUrl;
+                        if (!fallbackUrl) return;
+                        delete image.dataset.devFallbackUrl;
+                        image.src = fallbackUrl;
+                        const link = image.closest<HTMLAnchorElement>('a.pswp-link');
+                        if (link) {
+                            link.href = fallbackUrl;
+                            link.dataset.pswpSrc = fallbackUrl;
+                        }
+                    };
+                    image.addEventListener('error', useFallback, { once: true });
+                    if (image.complete && image.naturalWidth === 0) useFallback();
+                });
+                if (draft.metadata.gap) albumContent.style.setProperty('--album-block-gap', draft.metadata.gap);
+                else albumContent.style.removeProperty('--album-block-gap');
+
+                const heading = document.querySelector<HTMLElement>('[data-album-heading]');
+                const title = heading?.querySelector<HTMLElement>('[data-album-title]');
+                if (title) title.textContent = draft.metadata.title;
+                let info = heading?.querySelector<HTMLElement>('[data-album-info]');
+                if (draft.metadata.info && heading) {
+                    if (!info) {
+                        info = document.createElement('p');
+                        info.className = 'text-sm text-zinc-500 font-light tracking-wider uppercase';
+                        info.dataset.albumInfo = '';
+                        heading.appendChild(info);
+                    }
+                    info.textContent = draft.metadata.info;
+                } else {
+                    info?.remove();
+                }
+
+                activeTagBlock = null;
+                activeMarginControl = null;
+                void initToolbars();
+            };
+
             function createPageManagerDialog() {
                 let existing = document.getElementById("dev-pm-dialog") as HTMLDialogElement;
                 if (existing) return existing;
@@ -2021,6 +2491,23 @@
                 if (!res.ok) return showToast("❌ Failed to load structure");
 
                 const data = await res.json();
+                const normalizePageBlocks = (blocks: any[]) => JSON.parse(JSON.stringify(blocks)).map((block: any, index: number) => {
+                    block.props ||= {};
+                    block.__devKey ||= `persisted-${index}`;
+                    // Normalize legacy spacing before Page Manager writes a draft.
+                    if (block.props.mb && !block.props.blockMargin) {
+                        block.props.blockMargin = block.props.mb;
+                    }
+                    delete block.props.mt;
+                    delete block.props.mb;
+                    delete block.props.captionMargin;
+                    return block;
+                });
+                const serverBlocks = normalizePageBlocks(data.blocks);
+                const stagedStructure = pendingPageStructureChange?.albumSlug === albumSlug
+                    ? pendingPageStructureChange
+                    : null;
+                const displayedMetadata = stagedStructure?.draft.metadata || data.metadata || {};
                 const Tree = (window as any).Sortable ? (window as any).Sortable : await loadSortable();
 
                 const dialog = createPageManagerDialog();
@@ -2057,15 +2544,15 @@
                 const fInfo = dialog.querySelector("#dev-pm-info") as HTMLInputElement;
 
                 const fmData = {
-                    title: String(data.metadata?.title || ''),
-                    info: String(data.metadata?.info || ''),
+                    title: String(displayedMetadata.title || ''),
+                    info: String(displayedMetadata.info || ''),
                     coverKey: String(data.metadata?.cover?.assetKey || ''),
                 };
                 fTitle.value = fmData.title;
                 fInfo.value = fmData.info;
 
                 const fGap = dialog.querySelector("#dev-pm-gap") as HTMLInputElement;
-                fGap.value = remValueForInput(data.metadata?.gap);
+                fGap.value = remValueForInput(displayedMetadata.gap);
 
                 const fmSection = dialog.querySelector("#dev-pm-fm-section") as HTMLElement;
                 const fmToggle = dialog.querySelector("#dev-pm-fm-toggle") as HTMLButtonElement;
@@ -2086,23 +2573,14 @@
                 fmTitle.addEventListener('click', toggleFM);
                 updateFMState();
 
-                let currentBlocks = JSON.parse(JSON.stringify(data.blocks)).map((b: any) => {
-                    // Normalize legacy spacing before Page Manager writes a draft.
-                    if (b.props.mb && !b.props.blockMargin) {
-                        b.props.blockMargin = b.props.mb;
-                    }
-                    delete b.props.mt;
-                    delete b.props.mb;
-                    delete b.props.captionMargin;
-                    return b;
-                });
+                let currentBlocks = normalizePageBlocks(stagedStructure?.draft.blocks || serverBlocks);
                 let collapsedBlocks: Set<number> = new Set(
                     currentBlocks.map((_: any, i: number) => i),
                 ); // All collapsed by default
                 let selectedPhoto: {bIdx: number, pIdx: number} | null = null;
                 let selectedBlock: number | null = null;
-                let pendingPageImports: File[] = [];
-                const pendingLocalRemovals = new Set<string>();
+                let pendingPageImports: File[] = [...(stagedStructure?.imports || [])];
+                const pendingLocalRemovals = new Set<string>(stagedStructure?.draft.removeLocal || []);
                 const localPhotos: Array<{ name: string; size: number; modified: string }> = data.localPhotos || [];
                 const importObjectUrls = new Map<File, string>();
                 const basename = (value: string) => value.replace(/^\/+/, '').split('/').pop() || value;
@@ -2128,7 +2606,12 @@
                     ...currentBlocks.flatMap((block: any) => (block.photos || []).map((photo: any) => basename(photo.itemKey))),
                     ...(localCoverName() ? [localCoverName()] : []),
                 ]);
-                const initiallyReferencedNames = referencedPhotoNames();
+                const initiallyReferencedNames = new Set([
+                    ...serverBlocks.flatMap((block: any) => (block.photos || []).map((photo: any) => basename(photo.itemKey))),
+                    ...(data.metadata?.cover?.assetKey?.startsWith(`${albumSlug}/`)
+                        ? [basename(data.metadata.cover.assetKey)]
+                        : []),
+                ]);
                 const localPhotoNames = new Set(localPhotos.map((photo) => photo.name));
                 const reconcileRemovedPhotos = () => {
                     const referenced = referencedPhotoNames();
@@ -2157,15 +2640,26 @@
                     imports: pendingPageImports.map((file) => `${file.name}:${file.size}:${file.lastModified}`),
                     removeLocal: [...pendingLocalRemovals].sort(),
                 });
+                const serverPageSnapshot = JSON.stringify({
+                    metadata: {
+                        title: String(data.metadata?.title || '').trim(),
+                        info: String(data.metadata?.info || '').trim(),
+                        gap: remValueFromInput(remValueForInput(data.metadata?.gap)),
+                    },
+                    blocks: serverBlocks,
+                    imports: [],
+                    removeLocal: [],
+                });
                 let initialPageSnapshot = pageStateSnapshot();
                 const updatePageDirtyState = () => {
                     const dirty = pageStateSnapshot() !== initialPageSnapshot;
                     confirmBtn.disabled = !dirty;
-                    confirmBtn.title = dirty ? 'Save Changes' : 'No pending changes';
-                    r2SyncBtn.disabled = dirty;
-                    r2SyncBtn.title = dirty ? 'Save page changes before syncing R2' : 'Sync Current Album with R2';
-                    renameBtn.disabled = dirty;
-                    renameBtn.title = dirty ? 'Save page changes before renaming photos' : 'Rename photos by current order';
+                    confirmBtn.title = dirty ? 'Add to pending changes' : 'No new changes';
+                    const hasStagedStructure = pendingPageStructureChange?.albumSlug === albumSlug;
+                    r2SyncBtn.disabled = dirty || hasStagedStructure;
+                    r2SyncBtn.title = dirty || hasStagedStructure ? 'Save pending page changes before syncing R2' : 'Sync Current Album with R2';
+                    renameBtn.disabled = dirty || hasStagedStructure;
+                    renameBtn.title = dirty || hasStagedStructure ? 'Save pending page changes before renaming photos' : 'Rename photos by current order';
                 };
                 dialog.addEventListener('input', updatePageDirtyState);
 
@@ -2189,6 +2683,7 @@
                     currentBlocks[bIdx].photos.splice(targetPIdx, 0, moved);
                     if (currentBlocks[from.bIdx].photos.length === 0) {
                         currentBlocks.splice(from.bIdx, 1);
+                        syncManagedSpecialMargins(currentBlocks.map((_: any, index: number) => index));
                     }
                     renderTree();
                 };
@@ -2223,6 +2718,7 @@
 
                 const insertPreparedBlock = (newBlock: any, index: number) => {
                     currentBlocks.splice(index, 0, newBlock);
+                    syncManagedSpecialMargins([index - 1, index]);
                     const shifted = new Set<number>();
                     collapsedBlocks.forEach((item: number) => shifted.add(item >= index ? item + 1 : item));
                     collapsedBlocks = shifted;
@@ -2232,12 +2728,23 @@
 
                 const insertBlockAt = (type: string, index: number) => {
                     if (type === 'Text') {
-                        insertPreparedBlock({ type: 'Text', props: { align: 'left', size: 'title' }, text: '', photos: [] }, index);
+                        insertPreparedBlock({
+                            type: 'Text',
+                            __devKey: `pending-${crypto.randomUUID()}`,
+                            props: { blockMargin: '1.5rem' },
+                            text: '',
+                            photos: [],
+                        }, index);
                         return;
                     }
                     choosePhotosForBlock((files) => {
                         if (!stageNewBlockFiles(files)) return;
-                        insertPreparedBlock({ type, props: {}, photos: files.map((file) => ({ itemKey: file.name })) }, index);
+                        insertPreparedBlock({
+                            type,
+                            __devKey: `pending-${crypto.randomUUID()}`,
+                            props: {},
+                            photos: files.map((file) => ({ itemKey: file.name })),
+                        }, index);
                     });
                 };
 
@@ -2250,6 +2757,7 @@
                     const target = from < gapIndex ? gapIndex - 1 : gapIndex;
                     currentBlocks.splice(target, 0, movedBlock);
                     collapsedFlags.splice(target, 0, movedCollapsed);
+                    syncManagedSpecialMargins(currentBlocks.map((_: any, index: number) => index));
                     collapsedBlocks = new Set(collapsedFlags.flatMap((value: boolean, index: number) => value ? [index] : []));
                     selectedBlock = null;
                     renderTree();
@@ -2286,6 +2794,39 @@
                         document.removeEventListener('click', closeMenu);
                     };
                     window.setTimeout(() => document.addEventListener('click', closeMenu), 0);
+                };
+
+                const syncManagedSpecialMargins = (boundaryIndexes: number[]) => {
+                    const boundaryIsSpecial = (index: number) => {
+                        const block = currentBlocks[index];
+                        const nextBlock = currentBlocks[index + 1];
+                        if (!block) return false;
+                        if (block.type === 'Text' || block.type === 'PhotoCarousel') return true;
+                        if (nextBlock?.type === 'PhotoCarousel') return true;
+
+                        const captionPosition = String(block.props?.captionPosition || 'center bottom');
+                        if (block.props?.caption && captionPosition.includes('bottom') && nextBlock) return true;
+                        const nextCaptionPosition = String(nextBlock?.props?.captionPosition || 'center bottom');
+                        return Boolean(nextBlock?.props?.caption && nextCaptionPosition.includes('top'));
+                    };
+
+                    new Set(boundaryIndexes).forEach((index) => {
+                        const block = currentBlocks[index];
+                        if (!block) return;
+                        block.props ||= {};
+                        const currentMargin = remValueFromInput(block.props.blockMargin || block.props.mb);
+                        if (boundaryIsSpecial(index)) {
+                            if (!currentMargin || currentMargin === '0.5rem') {
+                                block.props.blockMargin = '1.5rem';
+                                delete block.props.mb;
+                            }
+                            return;
+                        }
+                        if (currentMargin === '0.5rem' || currentMargin === '1.5rem') {
+                            delete block.props.blockMargin;
+                            delete block.props.mb;
+                        }
+                    });
                 };
 
                 const renderTree = () => {
@@ -2432,11 +2973,13 @@
                             e.stopPropagation();
                             if (block.type === 'Text') return;
                             block.type = block.type === 'Row' ? 'PhotoCarousel' : 'Row';
+                            syncManagedSpecialMargins([bIdx - 1, bIdx]);
                             renderTree();
                         });
                         blockEl.querySelector('.block-delete')?.addEventListener('click', () => {
                             if (confirm("Delete this block? Any local photos no longer referenced by this page will move to the system Trash when you save.")) {
                                 currentBlocks.splice(bIdx, 1);
+                                syncManagedSpecialMargins(currentBlocks.map((_: any, index: number) => index));
                                 renderTree();
                             }
                         });
@@ -2487,9 +3030,19 @@
                                 const [extracted] = block.photos.splice(pIdx, 1);
                                 if (block.photos.length === 0) {
                                     // Replace the now-empty block
-                                    currentBlocks.splice(bIdx, 1, { type: 'Row', props: {}, photos: [extracted] });
+                                    currentBlocks.splice(bIdx, 1, {
+                                        type: 'Row',
+                                        __devKey: block.__devKey,
+                                        props: {},
+                                        photos: [extracted],
+                                    });
                                 } else {
-                                    currentBlocks.splice(bIdx + 1, 0, { type: 'Row', props: {}, photos: [extracted] });
+                                    currentBlocks.splice(bIdx + 1, 0, {
+                                        type: 'Row',
+                                        __devKey: `pending-${crypto.randomUUID()}`,
+                                        props: {},
+                                        photos: [extracted],
+                                    });
                                 }
                                 renderTree();
                             });
@@ -2549,6 +3102,7 @@
                                 if (currentBlocks[fromIdx].photos.length === 0) {
                                     currentBlocks.splice(fromIdx, 1);
                                 }
+                                syncManagedSpecialMargins(currentBlocks.map((_: any, index: number) => index));
                                 renderTree();
                             }
                         });
@@ -2565,6 +3119,7 @@
                             if (evt.from !== treeContainer || evt.to !== treeContainer) return;
                             const [moved] = currentBlocks.splice(evt.oldIndex, 1);
                             currentBlocks.splice(evt.newIndex, 0, moved);
+                            syncManagedSpecialMargins(currentBlocks.map((_: any, index: number) => index));
                             updatePageDirtyState();
                         }
                     });
@@ -2590,52 +3145,66 @@
                 });
                 document.addEventListener('click', globalClickHandler);
 
-                const closeHandler = () => {
-                    if (!confirmBtn.disabled && !confirm('Discard unsaved Page Manager changes?')) return;
+                const closeDialog = () => {
                     dialog.close();
                     document.removeEventListener('click', globalClickHandler);
                     closeBtn.removeEventListener('click', closeHandler);
                     confirmBtn.removeEventListener('click', confirmHandler);
                     importObjectUrls.forEach((url) => URL.revokeObjectURL(url));
                     importObjectUrls.clear();
+                    dialog.remove();
                 };
 
-                const confirmHandler = async () => {
-                    confirmBtn.disabled = true;
-                    confirmBtn.innerHTML = '...';
+                const closeHandler = () => {
+                    if (!confirmBtn.disabled && !confirm('Discard unstaged Page Manager changes?')) return;
+                    closeDialog();
+                };
+
+                const confirmHandler = () => {
                     reconcileRemovedPhotos();
-                    const blocksToSave = currentBlocks.filter((b: any) => b.type !== 'Text' || b.text?.trim());
-                    try {
-                        const form = new FormData();
-                        form.set('albumSlug', albumSlug);
-                        form.set('draft', JSON.stringify({
-                            blocks: blocksToSave,
+                    const blocksToSave = currentBlocks;
+                    const draft: PageStructureDraft = {
+                        blocks: blocksToSave,
+                        metadata: {
+                            title: fTitle.value.trim(),
+                            info: fInfo.value.trim() || undefined,
+                            gap: remValueFromInput(fGap.value) || undefined,
+                        },
+                        removeLocal: [...pendingLocalRemovals].sort(),
+                    };
+                    const stagedSnapshot = JSON.stringify({
+                        metadata: {
+                            title: draft.metadata.title,
+                            info: draft.metadata.info || '',
+                            gap: draft.metadata.gap || '',
+                        },
+                        blocks: draft.blocks,
+                        imports: pendingPageImports.map((file) => `${file.name}:${file.size}:${file.lastModified}`),
+                        removeLocal: draft.removeLocal,
+                    });
+                    if (stagedSnapshot === serverPageSnapshot) {
+                        pendingPageStructureChange = null;
+                        renderPendingPageStructure(albumSlug, {
+                            blocks: serverBlocks,
                             metadata: {
-                                title: fTitle.value.trim(),
-                                info: fInfo.value.trim() || undefined,
-                                gap: remValueFromInput(fGap.value) || undefined,
+                                title: String(data.metadata?.title || ''),
+                                info: data.metadata?.info || undefined,
+                                gap: data.metadata?.gap || undefined,
                             },
-                            removeLocal: [...pendingLocalRemovals],
-                        }));
-                        pendingPageImports.forEach((file) => form.append('photos', file, file.name));
-                        const res = await fetch("/api/save-page-manager", {
-                            method: "POST",
-                            body: form,
-                        });
-                        if (res.ok) {
-                            showToast("✅ Page structure updated!");
-                            setTimeout(() => window.location.reload(), 1000);
-                        } else {
-                            const result = await res.json().catch(() => ({}));
-                            showToast(`❌ ${result.error || 'Save failed'}`);
-                            confirmBtn.disabled = false;
-                            confirmBtn.innerHTML = ICONS.check;
-                        }
-                    } catch {
-                        showToast("❌ Network error");
-                        confirmBtn.disabled = false;
-                        confirmBtn.innerHTML = ICONS.check;
+                            removeLocal: [],
+                        }, []);
+                        showToast('ℹ️ Page structure unchanged');
+                    } else {
+                        pendingPageStructureChange = {
+                            albumSlug,
+                            draft: JSON.parse(JSON.stringify(draft)),
+                            imports: [...pendingPageImports],
+                        };
+                        renderPendingPageStructure(albumSlug, pendingPageStructureChange.draft, pendingPageStructureChange.imports);
+                        showToast('📝 Pending page structure update');
                     }
+                    updateSaveButtonState();
+                    closeDialog();
                 };
 
                 closeBtn.addEventListener('click', closeHandler);
@@ -3968,12 +4537,82 @@
                 if (!albumSlug) return;
 
                 let sourceBlocks: any[] = [];
-                try {
-                    const response = await fetch(`/api/get-page-structure?albumSlug=${encodeURIComponent(albumSlug)}`);
-                    if (response.ok) sourceBlocks = (await response.json()).blocks || [];
-                } catch {}
+                const stagedStructure = pendingPageStructureChange?.albumSlug === albumSlug
+                    ? pendingPageStructureChange
+                    : null;
+                if (stagedStructure) {
+                    sourceBlocks = stagedStructure.draft.blocks;
+                } else {
+                    try {
+                        const response = await fetch(`/api/get-page-structure?albumSlug=${encodeURIComponent(albumSlug)}`);
+                        if (response.ok) sourceBlocks = (await response.json()).blocks || [];
+                    } catch {}
+                }
 
                 const blocks = Array.from(document.querySelectorAll('[data-dev-block]'));
+                const reconcileAutomaticBlockMargins = () => {
+                    const currentBlocks = Array.from(document.querySelectorAll<HTMLElement>('[data-dev-block]'));
+
+                    const collectRequiredBoundaries = (includePending: boolean) => {
+                        const required = new Set<number>();
+                        currentBlocks.forEach((candidate, index) => {
+                            const sourceType = candidate.dataset.devSourceType;
+                            const typeChangeKey = candidate.dataset.devTypeChangeKey || '';
+                            const targetType = includePending
+                                ? pendingBlockTypeChanges.get(typeChangeKey)?.targetType || sourceType
+                                : sourceType;
+                            if (targetType === 'Text') required.add(index);
+                            if (targetType === 'PhotoCarousel') {
+                                if (index > 0) required.add(index - 1);
+                                required.add(index);
+                            }
+
+                            const captionChangeKey = candidate.dataset.devCaptionChangeKey || '';
+                            const captionChange = includePending
+                                ? pendingCaptionChanges.get(captionChangeKey)
+                                : undefined;
+                            const caption = captionChange
+                                ? captionChange.caption
+                                : candidate.dataset.devFileCaption || '';
+                            const captionPosition = captionChange
+                                ? captionChange.captionPosition
+                                : candidate.dataset.devFileCaptionPos || 'center bottom';
+                            if (!caption) return;
+
+                            const captionIsTop = captionPosition.includes('top');
+                            const hasAdjacentBlock = captionIsTop
+                                ? index > 0
+                                : index < currentBlocks.length - 1;
+                            if (hasAdjacentBlock) required.add(captionIsTop ? index - 1 : index);
+                        });
+                        return required;
+                    };
+
+                    const sourceBoundaries = collectRequiredBoundaries(false);
+                    const pendingBoundaries = collectRequiredBoundaries(true);
+
+                    currentBlocks.forEach((candidate) => {
+                        candidate.dispatchEvent(new CustomEvent('dev:automatic-block-margin', {
+                            detail: { action: 'reset' },
+                        }));
+                    });
+                    for (const [key, change] of pendingBlockMarginChanges) {
+                        if (change.automaticSpacingKey) pendingBlockMarginChanges.delete(key);
+                    }
+
+                    const boundaryIndexes = new Set([...sourceBoundaries, ...pendingBoundaries]);
+                    for (const index of boundaryIndexes) {
+                        const wasRequired = sourceBoundaries.has(index);
+                        const isRequired = pendingBoundaries.has(index);
+                        if (wasRequired === isRequired) continue;
+                        currentBlocks[index]?.dispatchEvent(new CustomEvent('dev:automatic-block-margin', {
+                            detail: {
+                                action: isRequired ? 'set' : 'remove',
+                                spacingKey: `layout-boundary:${index}`,
+                            },
+                        }));
+                    }
+                };
 
                 blocks.forEach((block, blockIndex) => {
                     if (block.querySelector('.dev-block-toolbar')) return;
@@ -4002,9 +4641,15 @@
                     const photoNames = Array.from(blockElement.querySelectorAll<HTMLElement>('.photo-wrapper[data-item-key]'))
                         .map((photo) => photo.dataset.itemKey?.split('/').pop() || '');
                     const captionChangeKey = `${sourceType}:${photoNames.join('\u001f')}`;
-                    const textChangeKey = `Text:${blockIndex}`;
+                    blockElement.dataset.devCaptionChangeKey = captionChangeKey;
+                    blockElement.dataset.devSourceType = sourceType;
+                    blockElement.dataset.devFileCaption = fileCaption;
+                    blockElement.dataset.devFileCaptionPos = fileCaptionPosition;
+                    const blockKey = blockElement.dataset.devBlockKey || sourceBlock?.__devKey || `persisted-${blockIndex}`;
+                    const textChangeKey = `Text:${blockKey}`;
                     const marginChangeKey = `${isTextBlock ? textChangeKey : captionChangeKey}:margin`;
                     const typeChangeKey = `${captionChangeKey}:type`;
+                    blockElement.dataset.devTypeChangeKey = typeChangeKey;
                     const stagedBlockType = pendingBlockTypeChanges.get(typeChangeKey)?.targetType;
                     const displayedBlockType = stagedBlockType || sourceType;
                     const rootFontSize = Number.parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
@@ -4017,16 +4662,53 @@
                     const isLastAlbumBlock = albumContent?.lastElementChild === blockElement;
                     const rowDefaultMargin = isLastAlbumBlock ? '0rem' : (albumGap || '0.5rem');
                     const defaultMarginForType = (blockType: 'Row' | 'PhotoCarousel' | 'Text') => {
-                        if (blockType === 'PhotoCarousel') return '2rem';
-                        if (blockType === 'Text') return '0.5rem';
+                        if (blockType === 'PhotoCarousel' || blockType === 'Text') return '0.5rem';
                         return rowDefaultMargin;
                     };
                     const originalBlockMargin = sourceBlock?.props?.blockMargin
                         || (isTextBlock ? sourceBlock?.props?.mb : '')
                         || blockElement.dataset.devBlockMargin
                         || '';
+                    const textIdentityMatches = (change: PendingTextChange) => (
+                        change.blockKey
+                            ? change.blockKey === blockKey
+                            : change.originalText === fileText
+                                && change.originalAlign === fileTextAlign
+                                && change.originalTextType === fileTextType
+                    );
+                    const findPendingTextEntry = () => {
+                        const direct = pendingTextChanges.get(textChangeKey);
+                        if (direct && textIdentityMatches(direct)) {
+                            return [textChangeKey, direct] as const;
+                        }
+                        return [...pendingTextChanges.entries()]
+                            .filter(([, change]) => textIdentityMatches(change))
+                            .sort(([, left], [, right]) =>
+                                Math.abs(left.blockIndex - blockIndex) - Math.abs(right.blockIndex - blockIndex))[0];
+                    };
+                    const marginIdentityMatches = (change: PendingBlockMarginChange) => (
+                        change.blockKey
+                            ? change.blockKey === blockKey
+                            : !isTextBlock
+                            ? change.sourceType === sourceType
+                                && change.photoNames.length === photoNames.length
+                                && change.photoNames.every((name, index) => name === photoNames[index])
+                            : change.sourceType === 'Text'
+                                && change.originalText === fileText
+                                && change.originalBlockMargin === originalBlockMargin
+                    );
+                    const findPendingMarginEntry = () => {
+                        const direct = pendingBlockMarginChanges.get(marginChangeKey);
+                        if (direct && marginIdentityMatches(direct)) {
+                            return [marginChangeKey, direct] as const;
+                        }
+                        return [...pendingBlockMarginChanges.entries()]
+                            .filter(([, change]) => marginIdentityMatches(change))
+                            .sort(([, left], [, right]) =>
+                                Math.abs(left.blockIndex - blockIndex) - Math.abs(right.blockIndex - blockIndex))[0];
+                    };
                     const fileEffectiveMargin = remValueFromInput(remValueForInput(originalBlockMargin || visibleMargin));
-                    const stagedBlockMargin = pendingBlockMarginChanges.get(marginChangeKey)?.blockMargin || '';
+                    const stagedBlockMargin = findPendingMarginEntry()?.[1].blockMargin || '';
                     const initialBlockMargin = stagedBlockMargin || originalBlockMargin || visibleMargin;
                     const hasBlockMargin = Boolean(stagedBlockMargin || originalBlockMargin);
                     toolbar.className = `dev-block-toolbar${hasCaption ? ' has-caption' : ''}${isTextBlock ? ' has-text' : ''}${hasTags ? ' has-tags' : ''}${hasBlockMargin ? ' has-margin' : ''}`;
@@ -4072,11 +4754,14 @@
                             delete blockElement.dataset.devCaption;
                             delete blockElement.dataset.devCaptionPos;
                         } else {
+                            const isGeneratedPreview = !preview
+                                || preview.classList.contains('dev-caption-generated-preview');
                             if (!preview) {
                                 preview = document.createElement('div');
                                 preview.classList.add('photo-caption');
                             }
                             preview.className = `photo-caption ${verticalPosition}`;
+                            preview.classList.toggle('dev-caption-generated-preview', isGeneratedPreview);
                             preview.style.textAlign = align;
                             if (matchesFile) preview.innerHTML = fileCaptionHtml;
                             else {
@@ -4136,22 +4821,37 @@
                         marginInput.select();
                     };
 
-                    const stageBlockMargin = () => {
+                    const stageBlockMargin = (
+                        requestedMargin?: string,
+                        automaticSpacingKey?: string,
+                        silent = false,
+                    ) => {
+                        if (requestedMargin !== undefined) {
+                            marginInput.value = remValueForInput(requestedMargin);
+                        }
                         const blockMargin = remValueFromInput(marginInput.value);
                         const displayedType = pendingBlockTypeChanges.get(typeChangeKey)?.targetType || sourceType;
                         const expectedEffectiveMargin = originalBlockMargin
                             ? fileEffectiveMargin
                             : remValueFromInput(remValueForInput(defaultMarginForType(displayedType)));
                         const matchesFile = blockMargin === expectedEffectiveMargin;
+                        const pendingMarginEntry = findPendingMarginEntry();
+                        const pendingMarginKey = pendingMarginEntry?.[0]
+                            || (!pendingBlockMarginChanges.has(marginChangeKey)
+                                ? marginChangeKey
+                                : `${marginChangeKey}:${Date.now()}`);
                         if (matchesFile) {
-                            pendingBlockMarginChanges.delete(marginChangeKey);
+                            if (pendingMarginEntry) pendingBlockMarginChanges.delete(pendingMarginEntry[0]);
                         } else {
-                            pendingBlockMarginChanges.set(marginChangeKey, {
+                            pendingBlockMarginChanges.set(pendingMarginKey, {
                                 sourceType,
+                                blockKey,
                                 blockIndex,
                                 photoNames,
                                 blockMargin,
                                 originalBlockMargin,
+                                originalText: isTextBlock ? fileText : undefined,
+                                automaticSpacingKey,
                             });
                         }
                         updateMarginPreview(matchesFile ? originalBlockMargin : blockMargin);
@@ -4159,8 +4859,41 @@
                         syncToolbarPendingState(toolbar);
                         closeInlineMarginEditor();
                         updateSaveButtonState();
-                        showToast(matchesFile ? 'ℹ️ Block margin unchanged' : '📝 Pending block margin update');
+                        if (!silent) {
+                            showToast(matchesFile ? 'ℹ️ Block margin unchanged' : '📝 Pending block margin update');
+                        }
                     };
+
+                    blockElement.addEventListener('dev:automatic-block-margin', (event) => {
+                        const detail = (event as CustomEvent<{
+                            action: 'reset' | 'set' | 'remove';
+                            spacingKey?: string;
+                        }>).detail;
+                        const pendingMarginEntry = findPendingMarginEntry();
+
+                        if (detail.action === 'reset') {
+                            if (!pendingMarginEntry?.[1].automaticSpacingKey) return;
+                            pendingBlockMarginChanges.delete(pendingMarginEntry[0]);
+                            updateMarginPreview(originalBlockMargin);
+                            marginControl.classList.remove('has-pending');
+                            syncToolbarPendingState(toolbar);
+                            return;
+                        }
+
+                        if (pendingMarginEntry && !pendingMarginEntry[1].automaticSpacingKey) {
+                            return;
+                        }
+                        if (detail.action === 'remove') {
+                            if (remValueFromInput(originalBlockMargin) === '1.5rem') {
+                                stageBlockMargin('', detail.spacingKey, true);
+                            } else if (!originalBlockMargin) {
+                                updateMarginPreview('');
+                            }
+                            return;
+                        }
+                        if (originalBlockMargin && fileEffectiveMargin !== '0.5rem') return;
+                        stageBlockMargin('1.5rem', detail.spacingKey, true);
+                    });
 
                     const updateBlockTypePreview = (
                         targetType: 'Row' | 'PhotoCarousel',
@@ -4190,7 +4923,7 @@
 
                         if (matchesFile) {
                             restoreOriginalLayout();
-                            updateMarginPreview(pendingBlockMarginChanges.get(marginChangeKey)?.blockMargin || originalBlockMargin);
+                            updateMarginPreview(findPendingMarginEntry()?.[1].blockMargin || originalBlockMargin);
                             return;
                         }
 
@@ -4207,7 +4940,7 @@
                         blockElement.classList.toggle('dev-preview-as-row', targetType === 'Row');
                         blockElement.classList.toggle('dev-preview-as-carousel', targetType === 'PhotoCarousel');
                         blockElement.querySelector('.dev-preview-carousel-dots')?.remove();
-                        updateMarginPreview(pendingBlockMarginChanges.get(marginChangeKey)?.blockMargin || originalBlockMargin);
+                        updateMarginPreview(findPendingMarginEntry()?.[1].blockMargin || originalBlockMargin);
 
                         if (targetType === 'Row') {
                             slides.forEach((slide) => {
@@ -4273,6 +5006,7 @@
                         blockTypeButton.setAttribute('aria-label', blockTypeButton.title);
                         blockTypeButton.classList.toggle('has-pending', !matchesFile);
                         updateBlockTypePreview(targetType, matchesFile);
+                        reconcileAutomaticBlockMargins();
                         syncToolbarPendingState(toolbar);
                         updateSaveButtonState();
                         showToast(matchesFile ? 'ℹ️ Block type unchanged' : `📝 Pending switch to ${targetType === 'Row' ? 'Row' : 'Carousel'}`);
@@ -4365,6 +5099,7 @@
                             }
                             closeInlineCaptionEditor();
                             updateCaptionPreview(caption, captionPosition, matchesFile);
+                            reconcileAutomaticBlockMargins();
                             captionButton?.classList.toggle('has-pending', !matchesFile);
                             syncToolbarPendingState(toolbar);
                             updateSaveButtonState();
@@ -4389,7 +5124,7 @@
 
                     const closeInlineTextEditor = () => {
                         blockElement.querySelector('.dev-inline-text-editor')?.remove();
-                        const pendingChange = pendingTextChanges.get(textChangeKey);
+                        const pendingChange = findPendingTextEntry()?.[1];
                         textContent?.classList.toggle('dev-text-preview-hidden', Boolean(pendingChange?.deleted));
                         toolbar.classList.remove('is-open');
                         textButton?.classList.remove('active');
@@ -4405,7 +5140,10 @@
                     ) => {
                         if (textContent) {
                             if (matchesFile) textContent.innerHTML = fileTextHtml;
-                            else textContent.textContent = text;
+                            else {
+                                textContent.replaceChildren();
+                                appendPendingRichText(textContent, text);
+                            }
                             textContent.classList.toggle('dev-text-preview-hidden', deleted);
                         }
                         blockElement.style.textAlign = align;
@@ -4420,7 +5158,7 @@
                     const openInlineTextEditor = () => {
                         closeInlineTextEditor();
 
-                        const pendingChange = pendingTextChanges.get(textChangeKey);
+                        const pendingChange = findPendingTextEntry()?.[1];
                         const initialText = pendingChange?.text ?? fileText;
                         const initialAlign = pendingChange?.align ?? fileTextAlign;
                         const initialTextType = pendingChange?.textType ?? fileTextType;
@@ -4463,11 +5201,17 @@
                                 && text === fileText
                                 && align === fileTextAlign
                                 && textType === fileTextType;
+                            const pendingTextEntry = findPendingTextEntry();
+                            const pendingTextKey = pendingTextEntry?.[0]
+                                || (!pendingTextChanges.has(textChangeKey)
+                                    ? textChangeKey
+                                    : `${textChangeKey}:${Date.now()}`);
                             if (matchesFile) {
-                                pendingTextChanges.delete(textChangeKey);
+                                if (pendingTextEntry) pendingTextChanges.delete(pendingTextEntry[0]);
                             } else {
-                                pendingTextChanges.set(textChangeKey, {
+                                pendingTextChanges.set(pendingTextKey, {
                                     sourceType: 'Text',
+                                    blockKey,
                                     blockIndex,
                                     text,
                                     align,
@@ -4550,6 +5294,45 @@
                         event.stopPropagation();
                         stageBlockType();
                     });
+
+                    const stagedCaption = pendingCaptionChanges.get(captionChangeKey);
+                    if (stagedCaption) {
+                        updateCaptionPreview(stagedCaption.caption, stagedCaption.captionPosition);
+                        captionButton?.classList.add('has-pending');
+                    }
+                    const stagedText = findPendingTextEntry()?.[1];
+                    if (stagedText) {
+                        updateTextPreview(stagedText.text, stagedText.align, stagedText.textType, stagedText.deleted, false);
+                        textButton?.classList.add('has-pending');
+                    }
+                    if (stagedBlockMargin) {
+                        updateMarginPreview(stagedBlockMargin);
+                        marginControl.classList.add('has-pending');
+                    }
+                    if (stagedBlockType) updateBlockTypePreview(stagedBlockType, false);
+                    syncToolbarPendingState(toolbar);
+
+                    blockElement.addEventListener('click', (event) => {
+                        if (!blockElement.classList.contains('dev-preview-as-carousel')) return;
+                        const track = blockElement.querySelector<HTMLElement>(':scope > .photo-row');
+                        const slide = (event.target as HTMLElement).closest<HTMLElement>('.photo-row > *');
+                        if (!track || !slide || !track.contains(slide) || slide.hasAttribute('data-active')) return;
+
+                        event.preventDefault();
+                        event.stopImmediatePropagation();
+                        const slides = Array.from(track.children) as HTMLElement[];
+                        const targetIndex = slides.indexOf(slide);
+                        slides.forEach((candidate) => candidate.removeAttribute('data-active'));
+                        slide.setAttribute('data-active', '');
+                        blockElement.querySelectorAll('.dev-preview-carousel-dot').forEach((dot, index) => {
+                            dot.classList.toggle('active', index === targetIndex);
+                        });
+                        track.scrollTo({
+                            left: slide.offsetLeft - track.offsetLeft - (track.clientWidth - slide.clientWidth) / 2,
+                            behavior: 'smooth',
+                        });
+                    }, true);
+
                     blockElement.addEventListener('pointerdown', (event) => {
                         if (!blockElement.classList.contains('dev-preview-as-row')) return;
                         const track = blockElement.querySelector<HTMLElement>(':scope > .carousel-track');
@@ -4558,6 +5341,7 @@
                         slide.setAttribute('data-active', '');
                     }, true);
                 });
+                reconcileAutomaticBlockMargins();
                 initTagEditButtons();
             };
 
