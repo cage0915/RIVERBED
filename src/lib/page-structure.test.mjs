@@ -346,6 +346,30 @@ test('carousel defaults show more of the adjacent photos with a tighter gap', ()
     assert.match(devTool, /\.dev-preview-as-carousel > \.photo-row > \*[\s\S]*?flex:\s*0 0 80% !important/);
 });
 
+test('tagged photos reveal tags without a grey image overlay on hover or touch', () => {
+    const photo = readProjectFile('src/components/Photo.astro');
+    const devTool = readProjectFile('src/components/DevTool.astro');
+
+    assert.match(photo, /\.photo-wrapper:hover \.tags-overlay\s*\{\s*opacity:\s*1/);
+    assert.match(photo, /\.photo-wrapper\.show-info \.tags-overlay\s*\{\s*opacity:\s*1/);
+    assert.doesNotMatch(
+        photo,
+        /\.photo-wrapper:hover \.tags-overlay\s*\{[^}]*background:/,
+    );
+    assert.doesNotMatch(
+        photo,
+        /\.photo-wrapper\.show-info \.tags-overlay\s*\{[^}]*background:/,
+    );
+    assert.doesNotMatch(
+        devTool,
+        /\.photo-wrapper:hover \.tags-overlay,[\s\S]*?\.photo-wrapper\.show-info \.tags-overlay\s*\{[^}]*background:/,
+    );
+    assert.doesNotMatch(
+        devTool,
+        /\.dev-block-overlay\.dev-tag-mode \.tags-overlay\s*\{[^}]*background:/,
+    );
+});
+
 test('media block type toggle is always last and saves through shared pending changes', () => {
     const devTool = readProjectFile('src/components/DevTool.astro');
 
