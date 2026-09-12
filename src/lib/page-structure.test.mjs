@@ -322,6 +322,21 @@ test('pending block controls and the shared save action use the yellow state', (
     assert.match(devTool, /\.dev-block-toolbar\.has-pending/);
 });
 
+test('persistent toolbar controls match the resting appearance of hovered empty controls', () => {
+    const devTool = readProjectFile('src/components/DevTool.astro');
+
+    assert.match(
+        devTool,
+        /\.dev-toolbar-btn\.has-data\s*\{[\s\S]*?background: rgba\(255,255,255,0\.2\);[\s\S]*?border-color: rgba\(255,255,255,0\.3\);[\s\S]*?color: white;/,
+    );
+    assert.match(
+        devTool,
+        /\.dev-inline-margin-control\.has-data\s*\{[\s\S]*?background: rgba\(255,255,255,0\.2\);[\s\S]*?border-color: rgba\(255,255,255,0\.3\);/,
+    );
+    assert.match(devTool, /\.dev-toolbar-btn\.has-data:hover[\s\S]*?background: rgba\(59, 130, 246, 0\.8\)/);
+    assert.match(devTool, /\.dev-inline-margin-control\.has-data:hover[\s\S]*?background: rgba\(59, 130, 246, 0\.8\)/);
+});
+
 test('direct caption editor uses a fixed four-line field with aligned controls', () => {
     const devTool = readProjectFile('src/components/DevTool.astro');
 
