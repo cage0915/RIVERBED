@@ -86,6 +86,13 @@ test('caption spacing initializes the adjacent block bottom margin without repla
     assert.equal(applyDefaultCaptionBoundaryMargin(topBlocks, 1), true);
     assert.equal(topBlocks[0].props.blockMargin, '1.5rem');
 
+    const textBeforeTopCaption = [
+        { type: 'Text', props: {}, text: 'Section' },
+        { type: 'Row', props: { caption: 'Top', captionPosition: 'center top' }, photos: [] },
+    ];
+    assert.equal(applyDefaultCaptionBoundaryMargin(textBeforeTopCaption, 1), true);
+    assert.equal(textBeforeTopCaption[0].props.blockMargin, '1.5rem');
+
     const bottomBlocks = [
         { type: 'Row', props: {}, photos: [] },
         { type: 'Row', props: { caption: 'Bottom', blockMargin: '3rem' }, photos: [] },
@@ -115,16 +122,21 @@ test('Page Manager serialization retires captionMargin', () => {
     assert.match(content, /blockMargin="1\.5rem"/);
 });
 
-test('existing caption spacing is a pending explicit Page Manager change', () => {
+test('Text serialization uses one bottom block margin and retires legacy Text margins', () => {
+    const content = createLayoutOnlyPageContent([
+        { type: 'Text', props: { align: 'left', size: 'title', mt: '2rem', mb: '1.5rem' }, text: 'Section' },
+    ]);
+
+    assert.match(content, /<Text\s+align="left"\s+size="title"\s+blockMargin="1\.5rem">/);
+    assert.doesNotMatch(content, /\smt=|\smb=/);
+});
+
+test('caption spacing is applied when direct block changes are saved', () => {
     const devTool = readProjectFile('src/components/DevTool.astro');
 
     assert.match(
         devTool,
-        /let initialPageSnapshot = pageStateSnapshot\(\);\s*currentBlocks\.forEach\([\s\S]*?applyCaptionSpacing\(index\)/,
-    );
-    assert.match(
-        devTool,
-        /persistDefault = control\?\.dataset\.marginPersistDefault === 'true'[\s\S]*?persistDefault \? `\$\{defaultValue\}rem`/,
+        /structure\.blocks\[targetIndex\]\.props = props;\s*if \(change\.caption\) applyDefaultCaptionBoundaryMargin\(structure\.blocks, targetIndex\)/,
     );
 });
 
@@ -168,55 +180,147 @@ test('Album R2 trash actions preserve the dry-run ETag', () => {
     );
 });
 
-test('Page Manager block spacing updates its draft during input', () => {
+test('direct block margin control stages changes for the shared save action', () => {
     const devTool = readProjectFile('src/components/DevTool.astro');
 
     assert.match(
         devTool,
-        /marginBlockInput\?\.addEventListener\('input',[\s\S]*?block\.props\.blockMargin = remValueFromInput\(marginBlockInput\.value\)/,
+        /dev-inline-margin-control[\s\S]*?dev-inline-margin-input[\s\S]*?dev-inline-margin-save/,
     );
-    assert.doesNotMatch(devTool, /marginBlockInput\?\.addEventListener\('change'/);
+    assert.match(devTool, /pendingBlockMarginChanges\.set\(marginChangeKey/);
+    assert.match(
+        devTool,
+        /const fileEffectiveMargin = remValueFromInput\(remValueForInput\(originalBlockMargin \|\| visibleMargin\)\)/,
+    );
+    assert.match(devTool, /const expectedEffectiveMargin = originalBlockMargin[\s\S]*?defaultMarginForType\(displayedType\)/);
+    assert.match(devTool, /const matchesFile = blockMargin === expectedEffectiveMargin/);
+    assert.match(devTool, /if \(matchesFile\) \{\s*pendingBlockMarginChanges\.delete\(marginChangeKey\)/);
+    assert.match(devTool, /updateMarginPreview\(matchesFile \? originalBlockMargin : blockMargin\)/);
+    assert.match(devTool, /savePendingBlockChanges/);
+    assert.match(devTool, /dev-inline-margin-control\.has-data:hover[\s\S]*?background: rgba\(59, 130, 246, 0\.8\)/);
+    assert.match(devTool, /activeMarginControl && activeMarginControl !== marginControl[\s\S]*?classList\.remove\('is-open'\)/);
+    assert.doesNotMatch(devTool, /block-margin-block|margin-block-reset/);
 });
 
-test('Page Manager exposes spacing controls from the full block boundary', () => {
+test('Page Manager delegates all Text settings to the direct Text toolbar', () => {
+    const devTool = readProjectFile('src/components/DevTool.astro');
+    const text = readProjectFile('src/components/Text.astro');
+    const getStructure = readProjectFile('src/dev-api/get-page-structure.ts');
+
+    assert.doesNotMatch(devTool, /dev-pm-margin-control|text-block-mt|text-block-mb|text-block-content|text-block-align|text-block-size/);
+    assert.match(devTool, /dev-btn-text[\s\S]*?dev-toolbar-text-icon[\s\S]*?>T</);
+    assert.match(devTool, /dev-inline-text-input[\s\S]*?dev-inline-text-align[\s\S]*?dev-inline-text-type/);
+    assert.match(devTool, /pendingTextChanges\.set\(textChangeKey/);
+    assert.match(devTool, /textButton\?\.classList\.toggle\('has-pending', !matchesFile\)/);
+    assert.match(text, /data-dev-block=\{isDev \? "text" : undefined\}/);
+    assert.match(text, /margin-bottom: \$\{finalBlockMargin\}/);
+    assert.doesNotMatch(text, /margin-top:/);
+    assert.match(getStructure, /blockMarginMatch[\s\S]*?props\.blockMargin/);
+});
+
+test('Page Manager delegates caption editing to the direct block toolbar', () => {
     const devTool = readProjectFile('src/components/DevTool.astro');
 
-    assert.match(devTool, /dev-pm-inline-add-zone:hover \.dev-pm-margin-control/);
-    assert.match(devTool, /dev-pm-margin-control\.has-custom[\s\S]*?opacity: 1/);
-    assert.match(devTool, /has-custom \.dev-pm-margin-icon:hover \.dev-pm-margin-icon-reset/);
-    assert.match(devTool, /dev-pm-inline-add-button[\s\S]*?opacity: 0/);
-    assert.match(devTool, /<button class="dev-pm-inline-add-button"[\s\S]*?\$\{bottomMarginControl\}<\/div>/);
-    assert.match(devTool, /edge: 'top',\s*property: 'mt'/);
-    assert.match(devTool, /edge: 'bottom',\s*property: 'mb'/);
+    assert.doesNotMatch(devTool, /block-caption-toggle|dev-pm-caption-editor|tree-caption-preview/);
+    assert.match(devTool, /dev-inline-caption-editor/);
 });
 
-test('Page Manager marks caption alignment changes as pending', () => {
+test('development block toolbar stacks tag editing above a bottom-aligned caption control', () => {
     const devTool = readProjectFile('src/components/DevTool.astro');
 
     assert.match(
         devTool,
-        /alignSel\?\.addEventListener\('change', \(\) => \{[\s\S]*?block\.props\.captionPosition = `\$\{alignSel\.value\} \$\{getVPos\(\)\}`;[\s\S]*?updatePageDirtyState\(\);/,
+        /\.dev-block-toolbar\s*\{[\s\S]*?bottom:\s*0;[\s\S]*?left:\s*-2\.75rem;[\s\S]*?flex-direction:\s*column;/,
     );
+    assert.match(
+        devTool,
+        /\.dev-block-overlay:hover > \.dev-block-toolbar,[\s\S]*?\.dev-block-toolbar\.has-caption/,
+    );
+    assert.match(devTool, /\.dev-block-overlay::before\s*\{[\s\S]*?left:\s*-3\.25rem;[\s\S]*?width:\s*3\.25rem;/);
+    assert.match(devTool, /toolbar\.innerHTML = `[\s\S]*?dev-btn-tag[\s\S]*?dev-btn-caption/);
+    assert.match(devTool, /const setBlockTagMode = \(block: HTMLElement\)/);
+    assert.match(devTool, /activeTagBlock === block[\s\S]*?closeActiveTagBlock\(\)/);
+    assert.match(devTool, /dev-block-overlay\.dev-tag-mode \.tags-overlay/);
+    assert.match(devTool, /if \(!wrapper\.closest\('\.dev-tag-mode'\)\) return;/);
+    assert.match(devTool, /editor\.className = 'dev-inline-caption-editor';/);
+    assert.match(devTool, /blockElement\.insertBefore\(editor, captionAnchor\);/);
+    assert.match(devTool, /pendingCaptionChanges\.set\(captionChangeKey/);
+    assert.match(devTool, /const matchesFile = caption === fileCaption && captionPosition === fileCaptionPosition/);
+    assert.match(devTool, /if \(matchesFile\) \{\s*pendingCaptionChanges\.delete\(captionChangeKey\)/);
+    assert.match(devTool, /saveBtn\.addEventListener\('click', savePendingChanges\)/);
+    assert.match(devTool, /sessionStorage\.setItem\('dev-caption-save-scroll-y'/);
 });
 
-test('Page Manager caption input is a fixed four-line field that wraps long text', () => {
+test('media block type toggle is always last and saves through shared pending changes', () => {
     const devTool = readProjectFile('src/components/DevTool.astro');
 
     assert.match(
         devTool,
-        /<textarea class="block-caption" rows="4" wrap="soft"[\s\S]*?overflow-wrap:anywhere; resize:none;/,
+        /dev-inline-margin-control[\s\S]*?dev-btn-block-type has-data[\s\S]*?displayedBlockType === 'Row' \? 'R' : 'C'/,
     );
-    assert.doesNotMatch(devTool, /autoResizeCaptionInput|scrollHeight/);
+    assert.match(devTool, /pendingBlockTypeChanges\.set\(typeChangeKey/);
+    assert.match(devTool, /structure\.blocks\[targetIndex\]\.type = change\.targetType/);
+    assert.match(devTool, /pendingBlockTypeChanges\.size > 0/);
+    assert.match(devTool, /const updateBlockTypePreview = \(/);
+    assert.match(devTool, /updateBlockTypePreview\(targetType, matchesFile\)/);
+    assert.match(devTool, /\.dev-preview-as-carousel > \.photo-row[\s\S]*?scroll-snap-type: x mandatory/);
+    assert.match(devTool, /\.dev-preview-as-row > \.carousel-track[\s\S]*?overflow: visible/);
+    assert.match(devTool, /dev-preview-carousel-dots/);
+    assert.match(devTool, /image\.naturalWidth \/ image\.naturalHeight/);
+    assert.match(devTool, /restoreOriginalLayout\(\)/);
+    assert.match(devTool, /const rowDefaultMargin = isLastAlbumBlock \? '0rem' : \(albumGap \|\| '0\.5rem'\)/);
+    assert.match(devTool, /if \(blockType === 'PhotoCarousel'\) return '2rem'/);
+    assert.match(
+        devTool,
+        /updateMarginPreview\(pendingBlockMarginChanges\.get\(marginChangeKey\)\?\.blockMargin \|\| originalBlockMargin\)/,
+    );
+    assert.match(devTool, /\.dev-block-toolbar \.dev-btn-block-type \{ --dev-toolbar-order: 4; \}/);
+    assert.match(
+        devTool,
+        /\.dev-block-toolbar \.dev-toolbar-btn:not\(\.has-data\):not\(\.has-pending\),[\s\S]*?display: none;[\s\S]*?order: 0;/,
+    );
+    assert.match(
+        devTool,
+        /\.dev-block-overlay:hover > \.dev-block-toolbar \.dev-toolbar-btn,[\s\S]*?display: flex;/,
+    );
+    assert.match(devTool, /blockTypeButton\.classList\.toggle\('has-pending', !matchesFile\)/);
+    assert.match(devTool, /blockEl\.querySelector\('\.block-toggle'\)\?\.addEventListener\('click'/);
 });
 
-test('Page Manager edits every rem spacing field as a unitless number', () => {
+test('pending block controls and the shared save action use the yellow state', () => {
     const devTool = readProjectFile('src/components/DevTool.astro');
 
-    for (const className of [
-        'text-block-mt',
-        'text-block-mb',
-        'block-margin-block',
-    ]) {
+    assert.match(
+        devTool,
+        /\.dev-toolbar-btn\.has-pending,\s*\.dev-inline-margin-control\.has-pending\s*\{[\s\S]*?background: rgba\(234, 179, 8, 0\.9\)/,
+    );
+    assert.match(
+        devTool,
+        /\.dev-save-btn\.has-pending\s*\{[\s\S]*?background: rgba\(234, 179, 8, 0\.9\)/,
+    );
+    assert.match(devTool, /captionButton\?\.classList\.toggle\('has-pending', !matchesFile\)/);
+    assert.match(devTool, /textButton\?\.classList\.toggle\('has-pending', !matchesFile\)/);
+    assert.match(devTool, /marginControl\.classList\.toggle\('has-pending', !matchesFile\)/);
+    assert.match(devTool, /dev-btn-tag'\)\?\.classList\.toggle\('has-pending', hasPendingTags\)/);
+    assert.match(devTool, /saveBtn\.classList\.toggle\('has-pending', hasPendingChanges\)/);
+    assert.match(devTool, /\.dev-block-toolbar\.has-pending/);
+});
+
+test('direct caption editor uses a fixed four-line field with aligned controls', () => {
+    const devTool = readProjectFile('src/components/DevTool.astro');
+
+    assert.match(
+        devTool,
+        /<textarea class="dev-inline-caption-text" rows="4" wrap="soft"/,
+    );
+    assert.match(devTool, /grid-template-rows: repeat\(3, minmax\(0, 1fr\)\)/);
+    assert.doesNotMatch(devTool, /block-caption-toggle|dev-pm-caption-editor/);
+});
+
+test('all remaining spacing inputs use unitless rem values', () => {
+    const devTool = readProjectFile('src/components/DevTool.astro');
+
+    for (const className of ['dev-inline-margin-input']) {
         assert.match(
             devTool,
             new RegExp(`class="${className}" type="number"`),
@@ -633,6 +737,7 @@ test('catalog routes share lifecycle-scoped card interactions', () => {
 test('album blocks use native margin collapsing for predictable spacing', () => {
     const albumPage = readProjectFile('src/pages/[folder]/[album].astro');
     const carousel = readProjectFile('src/components/PhotoCarousel.astro');
+    const text = readProjectFile('src/components/Text.astro');
 
     assert.match(
         albumPage,
@@ -646,6 +751,8 @@ test('album blocks use native margin collapsing for predictable spacing', () => 
         carousel,
         /const finalMT = mt \|\| \(hasTopCaption \? captionMargin : undefined\) \|\| ["']1\.5rem["'];/,
     );
+    assert.match(text, /const finalBlockMargin = blockMargin \|\| mb \|\| '0\.5rem'/);
+    assert.doesNotMatch(text, /\bmt\??:|margin-top:/);
 });
 
 test("covered client scripts do not retain after-swap initializers", () => {

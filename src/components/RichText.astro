@@ -14,6 +14,8 @@ const tokens = parseRichText(text);
         tokens.map((token) => {
             if (token.type === "break") return <br />;
             if (token.type === "text") return token.value;
+            if (token.type === "strong") return <strong>{token.value}</strong>;
+            if (token.type === "emphasis") return <em>{token.value}</em>;
             return (
                 <a
                     class="rich-text__link"
@@ -41,5 +43,13 @@ const tokens = parseRichText(text);
     .rich-text__link:hover {
         color: rgb(244 244 245);
         text-decoration-color: currentColor;
+    }
+
+    .rich-text strong {
+        font-weight: 700;
+    }
+
+    .rich-text em {
+        font-style: italic;
     }
 </style>

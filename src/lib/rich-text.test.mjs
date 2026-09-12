@@ -26,3 +26,16 @@ test("rich text leaves unsafe link targets as plain text", () => {
         { type: "text", value: "[不要點](javascript:alert)" },
     ]);
 });
+
+test("rich text parses bold and italic Markdown without interpreting unmatched markers", () => {
+    assert.deepEqual(
+        parseRichText("普通 **粗體**、*斜體* 與 **沒有結束"),
+        [
+            { type: "text", value: "普通 " },
+            { type: "strong", value: "粗體" },
+            { type: "text", value: "、" },
+            { type: "emphasis", value: "斜體" },
+            { type: "text", value: " 與 **沒有結束" },
+        ],
+    );
+});

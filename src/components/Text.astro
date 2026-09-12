@@ -2,21 +2,29 @@
 interface Props {
   align?: 'left' | 'center' | 'right';
   size?: 'caption' | 'title';
-  mt?: string;
-  mb?: string;
+  blockMargin?: string;
+  mb?: string; // legacy alias
 }
 
-const { align = 'center', size = 'caption', mt = '2rem', mb = '0.5rem' } = Astro.props;
+const { align = 'center', size = 'caption', blockMargin, mb } = Astro.props;
+const finalBlockMargin = blockMargin || mb || '0.5rem';
+const isDev = import.meta.env.DEV;
 
 const style = [
-  `margin-top: ${mt};`,
-  `margin-bottom: ${mb};`,
+  `margin-bottom: ${finalBlockMargin};`,
   `text-align: ${align};`,
 ].join(' ');
 ---
 
-<div class:list={["text-block", `text-block--${size}`]} style={style}>
-  <slot />
+<div
+  class:list={["text-block", `text-block--${size}`]}
+  style={style}
+  data-dev-block={isDev ? "text" : undefined}
+  data-dev-text-align={isDev ? align : undefined}
+  data-dev-text-type={isDev ? size : undefined}
+  data-dev-block-margin={isDev && (blockMargin || mb) ? blockMargin || mb : undefined}
+>
+  <div class="text-block__content"><slot /></div>
 </div>
 
 <style>

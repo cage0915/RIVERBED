@@ -50,6 +50,7 @@ if (finalMB) {
     data-dev-caption={isDev && caption ? caption : undefined}
     data-dev-caption-pos={isDev ? captionPosition : undefined}
     data-dev-mb={isDev && mb ? mb : undefined}
+    data-dev-block-margin={isDev && (blockMargin || mb) ? blockMargin || mb : undefined}
 >
     {caption && parsedPos === 'top' && (
         <div class="photo-caption top" style={`text-align: ${parsedAlign};`}>
@@ -100,7 +101,7 @@ if (finalMB) {
 
     @media (prefers-color-scheme: dark) {
         .photo-caption {
-            color: #a1a1aa;
+            color: #c4c4cc;
         }
     }
 </style>

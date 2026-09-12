@@ -26,7 +26,7 @@ export function applyDefaultCaptionBoundaryMargin(
 
     const target = blocks[targetIndex];
     target.props ||= {};
-    const property = target.type === 'Text' ? 'mb' : 'blockMargin';
+    const property = 'blockMargin';
     const currentValue = remNumber(target.props[property]);
 
     // Initialize caption spacing without replacing a margin the user customized.
@@ -43,8 +43,8 @@ export function serializePageBody(blocks: PageBlock[]) {
             let propsText = '';
             if (props.align && props.align !== 'center') propsText += `\n  align="${props.align}"`;
             if (props.size && props.size !== 'caption') propsText += `\n  size="${props.size}"`;
-            if (props.mt && props.mt !== '2rem') propsText += `\n  mt="${props.mt}"`;
-            if (props.mb) propsText += `\n  mb="${props.mb}"`;
+            if (props.blockMargin) propsText += `\n  blockMargin="${props.blockMargin}"`;
+            if (!props.blockMargin && props.mb) propsText += `\n  blockMargin="${props.mb}"`;
             body += `<Text${propsText}>\n  ${block.text || ''}\n</Text>\n\n`;
             continue;
         }

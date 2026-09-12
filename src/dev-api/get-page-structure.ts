@@ -58,6 +58,8 @@ export const GET: APIRoute = async ({ request }) => {
             if (mtMatch) props.mt = mtMatch[1];
             const mbMatch = propsStr.match(/mb="([^"]*)"/);
             if (mbMatch) props.mb = mbMatch[1];
+            const blockMarginMatch = propsStr.match(/blockMargin="([^"]*)"/);
+            if (blockMarginMatch) props.blockMargin = blockMarginMatch[1];
             blocks.push({ type: 'Text', props, text: innerContent.trim(), photos: [] });
             continue;
         }

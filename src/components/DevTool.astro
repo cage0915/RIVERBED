@@ -41,11 +41,50 @@
                 description: string;
                 region: MountainRegion;
             };
+            type PendingCaptionChange = {
+                sourceType: 'Row' | 'PhotoCarousel';
+                blockIndex: number;
+                photoNames: string[];
+                caption: string;
+                captionPosition: string;
+                originalCaption: string;
+                originalCaptionPosition: string;
+            };
+            type PendingTextChange = {
+                sourceType: 'Text';
+                blockIndex: number;
+                text: string;
+                align: 'left' | 'center' | 'right';
+                textType: 'caption' | 'title';
+                deleted: boolean;
+                originalText: string;
+                originalAlign: 'left' | 'center' | 'right';
+                originalTextType: 'caption' | 'title';
+            };
+            type PendingBlockMarginChange = {
+                sourceType: 'Row' | 'PhotoCarousel' | 'Text';
+                blockIndex: number;
+                photoNames: string[];
+                blockMargin: string;
+                originalBlockMargin: string;
+            };
+            type PendingBlockTypeChange = {
+                sourceType: 'Row' | 'PhotoCarousel';
+                targetType: 'Row' | 'PhotoCarousel';
+                blockIndex: number;
+                photoNames: string[];
+            };
             let mountainCache: CachedMountain[] = [];
             let mountainRegions: MountainRegionDefinition[] = [];
             let pendingMountainRegions: Record<string, MountainRegion> = {};
             let savedAlbumTagMap: Record<string, { name: string; x: number; y: number }[]> = {};
             let currentAlbumTagMap: Record<string, { name: string; x: number; y: number }[]> = {};
+            const pendingCaptionChanges = new Map<string, PendingCaptionChange>();
+            const pendingTextChanges = new Map<string, PendingTextChange>();
+            const pendingBlockMarginChanges = new Map<string, PendingBlockMarginChange>();
+            const pendingBlockTypeChanges = new Map<string, PendingBlockTypeChange>();
+            let activeTagBlock: HTMLElement | null = null;
+            let activeMarginControl: HTMLElement | null = null;
             const isLocalhost = ['localhost', '127.0.0.1'].includes(location.hostname);
 
             // Ensure we have CSS for the toolbar and interaction states
@@ -186,11 +225,27 @@
                     .dev-import-preview img { max-width: 100%; max-height: calc(100% - 3rem); object-fit: contain; }
                     .dev-block-toolbar {
                         position: absolute;
-                        top: 0.5rem;
-                        right: 0.5rem; /* Better right corner, out of the way */
+                        bottom: 0;
+                        left: -2.75rem;
                         display: flex;
-                        gap: 0.5rem;
+                        flex-direction: column;
+                        gap: 0.4rem;
                         z-index: 50;
+                        opacity: 0;
+                        pointer-events: none;
+                        transition: opacity 0.2s ease;
+                    }
+                    .dev-block-overlay:hover > .dev-block-toolbar,
+                    .dev-block-toolbar:focus-within,
+                    .dev-block-toolbar.has-caption,
+                    .dev-block-toolbar.has-text,
+                    .dev-block-toolbar.has-tags,
+                    .dev-block-toolbar.has-margin,
+                    .dev-block-toolbar.has-pending,
+                    .dev-block-toolbar.is-tagging,
+                    .dev-block-toolbar.is-open {
+                        opacity: 1;
+                        pointer-events: auto;
                     }
                     .dev-toolbar-btn {
                         width: 2rem;
@@ -223,8 +278,266 @@
                     .dev-toolbar-btn.has-data:hover {
                         background: rgba(59, 130, 246, 0.8);
                     }
+                    .dev-block-toolbar .dev-toolbar-btn,
+                    .dev-block-toolbar .dev-inline-margin-control {
+                        order: var(--dev-toolbar-order, 0);
+                    }
+                    .dev-block-toolbar .dev-btn-tag { --dev-toolbar-order: 1; }
+                    .dev-block-toolbar .dev-btn-caption,
+                    .dev-block-toolbar .dev-btn-text { --dev-toolbar-order: 2; }
+                    .dev-block-toolbar .dev-inline-margin-control { --dev-toolbar-order: 3; }
+                    .dev-block-toolbar .dev-btn-block-type { --dev-toolbar-order: 4; }
+                    .dev-block-toolbar .dev-toolbar-btn:not(.has-data):not(.has-pending),
+                    .dev-block-toolbar .dev-inline-margin-control:not(.has-data):not(.has-pending) {
+                        display: none;
+                        order: 0;
+                    }
+                    .dev-block-overlay:hover > .dev-block-toolbar .dev-toolbar-btn,
+                    .dev-block-overlay:hover > .dev-block-toolbar .dev-inline-margin-control,
+                    .dev-block-toolbar:focus-within .dev-toolbar-btn,
+                    .dev-block-toolbar:focus-within .dev-inline-margin-control,
+                    .dev-block-toolbar.is-open .dev-toolbar-btn,
+                    .dev-block-toolbar.is-open .dev-inline-margin-control,
+                    .dev-block-toolbar.is-tagging .dev-toolbar-btn {
+                        display: flex;
+                        opacity: 1;
+                        pointer-events: auto;
+                    }
+                    .dev-inline-margin-control {
+                        display: flex;
+                        width: 2rem;
+                        height: 2rem;
+                        overflow: hidden;
+                        border: 1px solid rgba(255,255,255,0.1);
+                        border-radius: 9999px;
+                        background: rgba(255,255,255,0.2);
+                        backdrop-filter: blur(4px);
+                        transition: width 0.2s ease, margin-left 0.2s ease, opacity 0.2s ease;
+                    }
+                    .dev-inline-margin-control.has-data {
+                        background: rgba(0,0,0,0.5);
+                        border: none;
+                    }
+                    .dev-inline-margin-control:hover {
+                        border-color: rgba(255,255,255,0.3);
+                    }
+                    .dev-inline-margin-control.has-data:hover {
+                        background: rgba(59, 130, 246, 0.8);
+                    }
+                    .dev-toolbar-btn.has-pending,
+                    .dev-inline-margin-control.has-pending {
+                        background: rgba(234, 179, 8, 0.9);
+                        border-color: rgba(250, 204, 21, 0.95);
+                        color: #18181b;
+                    }
+                    .dev-toolbar-btn.has-pending:hover,
+                    .dev-inline-margin-control.has-pending:hover {
+                        background: rgba(250, 204, 21, 0.95);
+                        color: #18181b;
+                    }
+                    .dev-inline-margin-control.is-open {
+                        width: 6rem;
+                        margin-left: -4rem;
+                    }
+                    .dev-inline-margin-control input {
+                        width: 2rem;
+                        min-width: 2rem;
+                        padding: 0;
+                        border: 0;
+                        outline: 0;
+                        background: transparent;
+                        color: white;
+                        font: 0.7rem/1 sans-serif;
+                        text-align: center;
+                    }
+                    .dev-inline-margin-control input::-webkit-inner-spin-button,
+                    .dev-inline-margin-control input::-webkit-outer-spin-button {
+                        appearance: none;
+                        margin: 0;
+                    }
+                    .dev-inline-margin-control button {
+                        display: flex;
+                        width: 2rem;
+                        min-width: 2rem;
+                        height: 2rem;
+                        padding: 0;
+                        align-items: center;
+                        justify-content: center;
+                        border: 0;
+                        background: transparent;
+                        color: white;
+                        cursor: pointer;
+                    }
+                    .dev-inline-margin-control .dev-inline-margin-cancel { color: #fca5a5; }
+                    .dev-inline-margin-control .dev-inline-margin-save { color: #bfdbfe; }
                     .dev-block-overlay {
                         position: relative;
+                    }
+                    .dev-block-overlay::before {
+                        content: '';
+                        position: absolute;
+                        top: 0;
+                        bottom: 0;
+                        left: -3.25rem;
+                        width: 3.25rem;
+                    }
+                    .dev-caption-preview-hidden {
+                        display: none !important;
+                    }
+                    .dev-text-preview-hidden {
+                        display: none !important;
+                    }
+                    .dev-block-overlay.dev-text-pending-delete {
+                        min-height: 2rem;
+                    }
+                    .dev-toolbar-text-icon {
+                        font: 600 0.8rem/1 sans-serif;
+                    }
+                    .dev-preview-as-carousel > .photo-row {
+                        display: flex;
+                        flex-direction: row;
+                        gap: 1rem;
+                        padding-inline: 5%;
+                        padding-block: 3.5rem;
+                        margin-block: -3.5rem;
+                        overflow-x: auto;
+                        scroll-snap-type: x mandatory;
+                        scroll-padding-inline: 5%;
+                        scrollbar-width: none;
+                    }
+                    .dev-preview-as-carousel > .photo-row::-webkit-scrollbar {
+                        display: none;
+                    }
+                    .dev-preview-as-carousel > .photo-row > * {
+                        flex: 0 0 90% !important;
+                        min-width: 0;
+                        opacity: 0.65;
+                        transform: scale(0.95);
+                        scroll-snap-align: center;
+                        transition: opacity 0.4s ease, transform 0.4s ease;
+                    }
+                    .dev-preview-as-carousel > .photo-row > [data-active],
+                    .dev-preview-as-carousel > .photo-row > :hover,
+                    .dev-preview-as-carousel > .photo-row > :focus-within {
+                        opacity: 1;
+                        transform: scale(1);
+                    }
+                    .dev-preview-carousel-dots {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        gap: 0.35rem;
+                        margin-top: 0.75rem;
+                    }
+                    .dev-preview-carousel-dot {
+                        width: 6px;
+                        height: 6px;
+                        padding: 0;
+                        border: 0;
+                        border-radius: 9999px;
+                        background: rgba(200, 200, 200, 0.25);
+                        transition: width 0.3s ease, background-color 0.3s ease;
+                    }
+                    .dev-preview-carousel-dot.active {
+                        width: 18px;
+                        background: rgba(255, 255, 255, 0.8);
+                    }
+                    .dev-preview-as-row > .carousel-track {
+                        display: flex;
+                        gap: 0.5rem;
+                        padding: 0;
+                        margin: 0;
+                        overflow: visible;
+                        scroll-snap-type: none;
+                    }
+                    .dev-preview-as-row > .carousel-track > * {
+                        min-width: 0;
+                        opacity: 1;
+                        transform: none;
+                        scroll-snap-align: none;
+                    }
+                    .dev-preview-as-row > .carousel-dots {
+                        display: none;
+                    }
+                    .dev-inline-caption-editor {
+                        margin: 0.5rem 0;
+                        padding: 0.65rem;
+                        border-radius: 0.5rem;
+                        background: rgba(24, 24, 27, 0.96);
+                        box-shadow: 0 4px 18px rgba(0,0,0,0.22);
+                        color: #e4e4e7;
+                    }
+                    .dev-inline-caption-editor__content {
+                        display: flex;
+                        align-items: stretch;
+                        gap: 0.4rem;
+                    }
+                    .dev-inline-caption-editor__side-controls {
+                        display: grid;
+                        grid-template-rows: repeat(3, minmax(0, 1fr));
+                        gap: 0.4rem;
+                        width: 10rem;
+                    }
+                    .dev-inline-caption-editor__actions {
+                        display: grid;
+                        grid-template-columns: repeat(3, minmax(0, 1fr));
+                        gap: 0.4rem;
+                    }
+                    .dev-inline-caption-editor textarea {
+                        min-width: 0;
+                        flex: 1;
+                        box-sizing: border-box;
+                        padding: 0.45rem 0.55rem;
+                        border: 1px solid rgba(255,255,255,0.24);
+                        border-radius: 0.3rem;
+                        background: rgba(0,0,0,0.28);
+                        color: #f4f4f5;
+                        font: 0.85rem/1.4 sans-serif;
+                        resize: none;
+                    }
+                    .dev-inline-caption-editor select {
+                        min-width: 0;
+                        width: 100%;
+                        box-sizing: border-box;
+                        padding: 0.35rem 0.45rem;
+                        border: 1px solid rgba(255,255,255,0.24);
+                        border-radius: 0.3rem;
+                        background: rgba(0,0,0,0.28);
+                        color: #f4f4f5;
+                        font-size: 0.75rem;
+                    }
+                    .dev-inline-caption-editor button {
+                        display: flex;
+                        width: 100%;
+                        height: 100%;
+                        padding: 0;
+                        align-items: center;
+                        justify-content: center;
+                        border: 1px solid rgba(255,255,255,0.24);
+                        border-radius: 0.3rem;
+                        background: rgba(255,255,255,0.08);
+                        color: #f4f4f5;
+                        cursor: pointer;
+                    }
+                    .dev-inline-caption-editor .dev-inline-caption-save {
+                        border-color: rgba(37,99,235,0.9);
+                        background: rgba(37,99,235,0.8);
+                    }
+                    .dev-inline-caption-editor .dev-inline-caption-delete {
+                        color: #f87171;
+                    }
+                    @media (max-width: 700px) {
+                        .dev-block-toolbar {
+                            top: auto;
+                            bottom: 0.5rem;
+                            left: 0.5rem;
+                        }
+                        .dev-block-overlay::before {
+                            display: none;
+                        }
+                        .dev-inline-caption-editor__side-controls {
+                            width: 8rem;
+                        }
                     }
                     /* Turn all dev mode photo wrappers into tagging areas */
                     .photo-wrapper {
@@ -242,6 +555,10 @@
                     }
                     .photo-wrapper:hover .tags-overlay,
                     .photo-wrapper.show-info .tags-overlay {
+                        opacity: 1;
+                        background: rgba(255, 255, 255, 0.1);
+                    }
+                    .dev-block-overlay.dev-tag-mode .tags-overlay {
                         opacity: 1;
                         background: rgba(255, 255, 255, 0.1);
                     }
@@ -316,6 +633,8 @@
                         justify-content: center;
                         cursor: pointer;
                         transition: all 0.3s; /* Matches transition duration-300 */
+                        opacity: 0;
+                        pointer-events: none;
                     }
                     .dev-tag-edit-btn svg {
                         width: 12px;
@@ -323,6 +642,10 @@
                     }
                     .dev-tag-edit-btn:hover {
                         background: rgba(59, 130, 246, 0.8);
+                    }
+                    .dev-tag-mode .dev-tag-edit-btn {
+                        opacity: 1;
+                        pointer-events: auto;
                     }
                     .dev-gear-btn {
                         width: 2rem;
@@ -375,9 +698,9 @@
                         color: white;
                     }
                     .dev-save-btn.has-pending {
-                        background: rgba(37, 99, 235, 0.85);
-                        color: white;
-                        border-color: rgba(37, 99, 235, 0.95);
+                        background: rgba(234, 179, 8, 0.9);
+                        color: #18181b;
+                        border-color: rgba(250, 204, 21, 0.95);
                     }
                     .dev-save-btn[disabled] {
                         opacity: 0.45;
@@ -437,95 +760,6 @@
                     .dev-pm-inline-add-zone:focus-within .dev-pm-inline-add-button,
                     .dev-pm-inline-add-zone.is-active .dev-pm-inline-add-button {
                         opacity: 1;
-                    }
-                    .dev-pm-margin-control {
-                        position: absolute;
-                        right: 1rem;
-                        z-index: 10;
-                        display: flex;
-                        height: 1.1rem;
-                        align-items: center;
-                        opacity: 0;
-                        transition: opacity 120ms ease;
-                    }
-                    .dev-pm-margin-control:hover,
-                    .dev-pm-margin-control:focus-within,
-                    .dev-pm-inline-add-zone:hover .dev-pm-margin-control,
-                    .dev-pm-inline-add-zone:focus-within .dev-pm-margin-control,
-                    .dev-pm-margin-control.has-custom {
-                        opacity: 1;
-                    }
-                    .dev-pm-margin-pill {
-                        display: flex;
-                        height: 22px;
-                        box-sizing: border-box;
-                        align-items: center;
-                        gap: 2px;
-                        padding: 0 4px;
-                        border: 1px solid #93c5fd;
-                        border-radius: 999px;
-                        background: white;
-                        color: #64748b;
-                        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12);
-                    }
-                    .dev-pm-margin-control.has-custom .dev-pm-margin-pill {
-                        border-color: #60a5fa;
-                        color: #2563eb;
-                    }
-                    .dev-pm-margin-icon {
-                        display: flex;
-                        width: 11px;
-                        height: 11px;
-                        padding: 0;
-                        align-items: center;
-                        justify-content: center;
-                        border: 0;
-                        background: none;
-                        color: inherit;
-                        cursor: pointer;
-                        flex-shrink: 0;
-                    }
-                    .dev-pm-margin-icon:disabled {
-                        cursor: default;
-                    }
-                    .dev-pm-margin-icon > span {
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                    }
-                    .dev-pm-margin-icon svg {
-                        width: 11px;
-                        height: 11px;
-                    }
-                    .dev-pm-margin-icon-reset {
-                        display: none !important;
-                        color: #ef4444;
-                    }
-                    .dev-pm-margin-control.has-custom .dev-pm-margin-icon:hover .dev-pm-margin-icon-direction,
-                    .dev-pm-margin-control.has-custom .dev-pm-margin-icon:focus-visible .dev-pm-margin-icon-direction {
-                        display: none;
-                    }
-                    .dev-pm-margin-control.has-custom .dev-pm-margin-icon:hover .dev-pm-margin-icon-reset,
-                    .dev-pm-margin-control.has-custom .dev-pm-margin-icon:focus-visible .dev-pm-margin-icon-reset {
-                        display: flex !important;
-                    }
-                    .dev-pm-margin-pill input[type=number] {
-                        width: 34px;
-                        padding: 0;
-                        border: 0;
-                        outline: 0;
-                        background: transparent;
-                        color: #334155;
-                        font: 0.68rem/1 sans-serif;
-                        text-align: center;
-                    }
-                    .dev-pm-margin-pill input[type=number]::placeholder {
-                        color: #94a3b8;
-                        opacity: 1;
-                    }
-                    .dev-pm-margin-unit {
-                        color: #94a3b8;
-                        font: 0.58rem/1 sans-serif;
                     }
                     .dev-pm-block-header {
                         display: flex;
@@ -917,18 +1151,50 @@
                 return JSON.stringify(normalizeTagMap(tagMap));
             };
 
+            const syncToolbarPendingState = (toolbar: Element | null) => {
+                if (!toolbar) return;
+                toolbar.classList.toggle('has-pending', Boolean(
+                    toolbar.querySelector('.dev-toolbar-btn.has-pending, .dev-inline-margin-control.has-pending'),
+                ));
+            };
+
+            const updateBlockTagPendingIndicator = (block: HTMLElement) => {
+                const hasPendingTags = Array.from(block.querySelectorAll<HTMLElement>('.photo-wrapper[data-item-key]'))
+                    .some((wrapper) => {
+                        const photoId = wrapper.dataset.itemKey;
+                        if (!photoId) return false;
+                        const key = getTagKeyFromPhotoId(photoId);
+                        return JSON.stringify(currentAlbumTagMap[key] || []) !== JSON.stringify(savedAlbumTagMap[key] || []);
+                    });
+                block.querySelector('.dev-btn-tag')?.classList.toggle('has-pending', hasPendingTags);
+                syncToolbarPendingState(block.querySelector('.dev-block-toolbar'));
+            };
+
+            const updateAllTagPendingIndicators = () => {
+                document.querySelectorAll<HTMLElement>('[data-dev-block]').forEach(updateBlockTagPendingIndicator);
+            };
+
             const updateSaveButtonState = (isSaving = false) => {
                 const saveBtn = document.getElementById('dev-save-btn') as HTMLButtonElement | null;
                 if (!saveBtn) return;
 
-                const hasPendingChanges = serializeTagMap(currentAlbumTagMap) !== serializeTagMap(savedAlbumTagMap);
+                const hasPendingTagChanges = serializeTagMap(currentAlbumTagMap) !== serializeTagMap(savedAlbumTagMap);
+                const hasPendingCaptionChanges = pendingCaptionChanges.size > 0;
+                const hasPendingTextChanges = pendingTextChanges.size > 0;
+                const hasPendingMarginChanges = pendingBlockMarginChanges.size > 0;
+                const hasPendingTypeChanges = pendingBlockTypeChanges.size > 0;
+                const hasPendingBlockChanges = hasPendingCaptionChanges
+                    || hasPendingTextChanges
+                    || hasPendingMarginChanges
+                    || hasPendingTypeChanges;
+                const hasPendingChanges = hasPendingTagChanges || hasPendingBlockChanges;
                 saveBtn.disabled = isSaving || !hasPendingChanges;
                 saveBtn.classList.toggle('has-pending', hasPendingChanges);
                 saveBtn.title = isSaving
-                    ? 'Saving tag changes...'
+                    ? 'Saving pending changes...'
                     : hasPendingChanges
-                        ? 'Save pending tag changes'
-                        : 'No pending tag changes';
+                        ? `Save pending ${hasPendingTagChanges && hasPendingBlockChanges ? 'tag and block' : hasPendingBlockChanges ? 'block' : 'tag'} changes`
+                        : 'No pending changes';
             };
 
             const rememberMountainName = (name: string, region?: MountainRegion) => {
@@ -984,6 +1250,13 @@
                 wrapper.querySelector('.tags-overlay')?.remove();
 
                 const tags = currentAlbumTagMap[getTagKeyFromPhotoId(photoId)] || [];
+                if (tags.length > 0) wrapper.dataset.hasTags = 'true';
+                else delete wrapper.dataset.hasTags;
+                const toolbar = wrapper.closest<HTMLElement>('[data-dev-block]')?.querySelector('.dev-block-toolbar');
+                const hasBlockTags = tags.length > 0
+                    || Boolean(toolbar?.closest('[data-dev-block]')?.querySelector('.photo-wrapper[data-has-tags="true"]'));
+                toolbar?.classList.toggle('has-tags', hasBlockTags);
+                toolbar?.querySelector('.dev-btn-tag')?.classList.toggle('has-data', hasBlockTags);
                 if (tags.length === 0) return;
 
                 const overlay = document.createElement('div');
@@ -1006,22 +1279,14 @@
                     renderTagOverlay(wrapper as HTMLElement);
                 });
                 initTagEditButtons();
+                updateAllTagPendingIndicators();
                 updateSaveButtonState();
             };
 
-            const savePendingTagChanges = async () => {
-                const albumSlug = getAlbumSlug();
-                if (!albumSlug) {
-                    showToast('❌ Cannot identify album');
-                    return;
-                }
-
+            const savePendingTagChanges = async (albumSlug: string) => {
                 if (serializeTagMap(currentAlbumTagMap) === serializeTagMap(savedAlbumTagMap)) {
-                    showToast('ℹ️ No pending tag changes');
-                    return;
+                    return true;
                 }
-
-                updateSaveButtonState(true);
 
                 try {
                     const response = await fetch('/api/save-tags', {
@@ -1044,11 +1309,160 @@
                         rememberMountainName(name, pendingMountainRegions[name]);
                         delete pendingMountainRegions[name];
                     });
-                    updateSaveButtonState();
-                    showToast('✅ Saved. The dev server may refresh the page.');
+                    updateAllTagPendingIndicators();
+                    return true;
                 } catch (error: any) {
-                    updateSaveButtonState();
                     showToast(`❌ Save failed: ${error?.message || 'Unknown error'}`);
+                    return false;
+                }
+            };
+
+            const savePendingBlockChanges = async (albumSlug: string) => {
+                const captionChanges = [...pendingCaptionChanges.entries()];
+                const textChanges = [...pendingTextChanges.entries()];
+                const marginChanges = [...pendingBlockMarginChanges.entries()];
+                const typeChanges = [...pendingBlockTypeChanges.entries()];
+                if (captionChanges.length === 0
+                    && textChanges.length === 0
+                    && marginChanges.length === 0
+                    && typeChanges.length === 0) return true;
+
+                try {
+                    const structureResponse = await fetch(`/api/get-page-structure?albumSlug=${encodeURIComponent(albumSlug)}`);
+                    if (!structureResponse.ok) throw new Error('Failed to load page structure');
+                    const structure = await structureResponse.json();
+
+                    const findBlock = (sourceType: string, photoNames: string[], blockIndex: number) => {
+                        const indexedCandidate = structure.blocks[blockIndex];
+                        if (indexedCandidate?.type === sourceType && (sourceType === 'Text'
+                            || (indexedCandidate.photos?.length === photoNames.length
+                                && indexedCandidate.photos.every((photo: any, index: number) => photo.itemKey === photoNames[index])))) {
+                            return blockIndex;
+                        }
+                        if (sourceType === 'Text') return -1;
+                        return structure.blocks.findIndex((candidate: any) =>
+                            candidate.type === sourceType
+                            && candidate.photos?.length === photoNames.length
+                            && candidate.photos.every((photo: any, index: number) => photo.itemKey === photoNames[index]),
+                        );
+                    };
+                    for (const [, change] of captionChanges) {
+                        const targetIndex = findBlock(change.sourceType, change.photoNames, change.blockIndex);
+                        if (targetIndex < 0) throw new Error('Could not identify a caption block');
+
+                        const props = { ...(structure.blocks[targetIndex].props || {}) };
+                        if (change.caption) {
+                            props.caption = change.caption;
+                            props.captionPosition = change.captionPosition;
+                        } else {
+                            delete props.caption;
+                            delete props.captionPosition;
+                        }
+                        structure.blocks[targetIndex].props = props;
+                        if (change.caption) applyDefaultCaptionBoundaryMargin(structure.blocks, targetIndex);
+                    }
+                    for (const [, change] of textChanges) {
+                        if (change.deleted) continue;
+                        const targetIndex = findBlock(change.sourceType, [], change.blockIndex);
+                        if (targetIndex < 0) throw new Error('Could not identify a text block');
+                        const target = structure.blocks[targetIndex];
+                        target.text = change.text;
+                        target.props = { ...(target.props || {}) };
+                        if (change.align === 'center') delete target.props.align;
+                        else target.props.align = change.align;
+                        if (change.textType === 'caption') delete target.props.size;
+                        else target.props.size = change.textType;
+                    }
+                    for (const [, change] of marginChanges) {
+                        const targetIndex = findBlock(change.sourceType, change.photoNames, change.blockIndex);
+                        if (targetIndex < 0) throw new Error('Could not identify a margin block');
+                        const props = { ...(structure.blocks[targetIndex].props || {}) };
+                        if (change.blockMargin) props.blockMargin = change.blockMargin;
+                        else delete props.blockMargin;
+                        if (change.sourceType === 'Text') {
+                            delete props.mt;
+                            delete props.mb;
+                        }
+                        structure.blocks[targetIndex].props = props;
+                    }
+                    for (const [, change] of typeChanges) {
+                        const targetIndex = findBlock(change.sourceType, change.photoNames, change.blockIndex);
+                        if (targetIndex < 0) throw new Error('Could not identify a media block');
+                        structure.blocks[targetIndex].type = change.targetType;
+                    }
+                    textChanges
+                        .filter(([, change]) => change.deleted)
+                        .sort(([, left], [, right]) => right.blockIndex - left.blockIndex)
+                        .forEach(([, change]) => {
+                            const targetIndex = findBlock(change.sourceType, [], change.blockIndex);
+                            if (targetIndex < 0) throw new Error('Could not identify a text block');
+                            structure.blocks.splice(targetIndex, 1);
+                        });
+
+                    const form = new FormData();
+                    form.set('albumSlug', albumSlug);
+                    form.set('draft', JSON.stringify({
+                        blocks: structure.blocks,
+                        metadata: {
+                            title: structure.metadata.title,
+                            info: structure.metadata.info || undefined,
+                            gap: structure.metadata.gap || undefined,
+                        },
+                        removeLocal: [],
+                    }));
+                    const saveResponse = await fetch('/api/save-page-manager', {
+                        method: 'POST',
+                        body: form,
+                    });
+                    if (!saveResponse.ok) {
+                        const result = await saveResponse.json().catch(() => ({}));
+                        throw new Error(result.error || 'Failed to save captions');
+                    }
+                    captionChanges.forEach(([key, change]) => {
+                        if (pendingCaptionChanges.get(key) === change) pendingCaptionChanges.delete(key);
+                    });
+                    textChanges.forEach(([key, change]) => {
+                        if (pendingTextChanges.get(key) === change) pendingTextChanges.delete(key);
+                    });
+                    marginChanges.forEach(([key, change]) => {
+                        if (pendingBlockMarginChanges.get(key) === change) pendingBlockMarginChanges.delete(key);
+                    });
+                    typeChanges.forEach(([key, change]) => {
+                        if (pendingBlockTypeChanges.get(key) === change) pendingBlockTypeChanges.delete(key);
+                    });
+                    return true;
+                } catch (error) {
+                    showToast(`❌ ${error instanceof Error ? error.message : 'Failed to save block changes'}`);
+                    return false;
+                }
+            };
+
+            const savePendingChanges = async () => {
+                const albumSlug = getAlbumSlug();
+                if (!albumSlug) return showToast('❌ Cannot identify album');
+                const hasPendingBlockChanges = pendingCaptionChanges.size > 0
+                    || pendingTextChanges.size > 0
+                    || pendingBlockMarginChanges.size > 0
+                    || pendingBlockTypeChanges.size > 0;
+                const hasPendingTags = serializeTagMap(currentAlbumTagMap) !== serializeTagMap(savedAlbumTagMap);
+                if (!hasPendingBlockChanges && !hasPendingTags) return showToast('ℹ️ No pending changes');
+
+                updateSaveButtonState(true);
+                const tagsSaved = await savePendingTagChanges(albumSlug);
+                if (tagsSaved && hasPendingBlockChanges) {
+                    // The dev server can apply an MDX update before the response returns.
+                    sessionStorage.setItem('dev-caption-save-scroll-y', String(window.scrollY));
+                }
+                const blocksSaved = tagsSaved && await savePendingBlockChanges(albumSlug);
+                updateSaveButtonState();
+                if (!tagsSaved || !blocksSaved) {
+                    if (!blocksSaved) sessionStorage.removeItem('dev-caption-save-scroll-y');
+                    return;
+                }
+
+                showToast('✅ Pending changes saved');
+                if (hasPendingBlockChanges) {
+                    window.setTimeout(() => window.location.reload(), 500);
                 }
             };
 
@@ -1289,9 +1703,6 @@
                     input.focus();
                 });
             }
-
-            // Caption Editing Dialog
-
 
             // Page Manager (Tree View)
             let sortableInstances: any[] = [];
@@ -1673,25 +2084,18 @@
                 updateFMState();
 
                 let currentBlocks = JSON.parse(JSON.stringify(data.blocks)).map((b: any) => {
-                    // Retire legacy media-block spacing props on load.
+                    // Normalize legacy spacing before Page Manager writes a draft.
                     if (b.props.mb && !b.props.blockMargin) {
                         b.props.blockMargin = b.props.mb;
                     }
-                    if (b.type !== 'Text') {
-                        delete b.props.mt;
-                        delete b.props.mb;
-                        delete b.props.captionMargin;
-                    }
+                    delete b.props.mt;
+                    delete b.props.mb;
+                    delete b.props.captionMargin;
                     return b;
                 });
-                const applyCaptionSpacing = (blockIndex: number) => applyDefaultCaptionBoundaryMargin(
-                    currentBlocks,
-                    blockIndex,
-                );
                 let collapsedBlocks: Set<number> = new Set(
                     currentBlocks.map((_: any, i: number) => i),
                 ); // All collapsed by default
-                let captionOpenBlocks = new Set(); // Track open caption editors
                 let selectedPhoto: {bIdx: number, pIdx: number} | null = null;
                 let selectedBlock: number | null = null;
                 let pendingPageImports: File[] = [];
@@ -1751,9 +2155,6 @@
                     removeLocal: [...pendingLocalRemovals].sort(),
                 });
                 let initialPageSnapshot = pageStateSnapshot();
-                currentBlocks.forEach((block: any, index: number) => {
-                    if (block.props.caption) applyCaptionSpacing(index);
-                });
                 const updatePageDirtyState = () => {
                     const dirty = pageStateSnapshot() !== initialPageSnapshot;
                     confirmBtn.disabled = !dirty;
@@ -1841,16 +2242,12 @@
                     if (selectedBlock === null) return;
                     const from = selectedBlock;
                     const collapsedFlags: boolean[] = currentBlocks.map((_: any, index: number) => collapsedBlocks.has(index));
-                    const captionFlags: boolean[] = currentBlocks.map((_: any, index: number) => captionOpenBlocks.has(index));
                     const [movedBlock] = currentBlocks.splice(from, 1);
                     const [movedCollapsed] = collapsedFlags.splice(from, 1);
-                    const [movedCaption] = captionFlags.splice(from, 1);
                     const target = from < gapIndex ? gapIndex - 1 : gapIndex;
                     currentBlocks.splice(target, 0, movedBlock);
                     collapsedFlags.splice(target, 0, movedCollapsed);
-                    captionFlags.splice(target, 0, movedCaption);
                     collapsedBlocks = new Set(collapsedFlags.flatMap((value: boolean, index: number) => value ? [index] : []));
-                    captionOpenBlocks = new Set(captionFlags.flatMap((value: boolean, index: number) => value ? [index] : []));
                     selectedBlock = null;
                     renderTree();
                 };
@@ -1909,80 +2306,6 @@
                     const gapButtonIcon = gapSelectionMode ? ICONS.arrowRight : ICONS.plus;
                     currentBlocks.forEach((block: any, bIdx: number) => {
                         const isCollapsed = collapsedBlocks.has(bIdx);
-                        const renderBoundaryMargin = ({
-                            edge,
-                            property,
-                            resetClass,
-                            label,
-                            defaultValue,
-                            persistDefault = false,
-                        }: {
-                            edge: 'top' | 'bottom';
-                            property: 'mt' | 'mb' | 'blockMargin';
-                            resetClass: string;
-                            label: string;
-                            defaultValue: string;
-                            persistDefault?: boolean;
-                        }) => {
-                            const value = remValueForInput(block.props[property]);
-                            const hasCustomValue = Boolean(value && value !== defaultValue);
-                            const icon = edge === 'top'
-                                ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="4" x2="19" y2="4"/><polyline points="12 8 12 20"/><polyline points="8 12 12 8 16 12"/></svg>`
-                                : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="20" x2="19" y2="20"/><polyline points="12 16 12 4"/><polyline points="8 12 12 16 16 12"/></svg>`;
-                            const input = property === 'mt'
-                                ? `<input class="text-block-mt" type="number" step="0.1" inputmode="decimal" placeholder="${defaultValue}" value="${hasCustomValue ? value : ''}" aria-label="${label} in rem" />`
-                                : property === 'mb'
-                                    ? `<input class="text-block-mb" type="number" step="0.1" inputmode="decimal" placeholder="${defaultValue}" value="${hasCustomValue ? value : ''}" aria-label="${label} in rem" />`
-                                    : `<input class="block-margin-block" type="number" step="0.1" inputmode="decimal" placeholder="${defaultValue}" value="${hasCustomValue ? value : ''}" aria-label="${label} in rem" />`;
-                            return `
-                                <div class="dev-pm-margin-control dev-pm-margin-control--${edge}${hasCustomValue ? ' has-custom' : ''}" data-margin-property="${property}" data-margin-default="${defaultValue}" data-margin-persist-default="${persistDefault}">
-                                    <div class="dev-pm-margin-pill" title="${label}">
-                                        <button class="dev-pm-margin-icon dev-pm-margin-reset ${resetClass}" type="button" ${hasCustomValue ? `title="Use default ${defaultValue}rem" aria-label="Reset ${label}"` : 'disabled aria-hidden="true" tabindex="-1"'}>
-                                            <span class="dev-pm-margin-icon-direction">${icon}</span>
-                                            <span class="dev-pm-margin-icon-reset">${ICONS.minus}</span>
-                                        </button>
-                                        ${input}
-                                        <span class="dev-pm-margin-unit">rem</span>
-                                    </div>
-                                </div>
-                            `;
-                        };
-                        const topMarginControl = block.type === 'Text'
-                            ? renderBoundaryMargin({
-                                edge: 'top',
-                                property: 'mt',
-                                resetClass: 'margin-text-mt-reset',
-                                label: 'Top margin',
-                                defaultValue: '2',
-                            })
-                            : '';
-                        const hasBottomCaption = Boolean(block.props.caption
-                            && !block.props.captionPosition?.includes('top'));
-                        const nextBlock = currentBlocks[bIdx + 1];
-                        const nextHasTopCaption = Boolean(nextBlock?.props.caption
-                            && nextBlock.props.captionPosition?.includes('top'));
-                        const usesCaptionSpacing = bIdx < currentBlocks.length - 1
-                            && (hasBottomCaption || nextHasTopCaption);
-                        const defaultBottomMargin = block.type === 'Text'
-                            ? '0.5'
-                            : block.type === 'PhotoCarousel' ? '2' : (fGap.value || '0.5');
-                        const bottomMarginControl = block.type === 'Text'
-                            ? renderBoundaryMargin({
-                                edge: 'bottom',
-                                property: 'mb',
-                                resetClass: 'margin-text-mb-reset',
-                                label: 'Bottom margin',
-                                defaultValue: defaultBottomMargin,
-                                persistDefault: usesCaptionSpacing,
-                            })
-                            : renderBoundaryMargin({
-                                edge: 'bottom',
-                                property: 'blockMargin',
-                                resetClass: 'margin-block-reset',
-                                label: 'Block margin',
-                                defaultValue: defaultBottomMargin,
-                                persistDefault: usesCaptionSpacing,
-                            });
                         const blockEl = document.createElement('div');
                         blockEl.className = `dev-pm-block ${isCollapsed ? 'collapsed' : ''}`;
                         blockEl.dataset.idx = bIdx.toString();
@@ -2008,74 +2331,16 @@
                                 </div>` : '<div style="flex:1;"></div>'}
                                 <div style="display:flex; align-items:center; gap:0.25rem; flex-shrink:0;">
                                     ${block.type !== 'Text' ? `<button class="block-add-photos" title="Add Photos" aria-label="Add Photos" style="background:none;border:none;cursor:pointer;color:#777;padding:4px;">${ICONS.plus}</button>` : ''}
-                                    ${block.type !== 'Text' ? `<button class="block-caption-toggle ${block.props.caption ? 'has-data' : ''}" title="Edit Caption" style="background: none; border: none; cursor: pointer; color: ${captionOpenBlocks.has(bIdx) ? '#2563eb' : block.props.caption ? '#22c55e' : '#777'}; padding: 4px;">${ICONS.quote}</button>` : ''}
                                     <button class="block-delete" title="Delete Block" style="background: none; border: none; cursor: pointer; color: #ef4444; padding: 4px;">${ICONS.trash}</button>
                                 </div>
                             </div>
                             <div class="dev-pm-block-content" style="display: ${isCollapsed ? 'none' : 'block'}; padding-left: 1rem;">
                                 ${block.type === 'Text' ? (() => {
-                                    const align = block.props.align || 'center';
-                                    const size = block.props.size || 'caption';
                                     return `
-                                        <div style="display: flex; flex-direction: column; gap: 0.5rem; padding: 0.5rem 0;">
-                                            <textarea class="text-block-content" placeholder="Enter text... Links: [text](/path) or [text](https://example.com)" style="width: 100%; box-sizing: border-box; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 0.85rem; min-height: 60px; resize: vertical; font-family: inherit;">${block.text || ''}</textarea>
-                                            <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
-                                                <select class="text-block-align" style="flex: 1; min-width: 80px; font-size: 0.75rem; padding: 4px; border: 1px solid #ddd; border-radius: 4px; background: white;">
-                                                    <option value="left" ${align === 'left' ? 'selected' : ''}>Left</option>
-                                                    <option value="center" ${align === 'center' ? 'selected' : ''}>Center</option>
-                                                    <option value="right" ${align === 'right' ? 'selected' : ''}>Right</option>
-                                                </select>
-                                                <select class="text-block-size" style="flex: 1; min-width: 80px; font-size: 0.75rem; padding: 4px; border: 1px solid #ddd; border-radius: 4px; background: white;">
-                                                    <option value="caption" ${size === 'caption' ? 'selected' : ''}>Caption</option>
-                                                    <option value="title" ${size === 'title' ? 'selected' : ''}>Title</option>
-                                                </select>
-                                            </div>
-                                        </div>
+                                        <div style="padding:0.5rem 0;color:#64748b;font-size:0.8rem;line-height:1.45;white-space:pre-wrap;">${escapeHtml(block.text || '')}</div>
                                     `;
                                 })() : (() => {
-                                    const isTop = block.props.captionPosition?.includes('top');
-                                    const isBottom = !block.props.captionPosition || block.props.captionPosition.includes('bottom');
-
-                                    const renderPreview = () => {
-                                        if (!block.props.caption) return '';
-                                        return `
-                                            <div class="tree-caption-preview" style="font-size: 0.75rem; color: #000; padding: 0.25rem 0.5rem; border-left: 2px solid #22c55e; margin: 0.25rem 0; font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                                ${block.props.caption}
-                                            </div>
-                                        `;
-                                    };
-
-                                    const renderCaptionArea = (vpos: 'top' | 'bottom') => {
-                                        if (captionOpenBlocks.has(bIdx)) return renderEditor(vpos);
-                                        return renderPreview();
-                                    };
-
-                                    const renderEditor = (vpos: 'top' | 'bottom') => `
-                                        <div class="dev-pm-caption-editor" style="padding: 0.75rem; background: #fdfdfd; border: 1px dashed #ddd; border-radius: 8px; margin: 0.5rem 0; display: flex; flex-direction: column; gap: 0.75rem; box-shadow: inset 0 1px 3px rgba(0,0,0,0.02);">
-                                            <div style="display: flex; gap: 0.25rem; align-items: center;">
-                                                <textarea class="block-caption" rows="4" wrap="soft" placeholder="Caption or [text](link)..." style="flex: 1; box-sizing:border-box; min-width:0; padding:6px; border:1px solid #ddd; border-radius:4px; font-size:0.85rem; line-height:1.4; overflow-wrap:anywhere; resize:none;">${block.props.caption || ''}</textarea>
-                                                <button class="caption-delete" title="Delete Caption" style="background: none; border: none; cursor: pointer; color: #ef4444; opacity: 0.6; display: flex; align-items: center;">${ICONS.trash}</button>
-                                            </div>
-
-                                            <div style="display: flex; gap: 0.25rem; align-items: center;">
-                                                    <select class="block-align" style="flex: 1; font-size:0.75rem; padding:4px; border:1px solid #ddd; border-radius:4px; background: white;">
-                                                        <option value="left" ${block.props.captionPosition?.includes('left') ? 'selected' : ''}>Left</option>
-                                                        <option value="center" ${(!block.props.captionPosition || block.props.captionPosition.includes('center')) ? 'selected' : ''}>Center</option>
-                                                        <option value="right" ${block.props.captionPosition?.includes('right') ? 'selected' : ''}>Right</option>
-                                                    </select>
-                                                    <select class="block-vpos" style="flex: 1; font-size:0.75rem; padding:4px; border:1px solid #ddd; border-radius:4px; background: white;">
-                                                        <option value="top" ${vpos === 'top' ? 'selected' : ''}>Top</option>
-                                                        <option value="bottom" ${vpos === 'bottom' ? 'selected' : ''}>Bottom</option>
-                                                    </select>
-                                            </div>
-                                        </div>
-                                    `;
-
-                                    const captionAreaTop = isTop ? renderCaptionArea('top') : '';
-                                    const captionAreaBottom = isBottom ? renderCaptionArea('bottom') : '';
-
                                     return `
-                                        ${captionAreaTop}
                                         <div class="dev-pm-photo-list" data-block-idx="${bIdx}">
                                             ${block.photos.map((p: any, pIdx: number) => `
                                                 <div class="dev-pm-photo${selectedPhoto && !(selectedPhoto.bIdx === bIdx && selectedPhoto.pIdx === pIdx) ? ' pm-move-target' : ''}${selectedPhoto?.bIdx === bIdx && selectedPhoto?.pIdx === pIdx ? ' pm-photo-selected' : ''}" data-p-idx="${pIdx}">
@@ -2101,16 +2366,13 @@
                                                 </div>
                                             `).join('')}
                                         </div>
-                                        ${captionAreaBottom}
                                     `;
                                 })()}
                             </div>
                             ${bIdx === 0
-                                ? `<div class="dev-pm-inline-add-zone dev-pm-inline-add-zone--before${gapSelectionMode ? ' is-active' : ''}"><button class="dev-pm-inline-add-button" type="button" data-page-gap-index="0" title="${gapSelectionMode ? 'Move here' : 'Add block before'}">${gapButtonIcon}</button>${topMarginControl}</div>`
-                                : topMarginControl
-                                    ? `<div class="dev-pm-inline-add-zone dev-pm-inline-add-zone--before">${topMarginControl}</div>`
-                                    : ''}
-                            <div class="dev-pm-inline-add-zone${gapSelectionMode ? ' is-active' : ''}"><button class="dev-pm-inline-add-button" type="button" data-page-gap-index="${bIdx + 1}" title="${gapSelectionMode ? 'Move here' : 'Add block here'}">${gapButtonIcon}</button>${bottomMarginControl}</div>
+                                ? `<div class="dev-pm-inline-add-zone dev-pm-inline-add-zone--before${gapSelectionMode ? ' is-active' : ''}"><button class="dev-pm-inline-add-button" type="button" data-page-gap-index="0" title="${gapSelectionMode ? 'Move here' : 'Add block before'}">${gapButtonIcon}</button></div>`
+                                : ''}
+                            <div class="dev-pm-inline-add-zone${gapSelectionMode ? ' is-active' : ''}"><button class="dev-pm-inline-add-button" type="button" data-page-gap-index="${bIdx + 1}" title="${gapSelectionMode ? 'Move here' : 'Add block here'}">${gapButtonIcon}</button></div>
                         `;
 
                         blockEl.querySelectorAll<HTMLImageElement>('img[data-pm-fallback-url]').forEach((image) => {
@@ -2125,11 +2387,6 @@
                         });
 
                         // Block events
-                        const capInput = blockEl.querySelector<HTMLTextAreaElement>('.block-caption');
-                        const alignSel = blockEl.querySelector('.block-align') as HTMLSelectElement;
-                        const vposSel = blockEl.querySelector('.block-vpos') as HTMLSelectElement;
-                        const captionToggle = blockEl.querySelector('.block-caption-toggle');
-
                         blockEl.querySelectorAll<HTMLElement>('[data-page-gap-index]').forEach((button) => {
                             button.addEventListener('click', (event) => {
                                 event.stopPropagation();
@@ -2137,116 +2394,6 @@
                                 if (selectedBlock !== null) moveSelectedBlockToGap(gapIndex);
                                 else openInlineBlockMenu(button, gapIndex);
                             });
-                        });
-
-                        captionToggle?.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            if (captionOpenBlocks.has(bIdx)) captionOpenBlocks.delete(bIdx);
-                            else {
-                                captionOpenBlocks.add(bIdx);
-                                collapsedBlocks.delete(bIdx); // auto-expand if collapsed
-                            }
-                            renderTree();
-                        });
-
-                        let isComposing = false;
-                        capInput?.addEventListener('compositionstart', () => { isComposing = true; });
-                        const refocusCaptionInput = () => {
-                            const newInput = treeContainer.querySelector<HTMLTextAreaElement>(`[data-idx="${bIdx}"] .block-caption`);
-                            if (newInput) {
-                                newInput.focus();
-                                const len = newInput.value.length;
-                                newInput.setSelectionRange(len, len);
-                            }
-                        };
-                        capInput?.addEventListener('compositionend', () => {
-                            isComposing = false;
-                            // Trigger re-render now that IME composition is committed
-                            const oldVal = block.props.caption;
-                            block.props.caption = capInput.value.trim();
-                            if (!oldVal && block.props.caption) applyCaptionSpacing(bIdx);
-                            if (!oldVal || !block.props.caption) {
-                                renderTree();
-                                refocusCaptionInput();
-                            }
-                        });
-                        capInput?.addEventListener('input', () => {
-                            // Skip re-render while IME composition is in progress
-                            if (isComposing) return;
-
-                            const oldVal = block.props.caption;
-                            block.props.caption = capInput.value.trim();
-                            if (!oldVal && block.props.caption) applyCaptionSpacing(bIdx);
-
-                            // If first character or cleared, re-render to create/remove the preview element
-                            if (!oldVal || !block.props.caption) {
-                                renderTree();
-                                refocusCaptionInput();
-                                return;
-                            }
-
-                            // Otherwise update preview directly for performance
-                            const preview = blockEl.querySelector('.tree-caption-preview');
-                            if (preview) {
-                                preview.textContent = block.props.caption;
-                            }
-                        });
-
-                        const getVPos = () => block.props.captionPosition?.includes('top') ? 'top' : 'bottom';
-
-                        alignSel?.addEventListener('change', () => {
-                            block.props.captionPosition = `${alignSel.value} ${getVPos()}`;
-                            updatePageDirtyState();
-                        });
-
-                        vposSel?.addEventListener('change', () => {
-                            const align = alignSel?.value || (block.props.captionPosition?.includes('right') ? 'right' : block.props.captionPosition?.includes('left') ? 'left' : 'center');
-                            block.props.captionPosition = `${align} ${vposSel.value}`;
-                            applyCaptionSpacing(bIdx);
-                            renderTree(); // Shift editor position
-                        });
-
-                        const syncBoundaryMarginControl = (input: HTMLInputElement, property: 'mt' | 'mb' | 'blockMargin') => {
-                            const control = input.closest('.dev-pm-margin-control') as HTMLElement | null;
-                            const defaultValue = control?.dataset.marginDefault || '';
-                            const persistDefault = control?.dataset.marginPersistDefault === 'true';
-                            const hasCustomValue = Boolean(block.props[property]
-                                && remValueForInput(block.props[property]) !== defaultValue);
-                            if (!hasCustomValue) {
-                                block.props[property] = persistDefault ? `${defaultValue}rem` : "";
-                            }
-                            control?.classList.toggle('has-custom', hasCustomValue);
-                            const reset = control?.querySelector('.dev-pm-margin-reset') as HTMLButtonElement | null;
-                            if (reset) {
-                                reset.disabled = !hasCustomValue;
-                                reset.tabIndex = hasCustomValue ? 0 : -1;
-                                reset.setAttribute('aria-hidden', String(!hasCustomValue));
-                                reset.title = hasCustomValue ? `Use default ${defaultValue}rem` : '';
-                            }
-                        };
-
-                        const marginBlockInput = blockEl.querySelector('.block-margin-block') as HTMLInputElement;
-                        marginBlockInput?.addEventListener('input', () => {
-                            block.props.blockMargin = remValueFromInput(marginBlockInput.value);
-                            syncBoundaryMarginControl(marginBlockInput, 'blockMargin');
-                        });
-                        blockEl.querySelector('.margin-block-reset')?.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            block.props.blockMargin = "";
-                            if (marginBlockInput) {
-                                marginBlockInput.value = '';
-                                syncBoundaryMarginControl(marginBlockInput, 'blockMargin');
-                                marginBlockInput.focus();
-                            }
-                            updatePageDirtyState();
-                        });
-
-                        blockEl.querySelector('.caption-delete')?.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            block.props.caption = "";
-                            block.props.captionPosition = "center bottom";
-                            captionOpenBlocks.delete(bIdx);
-                            renderTree();
                         });
 
                         blockEl.querySelector('.block-drag-handle')?.addEventListener('click', (e) => {
@@ -2260,7 +2407,6 @@
                             if (collapsedBlocks.has(bIdx)) collapsedBlocks.delete(bIdx);
                             else {
                                 collapsedBlocks.add(bIdx);
-                                captionOpenBlocks.delete(bIdx);
                             }
                             renderTree();
                         });
@@ -2292,41 +2438,6 @@
                             }
                         });
 
-                        // Text block controls
-                        if (block.type === 'Text') {
-                            const textArea = blockEl.querySelector('.text-block-content') as HTMLTextAreaElement;
-                            const alignSel = blockEl.querySelector('.text-block-align') as HTMLSelectElement;
-                            const sizeSel = blockEl.querySelector('.text-block-size') as HTMLSelectElement;
-                            const mtInput = blockEl.querySelector('.text-block-mt') as HTMLInputElement;
-                            const mbInput = blockEl.querySelector('.text-block-mb') as HTMLInputElement;
-                            textArea?.addEventListener('input', () => { block.text = textArea.value; });
-                            alignSel?.addEventListener('change', () => { block.props.align = alignSel.value; });
-                            sizeSel?.addEventListener('change', () => { block.props.size = sizeSel.value; });
-                            mtInput?.addEventListener('input', () => {
-                                block.props.mt = remValueFromInput(mtInput.value);
-                                syncBoundaryMarginControl(mtInput, 'mt');
-                            });
-                            mbInput?.addEventListener('input', () => {
-                                block.props.mb = remValueFromInput(mbInput.value);
-                                syncBoundaryMarginControl(mbInput, 'mb');
-                            });
-                            blockEl.querySelector('.margin-text-mt-reset')?.addEventListener('click', (e) => {
-                                e.stopPropagation();
-                                block.props.mt = "";
-                                mtInput.value = '';
-                                syncBoundaryMarginControl(mtInput, 'mt');
-                                mtInput.focus();
-                                updatePageDirtyState();
-                            });
-                            blockEl.querySelector('.margin-text-mb-reset')?.addEventListener('click', (e) => {
-                                e.stopPropagation();
-                                block.props.mb = "";
-                                mbInput.value = '';
-                                syncBoundaryMarginControl(mbInput, 'mb');
-                                mbInput.focus();
-                                updatePageDirtyState();
-                            });
-                        }
                         blockEl.querySelector('.block-add-photos')?.addEventListener('click', (event) => {
                             event.stopPropagation();
                             choosePhotosForBlock((files) => {
@@ -3825,22 +3936,602 @@
                 });
             };
 
-            const initToolbars = () => {
-                const blocks = Array.from(document.querySelectorAll('[data-dev-block]'));
-                const albumSlug = getAlbumSlug();
+            const setBlockTagMode = (block: HTMLElement) => {
+                const closeActiveTagBlock = () => {
+                    if (!activeTagBlock) return;
+                    activeTagBlock.classList.remove('dev-tag-mode');
+                    const activeToolbar = activeTagBlock.querySelector('.dev-block-toolbar');
+                    activeToolbar?.classList.remove('is-tagging');
+                    activeToolbar?.querySelector('.dev-btn-tag')?.classList.remove('active');
+                    activeToolbar?.querySelector('.dev-btn-tag')?.setAttribute('aria-pressed', 'false');
+                    activeTagBlock = null;
+                };
 
-                blocks.forEach((block, index) => {
+                if (activeTagBlock === block) {
+                    closeActiveTagBlock();
+                    return;
+                }
+                closeActiveTagBlock();
+                activeTagBlock = block;
+                block.classList.add('dev-tag-mode');
+                const toolbar = block.querySelector('.dev-block-toolbar');
+                toolbar?.classList.add('is-tagging');
+                toolbar?.querySelector('.dev-btn-tag')?.classList.add('active');
+                toolbar?.querySelector('.dev-btn-tag')?.setAttribute('aria-pressed', 'true');
+            };
+
+            const initToolbars = async () => {
+                const albumSlug = getAlbumSlug();
+                if (!albumSlug) return;
+
+                let sourceBlocks: any[] = [];
+                try {
+                    const response = await fetch(`/api/get-page-structure?albumSlug=${encodeURIComponent(albumSlug)}`);
+                    if (response.ok) sourceBlocks = (await response.json()).blocks || [];
+                } catch {}
+
+                const blocks = Array.from(document.querySelectorAll('[data-dev-block]'));
+
+                blocks.forEach((block, blockIndex) => {
                     if (block.querySelector('.dev-block-toolbar')) return;
 
                     block.classList.add('dev-block-overlay');
 
                     const toolbar = document.createElement('div');
-                    toolbar.className = 'dev-block-toolbar';
+                    const blockElement = block as HTMLElement;
+                    const isTextBlock = blockElement.dataset.devBlock === 'text';
+                    const sourceType: 'Row' | 'PhotoCarousel' | 'Text' = isTextBlock
+                        ? 'Text'
+                        : blockElement.dataset.devBlock === 'carousel' ? 'PhotoCarousel' : 'Row';
+                    const sourceBlock = sourceBlocks[blockIndex]?.type === sourceType
+                        ? sourceBlocks[blockIndex]
+                        : undefined;
+                    const fileCaption = blockElement.dataset.devCaption || '';
+                    const fileCaptionPosition = blockElement.dataset.devCaptionPos || 'center bottom';
+                    const hasCaption = Boolean(fileCaption);
+                    const textContent = blockElement.querySelector<HTMLElement>(':scope > .text-block__content');
+                    const fileText = String(sourceBlock?.text ?? textContent?.textContent ?? '').trim();
+                    const fileTextAlign = (sourceBlock?.props?.align || blockElement.dataset.devTextAlign || 'center') as 'left' | 'center' | 'right';
+                    const fileTextType = (sourceBlock?.props?.size || blockElement.dataset.devTextType || 'caption') as 'caption' | 'title';
+                    const fileTextHtml = textContent?.innerHTML || '';
+                    const hasTags = Boolean(blockElement.querySelector('.photo-wrapper[data-has-tags="true"]'));
+                    const photoNames = Array.from(blockElement.querySelectorAll<HTMLElement>('.photo-wrapper[data-item-key]'))
+                        .map((photo) => photo.dataset.itemKey?.split('/').pop() || '');
+                    const captionChangeKey = `${sourceType}:${photoNames.join('\u001f')}`;
+                    const textChangeKey = `Text:${blockIndex}`;
+                    const marginChangeKey = `${isTextBlock ? textChangeKey : captionChangeKey}:margin`;
+                    const typeChangeKey = `${captionChangeKey}:type`;
+                    const stagedBlockType = pendingBlockTypeChanges.get(typeChangeKey)?.targetType;
+                    const displayedBlockType = stagedBlockType || sourceType;
+                    const rootFontSize = Number.parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+                    const marginInPixels = Number.parseFloat(getComputedStyle(blockElement).marginBottom);
+                    const visibleMargin = `${Math.round(((Number.isFinite(marginInPixels) ? marginInPixels : 0) / rootFontSize) * 1000) / 1000}rem`;
+                    const albumContent = blockElement.closest<HTMLElement>('.album-content');
+                    const albumGap = albumContent
+                        ? getComputedStyle(albumContent).getPropertyValue('--album-block-gap').trim()
+                        : '';
+                    const isLastAlbumBlock = albumContent?.lastElementChild === blockElement;
+                    const rowDefaultMargin = isLastAlbumBlock ? '0rem' : (albumGap || '0.5rem');
+                    const defaultMarginForType = (blockType: 'Row' | 'PhotoCarousel' | 'Text') => {
+                        if (blockType === 'PhotoCarousel') return '2rem';
+                        if (blockType === 'Text') return '0.5rem';
+                        return rowDefaultMargin;
+                    };
+                    const originalBlockMargin = sourceBlock?.props?.blockMargin
+                        || (isTextBlock ? sourceBlock?.props?.mb : '')
+                        || blockElement.dataset.devBlockMargin
+                        || '';
+                    const fileEffectiveMargin = remValueFromInput(remValueForInput(originalBlockMargin || visibleMargin));
+                    const stagedBlockMargin = pendingBlockMarginChanges.get(marginChangeKey)?.blockMargin || '';
+                    const initialBlockMargin = stagedBlockMargin || originalBlockMargin || visibleMargin;
+                    const hasBlockMargin = Boolean(stagedBlockMargin || originalBlockMargin);
+                    toolbar.className = `dev-block-toolbar${hasCaption ? ' has-caption' : ''}${isTextBlock ? ' has-text' : ''}${hasTags ? ' has-tags' : ''}${hasBlockMargin ? ' has-margin' : ''}`;
 
-                    const hasCaption = !!(block as HTMLElement).dataset.devCaption;
-
-                    toolbar.innerHTML = ``;
+                    toolbar.innerHTML = `
+                        ${isTextBlock ? `
+                            <button class="dev-toolbar-btn dev-btn-text${fileText ? ' has-data' : ''}" type="button" title="Edit Text" aria-label="Edit Text" aria-expanded="false">
+                                <span class="dev-toolbar-text-icon" aria-hidden="true">T</span>
+                            </button>
+                        ` : `
+                            <button class="dev-toolbar-btn dev-btn-tag${hasTags ? ' has-data' : ''}" type="button" title="Edit Tags" aria-label="Edit Tags" aria-pressed="false">
+                                ${ICONS.pin}
+                            </button>
+                            <button class="dev-toolbar-btn dev-btn-caption${hasCaption ? ' has-data' : ''}" type="button" title="${hasCaption ? 'Edit Caption' : 'Add Caption'}" aria-label="${hasCaption ? 'Edit Caption' : 'Add Caption'}" aria-expanded="false">
+                                ${ICONS.quote}
+                            </button>
+                        `}
+                        <div class="dev-inline-margin-control${hasBlockMargin ? ' has-data' : ''}" title="Edit block margin">
+                            <input class="dev-inline-margin-input" type="number" step="0.1" inputmode="decimal" value="${remValueForInput(initialBlockMargin)}" aria-label="Block margin in rem" readonly />
+                            <button class="dev-inline-margin-cancel" type="button" title="Cancel margin change" aria-label="Cancel margin change">${ICONS.close}</button>
+                            <button class="dev-inline-margin-save" type="button" title="Confirm margin change" aria-label="Confirm margin change">${ICONS.check}</button>
+                        </div>
+                        ${isTextBlock ? '' : `
+                            <button class="dev-toolbar-btn dev-btn-block-type has-data${stagedBlockType ? ' has-pending' : ''}" type="button" title="Switch to ${displayedBlockType === 'Row' ? 'Carousel' : 'Row'}" aria-label="Switch to ${displayedBlockType === 'Row' ? 'Carousel' : 'Row'}">
+                                <span class="dev-toolbar-text-icon" aria-hidden="true">${displayedBlockType === 'Row' ? 'R' : 'C'}</span>
+                            </button>
+                        `}
+                    `;
                     block.appendChild(toolbar);
+
+                    const captionButton = toolbar.querySelector<HTMLButtonElement>('.dev-btn-caption');
+                    const textButton = toolbar.querySelector<HTMLButtonElement>('.dev-btn-text');
+                    const tagButton = toolbar.querySelector<HTMLButtonElement>('.dev-btn-tag');
+                    const blockTypeButton = toolbar.querySelector<HTMLButtonElement>('.dev-btn-block-type');
+                    const marginControl = toolbar.querySelector<HTMLElement>('.dev-inline-margin-control')!;
+                    const marginInput = toolbar.querySelector<HTMLInputElement>('.dev-inline-margin-input')!;
+
+                    const updateCaptionPreview = (caption: string, captionPosition: string) => {
+                        const [align = 'center', verticalPosition = 'bottom'] = captionPosition.split(' ');
+                        let preview = blockElement.querySelector<HTMLElement>(':scope > .photo-caption');
+                        if (!caption) {
+                            preview?.remove();
+                            delete blockElement.dataset.devCaption;
+                            delete blockElement.dataset.devCaptionPos;
+                        } else {
+                            if (!preview) {
+                                preview = document.createElement('div');
+                                preview.classList.add('photo-caption');
+                            }
+                            preview.className = `photo-caption ${verticalPosition}`;
+                            preview.style.textAlign = align;
+                            preview.textContent = caption;
+                            blockElement.dataset.devCaption = caption;
+                            blockElement.dataset.devCaptionPos = captionPosition;
+                            if (verticalPosition === 'top') {
+                                const firstContent = Array.from(blockElement.children)
+                                    .find((child) => !child.classList.contains('dev-block-toolbar'));
+                                if (firstContent) blockElement.insertBefore(preview, firstContent);
+                                else blockElement.appendChild(preview);
+                            } else {
+                                blockElement.insertBefore(preview, toolbar);
+                            }
+                        }
+                        const hasCurrentCaption = Boolean(caption);
+                        toolbar.classList.toggle('has-caption', hasCurrentCaption);
+                        captionButton?.classList.toggle('has-data', hasCurrentCaption);
+                        captionButton?.setAttribute('title', hasCurrentCaption ? 'Edit Caption' : 'Add Caption');
+                        captionButton?.setAttribute('aria-label', hasCurrentCaption ? 'Edit Caption' : 'Add Caption');
+                    };
+
+                    const updateMarginPreview = (blockMargin: string) => {
+                        const displayedType = pendingBlockTypeChanges.get(typeChangeKey)?.targetType || sourceType;
+                        const effectiveMargin = blockMargin || (isTextBlock
+                            ? defaultMarginForType('Text')
+                            : defaultMarginForType(displayedType as 'Row' | 'PhotoCarousel'));
+                        blockElement.style.setProperty('margin-bottom', effectiveMargin, 'important');
+                        if (blockMargin) blockElement.dataset.devBlockMargin = blockMargin;
+                        else delete blockElement.dataset.devBlockMargin;
+                        const hasCurrentMargin = Boolean(blockMargin);
+                        toolbar.classList.toggle('has-margin', hasCurrentMargin);
+                        marginControl.classList.toggle('has-data', hasCurrentMargin);
+                        marginInput.value = remValueForInput(effectiveMargin);
+                    };
+
+                    const closeInlineMarginEditor = () => {
+                        marginControl.classList.remove('is-open');
+                        marginInput.readOnly = true;
+                        if (activeMarginControl === marginControl) activeMarginControl = null;
+                    };
+
+                    const openInlineMarginEditor = () => {
+                        if (activeMarginControl && activeMarginControl !== marginControl) {
+                            const previousInput = activeMarginControl.querySelector<HTMLInputElement>('.dev-inline-margin-input');
+                            if (previousInput) previousInput.value = activeMarginControl.dataset.marginValue || '';
+                            previousInput && (previousInput.readOnly = true);
+                            activeMarginControl.classList.remove('is-open');
+                        }
+                        activeMarginControl = marginControl;
+                        marginControl.dataset.marginValue = marginInput.value;
+                        marginControl.classList.add('is-open');
+                        marginInput.readOnly = false;
+                        marginInput.focus();
+                        marginInput.select();
+                    };
+
+                    const stageBlockMargin = () => {
+                        const blockMargin = remValueFromInput(marginInput.value);
+                        const displayedType = pendingBlockTypeChanges.get(typeChangeKey)?.targetType || sourceType;
+                        const expectedEffectiveMargin = originalBlockMargin
+                            ? fileEffectiveMargin
+                            : remValueFromInput(remValueForInput(defaultMarginForType(displayedType)));
+                        const matchesFile = blockMargin === expectedEffectiveMargin;
+                        if (matchesFile) {
+                            pendingBlockMarginChanges.delete(marginChangeKey);
+                        } else {
+                            pendingBlockMarginChanges.set(marginChangeKey, {
+                                sourceType,
+                                blockIndex,
+                                photoNames,
+                                blockMargin,
+                                originalBlockMargin,
+                            });
+                        }
+                        updateMarginPreview(matchesFile ? originalBlockMargin : blockMargin);
+                        marginControl.classList.toggle('has-pending', !matchesFile);
+                        syncToolbarPendingState(toolbar);
+                        closeInlineMarginEditor();
+                        updateSaveButtonState();
+                        showToast(matchesFile ? 'ℹ️ Block margin unchanged' : '📝 Pending block margin update');
+                    };
+
+                    const updateBlockTypePreview = (
+                        targetType: 'Row' | 'PhotoCarousel',
+                        matchesFile: boolean,
+                    ) => {
+                        const track = blockElement.querySelector<HTMLElement>(':scope > .photo-row, :scope > .carousel-track');
+                        if (!track) return;
+                        const slides = Array.from(track.children) as HTMLElement[];
+
+                        const restoreOriginalLayout = () => {
+                            blockElement.classList.remove('dev-preview-as-row', 'dev-preview-as-carousel');
+                            blockElement.querySelector('.dev-preview-carousel-dots')?.remove();
+                            slides.forEach((slide) => {
+                                if ('devPreviewOriginalFlex' in slide.dataset) {
+                                    slide.style.flex = slide.dataset.devPreviewOriginalFlex || '';
+                                    delete slide.dataset.devPreviewOriginalFlex;
+                                }
+                                if (slide.dataset.devPreviewWasActive === 'true') slide.setAttribute('data-active', '');
+                                else if ('devPreviewWasActive' in slide.dataset) slide.removeAttribute('data-active');
+                                delete slide.dataset.devPreviewWasActive;
+                            });
+                            if ('devPreviewScrollLeft' in track.dataset) {
+                                track.scrollLeft = Number(track.dataset.devPreviewScrollLeft) || 0;
+                                delete track.dataset.devPreviewScrollLeft;
+                            }
+                        };
+
+                        if (matchesFile) {
+                            restoreOriginalLayout();
+                            updateMarginPreview(pendingBlockMarginChanges.get(marginChangeKey)?.blockMargin || originalBlockMargin);
+                            return;
+                        }
+
+                        if (!('devPreviewScrollLeft' in track.dataset)) {
+                            track.dataset.devPreviewScrollLeft = String(track.scrollLeft);
+                        }
+                        slides.forEach((slide) => {
+                            if (!('devPreviewOriginalFlex' in slide.dataset)) {
+                                slide.dataset.devPreviewOriginalFlex = slide.style.flex;
+                                slide.dataset.devPreviewWasActive = String(slide.hasAttribute('data-active'));
+                            }
+                        });
+
+                        blockElement.classList.toggle('dev-preview-as-row', targetType === 'Row');
+                        blockElement.classList.toggle('dev-preview-as-carousel', targetType === 'PhotoCarousel');
+                        blockElement.querySelector('.dev-preview-carousel-dots')?.remove();
+                        updateMarginPreview(pendingBlockMarginChanges.get(marginChangeKey)?.blockMargin || originalBlockMargin);
+
+                        if (targetType === 'Row') {
+                            slides.forEach((slide) => {
+                                const image = slide.querySelector<HTMLImageElement>('img');
+                                const applyRatio = () => {
+                                    if (!image?.naturalWidth || !image.naturalHeight) return;
+                                    slide.style.flex = `${(image.naturalWidth / image.naturalHeight) * 100} 1 0%`;
+                                };
+                                slide.setAttribute('data-active', '');
+                                if (image?.complete) applyRatio();
+                                else image?.addEventListener('load', applyRatio, { once: true });
+                            });
+                            return;
+                        }
+
+                        slides.forEach((slide, index) => {
+                            if (index === 0) slide.setAttribute('data-active', '');
+                            else slide.removeAttribute('data-active');
+                        });
+                        track.scrollLeft = 0;
+                        if (slides.length < 2) return;
+                        const dots = document.createElement('div');
+                        dots.className = 'dev-preview-carousel-dots';
+                        slides.forEach((slide, index) => {
+                            const dot = document.createElement('button');
+                            dot.className = `dev-preview-carousel-dot${index === 0 ? ' active' : ''}`;
+                            dot.type = 'button';
+                            dot.setAttribute('aria-label', `Go to slide ${index + 1}`);
+                            dot.addEventListener('click', (event) => {
+                                event.preventDefault();
+                                event.stopPropagation();
+                                slides.forEach((candidate) => candidate.removeAttribute('data-active'));
+                                dots.querySelectorAll('.dev-preview-carousel-dot').forEach((candidate) => candidate.classList.remove('active'));
+                                slide.setAttribute('data-active', '');
+                                dot.classList.add('active');
+                                track.scrollTo({
+                                    left: slide.offsetLeft - track.offsetLeft - (track.clientWidth - slide.clientWidth) / 2,
+                                    behavior: 'smooth',
+                                });
+                            });
+                            dots.appendChild(dot);
+                        });
+                        track.insertAdjacentElement('afterend', dots);
+                    };
+
+                    const stageBlockType = () => {
+                        if (isTextBlock || !blockTypeButton) return;
+                        const currentType = pendingBlockTypeChanges.get(typeChangeKey)?.targetType || sourceType;
+                        const targetType = currentType === 'Row' ? 'PhotoCarousel' : 'Row';
+                        const matchesFile = targetType === sourceType;
+                        if (matchesFile) {
+                            pendingBlockTypeChanges.delete(typeChangeKey);
+                        } else {
+                            pendingBlockTypeChanges.set(typeChangeKey, {
+                                sourceType: sourceType as PendingBlockTypeChange['sourceType'],
+                                targetType,
+                                blockIndex,
+                                photoNames,
+                            });
+                        }
+                        blockTypeButton.querySelector('.dev-toolbar-text-icon')!.textContent = targetType === 'Row' ? 'R' : 'C';
+                        blockTypeButton.title = `Switch to ${targetType === 'Row' ? 'Carousel' : 'Row'}`;
+                        blockTypeButton.setAttribute('aria-label', blockTypeButton.title);
+                        blockTypeButton.classList.toggle('has-pending', !matchesFile);
+                        updateBlockTypePreview(targetType, matchesFile);
+                        syncToolbarPendingState(toolbar);
+                        updateSaveButtonState();
+                        showToast(matchesFile ? 'ℹ️ Block type unchanged' : `📝 Pending switch to ${targetType === 'Row' ? 'Row' : 'Carousel'}`);
+                    };
+
+                    const closeInlineCaptionEditor = () => {
+                        blockElement.querySelector('.dev-inline-caption-editor')?.remove();
+                        blockElement.querySelectorAll(':scope > .photo-caption').forEach((caption) => {
+                            caption.classList.remove('dev-caption-preview-hidden');
+                        });
+                        toolbar.classList.remove('is-open');
+                        captionButton?.classList.remove('active');
+                        captionButton?.setAttribute('aria-expanded', 'false');
+                    };
+
+                    const openInlineCaptionEditor = () => {
+                        closeInlineCaptionEditor();
+
+                        const pendingChange = pendingCaptionChanges.get(captionChangeKey);
+                        const initialCaption = pendingChange?.caption ?? blockElement.dataset.devCaption ?? '';
+                        const initialPosition = pendingChange?.captionPosition ?? blockElement.dataset.devCaptionPos ?? 'center bottom';
+                        const [initialAlign = 'center', initialVPos = 'bottom'] = initialPosition.split(' ');
+                        const editor = document.createElement('div');
+                        editor.className = 'dev-inline-caption-editor';
+                        editor.innerHTML = `
+                            <div class="dev-inline-caption-editor__content">
+                                <textarea class="dev-inline-caption-text" rows="4" wrap="soft" placeholder="Caption, **bold**, *italic*, or [text](link)..."></textarea>
+                                <div class="dev-inline-caption-editor__side-controls">
+                                    <div class="dev-inline-caption-editor__actions">
+                                        ${initialCaption ? `<button class="dev-inline-caption-delete" type="button" title="Delete Caption" aria-label="Delete Caption">${ICONS.trash}</button>` : '<span></span>'}
+                                        <button class="dev-inline-caption-cancel" type="button" title="Cancel" aria-label="Cancel">${ICONS.close}</button>
+                                        <button class="dev-inline-caption-save" type="button" title="Save Caption" aria-label="Save Caption">${ICONS.check}</button>
+                                    </div>
+                                    <select class="dev-inline-caption-align" aria-label="Caption alignment">
+                                        <option value="left">Left</option>
+                                        <option value="center">Center</option>
+                                        <option value="right">Right</option>
+                                    </select>
+                                    <select class="dev-inline-caption-vpos" aria-label="Caption position">
+                                        <option value="top">Top</option>
+                                        <option value="bottom">Bottom</option>
+                                    </select>
+                                </div>
+                            </div>
+                        `;
+
+                        const textInput = editor.querySelector<HTMLTextAreaElement>('.dev-inline-caption-text')!;
+                        const alignSelect = editor.querySelector<HTMLSelectElement>('.dev-inline-caption-align')!;
+                        const positionSelect = editor.querySelector<HTMLSelectElement>('.dev-inline-caption-vpos')!;
+                        const saveButton = editor.querySelector<HTMLButtonElement>('.dev-inline-caption-save')!;
+                        textInput.value = initialCaption;
+                        alignSelect.value = initialAlign;
+                        positionSelect.value = initialVPos;
+
+                        const positionEditor = () => {
+                            blockElement.querySelectorAll(':scope > .photo-caption').forEach((caption) => {
+                                caption.classList.add('dev-caption-preview-hidden');
+                            });
+                            const position = positionSelect.value;
+                            const captionAnchor = blockElement.querySelector(`:scope > .photo-caption.${position}`);
+                            if (captionAnchor) {
+                                blockElement.insertBefore(editor, captionAnchor);
+                                return;
+                            }
+                            if (position === 'top') {
+                                const firstContent = Array.from(blockElement.children)
+                                    .find((child) => !child.classList.contains('dev-block-toolbar'));
+                                if (firstContent) blockElement.insertBefore(editor, firstContent);
+                                else blockElement.appendChild(editor);
+                                return;
+                            }
+                            blockElement.appendChild(editor);
+                        };
+
+                        const stageInlineCaption = (caption: string) => {
+                            const captionPosition = `${alignSelect.value} ${positionSelect.value}`;
+                            const matchesFile = caption === fileCaption && captionPosition === fileCaptionPosition;
+                            if (matchesFile) {
+                                pendingCaptionChanges.delete(captionChangeKey);
+                            } else {
+                                pendingCaptionChanges.set(captionChangeKey, {
+                                    sourceType: sourceType as PendingCaptionChange['sourceType'],
+                                    blockIndex,
+                                    photoNames,
+                                    caption,
+                                    captionPosition,
+                                    originalCaption: fileCaption,
+                                    originalCaptionPosition: fileCaptionPosition,
+                                });
+                            }
+                            closeInlineCaptionEditor();
+                            updateCaptionPreview(caption, captionPosition);
+                            captionButton?.classList.toggle('has-pending', !matchesFile);
+                            syncToolbarPendingState(toolbar);
+                            updateSaveButtonState();
+                            showToast(matchesFile ? 'ℹ️ Caption unchanged' : `📝 Pending caption ${caption ? 'update' : 'deletion'}`);
+                        };
+
+                        editor.querySelector('.dev-inline-caption-cancel')?.addEventListener('click', closeInlineCaptionEditor);
+                        editor.querySelector('.dev-inline-caption-delete')?.addEventListener('click', () => {
+                            stageInlineCaption('');
+                        });
+                        saveButton.addEventListener('click', () => {
+                            stageInlineCaption(textInput.value.trim());
+                        });
+                        positionSelect.addEventListener('change', positionEditor);
+                        editor.addEventListener('click', (event) => event.stopPropagation());
+                        positionEditor();
+                        toolbar.classList.add('is-open');
+                        captionButton?.classList.add('active');
+                        captionButton?.setAttribute('aria-expanded', 'true');
+                        textInput.focus();
+                    };
+
+                    const closeInlineTextEditor = () => {
+                        blockElement.querySelector('.dev-inline-text-editor')?.remove();
+                        const pendingChange = pendingTextChanges.get(textChangeKey);
+                        textContent?.classList.toggle('dev-text-preview-hidden', Boolean(pendingChange?.deleted));
+                        toolbar.classList.remove('is-open');
+                        textButton?.classList.remove('active');
+                        textButton?.setAttribute('aria-expanded', 'false');
+                    };
+
+                    const updateTextPreview = (
+                        text: string,
+                        align: 'left' | 'center' | 'right',
+                        textType: 'caption' | 'title',
+                        deleted: boolean,
+                        matchesFile: boolean,
+                    ) => {
+                        if (textContent) {
+                            if (matchesFile) textContent.innerHTML = fileTextHtml;
+                            else textContent.textContent = text;
+                            textContent.classList.toggle('dev-text-preview-hidden', deleted);
+                        }
+                        blockElement.style.textAlign = align;
+                        blockElement.classList.toggle('text-block--caption', textType === 'caption');
+                        blockElement.classList.toggle('text-block--title', textType === 'title');
+                        blockElement.classList.toggle('dev-text-pending-delete', deleted);
+                        blockElement.dataset.devTextAlign = align;
+                        blockElement.dataset.devTextType = textType;
+                        textButton?.classList.toggle('has-data', !deleted && Boolean(text));
+                    };
+
+                    const openInlineTextEditor = () => {
+                        closeInlineTextEditor();
+
+                        const pendingChange = pendingTextChanges.get(textChangeKey);
+                        const initialText = pendingChange?.text ?? fileText;
+                        const initialAlign = pendingChange?.align ?? fileTextAlign;
+                        const initialTextType = pendingChange?.textType ?? fileTextType;
+                        const editor = document.createElement('div');
+                        editor.className = 'dev-inline-caption-editor dev-inline-text-editor';
+                        editor.innerHTML = `
+                            <div class="dev-inline-caption-editor__content">
+                                <textarea class="dev-inline-text-input" rows="4" wrap="soft" placeholder="Text, **bold**, *italic*, or [text](link)..."></textarea>
+                                <div class="dev-inline-caption-editor__side-controls">
+                                    <div class="dev-inline-caption-editor__actions">
+                                        <button class="dev-inline-text-delete" type="button" title="Delete Text block" aria-label="Delete Text block">${ICONS.trash}</button>
+                                        <button class="dev-inline-text-cancel" type="button" title="Cancel" aria-label="Cancel">${ICONS.close}</button>
+                                        <button class="dev-inline-caption-save dev-inline-text-save" type="button" title="Confirm Text change" aria-label="Confirm Text change">${ICONS.check}</button>
+                                    </div>
+                                    <select class="dev-inline-text-align" aria-label="Text alignment">
+                                        <option value="left">Left</option>
+                                        <option value="center">Center</option>
+                                        <option value="right">Right</option>
+                                    </select>
+                                    <select class="dev-inline-text-type" aria-label="Text type">
+                                        <option value="caption">Caption</option>
+                                        <option value="title">Title</option>
+                                    </select>
+                                </div>
+                            </div>
+                        `;
+
+                        const textInput = editor.querySelector<HTMLTextAreaElement>('.dev-inline-text-input')!;
+                        const alignSelect = editor.querySelector<HTMLSelectElement>('.dev-inline-text-align')!;
+                        const typeSelect = editor.querySelector<HTMLSelectElement>('.dev-inline-text-type')!;
+                        textInput.value = initialText;
+                        alignSelect.value = initialAlign;
+                        typeSelect.value = initialTextType;
+
+                        const stageInlineText = (deleted = false) => {
+                            const text = textInput.value.trim();
+                            const align = alignSelect.value as 'left' | 'center' | 'right';
+                            const textType = typeSelect.value as 'caption' | 'title';
+                            const matchesFile = !deleted
+                                && text === fileText
+                                && align === fileTextAlign
+                                && textType === fileTextType;
+                            if (matchesFile) {
+                                pendingTextChanges.delete(textChangeKey);
+                            } else {
+                                pendingTextChanges.set(textChangeKey, {
+                                    sourceType: 'Text',
+                                    blockIndex,
+                                    text,
+                                    align,
+                                    textType,
+                                    deleted,
+                                    originalText: fileText,
+                                    originalAlign: fileTextAlign,
+                                    originalTextType: fileTextType,
+                                });
+                            }
+                            closeInlineTextEditor();
+                            updateTextPreview(text, align, textType, deleted, matchesFile);
+                            textButton?.classList.toggle('has-pending', !matchesFile);
+                            syncToolbarPendingState(toolbar);
+                            updateSaveButtonState();
+                            showToast(matchesFile ? 'ℹ️ Text unchanged' : `📝 Pending Text ${deleted ? 'block deletion' : 'update'}`);
+                        };
+
+                        editor.querySelector('.dev-inline-text-cancel')?.addEventListener('click', closeInlineTextEditor);
+                        editor.querySelector('.dev-inline-text-delete')?.addEventListener('click', () => stageInlineText(true));
+                        editor.querySelector('.dev-inline-text-save')?.addEventListener('click', () => stageInlineText(false));
+                        editor.addEventListener('click', (event) => event.stopPropagation());
+                        textContent?.classList.add('dev-text-preview-hidden');
+                        blockElement.insertBefore(editor, toolbar);
+                        toolbar.classList.add('is-open');
+                        textButton?.classList.add('active');
+                        textButton?.setAttribute('aria-expanded', 'true');
+                        textInput.focus();
+                    };
+
+                    captionButton?.addEventListener('click', (event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        if (blockElement.querySelector('.dev-inline-caption-editor')) closeInlineCaptionEditor();
+                        else openInlineCaptionEditor();
+                    });
+                    textButton?.addEventListener('click', (event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        if (blockElement.querySelector('.dev-inline-text-editor')) closeInlineTextEditor();
+                        else openInlineTextEditor();
+                    });
+                    marginInput.addEventListener('click', (event) => {
+                        event.stopPropagation();
+                        if (marginInput.readOnly) openInlineMarginEditor();
+                    });
+                    marginControl.querySelector('.dev-inline-margin-cancel')?.addEventListener('click', (event) => {
+                        event.stopPropagation();
+                        marginInput.value = marginControl.dataset.marginValue || remValueForInput(initialBlockMargin);
+                        closeInlineMarginEditor();
+                    });
+                    marginControl.querySelector('.dev-inline-margin-save')?.addEventListener('click', (event) => {
+                        event.stopPropagation();
+                        stageBlockMargin();
+                    });
+                    tagButton?.addEventListener('click', (event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        setBlockTagMode(blockElement);
+                    });
+                    blockTypeButton?.addEventListener('click', (event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        stageBlockType();
+                    });
+                    blockElement.addEventListener('pointerdown', (event) => {
+                        if (!blockElement.classList.contains('dev-preview-as-row')) return;
+                        const track = blockElement.querySelector<HTMLElement>(':scope > .carousel-track');
+                        const slide = (event.target as HTMLElement).closest<HTMLElement>('.carousel-track > *');
+                        if (!track || !slide || !track.contains(slide)) return;
+                        slide.setAttribute('data-active', '');
+                    }, true);
                 });
                 initTagEditButtons();
             };
@@ -3890,6 +4581,7 @@
                 ) return;
 
                 if (wrapper) {
+                    if (!wrapper.closest('.dev-tag-mode')) return;
                     e.preventDefault();
                     e.stopPropagation();
                     performTagging(e as MouseEvent, wrapper as HTMLElement);
@@ -3906,6 +4598,11 @@
                 syncAlbumTagStateFromDom();
                 initToolbars();
                 initFolderCoverEditors();
+                const savedScrollY = sessionStorage.getItem('dev-caption-save-scroll-y');
+                if (savedScrollY) {
+                    sessionStorage.removeItem('dev-caption-save-scroll-y');
+                    window.requestAnimationFrame(() => window.scrollTo({ top: Number(savedScrollY) }));
+                }
 
                 // Add Gear button
                 if (!document.getElementById('dev-gear-btn')) {
@@ -3949,9 +4646,9 @@
                     saveBtn.className = 'dev-save-btn';
                     saveBtn.type = 'button';
                     saveBtn.innerHTML = ICONS.cloudSync;
-                    saveBtn.title = 'No pending tag changes';
+                    saveBtn.title = 'No pending changes';
                     saveBtn.disabled = true;
-                    saveBtn.addEventListener('click', savePendingTagChanges);
+                    saveBtn.addEventListener('click', savePendingChanges);
 
                     const scrollContainer = document.querySelector('.fixed.bottom-8.right-8.flex-col');
                     if (scrollContainer) {

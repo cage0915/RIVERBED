@@ -68,6 +68,7 @@ const slideWidthPercent = 100 - peekPercent;
     data-dev-caption={isDev && caption ? caption : undefined}
     data-dev-caption-pos={isDev ? captionPosition : undefined}
     data-dev-mb={isDev && mb ? mb : undefined}
+    data-dev-block-margin={isDev && (blockMargin || mb) ? blockMargin || mb : undefined}
 >
     {caption && parsedPos === 'top' && (
         <div class="photo-caption top" style={`text-align: ${parsedAlign};`}>
@@ -362,7 +363,7 @@ const slideWidthPercent = 100 - peekPercent;
             background: rgba(255, 255, 255, 0.8);
         }
         .photo-caption {
-            color: #a1a1aa;
+            color: #c4c4cc;
         }
     }
 
