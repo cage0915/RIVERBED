@@ -321,6 +321,31 @@ test('pending captions share the component presentation used by persisted captio
     assert.doesNotMatch(devTool, /if \(document\.getElementById\('dev-tool-styles'\)\) return/);
 });
 
+test('carousel edge slides use scrollable spacers so every active photo shares one centre', () => {
+    const carousel = readProjectFile('src/components/PhotoCarousel.astro');
+    const devTool = readProjectFile('src/components/DevTool.astro');
+
+    assert.match(carousel, /--carousel-edge:\s*calc\(\(100% - var\(--slide-width, 80%\)\) \/ 2\)/);
+    assert.match(carousel, /\.carousel-track::before,[\s\S]*?\.carousel-track::after[\s\S]*?flex:\s*0 0 var\(--carousel-edge\)/);
+    assert.match(carousel, /\.carousel-track::before\s*\{[\s\S]*?margin-inline-end:\s*calc\(-1 \* var\(--gap, 0\.5rem\)\)/);
+    assert.match(carousel, /\.carousel-track::after\s*\{[\s\S]*?margin-inline-start:\s*calc\(-1 \* var\(--gap, 0\.5rem\)\)/);
+    assert.doesNotMatch(carousel, /padding-inline:\s*calc\(\(100% - var\(--slide-width/);
+
+    assert.match(devTool, /\.dev-page-structure-preview \.carousel-track::before,[\s\S]*?flex:\s*0 0 10%/);
+    assert.match(devTool, /\.dev-preview-as-carousel > \.photo-row::before,[\s\S]*?flex:\s*0 0 10%/);
+    assert.match(devTool, /\.dev-preview-as-row > \.carousel-track::before,[\s\S]*?display:\s*none/);
+});
+
+test('carousel defaults show more of the adjacent photos with a tighter gap', () => {
+    const carousel = readProjectFile('src/components/PhotoCarousel.astro');
+    const devTool = readProjectFile('src/components/DevTool.astro');
+
+    assert.match(carousel, /gap = "0\.5rem"/);
+    assert.match(carousel, /peekPercent = 20/);
+    assert.match(devTool, /\.dev-page-structure-preview \.carousel-track > \*[\s\S]*?flex:\s*0 0 80%/);
+    assert.match(devTool, /\.dev-preview-as-carousel > \.photo-row > \*[\s\S]*?flex:\s*0 0 80% !important/);
+});
+
 test('media block type toggle is always last and saves through shared pending changes', () => {
     const devTool = readProjectFile('src/components/DevTool.astro');
 

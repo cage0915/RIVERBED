@@ -460,18 +460,29 @@
                     }
                     .dev-page-structure-preview .carousel-track {
                         flex-direction: row;
-                        gap: 1rem;
-                        padding-inline: 5%;
+                        gap: 0.5rem;
                         padding-block: 3.5rem;
                         margin-block: -3.5rem;
                         overflow-x: auto;
                         scroll-snap-type: x mandatory;
-                        scroll-padding-inline: 5%;
+                        scroll-padding-inline: 10%;
                         scrollbar-width: none;
+                    }
+                    .dev-page-structure-preview .carousel-track::before,
+                    .dev-page-structure-preview .carousel-track::after {
+                        content: "";
+                        flex: 0 0 10%;
+                        pointer-events: none;
+                    }
+                    .dev-page-structure-preview .carousel-track::before {
+                        margin-inline-end: -0.5rem;
+                    }
+                    .dev-page-structure-preview .carousel-track::after {
+                        margin-inline-start: -0.5rem;
                     }
                     .dev-page-structure-preview .carousel-track::-webkit-scrollbar { display: none; }
                     .dev-page-structure-preview .carousel-track > * {
-                        flex: 0 0 90%;
+                        flex: 0 0 80%;
                         min-width: 0;
                         opacity: 0.65;
                         transform: scale(0.95);
@@ -525,20 +536,31 @@
                     .dev-preview-as-carousel > .photo-row {
                         display: flex;
                         flex-direction: row;
-                        gap: 1rem;
-                        padding-inline: 5%;
+                        gap: 0.5rem;
                         padding-block: 3.5rem;
                         margin-block: -3.5rem;
                         overflow-x: auto;
                         scroll-snap-type: x mandatory;
-                        scroll-padding-inline: 5%;
+                        scroll-padding-inline: 10%;
                         scrollbar-width: none;
+                    }
+                    .dev-preview-as-carousel > .photo-row::before,
+                    .dev-preview-as-carousel > .photo-row::after {
+                        content: "";
+                        flex: 0 0 10%;
+                        pointer-events: none;
+                    }
+                    .dev-preview-as-carousel > .photo-row::before {
+                        margin-inline-end: -0.5rem;
+                    }
+                    .dev-preview-as-carousel > .photo-row::after {
+                        margin-inline-start: -0.5rem;
                     }
                     .dev-preview-as-carousel > .photo-row::-webkit-scrollbar {
                         display: none;
                     }
                     .dev-preview-as-carousel > .photo-row > * {
-                        flex: 0 0 90% !important;
+                        flex: 0 0 80% !important;
                         min-width: 0;
                         opacity: 0.65;
                         transform: scale(0.95);
@@ -578,6 +600,10 @@
                         margin: 0;
                         overflow: visible;
                         scroll-snap-type: none;
+                    }
+                    .dev-preview-as-row > .carousel-track::before,
+                    .dev-preview-as-row > .carousel-track::after {
+                        display: none;
                     }
                     .dev-preview-as-row > .carousel-track > * {
                         min-width: 0;
