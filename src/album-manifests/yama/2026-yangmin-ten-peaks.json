@@ -31,16 +31,6 @@
       ]
     },
     {
-      "filename": "KCS00914.jpg",
-      "tags": [
-        {
-          "name": "紗帽山",
-          "x": 76.6,
-          "y": 35.48
-        }
-      ]
-    },
-    {
       "filename": "KCS00923.jpg",
       "tags": [
         {
@@ -51,10 +41,6 @@
       ]
     },
     {
-      "filename": "KCS00937.jpg",
-      "tags": []
-    },
-    {
       "filename": "KCS00943.jpg",
       "tags": [
         {
@@ -63,6 +49,10 @@
           "y": 61.03
         }
       ]
+    },
+    {
+      "filename": "KCS00937.jpg",
+      "tags": []
     },
     {
       "filename": "KCS00965.jpg",
@@ -81,6 +71,16 @@
           "name": "七星山",
           "x": 37.02,
           "y": 12.07
+        }
+      ]
+    },
+    {
+      "filename": "KCS00972.jpg",
+      "tags": [
+        {
+          "name": "大屯山南峰",
+          "x": 60.18,
+          "y": 48.72
         }
       ]
     },
@@ -115,16 +115,6 @@
       ]
     },
     {
-      "filename": "KCS00972.jpg",
-      "tags": [
-        {
-          "name": "大屯山南峰",
-          "x": 60.18,
-          "y": 48.72
-        }
-      ]
-    },
-    {
       "filename": "KCS00976.jpg",
       "tags": [
         {
@@ -135,6 +125,10 @@
       ]
     },
     {
+      "filename": "KCS00991.jpg",
+      "tags": []
+    },
+    {
       "filename": "KCS00978.jpg",
       "tags": [
         {
@@ -143,24 +137,6 @@
           "y": 31.31
         }
       ]
-    },
-    {
-      "filename": "KCS00986.jpg",
-      "tags": [
-        {
-          "name": "七星山",
-          "x": 61.86,
-          "y": 28.18
-        }
-      ]
-    },
-    {
-      "filename": "KCS00989.jpg",
-      "tags": []
-    },
-    {
-      "filename": "KCS00991.jpg",
-      "tags": []
     },
     {
       "filename": "KCS01005.jpg",
@@ -238,24 +214,6 @@
       ]
     },
     {
-      "filename": "KCS01042.jpg",
-      "tags": [
-        {
-          "name": "觀音山",
-          "x": 55.69,
-          "y": 32.36
-        }
-      ]
-    },
-    {
-      "filename": "KCS01048.jpg",
-      "tags": []
-    },
-    {
-      "filename": "KCS01050.jpg",
-      "tags": []
-    },
-    {
       "filename": "KCS01067.jpg",
       "tags": [
         {
@@ -266,24 +224,12 @@
       ]
     },
     {
-      "filename": "KCS01057.jpg",
-      "tags": [
-        {
-          "name": "大屯山",
-          "x": 54.49,
-          "y": 28.59
-        }
-      ]
+      "filename": "KCS01048.jpg",
+      "tags": []
     },
     {
-      "filename": "KCS01071.jpg",
-      "tags": [
-        {
-          "name": "觀音山",
-          "x": 55.61,
-          "y": 36.16
-        }
-      ]
+      "filename": "KCS01065.jpg",
+      "tags": []
     },
     {
       "filename": "KCS01060.jpg",
@@ -301,11 +247,17 @@
       ]
     },
     {
-      "filename": "KCS01062.jpg",
-      "tags": []
+      "filename": "KCS01071.jpg",
+      "tags": [
+        {
+          "name": "觀音山",
+          "x": 55.61,
+          "y": 36.16
+        }
+      ]
     },
     {
-      "filename": "KCS01065.jpg",
+      "filename": "KCS01062.jpg",
       "tags": []
     },
     {
