@@ -122,6 +122,22 @@ test('Page Manager serialization retires captionMargin', () => {
     assert.match(content, /blockMargin="1\.5rem"/);
 });
 
+test('caption serialization and pending preview preserve manual line breaks', () => {
+    const content = createLayoutOnlyPageContent([
+        {
+            type: 'Row',
+            props: { caption: 'First line\nSecond line' },
+            photos: [{ itemKey: 'one.jpg' }],
+        },
+    ]);
+    const devTool = readProjectFile('src/components/DevTool.astro');
+
+    assert.match(content, /caption="First line\nSecond line"/);
+    assert.match(devTool, /\.dev-caption-live-preview\s*\{\s*white-space: pre-line;/);
+    assert.match(devTool, /preview\.classList\.add\('dev-caption-live-preview'\);\s*preview\.textContent = caption/);
+    assert.match(devTool, /stageInlineCaption\(textInput\.value\.trim\(\)\)/);
+});
+
 test('Text serialization uses one bottom block margin and retires legacy Text margins', () => {
     const content = createLayoutOnlyPageContent([
         { type: 'Text', props: { align: 'left', size: 'title', mt: '2rem', mb: '1.5rem' }, text: 'Section' },
@@ -315,6 +331,20 @@ test('direct caption editor uses a fixed four-line field with aligned controls',
     );
     assert.match(devTool, /grid-template-rows: repeat\(3, minmax\(0, 1fr\)\)/);
     assert.doesNotMatch(devTool, /block-caption-toggle|dev-pm-caption-editor/);
+});
+
+test('block captions and Text content open their direct editors on double click', () => {
+    const devTool = readProjectFile('src/components/DevTool.astro');
+
+    assert.match(devTool, /blockElement\.addEventListener\('dblclick', \(event\) =>/);
+    assert.match(
+        devTool,
+        /target\.closest\('\.text-block__content'\)[\s\S]*?content\.parentElement !== blockElement[\s\S]*?openInlineTextEditor\(\)/,
+    );
+    assert.match(
+        devTool,
+        /target\.closest\('\.photo-caption'\)[\s\S]*?caption\.parentElement !== blockElement[\s\S]*?openInlineCaptionEditor\(\)/,
+    );
 });
 
 test('all remaining spacing inputs use unitless rem values', () => {

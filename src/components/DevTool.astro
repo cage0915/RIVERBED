@@ -384,6 +384,9 @@
                     .dev-caption-preview-hidden {
                         display: none !important;
                     }
+                    .dev-caption-live-preview {
+                        white-space: pre-line;
+                    }
                     .dev-text-preview-hidden {
                         display: none !important;
                     }
@@ -3988,6 +3991,7 @@
                         : undefined;
                     const fileCaption = blockElement.dataset.devCaption || '';
                     const fileCaptionPosition = blockElement.dataset.devCaptionPos || 'center bottom';
+                    const fileCaptionHtml = blockElement.querySelector<HTMLElement>(':scope > .photo-caption')?.innerHTML || '';
                     const hasCaption = Boolean(fileCaption);
                     const textContent = blockElement.querySelector<HTMLElement>(':scope > .text-block__content');
                     const fileText = String(sourceBlock?.text ?? textContent?.textContent ?? '').trim();
@@ -4060,7 +4064,7 @@
                     const marginControl = toolbar.querySelector<HTMLElement>('.dev-inline-margin-control')!;
                     const marginInput = toolbar.querySelector<HTMLInputElement>('.dev-inline-margin-input')!;
 
-                    const updateCaptionPreview = (caption: string, captionPosition: string) => {
+                    const updateCaptionPreview = (caption: string, captionPosition: string, matchesFile = false) => {
                         const [align = 'center', verticalPosition = 'bottom'] = captionPosition.split(' ');
                         let preview = blockElement.querySelector<HTMLElement>(':scope > .photo-caption');
                         if (!caption) {
@@ -4074,7 +4078,11 @@
                             }
                             preview.className = `photo-caption ${verticalPosition}`;
                             preview.style.textAlign = align;
-                            preview.textContent = caption;
+                            if (matchesFile) preview.innerHTML = fileCaptionHtml;
+                            else {
+                                preview.classList.add('dev-caption-live-preview');
+                                preview.textContent = caption;
+                            }
                             blockElement.dataset.devCaption = caption;
                             blockElement.dataset.devCaptionPos = captionPosition;
                             if (verticalPosition === 'top') {
@@ -4356,7 +4364,7 @@
                                 });
                             }
                             closeInlineCaptionEditor();
-                            updateCaptionPreview(caption, captionPosition);
+                            updateCaptionPreview(caption, captionPosition, matchesFile);
                             captionButton?.classList.toggle('has-pending', !matchesFile);
                             syncToolbarPendingState(toolbar);
                             updateSaveButtonState();
@@ -4501,6 +4509,23 @@
                         event.stopPropagation();
                         if (blockElement.querySelector('.dev-inline-text-editor')) closeInlineTextEditor();
                         else openInlineTextEditor();
+                    });
+                    blockElement.addEventListener('dblclick', (event) => {
+                        const target = event.target as HTMLElement;
+                        if (isTextBlock) {
+                            const content = target.closest('.text-block__content');
+                            if (!content || content.parentElement !== blockElement) return;
+                            event.preventDefault();
+                            event.stopPropagation();
+                            if (!blockElement.querySelector('.dev-inline-text-editor')) openInlineTextEditor();
+                            return;
+                        }
+
+                        const caption = target.closest('.photo-caption');
+                        if (!caption || caption.parentElement !== blockElement) return;
+                        event.preventDefault();
+                        event.stopPropagation();
+                        if (!blockElement.querySelector('.dev-inline-caption-editor')) openInlineCaptionEditor();
                     });
                     marginInput.addEventListener('click', (event) => {
                         event.stopPropagation();
