@@ -349,6 +349,7 @@ test('carousel defaults show more of the adjacent photos with a tighter gap', ()
 test('mobile album media is full bleed while captions keep the content gutter', () => {
     const albumPage = readProjectFile('src/pages/[folder]/[album].astro');
     const devTool = readProjectFile('src/components/DevTool.astro');
+    const layout = readProjectFile('src/layouts/Layout.astro');
 
     assert.match(albumPage, /@media \(max-width: 767px\)[\s\S]*?--album-mobile-gutter:\s*1rem/);
     assert.match(
@@ -378,6 +379,10 @@ test('mobile album media is full bleed while captions keep the content gutter', 
     assert.match(
         devTool,
         /@media \(max-width: 767px\)[\s\S]*?\.dev-page-structure-preview \.carousel-track > \*,[\s\S]*?flex:\s*0 0 100% !important;[\s\S]*?opacity:\s*1;[\s\S]*?transform:\s*none/,
+    );
+    assert.match(
+        layout,
+        /@media \(max-width: 767px\)[\s\S]*?:root\s*\{[\s\S]*?scrollbar-gutter:\s*auto/,
     );
 });
 

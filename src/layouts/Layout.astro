@@ -72,6 +72,12 @@ const { title } = Astro.props;
 		scrollbar-gutter: stable;
 	}
 
+	@media (max-width: 767px) {
+		:root {
+			scrollbar-gutter: auto;
+		}
+	}
+
 	body {
 		font-family: "PT Sans", "Noto Sans TC", "Noto Sans JP", sans-serif;
 	}
