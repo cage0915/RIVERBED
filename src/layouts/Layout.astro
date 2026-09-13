@@ -5,16 +5,12 @@ import SiteFooter from "../components/SiteFooter.astro";
 import SiteNavigation from "../components/SiteNavigation.astro";
 import ContentKeyboardNavigation from "../components/ContentKeyboardNavigation.astro";
 import PhotoLightbox from "../components/PhotoLightbox.astro";
-import "@fontsource/noto-sans-jp/300.css";
+// Keep the shared font baseline to the weight every route uses. Fontsource's
+// numbered CJK faces include unicode-range declarations, so browsers fetch
+// only the chunks needed by the text on the current page.
 import "@fontsource/noto-sans-jp/400.css";
-import "@fontsource/noto-sans-jp/500.css";
-import "@fontsource/noto-sans-jp/700.css";
 import "@fontsource/pt-sans/400.css";
-import "@fontsource/pt-sans/700.css";
-import "@fontsource/noto-sans-tc/300.css";
 import "@fontsource/noto-sans-tc/400.css";
-import "@fontsource/noto-sans-tc/500.css";
-import "@fontsource/noto-sans-tc/700.css";
 import "photoswipe/dist/photoswipe.css";
 
 interface Props {

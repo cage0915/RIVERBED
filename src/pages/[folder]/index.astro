@@ -1,6 +1,9 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import CatalogCardInteractions from "../../components/CatalogCardInteractions.astro";
+// Folder metadata uses the light CJK face; keep it out of unrelated routes.
+import "@fontsource/noto-sans-jp/300.css";
+import "@fontsource/noto-sans-tc/300.css";
 import { getAlbumSummaries } from "../../lib/albums/catalog";
 import {
     FOLDER_METADATA,
