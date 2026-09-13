@@ -401,12 +401,65 @@ const titleSections = extractTitleSections(albumEntry.body);
     }
 
     @media (max-width: 767px) {
+        .album-content {
+            --album-mobile-gutter: 1rem;
+        }
+
+        /*
+         * Album media bleeds through the page gutter on phones. Captions keep
+         * the page's original text boundary, so only the photos reach the
+         * viewport edges.
+         */
+        .album-content > :global(.row-wrapper),
+        .album-content > :global(.carousel-section) {
+            width: calc(100% + var(--album-mobile-gutter) + var(--album-mobile-gutter));
+            margin-inline: calc(0rem - var(--album-mobile-gutter));
+        }
+
+        .album-content :global(.row-wrapper > .photo-caption),
+        .album-content :global(.carousel-section > .photo-caption),
+        .album-content :global(.carousel-track > .photo-container .photo-caption--photo) {
+            box-sizing: border-box;
+            padding-inline: var(--album-mobile-gutter);
+        }
+
+        .album-content :global(.photo-row > :first-child .photo-caption--photo) {
+            padding-inline-start: var(--album-mobile-gutter);
+        }
+
+        .album-content :global(.photo-row > :last-child .photo-caption--photo) {
+            padding-inline-end: var(--album-mobile-gutter);
+        }
+
+        /* Dots already communicate swiping on mobile, so use one full-width
+           slide and remove the edge spacers that reveal adjacent photos. */
+        .album-content :global(.carousel-track) {
+            --carousel-edge: 0px;
+            scroll-padding-inline: 0;
+        }
+
+        .album-content :global(.carousel-track > *) {
+            flex-basis: 100%;
+            opacity: 1;
+            transform: none;
+        }
+
+        .album-content :global(.photo-wrapper img) {
+            border-radius: 0;
+        }
+
         .album-content :global(.album-photo-grid) {
             gap: 2px;
         }
 
         .album-content :global(.album-photo-grid__row) {
             gap: 2px;
+        }
+    }
+
+    @media (min-width: 640px) and (max-width: 767px) {
+        .album-content {
+            --album-mobile-gutter: 2rem;
         }
     }
 </style>

@@ -346,6 +346,41 @@ test('carousel defaults show more of the adjacent photos with a tighter gap', ()
     assert.match(devTool, /\.dev-preview-as-carousel > \.photo-row > \*[\s\S]*?flex:\s*0 0 80% !important/);
 });
 
+test('mobile album media is full bleed while captions keep the content gutter', () => {
+    const albumPage = readProjectFile('src/pages/[folder]/[album].astro');
+    const devTool = readProjectFile('src/components/DevTool.astro');
+
+    assert.match(albumPage, /@media \(max-width: 767px\)[\s\S]*?--album-mobile-gutter:\s*1rem/);
+    assert.match(
+        albumPage,
+        /\.album-content > :global\(\.row-wrapper\),[\s\S]*?\.album-content > :global\(\.carousel-section\)[\s\S]*?margin-inline:\s*calc\(0rem - var\(--album-mobile-gutter\)\)/,
+    );
+    assert.match(
+        albumPage,
+        /:global\(\.carousel-section > \.photo-caption\)[\s\S]*?padding-inline:\s*var\(--album-mobile-gutter\)/,
+    );
+    assert.match(
+        albumPage,
+        /:global\(\.carousel-track\)[\s\S]*?--carousel-edge:\s*0px;[\s\S]*?scroll-padding-inline:\s*0/,
+    );
+    assert.match(
+        albumPage,
+        /:global\(\.carousel-track > \*\)[\s\S]*?flex-basis:\s*100%;[\s\S]*?opacity:\s*1;[\s\S]*?transform:\s*none/,
+    );
+    assert.match(
+        albumPage,
+        /@media \(min-width: 640px\) and \(max-width: 767px\)[\s\S]*?--album-mobile-gutter:\s*2rem/,
+    );
+    assert.match(
+        devTool,
+        /@media \(max-width: 767px\)[\s\S]*?\.dev-page-structure-preview \.carousel-track::before,[\s\S]*?\.dev-preview-as-carousel > \.photo-row::after[\s\S]*?display:\s*none/,
+    );
+    assert.match(
+        devTool,
+        /@media \(max-width: 767px\)[\s\S]*?\.dev-page-structure-preview \.carousel-track > \*,[\s\S]*?flex:\s*0 0 100% !important;[\s\S]*?opacity:\s*1;[\s\S]*?transform:\s*none/,
+    );
+});
+
 test('tagged photos reveal tags without a grey image overlay on hover or touch', () => {
     const photo = readProjectFile('src/components/Photo.astro');
     const devTool = readProjectFile('src/components/DevTool.astro');

@@ -614,6 +614,24 @@
                     .dev-preview-as-row > .carousel-dots {
                         display: none;
                     }
+                    @media (max-width: 767px) {
+                        .dev-page-structure-preview .carousel-track,
+                        .dev-preview-as-carousel > .photo-row {
+                            scroll-padding-inline: 0;
+                        }
+                        .dev-page-structure-preview .carousel-track::before,
+                        .dev-page-structure-preview .carousel-track::after,
+                        .dev-preview-as-carousel > .photo-row::before,
+                        .dev-preview-as-carousel > .photo-row::after {
+                            display: none;
+                        }
+                        .dev-page-structure-preview .carousel-track > *,
+                        .dev-preview-as-carousel > .photo-row > * {
+                            flex: 0 0 100% !important;
+                            opacity: 1;
+                            transform: none;
+                        }
+                    }
                     .dev-inline-caption-editor {
                         margin: 0.5rem 0;
                         padding: 0.65rem;
