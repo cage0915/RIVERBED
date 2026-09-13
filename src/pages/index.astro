@@ -114,6 +114,7 @@ const sortedFolders = folderSlugs
                         class="album-card folder-card group"
                         data-catalog-card
                         data-keyboard-navigation-target
+                        data-mobile-direct
                         data-covers={folder.covers.length}
                     >
                         <a href={`/${folder.id}`} class="album-link">
@@ -132,10 +133,8 @@ const sortedFolders = folderSlugs
                                         }
                                     />
                                 ))}
-                                <div class="album-overlay">
-                                    <h2 class="album-title">{folder.title}</h2>
-                                </div>
                             </div>
+                            <h2 class="folder-title">{folder.title}</h2>
                         </a>
                     </div>
                 ))
@@ -245,8 +244,16 @@ const sortedFolders = folderSlugs
         z-index: 20;
     }
 
-    .folder-card .album-title {
+    .folder-title {
+        margin: 0;
+        padding: 0.65rem 0.25rem 0;
+        font-family: "Noto Sans TC", "Noto Sans JP", sans-serif;
         font-size: clamp(0.7rem, 1.25vw, 1rem);
+        font-weight: 400;
+        letter-spacing: 0.08em;
+        text-align: center;
+        color: #a1a1aa;
+        transition: color 0.25s ease;
     }
 
     .album-card.show-info .album-overlay {
@@ -273,6 +280,10 @@ const sortedFolders = folderSlugs
             opacity: 1;
             transform: translateY(0);
         }
+
+        .album-card:hover .folder-title {
+            color: #f4f4f5;
+        }
     }
 
     @media (max-width: 640px) {
@@ -290,7 +301,7 @@ const sortedFolders = folderSlugs
             scrollbar-width: thin;
         }
 
-        .folder-card .album-title {
+        .folder-title {
             font-size: 0.8rem;
         }
     }

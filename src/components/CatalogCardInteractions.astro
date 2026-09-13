@@ -31,7 +31,11 @@
                 const isMobile = window.matchMedia(
                     "(max-width: 768px) and (hover: none)",
                 ).matches;
-                if (!isMobile || card.classList.contains("show-info")) return;
+                if (
+                    !isMobile
+                    || card.hasAttribute("data-mobile-direct")
+                    || card.classList.contains("show-info")
+                ) return;
 
                 event.preventDefault();
                 closeCards();

@@ -831,7 +831,7 @@ test('Layout delegates explicit content keyboard navigation targets and lifecycl
     );
     assert.match(
         homePage,
-        /class="album-card folder-card group"[\s\S]*data-catalog-card[\s\S]*data-keyboard-navigation-target/,
+        /class="album-card folder-card group"[\s\S]*data-catalog-card[\s\S]*data-keyboard-navigation-target[\s\S]*data-mobile-direct/,
     );
     assert.match(
         folderPage,
@@ -946,6 +946,10 @@ test('catalog routes share lifecycle-scoped card interactions', () => {
         /<div class="pt-6 pb-8" data-catalog-grid>[\s\S]*class="album-card latest-post-card group"[\s\S]*data-catalog-card[\s\S]*<nav[\s\S]*class="folders-grid"[\s\S]*class="album-card folder-card group"[\s\S]*data-catalog-card/,
     );
     assert.match(
+        homePage,
+        /<div class="album-cover">[\s\S]*<\/div>\s*<h2 class="folder-title">\{folder\.title\}<\/h2>/,
+    );
+    assert.match(
         folderPage,
         /<div class="albums-grid" data-catalog-grid[\s\S]*class="album-card group"[\s\S]*data-catalog-card/,
     );
@@ -962,6 +966,7 @@ test('catalog routes share lifecycle-scoped card interactions', () => {
         interactions,
         /\(max-width: 768px\) and \(hover: none\)[\s\S]*classList\.contains\("show-info"\)[\s\S]*event\.preventDefault\(\)/,
     );
+    assert.match(interactions, /card\.hasAttribute\("data-mobile-direct"\)/);
     assert.match(
         interactions,
         /card\.contains\(target\)[\s\S]*if \(!isInsideCurrentCard\)/,
