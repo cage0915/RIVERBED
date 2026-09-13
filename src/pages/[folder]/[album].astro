@@ -227,13 +227,13 @@ const titleSections = extractTitleSections(albumEntry.body);
 
         <div class="mb-8 text-center" data-album-heading>
             <h1
-                class="text-xl font-sans tracking-widest uppercase mb-1"
+                class="text-xl tracking-widest uppercase mb-1"
                 data-album-title
             >
                 {albumRecord.title}
             </h1>
             {albumRecord.info && (
-                <p class="text-sm text-zinc-500 font-light tracking-wider uppercase" data-album-info>
+                <p class="text-sm text-zinc-500 font-sans font-light tracking-wider uppercase" data-album-info>
                     {albumRecord.info}
                 </p>
             )}
