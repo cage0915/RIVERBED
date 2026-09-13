@@ -405,6 +405,14 @@ const titleSections = extractTitleSections(albumEntry.body);
             --album-mobile-gutter: 1rem;
         }
 
+        /* Full-bleed photos can place rotated mountain labels beyond the
+           viewport. Even transparent labels otherwise widen the mobile page
+           and trigger browser auto-scaling, including the lightbox. Clip at
+           the page boundary without creating another scroll container. */
+        :global(main:has(> .album-page)) {
+            overflow-x: clip;
+        }
+
         /*
          * Album media bleeds through the page gutter on phones. Captions keep
          * the page's original text boundary, so only the photos reach the
@@ -435,7 +443,75 @@ const titleSections = extractTitleSections(albumEntry.body);
            slide and remove the edge spacers that reveal adjacent photos. */
         .album-content :global(.carousel-track) {
             --carousel-edge: 0px;
+            gap: 0;
             scroll-padding-inline: 0;
+            overscroll-behavior-x: contain;
+        }
+
+        .album-content :global([data-mobile-row-pan]) {
+            overflow-x: auto;
+            padding-block: 3.5rem;
+            margin-block: -3.5rem;
+            scrollbar-width: none;
+            overscroll-behavior-x: contain;
+        }
+
+        .album-content :global([data-mobile-row-pan] > *) {
+            flex: 0 0 var(--mobile-photo-width) !important;
+        }
+
+        .album-content :global(.carousel-track::before),
+        .album-content :global(.carousel-track::after),
+        .album-content :global([data-mobile-row-pan]::before),
+        .album-content :global([data-mobile-row-pan]::after),
+        .album-content :global(.dev-preview-as-carousel > .photo-row::before),
+        .album-content :global(.dev-preview-as-carousel > .photo-row::after) {
+            content: "";
+            display: block;
+            flex: 0 0 var(--mobile-tag-left, 0px);
+            margin-inline: 0;
+            pointer-events: none;
+            scroll-snap-align: start;
+        }
+
+        .album-content :global(.carousel-track::after),
+        .album-content :global([data-mobile-row-pan]::after),
+        .album-content :global(.dev-preview-as-carousel > .photo-row::after) {
+            flex-basis: var(--mobile-tag-right, 0px);
+            scroll-snap-align: end;
+        }
+
+        .album-content :global([data-mobile-row-pan]::before) {
+            margin-inline-end: -0.5rem;
+        }
+
+        .album-content :global([data-mobile-row-pan]::after) {
+            margin-inline-start: -0.5rem;
+        }
+
+        .album-content :global(.photo-wrapper:not(.show-info) .tags-overlay) {
+            display: none;
+        }
+
+        .album-content :global(.carousel-dots),
+        .album-content :global(.dev-preview-carousel-dots),
+        .album-content :global(.row-wrapper > .photo-caption),
+        .album-content :global(.carousel-section > .photo-caption) {
+            position: relative;
+            z-index: 1;
+        }
+
+        .album-content :global(.dev-preview-as-carousel > .photo-row) {
+            gap: 0;
+        }
+
+        .album-content :global(.dev-preview-as-row > .carousel-track) {
+            gap: 0.5rem;
+        }
+
+        .album-content :global(.dev-preview-as-row > .carousel-track:not([data-mobile-row-pan])::before),
+        .album-content :global(.dev-preview-as-row > .carousel-track:not([data-mobile-row-pan])::after) {
+            display: none;
         }
 
         .album-content :global(.carousel-track > *) {
@@ -466,6 +542,7 @@ const titleSections = extractTitleSections(albumEntry.body);
 
 <script>
     import { installPageLifecycle } from "../../lib/client-page-lifecycle";
+    import { installMobileAlbumTagPan } from "../../lib/mobile-album-tag-pan";
 
     let areAllTagsVisible = false;
 
@@ -870,6 +947,8 @@ const titleSections = extractTitleSections(albumEntry.body);
         const breadcrumbObserver = initAlbumBreadcrumbs();
         initAlbumTagToggle(controller.signal);
         const cleanupPhotoGrid = initAlbumPhotoGrid(controller.signal);
+        const article = page.querySelector<HTMLElement>('.album-content');
+        const cleanupTagPan = article ? installMobileAlbumTagPan(article) : undefined;
         handleScroll();
         window.addEventListener("scroll", handleScroll, {
             passive: true,
@@ -880,6 +959,7 @@ const titleSections = extractTitleSections(albumEntry.body);
             controller.abort();
             breadcrumbObserver?.disconnect();
             cleanupPhotoGrid?.();
+            cleanupTagPan?.();
             areAllTagsVisible = false;
         };
     });
