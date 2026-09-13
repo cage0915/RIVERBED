@@ -923,6 +923,7 @@ export function buildAlbumPageProposal(input: {
     manifest: AlbumManifest;
     mdx: string;
     importedFilenames: string[];
+    importedPhotoDimensions?: Record<string, { width: number; height: number }>;
     metadata?: Pick<AlbumManifest, 'title' | 'info' | 'gap'>;
 }): AlbumManifest {
     const albumSlug = validateAlbumSlug(input.albumSlug);
@@ -937,7 +938,11 @@ export function buildAlbumPageProposal(input: {
         }
     }
     const photos = contentFilenames.map((filename) =>
-        existingByFilename.get(filename) ?? { filename, tags: [] }
+        existingByFilename.get(filename) ?? {
+            filename,
+            ...(input.importedPhotoDimensions?.[filename] ?? {}),
+            tags: [],
+        }
     );
     if (
         current.cover.photo.kind === 'local' &&

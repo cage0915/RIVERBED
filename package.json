@@ -5,6 +5,7 @@
   "scripts": {
     "test": "node --test src/lib/*.test.mjs src/lib/albums/*.test.mjs",
     "albums:validate": "node --import tsx scripts/validate-album-repository.mjs",
+    "albums:dimensions": "node scripts/backfill-album-photo-dimensions.mjs",
     "dev": "astro dev",
     "contours:generate": "node scripts/generate-mountain-contours.mjs",
     "prebuild": "node --import tsx scripts/validate-album-repository.mjs && node scripts/prepare-contour-assets.mjs prepare",

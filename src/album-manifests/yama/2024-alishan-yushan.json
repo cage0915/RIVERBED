@@ -17,6 +17,8 @@
   "photos": [
     {
       "filename": "KCS00797.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "玉山北北峰",
@@ -42,6 +44,8 @@
     },
     {
       "filename": "KCS00743.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "玉山主峰",
@@ -52,6 +56,8 @@
     },
     {
       "filename": "KCS00741.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "玉山北北峰",
@@ -67,6 +73,8 @@
     },
     {
       "filename": "KCS00815.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "玉山南峰",
@@ -77,6 +85,8 @@
     },
     {
       "filename": "KCS00534.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "塔山",
@@ -87,34 +97,50 @@
     },
     {
       "filename": "KCS00675.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS00753.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS00754.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS00756.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS00561.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS00789.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS00569.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS00871.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     }
   ]

@@ -23,4 +23,11 @@ if (photo === undefined || !photo.isContent) {
 }
 ---
 
-<Photo assetKey={photo.assetKey} caption={photo.caption} tags={photo.tags} />
+<Photo
+    assetKey={photo.assetKey}
+    width={photo.width}
+    height={photo.height}
+    caption={photo.caption}
+    tags={photo.tags}
+    priority={itemKey === context.priorityPhotoFilename}
+/>

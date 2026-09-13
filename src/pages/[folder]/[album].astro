@@ -8,6 +8,7 @@ import Text from "../../components/Text.astro";
 import AlbumPagination from "../../components/AlbumPagination.astro";
 import { albumPathParams } from "../../lib/static-paths";
 import { getAlbumBySlug, getAlbumSummaries } from "../../lib/albums/catalog";
+import { extractMdxPhotos } from "../../lib/albums/mdx-photos";
 
 export async function getStaticPaths() {
     const albums = await getCollection("albums");
@@ -77,6 +78,7 @@ const nextAlbum = albumIndex >= 0 && albumIndex < folderAlbums.length - 1
 Astro.locals.albumPhotoContext = {
     sourceAlbumSlug: albumRecord.slug,
     photos: new Map(albumRecord.photos.map((photo) => [photo.filename, photo])),
+    priorityPhotoFilename: extractMdxPhotos(albumEntry.body)[0]?.filename,
 };
 
 // Get the Content component from the entry

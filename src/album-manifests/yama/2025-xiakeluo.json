@@ -17,86 +17,128 @@
   "photos": [
     {
       "filename": "KCS09966.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS09975.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS09981.jpg",
+      "width": 2000,
+      "height": 3000,
       "tags": []
     },
     {
       "filename": "KCS09988.jpg",
+      "width": 2000,
+      "height": 3000,
       "tags": []
     },
     {
       "filename": "KCS09985.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS09970.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS00001.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS00049.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS00017.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS00023.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS00011.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS00029.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS00042.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS00058.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS00066.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS00060.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS00053.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS00067.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS00073.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS00072.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS00075.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     }
   ]

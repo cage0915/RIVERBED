@@ -17,18 +17,26 @@
   "photos": [
     {
       "filename": "KCS01347.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS01363.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS01382.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS01391.jpg",
+      "width": 2000,
+      "height": 3000,
       "tags": [
         {
           "name": "大屯山南峰",
@@ -39,6 +47,8 @@
     },
     {
       "filename": "KCS01401.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "大屯山南峰",
@@ -49,6 +59,8 @@
     },
     {
       "filename": "KCS01410.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "七星山",
@@ -69,6 +81,8 @@
     },
     {
       "filename": "KCS01420.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "小油坑",
@@ -99,10 +113,14 @@
     },
     {
       "filename": "KCS01428.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS01478.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "竹子山",
@@ -113,6 +131,8 @@
     },
     {
       "filename": "KCS01494.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "大屯山",
@@ -123,14 +143,20 @@
     },
     {
       "filename": "KCS01497.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS01505.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS01515.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "竹子山",
@@ -141,10 +167,14 @@
     },
     {
       "filename": "KCS01528.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS01534.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "觀音山",
@@ -155,6 +185,8 @@
     },
     {
       "filename": "KCS02344.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "竹子山",
@@ -165,10 +197,14 @@
     },
     {
       "filename": "KCS02348.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS02357.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "七星山",
@@ -184,6 +220,8 @@
     },
     {
       "filename": "KCS02378.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "七星山",
@@ -204,6 +242,8 @@
     },
     {
       "filename": "KCS02374.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "觀音山",
@@ -214,18 +254,26 @@
     },
     {
       "filename": "KCS02375.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS02377.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS02391.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS02395.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     }
   ]

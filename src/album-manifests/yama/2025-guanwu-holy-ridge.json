@@ -17,6 +17,8 @@
   "photos": [
     {
       "filename": "KCS08600.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "榛山",
@@ -27,34 +29,50 @@
     },
     {
       "filename": "KCS08604.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS08605.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS08612.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS08634.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS08639.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS08653.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS08661.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS08667.jpg",
+      "width": 3000,
+      "height": 1319,
       "tags": [
         {
           "name": "雪山主峰",
@@ -110,6 +128,8 @@
     },
     {
       "filename": "KCS08664.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "雪山主峰",
@@ -125,6 +145,8 @@
     },
     {
       "filename": "KCS08662.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "大霸尖山",
@@ -140,6 +162,8 @@
     },
     {
       "filename": "KCS08683.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "穆特勒布山",
@@ -155,6 +179,8 @@
     },
     {
       "filename": "KCS08677.jpg",
+      "width": 3000,
+      "height": 1675,
       "tags": [
         {
           "name": "雪山主峰",

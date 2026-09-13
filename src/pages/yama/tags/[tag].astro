@@ -8,7 +8,11 @@ import {
     getTaggedPhotos,
 } from "../../../lib/albums/catalog";
 import { allMountains as mountainsData } from "../../../lib/mountains";
-import { getImageUrl, R2_DOMAIN } from "../../../lib/constants";
+import {
+    getThumbnailSrcSet,
+    getThumbnailUrl,
+    R2_DOMAIN,
+} from "../../../lib/constants";
 import { tagPathParams } from "../../../lib/static-paths";
 
 export async function getStaticPaths() {
@@ -36,7 +40,10 @@ const mountain = mountainsData.find(
 const matchingPhotos = await getTaggedPhotos(decodedTag);
 const representativePhotoKey = mountain?.coverKey;
 const representativePhotoUrl = representativePhotoKey
-    ? getImageUrl(representativePhotoKey)
+    ? getThumbnailUrl(representativePhotoKey, 1100)
+    : undefined;
+const representativePhotoSrcSet = representativePhotoKey
+    ? getThumbnailSrcSet(representativePhotoKey)
     : undefined;
 const representativePhotoFallbackUrl = representativePhotoKey
     ? `${R2_DOMAIN}/${representativePhotoKey}`
@@ -165,8 +172,11 @@ function chunkArray<T>(array: T[], size: number): T[][] {
             <figure class="mountain-representative-photo">
                 <img
                     src={representativePhotoUrl}
+                    srcset={representativePhotoSrcSet}
+                    sizes="(max-width: 767px) calc(100vw - 2rem), (max-width: 1024px) calc(100vw - 4rem), 960px"
                     alt={`${decodedTag} cover photo`}
                     loading="eager"
+                    fetchpriority="high"
                     onerror={
                         isDev && representativePhotoFallbackUrl
                             ? `this.onerror=null; this.src='${representativePhotoFallbackUrl}';`
@@ -203,6 +213,8 @@ function chunkArray<T>(array: T[], size: number): T[][] {
                                         >
                                             <Photo
                                                 assetKey={photo.assetKey}
+                                                width={photo.width}
+                                                height={photo.height}
                                                 caption={photo.caption}
                                                 tags={photo.tags}
                                             />

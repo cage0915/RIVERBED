@@ -17,6 +17,8 @@
   "photos": [
     {
       "filename": "KCS00911.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "紗帽山",
@@ -32,6 +34,8 @@
     },
     {
       "filename": "KCS00923.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "觀音山",
@@ -42,6 +46,8 @@
     },
     {
       "filename": "KCS00943.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "紗帽山",
@@ -52,10 +58,14 @@
     },
     {
       "filename": "KCS00937.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS00965.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "七星山",
@@ -66,6 +76,8 @@
     },
     {
       "filename": "KCS00964.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "七星山",
@@ -76,6 +88,8 @@
     },
     {
       "filename": "KCS00972.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "大屯山南峰",
@@ -86,6 +100,8 @@
     },
     {
       "filename": "KCS00981.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "大屯山西峰",
@@ -116,6 +132,8 @@
     },
     {
       "filename": "KCS00976.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "大屯山西峰",
@@ -126,10 +144,14 @@
     },
     {
       "filename": "KCS00991.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS00978.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "七星山",
@@ -140,6 +162,8 @@
     },
     {
       "filename": "KCS01005.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "大屯山",
@@ -150,6 +174,8 @@
     },
     {
       "filename": "KCS01008.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "大屯山西峰",
@@ -160,6 +186,8 @@
     },
     {
       "filename": "KCS01015.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "大屯山",
@@ -180,6 +208,8 @@
     },
     {
       "filename": "KCS01010.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "大屯山",
@@ -190,6 +220,8 @@
     },
     {
       "filename": "KCS01011.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "大屯山南峰",
@@ -200,6 +232,8 @@
     },
     {
       "filename": "KCS01022.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "面天山",
@@ -215,6 +249,8 @@
     },
     {
       "filename": "KCS01067.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "竹子山",
@@ -225,14 +261,20 @@
     },
     {
       "filename": "KCS01048.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS01065.jpg",
+      "width": 4000,
+      "height": 1816,
       "tags": []
     },
     {
       "filename": "KCS01060.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "觀音山",
@@ -248,6 +290,8 @@
     },
     {
       "filename": "KCS01071.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "觀音山",
@@ -258,38 +302,56 @@
     },
     {
       "filename": "KCS01062.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS00950.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS01090.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS00891.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS00956.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS01084.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS01092.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS01093.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS01101.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "觀音山",

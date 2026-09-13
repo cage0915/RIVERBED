@@ -812,6 +812,22 @@ test('Page Manager proposal keeps manifest inventory in MDX order and preserves 
     ]);
 });
 
+test('Page Manager proposal persists dimensions for newly imported photos', () => {
+    const proposal = buildAlbumPageProposal({
+        albumSlug: 'yama/source',
+        manifest: album(),
+        mdx: '<Photo itemKey="A.jpg" />\n<Photo itemKey="C.jpg" />',
+        importedFilenames: ['C.jpg'],
+        importedPhotoDimensions: {
+            'C.jpg': { width: 3000, height: 2000 },
+        },
+    });
+
+    const imported = proposal.photos.find(({ filename }) => filename === 'C.jpg');
+    assert.equal(imported.width, 3000);
+    assert.equal(imported.height, 2000);
+});
+
 test('Page Manager proposal rejects an unimported or cross-Album content photo', () => {
     assert.throws(() => buildAlbumPageProposal({
         albumSlug: 'yama/source',

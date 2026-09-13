@@ -17,6 +17,8 @@
   "photos": [
     {
       "filename": "KCS02233.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "石筍尖",
@@ -27,30 +29,44 @@
     },
     {
       "filename": "KCS02240-Pano.jpg",
+      "width": 3000,
+      "height": 1334,
       "tags": []
     },
     {
       "filename": "KCS02242.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS02252.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS02256.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS02265.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS02267.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS02285.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "基隆嶼",
@@ -61,6 +77,8 @@
     },
     {
       "filename": "KCS02293.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "無耳茶壺山",
@@ -76,6 +94,8 @@
     },
     {
       "filename": "KCS02290.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "無耳茶壺山",
@@ -86,6 +106,8 @@
     },
     {
       "filename": "KCS02292.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "半屏山",
@@ -96,10 +118,14 @@
     },
     {
       "filename": "KCS02295.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS02305.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "基隆山",
@@ -110,6 +136,8 @@
     },
     {
       "filename": "KCS02300.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "基隆山東峰",
@@ -120,10 +148,14 @@
     },
     {
       "filename": "KCS02312.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS02317.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     }
   ]

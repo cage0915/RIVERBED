@@ -30,6 +30,8 @@ export type AlbumManifest = {
     };
     photos: Array<{
         filename: string;
+        width?: number;
+        height?: number;
         caption?: string;
         tags: PhotoTag[];
     }>;
@@ -40,6 +42,8 @@ export type ResolvedAlbumPhoto = {
     sourceAlbumTitle: string;
     filename: string;
     assetKey: string;
+    width?: number;
+    height?: number;
     caption?: string;
     tags: PhotoTag[];
     isContent: boolean;

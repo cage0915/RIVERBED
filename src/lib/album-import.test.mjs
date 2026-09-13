@@ -49,3 +49,19 @@ test('createAlbumImport validates both proposals before returning either', () =>
         order: 30,
     }), /publishedAt/);
 });
+
+test('createAlbumImport persists dimensions supplied by the photo importer', () => {
+    const proposal = createAlbumImport({
+        albumSlug: 'yama/new-album',
+        title: 'New Album',
+        filenames: ['002.jpg'],
+        photoDimensions: {
+            '002.jpg': { width: 3000, height: 2000 },
+        },
+        publishedAt: '2026-07-19',
+        order: 30,
+    });
+
+    assert.equal(proposal.manifest.photos[0].width, 3000);
+    assert.equal(proposal.manifest.photos[0].height, 2000);
+});

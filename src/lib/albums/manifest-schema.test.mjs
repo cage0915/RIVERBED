@@ -38,6 +38,32 @@ test("parses a valid local cover and defaults omitted photo tags", () => {
     assert.notEqual(manifest.photos[1], input.photos[1]);
 });
 
+test("parses optional intrinsic photo dimensions", () => {
+    const input = validManifest();
+    input.photos[0].width = 3000;
+    input.photos[0].height = 2000;
+
+    const manifest = parseAlbumManifest(input, "taiwan/morning-walk");
+    assert.equal(manifest.photos[0].width, 3000);
+    assert.equal(manifest.photos[0].height, 2000);
+});
+
+test("requires positive integer photo dimensions as a pair", () => {
+    for (const dimensions of [
+        { width: 3000 },
+        { height: 2000 },
+        { width: 0, height: 2000 },
+        { width: 3000.5, height: 2000 },
+    ]) {
+        const input = validManifest();
+        Object.assign(input.photos[0], dimensions);
+        assert.throws(
+            () => parseAlbumManifest(input, "taiwan/morning-walk"),
+            /photo 0 (?:width|height)/i,
+        );
+    }
+});
+
 test("parses and normalizes a valid external cover asset key", () => {
     const manifest = parseAlbumManifest(validManifest({
         cover: {

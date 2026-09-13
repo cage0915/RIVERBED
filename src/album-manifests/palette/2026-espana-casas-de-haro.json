@@ -17,358 +17,536 @@
   "photos": [
     {
       "filename": "KCS01906.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS01911.jpg",
+      "width": 2000,
+      "height": 3000,
       "tags": []
     },
     {
       "filename": "KCS01924.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS01930.jpg",
+      "width": 2000,
+      "height": 3000,
       "tags": []
     },
     {
       "filename": "KCS01934.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS01946.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS01945.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS01944.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS01951.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS01947.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS01940.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS01954.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS01965.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS01978.jpg",
+      "width": 2000,
+      "height": 3000,
       "tags": []
     },
     {
       "filename": "KCS01970.jpg",
+      "width": 2000,
+      "height": 3000,
       "tags": []
     },
     {
       "filename": "KCS01974.jpg",
+      "width": 2000,
+      "height": 3000,
       "tags": []
     },
     {
       "filename": "KCS01982.jpg",
+      "width": 2000,
+      "height": 3000,
       "tags": []
     },
     {
       "filename": "2026-0402-1546-50.611.jpg",
+      "width": 2880,
+      "height": 3840,
       "tags": []
     },
     {
       "filename": "2026-0402-1548-05.461.jpg",
+      "width": 3840,
+      "height": 2880,
       "tags": []
     },
     {
       "filename": "2026-0402-1552-49.242.jpg",
+      "width": 2880,
+      "height": 3840,
       "tags": []
     },
     {
       "filename": "KCS01983.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "2026-0402-1744-57.336.jpg",
+      "width": 2880,
+      "height": 3840,
       "tags": []
     },
     {
       "filename": "2026-0402-1740-09.176.jpg",
+      "width": 2880,
+      "height": 3840,
       "tags": []
     },
     {
       "filename": "2026-0402-1744-28.785.jpg",
+      "width": 2880,
+      "height": 3840,
       "tags": []
     },
     {
       "filename": "KCS01989.jpg",
+      "width": 2000,
+      "height": 3000,
       "tags": []
     },
     {
       "filename": "2026-0403-1453-18.215.jpg",
+      "width": 3840,
+      "height": 2880,
       "tags": []
     },
     {
       "filename": "2026-0403-1934-49.403.jpg",
+      "width": 2880,
+      "height": 3840,
       "tags": []
     },
     {
       "filename": "2026-0403-1651-00.558.jpg",
+      "width": 2880,
+      "height": 3840,
       "tags": []
     },
     {
       "filename": "2026-0404-1345-25.879.jpg",
+      "width": 3840,
+      "height": 2880,
       "tags": []
     },
     {
       "filename": "2026-0404-1412-31.664.jpg",
+      "width": 3840,
+      "height": 2880,
       "tags": []
     },
     {
       "filename": "2026-0403-2007-59.079.jpg",
+      "width": 2880,
+      "height": 3840,
       "tags": []
     },
     {
       "filename": "KCS02053.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS02048.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "2026-0403-1940-09.265.jpg",
+      "width": 2880,
+      "height": 3840,
       "tags": []
     },
     {
       "filename": "KCS02021.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "2026-0404-1033-29.625.jpg",
+      "width": 3840,
+      "height": 2880,
       "tags": []
     },
     {
       "filename": "KCS02032.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS02034.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS02056.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "2026-0403-1951-19.290.jpg",
+      "width": 3840,
+      "height": 2880,
       "tags": []
     },
     {
       "filename": "2026-0404-1919-27.750.jpg",
+      "width": 3840,
+      "height": 2880,
       "tags": []
     },
     {
       "filename": "KCS02072.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS02189.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS02071.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "2026-0404-1347-46.887.jpg",
+      "width": 3840,
+      "height": 2880,
       "tags": []
     },
     {
       "filename": "2026-0404-1924-51.968.jpg",
+      "width": 3840,
+      "height": 2880,
       "tags": []
     },
     {
       "filename": "KCS02182.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS02178.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS02038.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS02082.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS02063.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS02065.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS02064.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "2026-0405-1844-42.733.jpg",
+      "width": 3840,
+      "height": 2880,
       "tags": []
     },
     {
       "filename": "KCS02094.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS02073.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS02084.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS02076.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS02081.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS02105.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS02098.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS02126.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "2026-0405-1128-30.312.jpg",
+      "width": 3840,
+      "height": 2880,
       "tags": []
     },
     {
       "filename": "KCS02170.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS02136.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS02169.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS02161.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "2026-0405-1228-53.762.jpg",
+      "width": 3840,
+      "height": 2880,
       "tags": []
     },
     {
       "filename": "2026-0405-1244-28.629.jpg",
+      "width": 3840,
+      "height": 2880,
       "tags": []
     },
     {
       "filename": "2026-0405-1217-28.891.jpg",
+      "width": 3840,
+      "height": 2880,
       "tags": []
     },
     {
       "filename": "2026-0405-1230-40.532.jpg",
+      "width": 3840,
+      "height": 2880,
       "tags": []
     },
     {
       "filename": "2026-0405-1228-59.633.jpg",
+      "width": 3840,
+      "height": 2880,
       "tags": []
     },
     {
       "filename": "KCS02207.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "2026-0405-1232-00.283.jpg",
+      "width": 2880,
+      "height": 3840,
       "tags": []
     },
     {
       "filename": "2026-0405-1235-35.588.jpg",
+      "width": 3840,
+      "height": 2880,
       "tags": []
     },
     {
       "filename": "2026-0405-1332-39.623.jpg",
+      "width": 2880,
+      "height": 3840,
       "tags": []
     },
     {
       "filename": "2026-0405-1356-25.748.jpg",
+      "width": 3840,
+      "height": 2880,
       "tags": []
     },
     {
       "filename": "2026-0405-1441-13.672.jpg",
+      "width": 3840,
+      "height": 2880,
       "tags": []
     },
     {
       "filename": "KCS02067.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "2026-0405-2045-24.377.jpg",
+      "width": 2880,
+      "height": 3840,
       "tags": []
     },
     {
       "filename": "2026-0405-1403-37.890.jpg",
+      "width": 3840,
+      "height": 2880,
       "tags": []
     },
     {
       "filename": "2026-0405-1507-04.871.jpg",
+      "width": 3840,
+      "height": 2880,
       "tags": []
     },
     {
       "filename": "2026-0405-2013-14.900.jpg",
+      "width": 3840,
+      "height": 2880,
       "tags": []
     },
     {
       "filename": "2026-0405-2011-44.548.jpg",
+      "width": 3840,
+      "height": 2880,
       "tags": []
     },
     {
       "filename": "2026-0403-2155-33.471.jpg",
+      "width": 2880,
+      "height": 3840,
       "tags": []
     },
     {
       "filename": "2026-0403-2155-53.472.jpg",
+      "width": 2880,
+      "height": 3840,
       "tags": []
     },
     {
       "filename": "2026-0403-2158-06.673.jpg",
+      "width": 2880,
+      "height": 3840,
       "tags": []
     },
     {
       "filename": "2026-0406-1108-04.277.jpg",
+      "width": 3840,
+      "height": 2880,
       "tags": []
     },
     {
       "filename": "2026-0406-1108-36.646.jpg",
+      "width": 3840,
+      "height": 2880,
       "tags": []
     }
   ]

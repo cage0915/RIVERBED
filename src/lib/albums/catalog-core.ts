@@ -169,6 +169,9 @@ export function createAlbumCatalog(records: AlbumSourceRecord[]): AlbumCatalog {
             sourceAlbumTitle: record.manifest.title,
             filename: photo.filename,
             assetKey: `${slug}/${photo.filename}`,
+            ...(photo.width !== undefined && photo.height !== undefined
+                ? { width: photo.width, height: photo.height }
+                : {}),
             caption: photo.caption,
             tags: photo.tags.map((tag) => ({ ...tag })),
             isContent: contentFilenameSet.has(photo.filename),

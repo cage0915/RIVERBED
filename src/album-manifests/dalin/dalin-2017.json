@@ -16,30 +16,44 @@
   "photos": [
     {
       "filename": "01.JPG",
+      "width": 1840,
+      "height": 1232,
       "tags": []
     },
     {
       "filename": "02.JPG",
+      "width": 1840,
+      "height": 1232,
       "tags": []
     },
     {
       "filename": "03.JPG",
+      "width": 1840,
+      "height": 1232,
       "tags": []
     },
     {
       "filename": "04.JPG",
+      "width": 1840,
+      "height": 1232,
       "tags": []
     },
     {
       "filename": "05.JPG",
+      "width": 1840,
+      "height": 1232,
       "tags": []
     },
     {
       "filename": "06.JPG",
+      "width": 1840,
+      "height": 1232,
       "tags": []
     },
     {
       "filename": "07.JPG",
+      "width": 1840,
+      "height": 1232,
       "tags": []
     }
   ]

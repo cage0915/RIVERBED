@@ -17,6 +17,8 @@
   "photos": [
     {
       "filename": "KCS06790.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "富士山",
@@ -77,6 +79,8 @@
     },
     {
       "filename": "KCS06791.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "富士山",
@@ -92,6 +96,8 @@
     },
     {
       "filename": "KCS06792.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "編笠山",
@@ -137,6 +143,8 @@
     },
     {
       "filename": "KCS06817.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "浅間山",
@@ -147,6 +155,8 @@
     },
     {
       "filename": "KCS06809.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "槍ヶ岳",
@@ -167,6 +177,8 @@
     },
     {
       "filename": "KCS06808.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "槍ヶ岳",
@@ -182,6 +194,8 @@
     },
     {
       "filename": "KCS06978.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "槍ヶ岳",
@@ -202,6 +216,8 @@
     },
     {
       "filename": "KCS06981.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "槍ヶ岳",
@@ -217,18 +233,26 @@
     },
     {
       "filename": "KCS06909.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS06932.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS06943.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS06982.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "大天井岳",
@@ -239,6 +263,8 @@
     },
     {
       "filename": "KCS06992.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "浅間山",
@@ -259,6 +285,8 @@
     },
     {
       "filename": "KCS06993.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "富士山",
@@ -274,22 +302,32 @@
     },
     {
       "filename": "KCS07001.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS07000.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS07008.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS07002.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS07006.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "硫黄岳",
@@ -300,6 +338,8 @@
     },
     {
       "filename": "KCS07007.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "剱岳",
@@ -340,22 +380,32 @@
     },
     {
       "filename": "KCS07020.jpg",
+      "width": 3000,
+      "height": 1286,
       "tags": []
     },
     {
       "filename": "KCS07021.jpg",
+      "width": 3000,
+      "height": 1286,
       "tags": []
     },
     {
       "filename": "KCS07062.jpg",
+      "width": 3000,
+      "height": 1286,
       "tags": []
     },
     {
       "filename": "KCS07065.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS07067.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "槍ヶ岳",
@@ -376,6 +426,8 @@
     },
     {
       "filename": "KCS07069.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "槍ヶ岳",
@@ -386,10 +438,14 @@
     },
     {
       "filename": "KCS07061.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS07059.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "大天井岳",
@@ -405,6 +461,8 @@
     },
     {
       "filename": "KCS07094.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "大天井岳",
@@ -415,6 +473,8 @@
     },
     {
       "filename": "KCS07117-全景.jpg",
+      "width": 3000,
+      "height": 1453,
       "tags": [
         {
           "name": "燕岳",
@@ -425,26 +485,38 @@
     },
     {
       "filename": "KCS07121.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS07120.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS07123.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS07132.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS07136.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS07141.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "大天井岳",
@@ -455,6 +527,8 @@
     },
     {
       "filename": "KCS07142.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "針ノ木岳",
@@ -475,6 +549,8 @@
     },
     {
       "filename": "KCS07145.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "野口五郎岳",
@@ -495,10 +571,14 @@
     },
     {
       "filename": "KCS07146.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS07148.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "前穂高岳",
@@ -509,6 +589,8 @@
     },
     {
       "filename": "KCS07166.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "前穂高岳",
@@ -519,6 +601,8 @@
     },
     {
       "filename": "KCS07171.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "槍ヶ岳",
@@ -534,22 +618,32 @@
     },
     {
       "filename": "KCS07185.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS07179.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS07183.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS07194.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS07198.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "剱岳",
@@ -585,10 +679,14 @@
     },
     {
       "filename": "KCS07206.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS07244.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     }
   ]

@@ -42,6 +42,15 @@ function requireFiniteNumber(value: unknown, field: string): number {
     return value;
 }
 
+function optionalPositiveInteger(value: unknown, field: string): number | undefined {
+    if (value === undefined) return undefined;
+    const number = requireFiniteNumber(value, field);
+    if (!Number.isInteger(number) || number <= 0) {
+        throw new Error(`${field} must be a positive integer`);
+    }
+    return number;
+}
+
 function requireCoordinate(value: unknown, field: string): number {
     const coordinate = requireFiniteNumber(value, field);
     if (coordinate < 0 || coordinate > 100) {
@@ -132,7 +141,11 @@ export function parseAlbumManifest(input: unknown, albumSlug: string): AlbumMani
     const filenames = new Set<string>();
     const photos = manifest.photos.map((value, photoIndex) => {
         const photo = requireRecord(value, `photo ${photoIndex}`);
-        rejectUnknownFields(photo, ["filename", "caption", "tags"], `photo ${photoIndex}`);
+        rejectUnknownFields(
+            photo,
+            ["filename", "width", "height", "caption", "tags"],
+            `photo ${photoIndex}`,
+        );
         const filename = validateLocalPhotoFilename(
             requireString(photo.filename, `photo ${photoIndex} filename`),
         );
@@ -141,8 +154,14 @@ export function parseAlbumManifest(input: unknown, albumSlug: string): AlbumMani
 
         const tagValues = photo.tags === undefined ? [] : photo.tags;
         if (!Array.isArray(tagValues)) throw new Error(`photo ${photoIndex} tags must be an array`);
+        const width = optionalPositiveInteger(photo.width, `photo ${photoIndex} width`);
+        const height = optionalPositiveInteger(photo.height, `photo ${photoIndex} height`);
+        if ((width === undefined) !== (height === undefined)) {
+            throw new Error(`photo ${photoIndex} width and height must be provided together`);
+        }
         return {
             filename,
+            ...(width !== undefined && height !== undefined ? { width, height } : {}),
             caption: optionalString(photo.caption, `photo ${photoIndex} caption`),
             tags: tagValues.map((tag, tagIndex) => parseTag(tag, tagIndex)),
         };

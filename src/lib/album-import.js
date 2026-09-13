@@ -35,9 +35,16 @@ function createAlbumLayoutMdx(filenames) {
 
 /**
  * Build and cross-validate the two source files created for a new Album.
- * @param {{ albumSlug: string, title: string, filenames: string[], publishedAt?: string, order: number }} options
+ * @param {{ albumSlug: string, title: string, filenames: string[], photoDimensions?: Record<string, { width: number, height: number }>, publishedAt?: string, order: number }} options
  */
-export function createAlbumImport({ albumSlug, title, filenames, publishedAt, order }) {
+export function createAlbumImport({
+    albumSlug,
+    title,
+    filenames,
+    photoDimensions = {},
+    publishedAt,
+    order,
+}) {
     const date = publishedAt || new Date().toISOString().slice(0, 10);
     const mdx = createAlbumLayoutMdx(filenames);
     const photos = filenames.map(validateImageFilename);
@@ -51,7 +58,11 @@ export function createAlbumImport({ albumSlug, title, filenames, publishedAt, or
             zoom: 1,
             offset: { x: 50, y: 50 },
         },
-        photos: photos.map((filename) => ({ filename, tags: [] })),
+        photos: photos.map((filename) => ({
+            filename,
+            ...(photoDimensions[filename] || {}),
+            tags: [],
+        })),
     }, albumSlug);
     const diagnostics = validateAlbumInventory({
         albumSlug,

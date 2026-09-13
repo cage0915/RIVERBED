@@ -17,6 +17,8 @@
   "photos": [
     {
       "filename": "KCS00128.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "魯培山",
@@ -32,6 +34,8 @@
     },
     {
       "filename": "KCS00133.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "北插天山",
@@ -42,58 +46,86 @@
     },
     {
       "filename": "KCS00132.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS00139.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS00140.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS00144.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS00147.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS00148.jpg",
+      "width": 2000,
+      "height": 3000,
       "tags": []
     },
     {
       "filename": "KCS00154.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS00152.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS00173.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS00184.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS00191.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS00201.jpg",
+      "width": 2000,
+      "height": 3000,
       "tags": []
     },
     {
       "filename": "KCS00208.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS00210.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "北插天山",
@@ -104,6 +136,8 @@
     },
     {
       "filename": "KCS00211.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "北插天山",
@@ -114,6 +148,8 @@
     },
     {
       "filename": "KCS00217.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "北插天山",
@@ -124,6 +160,8 @@
     },
     {
       "filename": "KCS00216.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "北插天山",
@@ -134,22 +172,32 @@
     },
     {
       "filename": "KCS00231.jpg",
+      "width": 2000,
+      "height": 3000,
       "tags": []
     },
     {
       "filename": "KCS00233.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS00237.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS00244.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS00243.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     }
   ]

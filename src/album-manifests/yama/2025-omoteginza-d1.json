@@ -17,6 +17,8 @@
   "photos": [
     {
       "filename": "KCS06208.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "常念岳",
@@ -37,6 +39,8 @@
     },
     {
       "filename": "KCS06223.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "蝶ヶ岳",
@@ -52,50 +56,74 @@
     },
     {
       "filename": "KCS06232.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS06237.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS06295.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS06296.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS06292.jpg",
+      "width": 2000,
+      "height": 3000,
       "tags": []
     },
     {
       "filename": "KCS06331.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS06359.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS06362.jpg",
+      "width": 2000,
+      "height": 3000,
       "tags": []
     },
     {
       "filename": "KCS06375.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS06411.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS06457.jpg",
+      "width": 2000,
+      "height": 3000,
       "tags": []
     },
     {
       "filename": "KCS06486.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "燕岳",
@@ -106,18 +134,26 @@
     },
     {
       "filename": "KCS06498.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS06502.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS06660.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS06515.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "野口五郎岳",
@@ -138,6 +174,8 @@
     },
     {
       "filename": "KCS06591.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "三俣蓮華岳",
@@ -173,6 +211,8 @@
     },
     {
       "filename": "KCS06513.jpg",
+      "width": 2000,
+      "height": 3000,
       "tags": [
         {
           "name": "双六岳",
@@ -203,14 +243,20 @@
     },
     {
       "filename": "KCS06519.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS06627.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS06506.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "三ツ岳",
@@ -221,6 +267,8 @@
     },
     {
       "filename": "KCS06533.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "三俣蓮華岳",
@@ -231,26 +279,38 @@
     },
     {
       "filename": "KCS06649.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS06547.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS06647.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS06557.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS06719.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS06637.jpg",
+      "width": 2000,
+      "height": 3000,
       "tags": [
         {
           "name": "笠ヶ岳",
@@ -271,6 +331,8 @@
     },
     {
       "filename": "KCS06671.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "槍ヶ岳",
@@ -281,6 +343,8 @@
     },
     {
       "filename": "KCS06721.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "燕岳",
@@ -291,10 +355,14 @@
     },
     {
       "filename": "KCS06685.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS06705.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "槍ヶ岳",
@@ -335,6 +403,8 @@
     },
     {
       "filename": "KCS06724.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "槍ヶ岳",
@@ -360,6 +430,8 @@
     },
     {
       "filename": "KCS06727.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "燕岳",
@@ -370,6 +442,8 @@
     },
     {
       "filename": "KCS06726.jpg",
+      "width": 2000,
+      "height": 3000,
       "tags": [
         {
           "name": "燕岳",
@@ -380,6 +454,8 @@
     },
     {
       "filename": "KCS06741.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "鹿島槍ヶ岳",
@@ -400,14 +476,20 @@
     },
     {
       "filename": "KCS06729.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS06739.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS06748.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "大天井岳",
@@ -448,6 +530,8 @@
     },
     {
       "filename": "KCS06747.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "大天井岳",
@@ -458,6 +542,8 @@
     },
     {
       "filename": "KCS06750.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "奥穂高岳",
@@ -473,6 +559,8 @@
     },
     {
       "filename": "KCS06756.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "槍ヶ岳",
@@ -503,14 +591,20 @@
     },
     {
       "filename": "KCS06761.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS06772.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS06782.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     }
   ]

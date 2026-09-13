@@ -37,3 +37,15 @@ export const getThumbnailUrl = (itemKey: string, width = 480) => {
     const safeWidth = Math.max(1, Math.round(width));
     return `${R2_DOMAIN}/cdn-cgi/image/width=${safeWidth},quality=75,format=auto,onerror=redirect/${itemKey}`;
 };
+
+export const getThumbnailSrcSet = (
+    itemKey: string,
+    widths: readonly number[] = [480, 768, 1100, 1600],
+) => {
+    if (import.meta.env.DEV) return undefined;
+
+    return [...new Set(widths.map((width) => Math.max(1, Math.round(width))))]
+        .sort((left, right) => left - right)
+        .map((width) => `${getThumbnailUrl(itemKey, width)} ${width}w`)
+        .join(", ");
+};

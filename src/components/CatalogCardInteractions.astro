@@ -10,21 +10,68 @@
         const controller = new AbortController();
         const cards = root.querySelectorAll<HTMLElement>("[data-catalog-card]");
         const intervals: number[] = [];
+        const observers: IntersectionObserver[] = [];
         const closeCards = () => {
             cards.forEach((card) => card.classList.remove("show-info"));
         };
 
         cards.forEach((card) => {
-            const slides = card.querySelectorAll<HTMLElement>(".slide");
+            const slides = Array.from(
+                card.querySelectorAll<HTMLImageElement>("img.slide"),
+            );
 
             if (slides.length > 1) {
-                let current = 0;
-                const interval = window.setInterval(() => {
+                let current = Math.max(
+                    0,
+                    slides.findIndex((slide) => slide.classList.contains("active")),
+                );
+                let interval: number | undefined;
+                const loadSlide = (slide: HTMLImageElement) => {
+                    if (slide.dataset.src) {
+                        slide.src = slide.dataset.src;
+                        delete slide.dataset.src;
+                    }
+                    if (slide.dataset.srcset) {
+                        slide.srcset = slide.dataset.srcset;
+                        delete slide.dataset.srcset;
+                    }
+                };
+                const queueNextSlide = () => {
+                    loadSlide(slides[(current + 1) % slides.length]);
+                };
+                const advance = () => {
                     slides[current].classList.remove("active");
                     current = (current + 1) % slides.length;
+                    loadSlide(slides[current]);
                     slides[current].classList.add("active");
-                }, INTERVAL_MS);
-                intervals.push(interval);
+                    queueNextSlide();
+                };
+                const start = () => {
+                    if (interval !== undefined) return;
+                    queueNextSlide();
+                    interval = window.setInterval(advance, INTERVAL_MS);
+                    intervals.push(interval);
+                };
+                const stop = () => {
+                    if (interval === undefined) return;
+                    window.clearInterval(interval);
+                    const intervalIndex = intervals.indexOf(interval);
+                    if (intervalIndex !== -1) intervals.splice(intervalIndex, 1);
+                    interval = undefined;
+                };
+
+                if ("IntersectionObserver" in window) {
+                    const observer = new IntersectionObserver((entries) => {
+                        entries.forEach((entry) => {
+                            if (entry.isIntersecting) start();
+                            else stop();
+                        });
+                    }, { rootMargin: "200px" });
+                    observer.observe(card);
+                    observers.push(observer);
+                } else {
+                    start();
+                }
             }
 
             card.addEventListener("click", (event) => {
@@ -56,6 +103,7 @@
         return () => {
             controller.abort();
             intervals.forEach((interval) => window.clearInterval(interval));
+            observers.forEach((observer) => observer.disconnect());
             closeCards();
         };
     });

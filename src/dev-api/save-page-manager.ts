@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import fs from 'node:fs';
 import path from 'node:path';
+import sharp from 'sharp';
 import trash from 'trash';
 
 import { validateImageFilename } from '../lib/album-import.js';
@@ -67,10 +68,23 @@ export const POST: APIRoute = async ({ request }) => {
         const protectedRemoval = removals.find((name) => referenced.has(name));
         if (protectedRemoval) return json({ error: `${protectedRemoval} is still referenced by the page draft` }, 409);
 
-        const payloads = await Promise.all(files.map(async (file, index) => ({
-            name: names[index],
-            bytes: new Uint8Array(await file.arrayBuffer()),
-        })));
+        const importedPhotos = await Promise.all(files.map(async (file, index) => {
+            const bytes = new Uint8Array(await file.arrayBuffer());
+            const metadata = await sharp(bytes).metadata();
+            if (!metadata.width || !metadata.height) {
+                throw new Error(`Unable to read image dimensions: ${names[index]}`);
+            }
+            return {
+                name: names[index],
+                bytes,
+                width: metadata.width,
+                height: metadata.height,
+            };
+        }));
+        const payloads = importedPhotos.map(({ name, bytes }) => ({ name, bytes }));
+        const importedPhotoDimensions = Object.fromEntries(
+            importedPhotos.map(({ name, width, height }) => [name, { width, height }]),
+        );
         const initialManifests = await readAllAlbumManifestFiles(projectRoot);
         if (!initialManifests[albumSlug]) return json({ error: 'Page does not exist' }, 404);
         return await withAlbumManifestLocks(projectRoot, Object.keys(initialManifests), async () => {
@@ -104,6 +118,7 @@ export const POST: APIRoute = async ({ request }) => {
                 manifest: currentManifest,
                 mdx: newContent,
                 importedFilenames: names,
+                importedPhotoDimensions,
                 metadata,
             });
 

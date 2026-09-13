@@ -17,18 +17,26 @@
   "photos": [
     {
       "filename": "01.jpg",
+      "width": 3130,
+      "height": 2075,
       "tags": []
     },
     {
       "filename": "02.jpg",
+      "width": 3130,
+      "height": 2075,
       "tags": []
     },
     {
       "filename": "03.jpg",
+      "width": 3130,
+      "height": 2075,
       "tags": []
     },
     {
       "filename": "04.jpg",
+      "width": 3130,
+      "height": 2075,
       "tags": [
         {
           "name": "奇峻山",
@@ -64,6 +72,8 @@
     },
     {
       "filename": "05.jpg",
+      "width": 3130,
+      "height": 2075,
       "tags": [
         {
           "name": "東洗水山",
@@ -89,6 +99,8 @@
     },
     {
       "filename": "06.jpg",
+      "width": 3130,
+      "height": 2075,
       "tags": [
         {
           "name": "穆特勒布山",
@@ -114,6 +126,8 @@
     },
     {
       "filename": "07.jpg",
+      "width": 3130,
+      "height": 2075,
       "tags": [
         {
           "name": "大霸尖山",
@@ -129,6 +143,8 @@
     },
     {
       "filename": "08.jpg",
+      "width": 3130,
+      "height": 2075,
       "tags": [
         {
           "name": "大霸尖山",
@@ -139,6 +155,8 @@
     },
     {
       "filename": "09.jpg",
+      "width": 3130,
+      "height": 2075,
       "tags": [
         {
           "name": "小霸尖山",
@@ -149,6 +167,8 @@
     },
     {
       "filename": "11.jpg",
+      "width": 3130,
+      "height": 2075,
       "tags": [
         {
           "name": "巴紗拉雲山",
@@ -179,6 +199,8 @@
     },
     {
       "filename": "10.jpg",
+      "width": 3130,
+      "height": 2075,
       "tags": [
         {
           "name": "雪山北峰",
@@ -204,6 +226,8 @@
     },
     {
       "filename": "12.jpg",
+      "width": 3130,
+      "height": 2075,
       "tags": [
         {
           "name": "南湖大山",
@@ -219,22 +243,32 @@
     },
     {
       "filename": "13.jpg",
+      "width": 3130,
+      "height": 2075,
       "tags": []
     },
     {
       "filename": "14.jpg",
+      "width": 3130,
+      "height": 2075,
       "tags": []
     },
     {
       "filename": "15.jpg",
+      "width": 3130,
+      "height": 2075,
       "tags": []
     },
     {
       "filename": "16.jpg",
+      "width": 3130,
+      "height": 2075,
       "tags": []
     },
     {
       "filename": "17.jpg",
+      "width": 3130,
+      "height": 2075,
       "tags": []
     }
   ]

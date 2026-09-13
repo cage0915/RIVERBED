@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import fs from 'node:fs';
 import path from 'node:path';
+import sharp from 'sharp';
 
 import { createAlbumImport, validateAlbumSegment, validateImageFilename } from '../lib/album-import.js';
 import {
@@ -43,19 +44,28 @@ export const POST: APIRoute = async ({ request }) => {
 
         const albumSlug = `${folder}/${album}`;
         await assertAlbumAssetStorageSafe(projectRoot, albumSlug);
+        const payloads = await Promise.all(files.map(async (file, index) => ({
+            name: names[index],
+            bytes: new Uint8Array(await file.arrayBuffer()),
+        })));
+        const photoDimensions = Object.fromEntries(await Promise.all(
+            payloads.map(async ({ name, bytes }) => {
+                const metadata = await sharp(bytes).metadata();
+                if (!metadata.width || !metadata.height) {
+                    throw new Error(`Unable to read image dimensions: ${name}`);
+                }
+                return [name, { width: metadata.width, height: metadata.height }];
+            }),
+        ));
         const importProposal = createPage
             ? createAlbumImport({
                 albumSlug,
                 title,
                 filenames: names,
+                photoDimensions,
                 order: nextAlbumOrder(await readAllAlbumManifestFiles(projectRoot), folder),
             })
             : undefined;
-
-        const payloads = await Promise.all(files.map(async (file, index) => ({
-            name: names[index],
-            bytes: new Uint8Array(await file.arrayBuffer()),
-        })));
 
         let copied: string[] = [];
         let skipped: string[] = [];

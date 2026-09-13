@@ -21,6 +21,7 @@ declare namespace App {
                 string,
                 import("./lib/albums/types").ResolvedAlbumPhoto
             >;
+            priorityPhotoFilename?: string;
         };
     }
 }

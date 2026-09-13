@@ -17,6 +17,8 @@
   "photos": [
     {
       "filename": "KCS03732.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "中央尖山",
@@ -37,6 +39,8 @@
     },
     {
       "filename": "KCS03808.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "中央尖山",
@@ -47,6 +51,8 @@
     },
     {
       "filename": "KCS03789.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "南湖大山",
@@ -57,6 +63,8 @@
     },
     {
       "filename": "KCS03820.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "無明山",
@@ -67,6 +75,8 @@
     },
     {
       "filename": "KCS03830.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "清水大山",
@@ -77,6 +87,8 @@
     },
     {
       "filename": "KCS03831.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "三角錐山",
@@ -87,6 +99,8 @@
     },
     {
       "filename": "KCS03791.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "雪山主峰",
@@ -132,6 +146,8 @@
     },
     {
       "filename": "KCS03815.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "雪山主峰",
@@ -142,6 +158,8 @@
     },
     {
       "filename": "KCS03806.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "大劍山",
@@ -162,6 +180,8 @@
     },
     {
       "filename": "KCS03834.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "玉山主峰",
@@ -202,6 +222,8 @@
     },
     {
       "filename": "KCS03851.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "太魯閣大山",
@@ -242,6 +264,8 @@
     },
     {
       "filename": "KCS03857.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "太魯閣大山",
@@ -262,6 +286,8 @@
     },
     {
       "filename": "KCS03837.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "奇萊主山",
@@ -272,6 +298,8 @@
     },
     {
       "filename": "KCS03869.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "奇萊北峰",
@@ -282,6 +310,8 @@
     },
     {
       "filename": "KCS03866.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "合歡山北峰",
@@ -292,6 +322,8 @@
     },
     {
       "filename": "KCS03876.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "合歡山北峰",

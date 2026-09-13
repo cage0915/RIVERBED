@@ -7,16 +7,26 @@ interface Tag {
 
 interface Props {
     assetKey: string;
+    width?: number;
+    height?: number;
     caption?: string;
     tags?: Tag[];
+    priority?: boolean;
 }
 
-import { getImageUrl, R2_DOMAIN } from "../lib/constants";
+import {
+    getImageUrl,
+    getThumbnailSrcSet,
+    getThumbnailUrl,
+    R2_DOMAIN,
+} from "../lib/constants";
 import RichText from "./RichText.astro";
 
-const { assetKey, caption, tags = [] } = Astro.props;
+const { assetKey, width, height, caption, tags = [], priority = false } = Astro.props;
 const encodedAssetKey = assetKey.split("/").map(encodeURIComponent).join("/");
 const imageUrl = getImageUrl(encodedAssetKey);
+const displayUrl = getThumbnailUrl(encodedAssetKey, 1100);
+const displaySrcSet = getThumbnailSrcSet(encodedAssetKey);
 const isDev = import.meta.env.DEV;
 const fallbackUrl = `${R2_DOMAIN}/${encodedAssetKey}`;
 ---
@@ -36,9 +46,15 @@ const fallbackUrl = `${R2_DOMAIN}/${encodedAssetKey}`;
             data-photo-lightbox-link
         >
             <img
-                src={imageUrl}
+                src={displayUrl}
+                srcset={displaySrcSet}
+                sizes="(max-width: 767px) 100vw, (max-width: 1100px) calc(100vw - 4rem), 1036px"
+                width={width}
+                height={height}
                 alt=""
-                loading="lazy"
+                loading={priority ? "eager" : "lazy"}
+                fetchpriority={priority ? "high" : undefined}
+                decoding="async"
                 class="photo-img"
                 data-dev-fallback-url={isDev ? fallbackUrl : undefined}
             />

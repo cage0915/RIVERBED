@@ -17,6 +17,8 @@
   "photos": [
     {
       "filename": "KCS00600.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "鳶嘴山",
@@ -27,6 +29,8 @@
     },
     {
       "filename": "KCS00631.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "治茆山",
@@ -87,6 +91,8 @@
     },
     {
       "filename": "KCS00601.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "東郡大山",
@@ -127,6 +133,8 @@
     },
     {
       "filename": "KCS00633.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "卓社大山",
@@ -142,6 +150,8 @@
     },
     {
       "filename": "KCS00618.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "劍山",
@@ -167,6 +177,8 @@
     },
     {
       "filename": "KCS00627.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "白姑大山",
@@ -197,6 +209,8 @@
     },
     {
       "filename": "KCS00629.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "白姑大山西峰",
@@ -212,6 +226,8 @@
     },
     {
       "filename": "KCS00635.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "大雪山",
@@ -222,6 +238,8 @@
     },
     {
       "filename": "KCS00638.jpg",
+      "width": 2000,
+      "height": 3000,
       "tags": [
         {
           "name": "劍山",

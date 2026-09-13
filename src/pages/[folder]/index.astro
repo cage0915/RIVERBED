@@ -2,7 +2,14 @@
 import Layout from "../../layouts/Layout.astro";
 import CatalogCardInteractions from "../../components/CatalogCardInteractions.astro";
 import { getAlbumSummaries } from "../../lib/albums/catalog";
-import { getFolderTitle, getFolderCols, getImageUrl, R2_DOMAIN, FOLDER_METADATA } from "../../lib/constants";
+import {
+    FOLDER_METADATA,
+    getFolderCols,
+    getFolderTitle,
+    getThumbnailSrcSet,
+    getThumbnailUrl,
+    R2_DOMAIN,
+} from "../../lib/constants";
 import { folderPathParams } from "../../lib/static-paths";
 
 export async function getStaticPaths() {
@@ -64,7 +71,11 @@ const isYama = folder === "yama";
                     folderAlbums.map((album) => {
                         const albumSlug = album.slug.split("/")[1];
                         const resolvedCoverKey = album.cover.assetKey;
-                        const coverUrl = getImageUrl(resolvedCoverKey);
+                        const coverUrl = getThumbnailUrl(resolvedCoverKey, 720);
+                        const coverSrcSet = getThumbnailSrcSet(
+                            resolvedCoverKey,
+                            [320, 480, 720],
+                        );
                         const fallbackUrl = `${R2_DOMAIN}/${resolvedCoverKey}`;
                         return (
                             <div
@@ -84,8 +95,11 @@ const isYama = folder === "yama";
                                     <div class="album-cover">
                                         <img
                                             src={coverUrl}
+                                            srcset={coverSrcSet}
+                                            sizes="(max-width: 640px) calc(100vw - 2rem), (max-width: 1024px) calc((100vw - 4.5rem) / 2), 340px"
                                             alt={album.title}
                                             loading="lazy"
+                                            decoding="async"
                                             style={`--zoom: ${album.cover.zoom}; --ox: ${album.cover.offset.x}%; --oy: ${album.cover.offset.y}%;`}
                                             onerror={
                                                 isDev

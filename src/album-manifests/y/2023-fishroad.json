@@ -17,6 +17,8 @@
   "photos": [
     {
       "filename": "001.jpg",
+      "width": 3000,
+      "height": 1989,
       "tags": [
         {
           "name": "七星山",
@@ -27,6 +29,8 @@
     },
     {
       "filename": "002.jpg",
+      "width": 3000,
+      "height": 1989,
       "tags": [
         {
           "name": "七星山",
@@ -37,6 +41,8 @@
     },
     {
       "filename": "003.jpg",
+      "width": 3000,
+      "height": 1989,
       "tags": [
         {
           "name": "七星山",
@@ -47,10 +53,14 @@
     },
     {
       "filename": "004.jpg",
+      "width": 3000,
+      "height": 1989,
       "tags": []
     },
     {
       "filename": "005.jpg",
+      "width": 3000,
+      "height": 1989,
       "tags": [
         {
           "name": "竹子山",
@@ -61,18 +71,26 @@
     },
     {
       "filename": "006.jpg",
+      "width": 3000,
+      "height": 1989,
       "tags": []
     },
     {
       "filename": "007.jpg",
+      "width": 3000,
+      "height": 1989,
       "tags": []
     },
     {
       "filename": "008.jpg",
+      "width": 3000,
+      "height": 1989,
       "tags": []
     },
     {
       "filename": "009.jpg",
+      "width": 3000,
+      "height": 1989,
       "tags": [
         {
           "name": "大油坑",
@@ -83,10 +101,14 @@
     },
     {
       "filename": "010.jpg",
+      "width": 3000,
+      "height": 1989,
       "tags": []
     },
     {
       "filename": "011.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "七星山",
@@ -97,30 +119,44 @@
     },
     {
       "filename": "012.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "013.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "014.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "015.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "016.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "017.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "018.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     }
   ]

@@ -17,6 +17,8 @@
   "photos": [
     {
       "filename": "KCS04834.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "北大武山",
@@ -32,22 +34,32 @@
     },
     {
       "filename": "KCS05018.jpg",
+      "width": 2000,
+      "height": 3000,
       "tags": []
     },
     {
       "filename": "KCS05023.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS05026.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS05040.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS05086.jpg",
+      "width": 2000,
+      "height": 3000,
       "tags": [
         {
           "name": "北大武山",
@@ -58,6 +70,8 @@
     },
     {
       "filename": "KCS05091.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "北大武山",
@@ -68,14 +82,20 @@
     },
     {
       "filename": "KCS05119.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS05124.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS05125.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "霧頭山",
@@ -86,18 +106,26 @@
     },
     {
       "filename": "KCS05174.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS05134.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS05180.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS05198.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "北大武山",
@@ -108,6 +136,8 @@
     },
     {
       "filename": "KCS05233.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "北大武山",

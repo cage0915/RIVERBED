@@ -16,6 +16,8 @@
   "photos": [
     {
       "filename": "01.jpg",
+      "width": 3000,
+      "height": 1989,
       "tags": [
         {
           "name": "大尖山",
@@ -36,6 +38,8 @@
     },
     {
       "filename": "03.jpg",
+      "width": 3000,
+      "height": 1989,
       "tags": [
         {
           "name": "大尖山",
@@ -46,6 +50,8 @@
     },
     {
       "filename": "04.jpg",
+      "width": 4525,
+      "height": 3000,
       "tags": [
         {
           "name": "大尖山",
@@ -56,6 +62,8 @@
     },
     {
       "filename": "05.jpg",
+      "width": 4525,
+      "height": 3000,
       "tags": [
         {
           "name": "大尖山",
@@ -66,6 +74,8 @@
     },
     {
       "filename": "06.jpg",
+      "width": 3000,
+      "height": 1989,
       "tags": [
         {
           "name": "大尖山",
@@ -76,6 +86,8 @@
     },
     {
       "filename": "07.jpg",
+      "width": 3000,
+      "height": 1989,
       "tags": [
         {
           "name": "大尖山",
@@ -86,6 +98,8 @@
     },
     {
       "filename": "08.jpg",
+      "width": 3000,
+      "height": 1989,
       "tags": [
         {
           "name": "大尖山",
@@ -106,14 +120,20 @@
     },
     {
       "filename": "09.jpg",
+      "width": 3000,
+      "height": 1989,
       "tags": []
     },
     {
       "filename": "10.jpg",
+      "width": 3000,
+      "height": 1989,
       "tags": []
     },
     {
       "filename": "11.jpg",
+      "width": 3000,
+      "height": 1989,
       "tags": [
         {
           "name": "大尖山",
@@ -134,14 +154,20 @@
     },
     {
       "filename": "12.jpg",
+      "width": 3000,
+      "height": 1989,
       "tags": []
     },
     {
       "filename": "13.jpg",
+      "width": 3000,
+      "height": 1989,
       "tags": []
     },
     {
       "filename": "14.jpg",
+      "width": 3000,
+      "height": 1989,
       "tags": []
     }
   ]

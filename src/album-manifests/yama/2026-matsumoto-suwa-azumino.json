@@ -17,6 +17,8 @@
   "photos": [
     {
       "filename": "KCS01278.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "乗鞍岳",
@@ -27,6 +29,8 @@
     },
     {
       "filename": "KCS01266.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "常念岳",
@@ -47,6 +51,8 @@
     },
     {
       "filename": "KCS01309.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "常念岳",
@@ -57,10 +63,14 @@
     },
     {
       "filename": "KCS01286.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS01582.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "赤岳",
@@ -76,30 +86,44 @@
     },
     {
       "filename": "KCS01586.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS01588.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS01595.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS01592.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS01596.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS01602.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS01786.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "常念岳",
@@ -135,6 +159,8 @@
     },
     {
       "filename": "KCS01789.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "常念岳",
@@ -150,6 +176,8 @@
     },
     {
       "filename": "KCS01788.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "横通岳",
@@ -170,6 +198,8 @@
     },
     {
       "filename": "KCS01798.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "有明山",
@@ -180,6 +210,8 @@
     },
     {
       "filename": "KCS01809.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "常念岳",
@@ -220,6 +252,8 @@
     },
     {
       "filename": "KCS01825.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "蝶槍",
@@ -240,6 +274,8 @@
     },
     {
       "filename": "KCS01819.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "常念岳",

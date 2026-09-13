@@ -5,7 +5,8 @@ import { getAlbumSummaries } from "../lib/albums/catalog";
 import {
     getFolderTitle,
     getFolderOrder,
-    getImageUrl,
+    getThumbnailSrcSet,
+    getThumbnailUrl,
     R2_DOMAIN,
 } from "../lib/constants";
 
@@ -34,6 +35,7 @@ const folderMap = new Map<
     string,
     {
         coverUrl: string;
+        coverSrcSet?: string;
         fallbackUrl: string;
         title: string;
         coverZoom?: number;
@@ -47,7 +49,8 @@ for (const slug of folderSlugs) {
     folderMap.set(slug, albumsInFolder.map(album => {
         const resolvedCoverKey = album.cover.assetKey;
         return {
-            coverUrl: getImageUrl(resolvedCoverKey),
+            coverUrl: getThumbnailUrl(resolvedCoverKey, 480),
+            coverSrcSet: getThumbnailSrcSet(resolvedCoverKey, [320, 480, 720]),
             fallbackUrl: `${R2_DOMAIN}/${resolvedCoverKey}`,
             title: album.title,
             coverZoom: album.cover.zoom,
@@ -76,9 +79,13 @@ const sortedFolders = folderSlugs
                 <a href={`/${latestAlbum.slug}`} class="album-link">
                     <div class="album-cover latest-post-cover">
                         <img
-                            src={getImageUrl(latestAlbumCoverKey)}
+                            src={getThumbnailUrl(latestAlbumCoverKey, 1100)}
+                            srcset={getThumbnailSrcSet(latestAlbumCoverKey)}
+                            sizes="(max-width: 640px) calc(100vw - 2rem), (max-width: 1100px) calc(100vw - 4rem), 1036px"
                             alt={latestAlbum.title}
                             loading="eager"
+                            fetchpriority="high"
+                            decoding="async"
                             class="slide active"
                             style={`--zoom: ${latestAlbum.cover.zoom}; --ox: ${latestAlbum.cover.offset.x}%; --oy: ${latestAlbum.cover.offset.y}%;`}
                             onerror={
@@ -121,9 +128,14 @@ const sortedFolders = folderSlugs
                             <div class="album-cover">
                                 {folder.covers.map((cover, i) => (
                                     <img
-                                        src={cover.coverUrl}
+                                        src={i === 0 ? cover.coverUrl : undefined}
+                                        srcset={i === 0 ? cover.coverSrcSet : undefined}
+                                        sizes="(max-width: 640px) 9rem, (max-width: 1100px) calc((100vw - 6rem) / 5), 203px"
+                                        data-src={i === 0 ? undefined : cover.coverUrl}
+                                        data-srcset={i === 0 ? undefined : cover.coverSrcSet}
                                         alt={cover.title}
                                         loading={i === 0 ? "eager" : "lazy"}
+                                        decoding="async"
                                         class={`slide ${i === 0 ? "active" : ""}`}
                                         style={`--zoom: ${cover.coverZoom ?? 1}; --ox: ${cover.coverOffset?.x ?? 50}%; --oy: ${cover.coverOffset?.y ?? 50}%;`}
                                         onerror={

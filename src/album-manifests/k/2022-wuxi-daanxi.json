@@ -17,22 +17,32 @@
   "photos": [
     {
       "filename": "000166010003.jpg",
+      "width": 3000,
+      "height": 1989,
       "tags": []
     },
     {
       "filename": "000166010007.jpg",
+      "width": 3000,
+      "height": 1989,
       "tags": []
     },
     {
       "filename": "000166010010.jpg",
+      "width": 3000,
+      "height": 1989,
       "tags": []
     },
     {
       "filename": "000166010012.jpg",
+      "width": 3000,
+      "height": 1989,
       "tags": []
     },
     {
       "filename": "000166010017.jpg",
+      "width": 3000,
+      "height": 1989,
       "tags": [
         {
           "name": "火炎山",
@@ -43,6 +53,8 @@
     },
     {
       "filename": "000166010021.jpg",
+      "width": 3000,
+      "height": 1989,
       "tags": [
         {
           "name": "火炎山",
@@ -53,6 +65,8 @@
     },
     {
       "filename": "000166010023.jpg",
+      "width": 3000,
+      "height": 1989,
       "tags": [
         {
           "name": "火炎山",
@@ -63,6 +77,8 @@
     },
     {
       "filename": "000166010026.jpg",
+      "width": 3000,
+      "height": 1989,
       "tags": [
         {
           "name": "火炎山",
@@ -73,6 +89,8 @@
     },
     {
       "filename": "000166010031.jpg",
+      "width": 3000,
+      "height": 1989,
       "tags": [
         {
           "name": "火炎山",
@@ -83,6 +101,8 @@
     },
     {
       "filename": "000166010033.jpg",
+      "width": 3000,
+      "height": 1989,
       "tags": [
         {
           "name": "火炎山",
@@ -93,6 +113,8 @@
     },
     {
       "filename": "000166010030.jpg",
+      "width": 3000,
+      "height": 1989,
       "tags": []
     }
   ]

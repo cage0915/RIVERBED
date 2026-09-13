@@ -17,6 +17,8 @@
   "photos": [
     {
       "filename": "KCS01682.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "北葛岳",
@@ -27,6 +29,8 @@
     },
     {
       "filename": "KCS01684.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "餓鬼岳",
@@ -37,6 +41,8 @@
     },
     {
       "filename": "KCS01687.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "鹿島槍ヶ岳",
@@ -52,6 +58,8 @@
     },
     {
       "filename": "KCS01693.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "鹿島槍ヶ岳",
@@ -67,6 +75,8 @@
     },
     {
       "filename": "KCS01688.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "爺ヶ岳",
@@ -77,6 +87,8 @@
     },
     {
       "filename": "KCS01691.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "鹿島槍ヶ岳",
@@ -87,6 +99,8 @@
     },
     {
       "filename": "KCS01689.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "蓮華岳",
@@ -97,6 +111,8 @@
     },
     {
       "filename": "KCS01694.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "蓮華岳",
@@ -112,6 +128,8 @@
     },
     {
       "filename": "KCS01695.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "北葛岳",
@@ -122,6 +140,8 @@
     },
     {
       "filename": "KCS01696.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "蓮華岳",
@@ -132,6 +152,8 @@
     },
     {
       "filename": "KCS01709-全景.jpg",
+      "width": 6000,
+      "height": 2108,
       "tags": [
         {
           "name": "北葛岳",
@@ -157,18 +179,26 @@
     },
     {
       "filename": "KCS01699.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS01710.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS01742.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS01745.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "爺ヶ岳",
@@ -179,6 +209,8 @@
     },
     {
       "filename": "KCS01746.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "爺ヶ岳",
@@ -189,18 +221,26 @@
     },
     {
       "filename": "KCS01765.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS01772.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS01762.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": []
     },
     {
       "filename": "KCS01774.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "鹿島槍ヶ岳",
@@ -211,6 +251,8 @@
     },
     {
       "filename": "KCS01776.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "爺ヶ岳",
@@ -221,6 +263,8 @@
     },
     {
       "filename": "KCS01783.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "白馬鑓ヶ岳",
@@ -241,6 +285,8 @@
     },
     {
       "filename": "KCS01781.jpg",
+      "width": 3000,
+      "height": 2000,
       "tags": [
         {
           "name": "鹿島槍ヶ岳",
