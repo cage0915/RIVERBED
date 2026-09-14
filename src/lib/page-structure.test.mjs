@@ -212,6 +212,8 @@ test('PhotoCarousel can enable full-width carousel and joined proportional views
     assert.match(panorama, /@media \(min-width: 768px\)\s*\{[\s\S]*?\.photo-panorama-section \.photo-panorama-track :global\(\.photo-img\)\s*\{\s*border-radius: 0/);
     assert.match(panorama, /data-view="panorama"[^}]*\.photo-panorama-track:hover :global\(\.tags-overlay\)/);
     assert.match(panorama, /const animations = slides\.map[\s\S]*?translateX[\s\S]*?scaleX[\s\S]*?slide\.animate\(keyframes/);
+    assert.match(panorama, /useMobileCarouselReveal[\s\S]*?nextView === "carousel"[\s\S]*?activeIndex > 0[\s\S]*?max-width: 767px/);
+    assert.match(panorama, /const keyframes = useMobileCarouselReveal[\s\S]*?opacity: 0[\s\S]*?opacity: 1/);
     assert.match(panorama, /duration: 650[\s\S]*?cubic-bezier\(0\.22, 1, 0\.36, 1\)/);
     assert.match(panorama, /await Promise\.allSettled\(animations\.map\(\(animation\) => animation\.finished\)\)/);
     assert.doesNotMatch(panorama, /scrollIntoView/);

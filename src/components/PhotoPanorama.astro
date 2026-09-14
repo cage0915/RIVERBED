@@ -282,7 +282,11 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
                 const shouldAnimate = viewChanged
                     && animate
                     && !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-                const beforeRects = shouldAnimate
+                const useMobileCarouselReveal = shouldAnimate
+                    && nextView === "carousel"
+                    && activeIndex > 0
+                    && window.matchMedia("(max-width: 767px)").matches;
+                const beforeRects = shouldAnimate && !useMobileCarouselReveal
                     ? slides.map((slide) => slide.getBoundingClientRect())
                     : [];
                 const beforeStageHeight = shouldAnimate ? stage.getBoundingClientRect().height : 0;
@@ -310,13 +314,18 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
                     const animations = slides.map((slide, index) => {
                         const before = beforeRects[index];
                         const after = afterRects[index];
-                        const keyframes = [
-                            {
-                                transform: `translateX(${before.left - after.left}px) scaleX(${after.width ? before.width / after.width : 1})`,
-                                transformOrigin: "left center",
-                            },
-                            { transform: "translateX(0) scaleX(1)", transformOrigin: "left center" },
-                        ];
+                        const keyframes = useMobileCarouselReveal
+                            ? [
+                                { opacity: 0 },
+                                { opacity: 1 },
+                            ]
+                            : [
+                                {
+                                    transform: `translateX(${before.left - after.left}px) scaleX(${after.width ? before.width / after.width : 1})`,
+                                    transformOrigin: "left center",
+                                },
+                                { transform: "translateX(0) scaleX(1)", transformOrigin: "left center" },
+                            ];
                         const animation = slide.animate(keyframes, {
                             duration: 650,
                             easing: "cubic-bezier(0.22, 1, 0.36, 1)",
