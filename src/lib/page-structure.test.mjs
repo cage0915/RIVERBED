@@ -217,6 +217,7 @@ test('PhotoCarousel can enable full-width carousel and joined proportional views
     assert.match(panorama, /duration: 650[\s\S]*?cubic-bezier\(0\.22, 1, 0\.36, 1\)/);
     assert.match(panorama, /await Promise\.allSettled\(animations\.map\(\(animation\) => animation\.finished\)\)/);
     assert.doesNotMatch(panorama, /scrollIntoView/);
+    assert.match(panorama, /sourceSlides\.length === 1[\s\S]*?originalDisplayUrl = sourceLightbox\?\.dataset\.pswpSrc[\s\S]*?sourceImage\.removeAttribute\("srcset"\)[\s\S]*?sourceImage\.removeAttribute\("sizes"\)[\s\S]*?sourceImage\.src = originalDisplayUrl/);
     assert.match(panorama, /sourceSlides\.length === 1 && requestedSlices > 1/);
     assert.match(panorama, /sourceSlide\.cloneNode\(true\)/);
     assert.match(panorama, /slides = sliceSlides/);

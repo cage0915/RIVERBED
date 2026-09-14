@@ -170,6 +170,18 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
                 Math.max(1, Number.parseInt(section.dataset.panoramaSlices || "1", 10) || 1),
             );
             const sliceSlides: HTMLElement[] = [];
+            if (sourceSlides.length === 1) {
+                const sourceImage = sourceSlides[0].querySelector<HTMLImageElement>("img");
+                const sourceLightbox = sourceSlides[0].querySelector<HTMLAnchorElement>("[data-photo-lightbox-link]");
+                const originalDisplayUrl = sourceLightbox?.dataset.pswpSrc
+                    || sourceLightbox?.getAttribute("href");
+                if (sourceImage && originalDisplayUrl) {
+                    sourceImage.removeAttribute("srcset");
+                    sourceImage.removeAttribute("sizes");
+                    sourceImage.src = originalDisplayUrl;
+                    sourceImage.dataset.panoramaOriginalSource = "true";
+                }
+            }
             if (sourceSlides.length === 1 && requestedSlices > 1) {
                 const sourceSlide = sourceSlides[0];
                 const sourceLightbox = sourceSlide.querySelector<HTMLAnchorElement>("[data-photo-lightbox-link]");
