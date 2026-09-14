@@ -228,6 +228,7 @@ test('PhotoCarousel can enable full-width carousel and joined proportional views
     assert.match(panorama, /sliceWrapper\.dataset\.panoramaSourceItemKey = sourceItemKey/);
     assert.match(panorama, /data-single-photo-sliced[^}]*photo-panorama-single-source\)\s*\{\s*display: none/);
     assert.match(panorama, /\.photo-panorama-controls\s*\{\s*position: relative;\s*z-index: 3/);
+    assert.match(panorama, /data-view="panorama"\] \.photo-panorama-dots\s*\{\s*display: none/);
     assert.match(getStructure, /Row\|PhotoCarousel\|Text/);
     assert.match(getStructure, /props\.enablePanorama = true/);
     assert.match(getStructure, /panoramaSlices=\\\{\(\\d\+\)\\\}/);
