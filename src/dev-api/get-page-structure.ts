@@ -37,7 +37,7 @@ export const GET: APIRoute = async ({ request }) => {
     const body = fmMatch ? content.slice(fmMatch[0].length).trim() : content;
 
     // 2. Extract Blocks
-    // Regex to match <Row ...>...</Row>, <PhotoCarousel ...>...</PhotoCarousel>, or <Text ...>...</Text>
+    // Regex to match the supported album layout blocks.
     const blockRegex = /<(Row|PhotoCarousel|Text)\b([^>]*?)>([\s\S]*?)<\/\1>/g;
     const blocks: any[] = [];
     let match;
@@ -64,7 +64,7 @@ export const GET: APIRoute = async ({ request }) => {
             continue;
         }
 
-        // Parse Block Props (Row / PhotoCarousel)
+        // Parse media block props.
         const props: any = {};
         const captionMatch = propsStr.match(/caption="([^"]*)"/);
         if (captionMatch) props.caption = captionMatch[1];
@@ -89,6 +89,13 @@ export const GET: APIRoute = async ({ request }) => {
 
         const initialSlideMatch = propsStr.match(/initialSlide=\{(\d+)\}/);
         if (initialSlideMatch) props.initialSlide = parseInt(initialSlideMatch[1]);
+
+        if (/\benablePanorama(?:=\{true\})?(?=\s|$)/.test(propsStr)) {
+            props.enablePanorama = true;
+        }
+
+        const initialViewMatch = propsStr.match(/initialView="(carousel|panorama)"/);
+        if (initialViewMatch) props.initialView = initialViewMatch[1];
 
         // Parse Photos inside Block
         const photoRegex = /<Photo\s+([^>]*?)\/>/g;

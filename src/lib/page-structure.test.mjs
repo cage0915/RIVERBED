@@ -149,6 +149,64 @@ test('Text serialization uses one bottom block margin and retires legacy Text ma
     assert.doesNotMatch(content, /blockMargin="0\.5rem"/);
 });
 
+test('PhotoCarousel panorama serialization preserves its configured initial view and slide', () => {
+    const content = createLayoutOnlyPageContent([{
+        type: 'PhotoCarousel',
+        props: { enablePanorama: true, initialView: 'panorama', initialSlide: 2 },
+        photos: [
+            { itemKey: 'one.jpg' },
+            { itemKey: 'two.jpg' },
+            { itemKey: 'three.jpg' },
+        ],
+    }]);
+
+    assert.match(content, /<PhotoCarousel\s+enablePanorama=\{true\}\s+initialSlide=\{2\}\s+initialView="panorama">/);
+    assert.match(content, /<Photo itemKey="three\.jpg" \/>/);
+    assert.match(content, /<\/PhotoCarousel>/);
+    assert.doesNotMatch(content, /<PhotoPanorama/);
+});
+
+test('PhotoCarousel can enable full-width carousel and joined proportional views', () => {
+    const carousel = readProjectFile('src/components/PhotoCarousel.astro');
+    const panorama = readProjectFile('src/components/PhotoPanorama.astro');
+    const albumPage = readProjectFile('src/pages/[folder]/[album].astro');
+    const getStructure = readProjectFile('src/dev-api/get-page-structure.ts');
+    const devTool = readProjectFile('src/components/DevTool.astro');
+
+    assert.match(carousel, /enablePanorama\?: boolean/);
+    assert.match(carousel, /\{enablePanorama \? \(/);
+    assert.match(carousel, /<PhotoPanorama/);
+    assert.doesNotMatch(albumPage, /import PhotoPanorama/);
+    assert.match(albumPage, /components=\{\{ Row, Photo: AlbumPhoto, Text, PhotoCarousel \}\}/);
+    assert.match(panorama, /initialView\?: PanoramaView/);
+    assert.match(panorama, /data-initial-view=\{view\}/);
+    assert.match(panorama, /data-view=\{view\}/);
+    assert.match(panorama, /data-view="carousel"[^}]*\.photo-panorama-track > :global\(\*\)[\s\S]*?flex:\s*0 0 100%/);
+    assert.match(panorama, /data-view="panorama"[^}]*\.photo-panorama-track > :global\(\*\)[\s\S]*?flex:\s*var\(--panorama-grow, 100\) 1 0%/);
+    assert.match(panorama, /gap:\s*0/);
+    assert.match(panorama, /photo-panorama-arrow--previous/);
+    assert.match(panorama, /photo-panorama-arrow--next/);
+    assert.match(panorama, /photo-panorama-stage:hover \.photo-panorama-arrow:not\(:disabled\)/);
+    assert.match(panorama, /@media \(max-width: 767px\)[\s\S]*?\.photo-panorama-arrow\s*\{\s*display:\s*none/);
+    assert.equal((panorama.match(/viewBox="0 0 16 16"/g) || []).length, 2);
+    assert.match(panorama, /photo-panorama-view-icon--carousel[\s\S]*?<rect x="0\.5" y="4" width="3" height="8"[\s\S]*?<rect x="6\.5" y="4" width="3" height="8"[\s\S]*?<rect x="12\.5" y="4" width="3" height="8"/);
+    assert.match(panorama, /photo-panorama-view-icon--panorama[\s\S]*?<rect x="0\.5" y="4" width="15" height="8"/);
+    assert.doesNotMatch(panorama, /tags-overlay[^}]*display:\s*none/);
+    assert.match(panorama, /@media \(min-width: 768px\)\s*\{[\s\S]*?\.photo-panorama-section \.photo-panorama-track :global\(\.photo-img\)\s*\{\s*border-radius: 0/);
+    assert.match(panorama, /data-view="panorama"[^}]*\.photo-panorama-track:hover :global\(\.tags-overlay\)/);
+    assert.match(panorama, /slide\.animate\(\[\s*\{[\s\S]*?translateX[\s\S]*?scaleX/);
+    assert.match(panorama, /duration: 650[\s\S]*?cubic-bezier\(0\.22, 1, 0\.36, 1\)/);
+    assert.match(panorama, /await Promise\.allSettled\(animations\.map\(\(animation\) => animation\.finished\)\)/);
+    assert.doesNotMatch(panorama, /scrollIntoView/);
+    assert.match(getStructure, /Row\|PhotoCarousel\|Text/);
+    assert.match(getStructure, /props\.enablePanorama = true/);
+    assert.match(getStructure, /initialView="\(carousel\|panorama\)"/);
+    assert.match(devTool, /label: 'Panorama', value: 'PhotoCarouselPanorama'/);
+    assert.match(devTool, /class="photo-panorama-initial-view"/);
+    assert.match(devTool, /sourceType: 'Row' \| 'PhotoCarousel';\s*targetType: 'Row' \| 'PhotoCarousel';\s*sourcePanorama: boolean;\s*targetPanorama: boolean/);
+    assert.match(devTool, /target\.props\.enablePanorama = true/);
+});
+
 test('caption spacing is applied when direct block changes are saved', () => {
     const devTool = readProjectFile('src/components/DevTool.astro');
 
@@ -410,18 +468,22 @@ test('tagged photos reveal tags without a grey image overlay on hover or touch',
     );
 });
 
-test('media block type toggle is always last and saves through shared pending changes', () => {
+test('media block type chooser expands left with direct R C P choices and saves through shared pending changes', () => {
     const devTool = readProjectFile('src/components/DevTool.astro');
 
     assert.match(
         devTool,
-        /dev-inline-margin-control[\s\S]*?dev-btn-block-type has-data[\s\S]*?displayedBlockType === 'Row' \? 'R' : 'C'/,
+        /dev-inline-margin-control[\s\S]*?dev-inline-block-type-control has-data[\s\S]*?\['Row', 'R'\][\s\S]*?\['PhotoCarousel', 'C'\][\s\S]*?\['PhotoPanorama', 'P'\]/,
     );
+    assert.match(devTool, /\.dev-inline-block-type-control\.is-open\s*\{\s*width: 6rem;\s*margin-left: -4rem;/);
+    assert.match(devTool, /\.dev-inline-block-type-control\.is-open \.dev-inline-block-type-current\s*\{\s*display: none;/);
+    assert.match(devTool, /stageBlockType\(option\.dataset\.blockMode as MediaBlockMode\)/);
     assert.match(devTool, /pendingBlockTypeChanges\.set\(typeChangeKey/);
-    assert.match(devTool, /structure\.blocks\[targetIndex\]\.type = change\.targetType/);
+    assert.match(devTool, /target\.type = change\.targetType/);
+    assert.match(devTool, /change\.targetType === 'PhotoCarousel' && change\.targetPanorama/);
     assert.match(devTool, /pendingBlockTypeChanges\.size > 0/);
     assert.match(devTool, /const updateBlockTypePreview = \(/);
-    assert.match(devTool, /updateBlockTypePreview\(targetType, matchesFile\)/);
+    assert.match(devTool, /updateBlockTypePreview\(targetMode, matchesFile\)/);
     assert.match(devTool, /\.dev-preview-as-carousel > \.photo-row[\s\S]*?scroll-snap-type: x mandatory/);
     assert.match(devTool, /\.dev-preview-as-row > \.carousel-track[\s\S]*?overflow: visible/);
     assert.match(devTool, /dev-preview-carousel-dots/);
@@ -430,13 +492,16 @@ test('media block type toggle is always last and saves through shared pending ch
     assert.match(devTool, /const rowDefaultMargin = isLastAlbumBlock \? '0rem' : \(albumGap \|\| '0\.5rem'\)/);
     assert.match(devTool, /if \(blockType === 'PhotoCarousel' \|\| blockType === 'Text'\) return '0\.5rem'/);
     assert.match(devTool, /if \(targetType === 'PhotoCarousel'\) \{\s*if \(index > 0\) required\.add\(index - 1\);\s*required\.add\(index\)/);
-    assert.match(devTool, /updateBlockTypePreview\(targetType, matchesFile\);\s*reconcileAutomaticBlockMargins\(\)/);
+    assert.match(devTool, /updateBlockTypePreview\(targetMode, matchesFile\);\s*reconcileAutomaticBlockMargins\(\)/);
+    assert.match(devTool, /dev-preview-as-panorama/);
+    assert.match(devTool, /dev-preview-panorama-controls/);
+    assert.match(devTool, /dev-preview-as-panorama\[data-dev-preview-panorama-view="panorama"\]:hover \.tags-overlay/);
     assert.match(devTool, /syncManagedSpecialMargins\(\[bIdx - 1, bIdx\]\)/);
     assert.match(
         devTool,
         /updateMarginPreview\(findPendingMarginEntry\(\)\?\.\[1\]\.blockMargin \|\| originalBlockMargin\)/,
     );
-    assert.match(devTool, /\.dev-block-toolbar \.dev-btn-block-type \{ --dev-toolbar-order: 4; \}/);
+    assert.match(devTool, /\.dev-block-toolbar \.dev-inline-block-type-control \{ --dev-toolbar-order: 4; \}/);
     assert.match(
         devTool,
         /\.dev-block-toolbar \.dev-toolbar-btn:not\(\.has-data\):not\(\.has-pending\),[\s\S]*?display: none;[\s\S]*?order: 0;/,
@@ -445,7 +510,7 @@ test('media block type toggle is always last and saves through shared pending ch
         devTool,
         /\.dev-block-overlay:hover > \.dev-block-toolbar \.dev-toolbar-btn,[\s\S]*?display: flex;/,
     );
-    assert.match(devTool, /blockTypeButton\.classList\.toggle\('has-pending', !matchesFile\)/);
+    assert.match(devTool, /blockTypeControl\?\.classList\.toggle\('has-pending', !matchesFile\)/);
     assert.match(devTool, /blockEl\.querySelector\('\.block-toggle'\)\?\.addEventListener\('click'/);
     assert.match(
         devTool,
@@ -458,7 +523,7 @@ test('pending block controls and the shared save action use the yellow state', (
 
     assert.match(
         devTool,
-        /\.dev-toolbar-btn\.has-pending,\s*\.dev-inline-margin-control\.has-pending\s*\{[\s\S]*?background: rgba\(234, 179, 8, 0\.9\)/,
+        /\.dev-toolbar-btn\.has-pending,\s*\.dev-inline-margin-control\.has-pending\s*\{[\s\S]*?background: rgba\(234, 179, 8, 0\.9\)|\.dev-inline-block-type-control\.has-pending\s*\{[\s\S]*?background: rgba\(234, 179, 8, 0\.9\)/,
     );
     assert.match(
         devTool,
@@ -856,6 +921,7 @@ test('media behavior uses page-scoped lifecycle owners with deterministic cleanu
     const photo = readProjectFile('src/components/Photo.astro');
     const row = readProjectFile('src/components/Row.astro');
     const carousel = readProjectFile('src/components/PhotoCarousel.astro');
+    const panorama = readProjectFile('src/components/PhotoPanorama.astro');
     const mountainProfile = readProjectFile('src/components/MountainProfile.astro');
 
     assert.match(
@@ -900,6 +966,12 @@ test('media behavior uses page-scoped lifecycle owners with deterministic cleanu
     assert.match(carousel, /observer\.disconnect\(\)/);
     assert.match(carousel, /clearTimeout/);
     assert.doesNotMatch(carousel, /astro:(?:before|after)-swap|initCarousels\(\);/);
+
+    assert.match(panorama, /installPageLifecycle/);
+    assert.match(panorama, /new AbortController\(\)/);
+    assert.match(panorama, /resizeObservers\.forEach\(\(observer\) => observer\.disconnect\(\)\)/);
+    assert.match(panorama, /frameIds\.forEach\(\(id\) => cancelAnimationFrame\(id\)\)/);
+    assert.doesNotMatch(panorama, /astro:(?:before|after)-swap/);
 
     assert.match(mountainProfile, /installPageLifecycle/);
     assert.match(mountainProfile, /resizeObserver\.disconnect\(\)/);
@@ -1017,6 +1089,7 @@ test("covered client scripts do not retain after-swap initializers", () => {
         "src/components/Photo.astro",
         "src/components/Row.astro",
         "src/components/PhotoCarousel.astro",
+        "src/components/PhotoPanorama.astro",
         "src/components/MountainProfile.astro",
     ];
 

@@ -76,6 +76,8 @@
             type PendingBlockTypeChange = {
                 sourceType: 'Row' | 'PhotoCarousel';
                 targetType: 'Row' | 'PhotoCarousel';
+                sourcePanorama: boolean;
+                targetPanorama: boolean;
                 blockIndex: number;
                 photoNames: string[];
             };
@@ -305,25 +307,30 @@
                         background: rgba(59, 130, 246, 0.8);
                     }
                     .dev-block-toolbar .dev-toolbar-btn,
-                    .dev-block-toolbar .dev-inline-margin-control {
+                    .dev-block-toolbar .dev-inline-margin-control,
+                    .dev-block-toolbar .dev-inline-block-type-control {
                         order: var(--dev-toolbar-order, 0);
                     }
                     .dev-block-toolbar .dev-btn-tag { --dev-toolbar-order: 1; }
                     .dev-block-toolbar .dev-btn-caption,
                     .dev-block-toolbar .dev-btn-text { --dev-toolbar-order: 2; }
                     .dev-block-toolbar .dev-inline-margin-control { --dev-toolbar-order: 3; }
-                    .dev-block-toolbar .dev-btn-block-type { --dev-toolbar-order: 4; }
+                    .dev-block-toolbar .dev-inline-block-type-control { --dev-toolbar-order: 4; }
                     .dev-block-toolbar .dev-toolbar-btn:not(.has-data):not(.has-pending),
-                    .dev-block-toolbar .dev-inline-margin-control:not(.has-data):not(.has-pending) {
+                    .dev-block-toolbar .dev-inline-margin-control:not(.has-data):not(.has-pending),
+                    .dev-block-toolbar .dev-inline-block-type-control:not(.has-data):not(.has-pending) {
                         display: none;
                         order: 0;
                     }
                     .dev-block-overlay:hover > .dev-block-toolbar .dev-toolbar-btn,
                     .dev-block-overlay:hover > .dev-block-toolbar .dev-inline-margin-control,
+                    .dev-block-overlay:hover > .dev-block-toolbar .dev-inline-block-type-control,
                     .dev-block-toolbar:focus-within .dev-toolbar-btn,
                     .dev-block-toolbar:focus-within .dev-inline-margin-control,
+                    .dev-block-toolbar:focus-within .dev-inline-block-type-control,
                     .dev-block-toolbar.is-open .dev-toolbar-btn,
                     .dev-block-toolbar.is-open .dev-inline-margin-control,
+                    .dev-block-toolbar.is-open .dev-inline-block-type-control,
                     .dev-block-toolbar.is-tagging .dev-toolbar-btn {
                         display: flex;
                         opacity: 1;
@@ -396,6 +403,61 @@
                     }
                     .dev-inline-margin-control .dev-inline-margin-cancel { color: #fca5a5; }
                     .dev-inline-margin-control .dev-inline-margin-save { color: #bfdbfe; }
+                    .dev-inline-block-type-control {
+                        display: flex;
+                        justify-content: flex-end;
+                        width: 2rem;
+                        height: 2rem;
+                        margin-left: 0;
+                        overflow: hidden;
+                        border: 1px solid rgba(255,255,255,0.3);
+                        border-radius: 9999px;
+                        background: rgba(255,255,255,0.2);
+                        backdrop-filter: blur(4px);
+                        transition: width 0.2s ease, margin-left 0.2s ease, opacity 0.2s ease;
+                    }
+                    .dev-inline-block-type-control:hover,
+                    .dev-inline-block-type-control.is-open {
+                        background: rgba(59, 130, 246, 0.8);
+                    }
+                    .dev-inline-block-type-control.has-pending {
+                        background: rgba(234, 179, 8, 0.9);
+                        border-color: rgba(250, 204, 21, 0.95);
+                        color: #18181b;
+                    }
+                    .dev-inline-block-type-control.is-open {
+                        width: 6rem;
+                        margin-left: -4rem;
+                    }
+                    .dev-inline-block-type-options {
+                        display: flex;
+                        flex: 0 0 auto;
+                    }
+                    .dev-inline-block-type-control button {
+                        display: flex;
+                        width: 2rem;
+                        min-width: 2rem;
+                        height: 2rem;
+                        padding: 0;
+                        align-items: center;
+                        justify-content: center;
+                        border: 0;
+                        background: transparent;
+                        color: inherit;
+                        cursor: pointer;
+                        font: 600 0.8rem/1 sans-serif;
+                    }
+                    .dev-inline-block-type-option[aria-pressed="true"] {
+                        background: rgba(255,255,255,0.3);
+                        color: white;
+                    }
+                    .dev-inline-block-type-current {
+                        flex: 0 0 auto;
+                        border-left: 1px solid rgba(255,255,255,0.18) !important;
+                    }
+                    .dev-inline-block-type-control.is-open .dev-inline-block-type-current {
+                        display: none;
+                    }
                     .dev-block-overlay {
                         position: relative;
                     }
@@ -424,11 +486,13 @@
                     }
                     .dev-page-structure-preview.row-wrapper,
                     .dev-page-structure-preview.carousel-section,
+                    .dev-page-structure-preview.photo-panorama-section,
                     .dev-page-structure-preview.text-block {
                         width: 100%;
                     }
                     .dev-page-structure-preview.row-wrapper,
-                    .dev-page-structure-preview.carousel-section {
+                    .dev-page-structure-preview.carousel-section,
+                    .dev-page-structure-preview.photo-panorama-section {
                         display: flex;
                         flex-direction: column;
                     }
@@ -449,7 +513,8 @@
                         letter-spacing: 0.05em;
                     }
                     .dev-page-structure-preview .photo-row,
-                    .dev-page-structure-preview .carousel-track {
+                    .dev-page-structure-preview .carousel-track,
+                    .dev-page-structure-preview .photo-panorama-track {
                         display: flex;
                         width: 100%;
                     }
@@ -513,6 +578,72 @@
                     .dev-page-structure-preview .carousel-dot.active {
                         width: 18px;
                         background: rgba(255, 255, 255, 0.8);
+                    }
+                    .dev-page-structure-preview.photo-panorama-section .photo-panorama-track {
+                        display: flex;
+                        width: 100%;
+                        gap: 0;
+                        padding-block: 3.5rem;
+                        margin-block: -3.5rem;
+                        scrollbar-width: none;
+                    }
+                    .dev-page-structure-preview.photo-panorama-section[data-view="carousel"] .photo-panorama-track {
+                        overflow-x: auto;
+                        scroll-snap-type: x mandatory;
+                    }
+                    .dev-page-structure-preview.photo-panorama-section[data-view="carousel"] .photo-panorama-track > * {
+                        flex: 0 0 100%;
+                        min-width: 0;
+                        scroll-snap-align: start;
+                    }
+                    .dev-page-structure-preview.photo-panorama-section[data-view="panorama"] .photo-panorama-track {
+                        overflow: visible;
+                    }
+                    .dev-page-structure-preview.photo-panorama-section[data-view="panorama"] .photo-panorama-track > * {
+                        flex: var(--panorama-grow, 100) 1 0%;
+                        min-width: 0;
+                    }
+                    @media (min-width: 768px) and (hover: hover) {
+                        .dev-page-structure-preview.photo-panorama-section[data-view="panorama"]:hover .tags-overlay {
+                            opacity: 1;
+                        }
+                    }
+                    .dev-page-structure-preview.photo-panorama-section .photo-panorama-controls {
+                        display: flex;
+                        min-height: 1.5rem;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 0.75rem;
+                        margin-top: 0.75rem;
+                    }
+                    .dev-page-structure-preview.photo-panorama-section .photo-panorama-dots {
+                        display: flex;
+                        align-items: center;
+                        gap: 0.35rem;
+                    }
+                    .dev-page-structure-preview.photo-panorama-section .photo-panorama-dot {
+                        width: 6px;
+                        height: 6px;
+                        padding: 0;
+                        border: 0;
+                        border-radius: 9999px;
+                        background: rgba(200, 200, 200, 0.25);
+                    }
+                    .dev-page-structure-preview.photo-panorama-section .photo-panorama-dot.active {
+                        width: 18px;
+                        background: rgba(255, 255, 255, 0.8);
+                    }
+                    .dev-page-structure-preview.photo-panorama-section .photo-panorama-view-toggle {
+                        display: grid;
+                        width: 2rem;
+                        height: 1.5rem;
+                        place-items: center;
+                        padding: 0;
+                        border: 1px solid rgba(255,255,255,.2);
+                        border-radius: 9999px;
+                        color: rgba(255,255,255,.8);
+                        background: transparent;
+                        font: 600 .65rem/1 sans-serif;
                     }
                     .dev-page-structure-preview .rich-text__link {
                         color: inherit;
@@ -614,19 +745,158 @@
                     .dev-preview-as-row > .carousel-dots {
                         display: none;
                     }
+                    .dev-preview-as-row > .photo-panorama-stage,
+                    .dev-preview-as-carousel > .photo-panorama-stage {
+                        display: contents;
+                    }
+                    .dev-preview-as-row > .photo-panorama-stage > .photo-panorama-track {
+                        display: flex;
+                        width: 100%;
+                        gap: 0.5rem;
+                        padding: 0;
+                        margin: 0;
+                        overflow: visible;
+                        scroll-snap-type: none;
+                    }
+                    .dev-preview-as-row > .photo-panorama-stage > .photo-panorama-track > * {
+                        min-width: 0;
+                        opacity: 1;
+                        transform: none;
+                        scroll-snap-align: none;
+                    }
+                    .dev-preview-as-carousel > .photo-panorama-stage > .photo-panorama-track {
+                        display: flex;
+                        width: 100%;
+                        flex-direction: row;
+                        gap: 0.5rem;
+                        padding-block: 3.5rem;
+                        margin-block: -3.5rem;
+                        overflow-x: auto;
+                        scroll-snap-type: x mandatory;
+                        scroll-padding-inline: 10%;
+                        scrollbar-width: none;
+                    }
+                    .dev-preview-as-carousel > .photo-panorama-stage > .photo-panorama-track::before,
+                    .dev-preview-as-carousel > .photo-panorama-stage > .photo-panorama-track::after {
+                        content: "";
+                        flex: 0 0 10%;
+                        pointer-events: none;
+                    }
+                    .dev-preview-as-carousel > .photo-panorama-stage > .photo-panorama-track::before {
+                        margin-inline-end: -0.5rem;
+                    }
+                    .dev-preview-as-carousel > .photo-panorama-stage > .photo-panorama-track::after {
+                        margin-inline-start: -0.5rem;
+                    }
+                    .dev-preview-as-carousel > .photo-panorama-stage > .photo-panorama-track > * {
+                        flex: 0 0 80% !important;
+                        min-width: 0;
+                        opacity: 0.65;
+                        transform: scale(0.95);
+                        scroll-snap-align: center;
+                    }
+                    .dev-preview-as-carousel > .photo-panorama-stage > .photo-panorama-track > [data-active] {
+                        opacity: 1;
+                        transform: scale(1);
+                    }
+                    .dev-preview-as-row > .photo-panorama-controls,
+                    .dev-preview-as-carousel > .photo-panorama-controls,
+                    .dev-preview-as-row .photo-panorama-arrow,
+                    .dev-preview-as-carousel .photo-panorama-arrow {
+                        display: none;
+                    }
+                    .dev-preview-as-panorama > .carousel-dots {
+                        display: none;
+                    }
+                    .dev-preview-as-panorama > :is(.photo-row, .carousel-track) {
+                        display: flex;
+                        width: 100%;
+                        gap: 0;
+                        padding-block: 3.5rem;
+                        margin-block: -3.5rem;
+                        overflow-x: auto;
+                        scroll-snap-type: x mandatory;
+                        scroll-padding-inline: 0;
+                        scrollbar-width: none;
+                    }
+                    .dev-preview-as-panorama > :is(.photo-row, .carousel-track)::before,
+                    .dev-preview-as-panorama > :is(.photo-row, .carousel-track)::after {
+                        display: none;
+                    }
+                    .dev-preview-as-panorama > :is(.photo-row, .carousel-track) > * {
+                        flex: 0 0 100% !important;
+                        min-width: 0;
+                        opacity: 1;
+                        transform: none;
+                        scroll-snap-align: start;
+                    }
+                    .dev-preview-as-panorama[data-dev-preview-panorama-view="panorama"] > :is(.photo-row, .carousel-track) {
+                        overflow: visible;
+                        scroll-snap-type: none;
+                    }
+                    .dev-preview-as-panorama[data-dev-preview-panorama-view="panorama"] > :is(.photo-row, .carousel-track) > * {
+                        flex: var(--panorama-grow, 100) 1 0% !important;
+                        scroll-snap-align: none;
+                    }
+                    @media (min-width: 768px) and (hover: hover) {
+                        .dev-preview-as-panorama[data-dev-preview-panorama-view="panorama"]:hover .tags-overlay {
+                            opacity: 1;
+                        }
+                    }
+                    .dev-preview-panorama-controls {
+                        display: flex;
+                        min-height: 1.5rem;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 0.75rem;
+                        margin-top: 0.75rem;
+                    }
+                    .dev-preview-panorama-dots {
+                        display: flex;
+                        align-items: center;
+                        gap: 0.35rem;
+                    }
+                    .dev-preview-panorama-dot {
+                        width: 6px;
+                        height: 6px;
+                        padding: 0;
+                        border: 0;
+                        border-radius: 9999px;
+                        background: rgba(200, 200, 200, 0.25);
+                    }
+                    .dev-preview-panorama-dot.active {
+                        width: 18px;
+                        background: rgba(255, 255, 255, 0.8);
+                    }
+                    .dev-preview-panorama-toggle {
+                        display: grid;
+                        width: 2rem;
+                        height: 1.5rem;
+                        place-items: center;
+                        padding: 0;
+                        border: 1px solid rgba(255,255,255,.2);
+                        border-radius: 9999px;
+                        color: rgba(255,255,255,.8);
+                        background: transparent;
+                        font: 600 .65rem/1 sans-serif;
+                    }
                     @media (max-width: 767px) {
                         .dev-page-structure-preview .carousel-track,
-                        .dev-preview-as-carousel > .photo-row {
+                        .dev-preview-as-carousel > .photo-row,
+                        .dev-preview-as-carousel > .photo-panorama-stage > .photo-panorama-track {
                             scroll-padding-inline: 0;
                         }
                         .dev-page-structure-preview .carousel-track::before,
                         .dev-page-structure-preview .carousel-track::after,
                         .dev-preview-as-carousel > .photo-row::before,
-                        .dev-preview-as-carousel > .photo-row::after {
+                        .dev-preview-as-carousel > .photo-row::after,
+                        .dev-preview-as-carousel > .photo-panorama-stage > .photo-panorama-track::before,
+                        .dev-preview-as-carousel > .photo-panorama-stage > .photo-panorama-track::after {
                             display: none;
                         }
                         .dev-page-structure-preview .carousel-track > *,
-                        .dev-preview-as-carousel > .photo-row > * {
+                        .dev-preview-as-carousel > .photo-row > *,
+                        .dev-preview-as-carousel > .photo-panorama-stage > .photo-panorama-track > * {
                             flex: 0 0 100% !important;
                             opacity: 1;
                             transform: none;
@@ -1324,7 +1594,7 @@
             const syncToolbarPendingState = (toolbar: Element | null) => {
                 if (!toolbar) return;
                 toolbar.classList.toggle('has-pending', Boolean(
-                    toolbar.querySelector('.dev-toolbar-btn.has-pending, .dev-inline-margin-control.has-pending'),
+                    toolbar.querySelector('.dev-toolbar-btn.has-pending, .dev-inline-margin-control.has-pending, .dev-inline-block-type-control.has-pending'),
                 ));
             };
 
@@ -1628,7 +1898,15 @@
                             if (structureChange) continue;
                             throw new Error('Could not identify a media block');
                         }
-                        structure.blocks[targetIndex].type = change.targetType;
+                        const target = structure.blocks[targetIndex];
+                        target.type = change.targetType;
+                        target.props = { ...(target.props || {}) };
+                        if (change.targetType === 'PhotoCarousel' && change.targetPanorama) {
+                            target.props.enablePanorama = true;
+                        } else {
+                            delete target.props.enablePanorama;
+                            delete target.props.initialView;
+                        }
                     }
                     textChanges
                         .filter(([, change]) => change.deleted)
@@ -2345,10 +2623,12 @@
                         return;
                     }
 
-                    const isCarousel = block.type === 'PhotoCarousel';
-                    const media = document.createElement(isCarousel ? 'section' : 'div');
-                    media.className = `${isCarousel ? 'carousel-section group' : 'row-wrapper'} dev-page-structure-preview`;
-                    media.dataset.devBlock = isCarousel ? 'carousel' : 'row';
+                    const isPanorama = block.type === 'PhotoCarousel' && props.enablePanorama === true;
+                    const isCarousel = block.type === 'PhotoCarousel' && !isPanorama;
+                    const media = document.createElement(isCarousel || isPanorama ? 'section' : 'div');
+                    media.className = `${isCarousel ? 'carousel-section group' : isPanorama ? 'photo-panorama-section group' : 'row-wrapper'} dev-page-structure-preview`;
+                    media.dataset.devBlock = isCarousel || isPanorama ? 'carousel' : 'row';
+                    if (isPanorama) media.dataset.devPanorama = 'true';
                     media.dataset.devBlockKey = block.__devKey || '';
                     const caption = String(props.caption || '');
                     const captionPosition = String(props.captionPosition || 'center bottom');
@@ -2364,6 +2644,12 @@
                         if (topMargin) media.style.setProperty('margin-top', topMargin, 'important');
                         if (bottomMargin) media.style.setProperty('margin-bottom', bottomMargin, 'important');
                     } else {
+                        if (isPanorama) {
+                            media.dataset.photoPanorama = '';
+                            media.dataset.initialView = props.initialView === 'panorama' ? 'panorama' : 'carousel';
+                            media.dataset.view = media.dataset.initialView;
+                            media.dataset.initialSlide = String(props.initialSlide || 0);
+                        }
                         const topMargin = props.mt || (caption && captionPosition.includes('top') ? props.captionMargin : '');
                         const bottomMargin = props.mb || props.blockMargin || (caption && captionPosition.includes('bottom') ? props.captionMargin : '');
                         if (topMargin) media.style.setProperty('margin-top', topMargin, 'important');
@@ -2372,8 +2658,8 @@
 
                     if (caption && captionPosition.includes('top')) media.appendChild(createCaption(caption, captionPosition));
                     const track = document.createElement('div');
-                    track.className = isCarousel ? 'carousel-track' : 'photo-row';
-                    if (!isCarousel) track.dataset.photoRow = '';
+                    track.className = isCarousel ? 'carousel-track' : isPanorama ? 'photo-panorama-track' : 'photo-row';
+                    if (!isCarousel && !isPanorama) track.dataset.photoRow = '';
                     (block.photos || []).forEach((photo: any) => {
                         const photoNode = getPhotoNode(photo.itemKey);
                         if (photoNode) {
@@ -2384,28 +2670,64 @@
                     });
                     media.appendChild(track);
 
-                    if (isCarousel) {
+                    if (isCarousel || isPanorama) {
                         const dots = document.createElement('div');
-                        dots.className = 'carousel-dots';
+                        dots.className = isCarousel ? 'carousel-dots' : 'photo-panorama-dots';
                         const slides = Array.from(track.children) as HTMLElement[];
                         const initialIndex = Math.min(Number(props.initialSlide) || 0, Math.max(0, slides.length - 1));
                         slides.forEach((slide, index) => {
                             slide.toggleAttribute('data-active', index === initialIndex);
+                            if (isPanorama) {
+                                const image = slide.querySelector<HTMLImageElement>('img');
+                                const applyRatio = () => {
+                                    if (!image?.naturalWidth || !image.naturalHeight) return;
+                                    slide.style.setProperty('--panorama-grow', String((image.naturalWidth / image.naturalHeight) * 100));
+                                };
+                                if (image?.complete) applyRatio();
+                                else image?.addEventListener('load', applyRatio, { once: true });
+                            }
                             if (slides.length < 2) return;
                             const dot = document.createElement('button');
                             dot.type = 'button';
-                            dot.className = `carousel-dot${index === initialIndex ? ' active' : ''}`;
+                            dot.className = `${isCarousel ? 'carousel-dot' : 'photo-panorama-dot'}${index === initialIndex ? ' active' : ''}`;
                             dot.setAttribute('aria-label', `Go to slide ${index + 1}`);
                             dot.addEventListener('click', () => {
                                 slides.forEach((candidate) => candidate.removeAttribute('data-active'));
-                                dots.querySelectorAll('.carousel-dot').forEach((candidate) => candidate.classList.remove('active'));
+                                dots.querySelectorAll('.carousel-dot, .photo-panorama-dot').forEach((candidate) => candidate.classList.remove('active'));
                                 slide.setAttribute('data-active', '');
                                 dot.classList.add('active');
-                                track.scrollTo({ left: slide.offsetLeft - track.offsetLeft - (track.clientWidth - slide.clientWidth) / 2, behavior: 'smooth' });
+                                if (isPanorama) media.dataset.view = 'carousel';
+                                track.scrollTo({
+                                    left: isPanorama
+                                        ? slide.offsetLeft - track.offsetLeft
+                                        : slide.offsetLeft - track.offsetLeft - (track.clientWidth - slide.clientWidth) / 2,
+                                    behavior: 'smooth',
+                                });
                             });
                             dots.appendChild(dot);
                         });
-                        media.appendChild(dots);
+                        if (isPanorama) {
+                            const controls = document.createElement('div');
+                            controls.className = 'photo-panorama-controls';
+                            controls.appendChild(dots);
+                            const viewToggle = document.createElement('button');
+                            viewToggle.type = 'button';
+                            viewToggle.className = 'photo-panorama-view-toggle';
+                            viewToggle.setAttribute('aria-label', 'Toggle panorama view');
+                            viewToggle.innerHTML = '<span aria-hidden="true">P</span>';
+                            viewToggle.addEventListener('click', () => {
+                                media.dataset.view = media.dataset.view === 'panorama' ? 'carousel' : 'panorama';
+                                if (media.dataset.view === 'carousel') {
+                                    track.scrollLeft = slides[initialIndex]?.offsetLeft - track.offsetLeft || 0;
+                                } else {
+                                    track.scrollLeft = 0;
+                                }
+                            });
+                            controls.appendChild(viewToggle);
+                            media.appendChild(controls);
+                        } else {
+                            media.appendChild(dots);
+                        }
                     } else {
                         Array.from(track.children).forEach((photo) => {
                             photo.removeAttribute('data-active');
@@ -2782,9 +3104,9 @@
                     choosePhotosForBlock((files) => {
                         if (!stageNewBlockFiles(files)) return;
                         insertPreparedBlock({
-                            type,
+                            type: type === 'PhotoCarouselPanorama' ? 'PhotoCarousel' : type,
                             __devKey: `pending-${crypto.randomUUID()}`,
-                            props: {},
+                            props: type === 'PhotoCarouselPanorama' ? { enablePanorama: true } : {},
                             photos: files.map((file) => ({ itemKey: file.name })),
                         }, index);
                     });
@@ -2815,6 +3137,7 @@
                     [
                         { label: 'Row', value: 'Row' },
                         { label: 'Carousel', value: 'PhotoCarousel' },
+                        { label: 'Panorama', value: 'PhotoCarouselPanorama' },
                         { label: 'Text', value: 'Text' },
                     ].forEach(({ label, value }) => {
                         const button = document.createElement('button');
@@ -2904,7 +3227,7 @@
                                     ? `<button class="block-drag-handle selected" title="Cancel move">${ICONS.drag}</button>`
                                     : `<button class="block-drag-handle" title="Click to move / drag">${ICONS.drag}</button>`
                                 }
-                                <button class="block-toggle block-type-badge" title="Toggle Type (${block.type})" ${block.type === 'Text' ? 'disabled style="opacity:0.5;cursor:default;"' : ''}>${block.type === 'PhotoCarousel' ? 'C' : block.type === 'Text' ? 'T' : 'R'}</button>
+                                <button class="block-toggle block-type-badge" title="Toggle Type (${block.type}${block.props.enablePanorama ? ' + Panorama' : ''})" ${block.type === 'Text' ? 'disabled style="opacity:0.5;cursor:default;"' : ''}>${block.type === 'PhotoCarousel' ? (block.props.enablePanorama ? 'P' : 'C') : block.type === 'Text' ? 'T' : 'R'}</button>
                                 ${isCollapsed && block.type === 'Text' && block.text ? `
                                 <div style="flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 0.75rem; color: #64748b; padding: 0 0.25rem; ${block.props.size === 'title' ? 'font-weight: 700;' : ''}">${block.text}</div>
                                 ` : isCollapsed && block.type !== 'Text' && isLocalhost && block.photos.length > 0 ? `
@@ -2927,6 +3250,15 @@
                                     `;
                                 })() : (() => {
                                     return `
+                                        ${block.type === 'PhotoCarousel' && block.props.enablePanorama ? `
+                                            <label style="display:flex;align-items:center;justify-content:space-between;gap:.75rem;padding:.35rem 0 .6rem;color:#64748b;font-size:.75rem;">
+                                                Initial view
+                                                <select class="photo-panorama-initial-view" style="border:1px solid #cbd5e1;border-radius:4px;background:white;color:#334155;padding:.2rem .35rem;font-size:.75rem;">
+                                                    <option value="carousel" ${(block.props.initialView || 'carousel') === 'carousel' ? 'selected' : ''}>Carousel</option>
+                                                    <option value="panorama" ${block.props.initialView === 'panorama' ? 'selected' : ''}>Panorama</option>
+                                                </select>
+                                            </label>
+                                        ` : ''}
                                         <div class="dev-pm-photo-list" data-block-idx="${bIdx}">
                                             ${block.photos.map((p: any, pIdx: number) => `
                                                 <div class="dev-pm-photo${selectedPhoto && !(selectedPhoto.bIdx === bIdx && selectedPhoto.pIdx === pIdx) ? ' pm-move-target' : ''}${selectedPhoto?.bIdx === bIdx && selectedPhoto?.pIdx === pIdx ? ' pm-photo-selected' : ''}" data-p-idx="${pIdx}">
@@ -3014,9 +3346,25 @@
                         blockEl.querySelector('.block-toggle')?.addEventListener('click', (e) => {
                             e.stopPropagation();
                             if (block.type === 'Text') return;
-                            block.type = block.type === 'Row' ? 'PhotoCarousel' : 'Row';
+                            if (block.type === 'Row') {
+                                block.type = 'PhotoCarousel';
+                                delete block.props.enablePanorama;
+                                delete block.props.initialView;
+                            } else if (!block.props.enablePanorama) {
+                                block.props.enablePanorama = true;
+                            } else {
+                                block.type = 'Row';
+                                delete block.props.enablePanorama;
+                                delete block.props.initialView;
+                            }
                             syncManagedSpecialMargins([bIdx - 1, bIdx]);
                             renderTree();
+                        });
+                        blockEl.querySelector<HTMLSelectElement>('.photo-panorama-initial-view')?.addEventListener('change', (event) => {
+                            const value = (event.currentTarget as HTMLSelectElement).value;
+                            if (value === 'panorama') block.props.initialView = 'panorama';
+                            else delete block.props.initialView;
+                            updatePageDirtyState();
                         });
                         blockEl.querySelector('.block-delete')?.addEventListener('click', () => {
                             if (confirm("Delete this block? Any local photos no longer referenced by this page will move to the system Trash when you save.")) {
@@ -4666,7 +5014,9 @@
                     const isTextBlock = blockElement.dataset.devBlock === 'text';
                     const sourceType: 'Row' | 'PhotoCarousel' | 'Text' = isTextBlock
                         ? 'Text'
-                        : blockElement.dataset.devBlock === 'carousel' ? 'PhotoCarousel' : 'Row';
+                        : blockElement.dataset.devBlock === 'carousel'
+                          ? 'PhotoCarousel'
+                          : 'Row';
                     const sourceBlock = sourceBlocks[blockIndex]?.type === sourceType
                         ? sourceBlocks[blockIndex]
                         : undefined;
@@ -4692,8 +5042,19 @@
                     const marginChangeKey = `${isTextBlock ? textChangeKey : captionChangeKey}:margin`;
                     const typeChangeKey = `${captionChangeKey}:type`;
                     blockElement.dataset.devTypeChangeKey = typeChangeKey;
-                    const stagedBlockType = pendingBlockTypeChanges.get(typeChangeKey)?.targetType;
+                    type MediaBlockMode = 'Row' | 'PhotoCarousel' | 'PhotoPanorama';
+                    const sourcePanorama = sourceType === 'PhotoCarousel'
+                        && (sourceBlock?.props?.enablePanorama === true || blockElement.dataset.devPanorama === 'true');
+                    const stagedBlockTypeChange = pendingBlockTypeChanges.get(typeChangeKey);
+                    const stagedBlockType = stagedBlockTypeChange?.targetType;
                     const displayedBlockType = stagedBlockType || sourceType;
+                    const mediaBlockLabel = (type: 'Row' | 'PhotoCarousel' | 'PhotoPanorama') =>
+                        type === 'Row' ? 'Row' : type === 'PhotoCarousel' ? 'Carousel' : 'Panorama';
+                    const displayedMediaType: MediaBlockMode = displayedBlockType === 'Text'
+                        ? 'Row'
+                        : stagedBlockTypeChange?.targetPanorama || (!stagedBlockTypeChange && sourcePanorama)
+                            ? 'PhotoPanorama'
+                            : displayedBlockType;
                     const rootFontSize = Number.parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
                     const marginInPixels = Number.parseFloat(getComputedStyle(blockElement).marginBottom);
                     const visibleMargin = `${Math.round(((Number.isFinite(marginInPixels) ? marginInPixels : 0) / rootFontSize) * 1000) / 1000}rem`;
@@ -4774,9 +5135,20 @@
                             <button class="dev-inline-margin-save" type="button" title="Confirm margin change" aria-label="Confirm margin change">${ICONS.check}</button>
                         </div>
                         ${isTextBlock ? '' : `
-                            <button class="dev-toolbar-btn dev-btn-block-type has-data${stagedBlockType ? ' has-pending' : ''}" type="button" title="Switch to ${displayedBlockType === 'Row' ? 'Carousel' : 'Row'}" aria-label="Switch to ${displayedBlockType === 'Row' ? 'Carousel' : 'Row'}">
-                                <span class="dev-toolbar-text-icon" aria-hidden="true">${displayedBlockType === 'Row' ? 'R' : 'C'}</span>
-                            </button>
+                            <div class="dev-inline-block-type-control has-data${stagedBlockTypeChange ? ' has-pending' : ''}">
+                                <div class="dev-inline-block-type-options" role="group" aria-label="Choose block type">
+                                    ${([
+                                        ['Row', 'R'],
+                                        ['PhotoCarousel', 'C'],
+                                        ['PhotoPanorama', 'P'],
+                                    ] as const).map(([mode, label]) => `
+                                        <button class="dev-inline-block-type-option" type="button" data-block-mode="${mode}" title="${mediaBlockLabel(mode)}" aria-label="Use ${mediaBlockLabel(mode)}" aria-pressed="${displayedMediaType === mode}">${label}</button>
+                                    `).join('')}
+                                </div>
+                                <button class="dev-inline-block-type-current" type="button" title="Choose block type" aria-label="Choose block type" aria-expanded="false">
+                                    <span aria-hidden="true">${displayedMediaType === 'Row' ? 'R' : displayedMediaType === 'PhotoCarousel' ? 'C' : 'P'}</span>
+                                </button>
+                            </div>
                         `}
                     `;
                     block.appendChild(toolbar);
@@ -4784,7 +5156,9 @@
                     const captionButton = toolbar.querySelector<HTMLButtonElement>('.dev-btn-caption');
                     const textButton = toolbar.querySelector<HTMLButtonElement>('.dev-btn-text');
                     const tagButton = toolbar.querySelector<HTMLButtonElement>('.dev-btn-tag');
-                    const blockTypeButton = toolbar.querySelector<HTMLButtonElement>('.dev-btn-block-type');
+                    const blockTypeControl = toolbar.querySelector<HTMLElement>('.dev-inline-block-type-control');
+                    const blockTypeButton = toolbar.querySelector<HTMLButtonElement>('.dev-inline-block-type-current');
+                    const blockTypeOptions = toolbar.querySelectorAll<HTMLButtonElement>('.dev-inline-block-type-option');
                     const marginControl = toolbar.querySelector<HTMLElement>('.dev-inline-margin-control')!;
                     const marginInput = toolbar.querySelector<HTMLInputElement>('.dev-inline-margin-input')!;
 
@@ -4938,16 +5312,18 @@
                     });
 
                     const updateBlockTypePreview = (
-                        targetType: 'Row' | 'PhotoCarousel',
+                        targetType: 'Row' | 'PhotoCarousel' | 'PhotoPanorama',
                         matchesFile: boolean,
                     ) => {
-                        const track = blockElement.querySelector<HTMLElement>(':scope > .photo-row, :scope > .carousel-track');
+                        const track = blockElement.querySelector<HTMLElement>(':scope > .photo-row, :scope > .carousel-track, :scope > .photo-panorama-stage > .photo-panorama-track');
                         if (!track) return;
                         const slides = Array.from(track.children) as HTMLElement[];
 
                         const restoreOriginalLayout = () => {
-                            blockElement.classList.remove('dev-preview-as-row', 'dev-preview-as-carousel');
+                            blockElement.classList.remove('dev-preview-as-row', 'dev-preview-as-carousel', 'dev-preview-as-panorama');
                             blockElement.querySelector('.dev-preview-carousel-dots')?.remove();
+                            blockElement.querySelector('.dev-preview-panorama-controls')?.remove();
+                            delete blockElement.dataset.devPreviewPanoramaView;
                             slides.forEach((slide) => {
                                 if ('devPreviewOriginalFlex' in slide.dataset) {
                                     slide.style.flex = slide.dataset.devPreviewOriginalFlex || '';
@@ -4981,7 +5357,10 @@
 
                         blockElement.classList.toggle('dev-preview-as-row', targetType === 'Row');
                         blockElement.classList.toggle('dev-preview-as-carousel', targetType === 'PhotoCarousel');
+                        blockElement.classList.toggle('dev-preview-as-panorama', targetType === 'PhotoPanorama');
                         blockElement.querySelector('.dev-preview-carousel-dots')?.remove();
+                        blockElement.querySelector('.dev-preview-panorama-controls')?.remove();
+                        delete blockElement.dataset.devPreviewPanoramaView;
                         updateMarginPreview(findPendingMarginEntry()?.[1].blockMargin || originalBlockMargin);
 
                         if (targetType === 'Row') {
@@ -5003,6 +5382,66 @@
                             else slide.removeAttribute('data-active');
                         });
                         track.scrollLeft = 0;
+                        if (targetType === 'PhotoPanorama') {
+                            blockElement.dataset.devPreviewPanoramaView = 'carousel';
+                            slides.forEach((slide) => {
+                                const image = slide.querySelector<HTMLImageElement>('img');
+                                const applyRatio = () => {
+                                    if (!image?.naturalWidth || !image.naturalHeight) return;
+                                    slide.style.setProperty('--panorama-grow', String((image.naturalWidth / image.naturalHeight) * 100));
+                                };
+                                if (image?.complete) applyRatio();
+                                else image?.addEventListener('load', applyRatio, { once: true });
+                            });
+
+                            const controls = document.createElement('div');
+                            controls.className = 'dev-preview-panorama-controls';
+                            const panoramaDots = document.createElement('div');
+                            panoramaDots.className = 'dev-preview-panorama-dots';
+                            const viewToggle = document.createElement('button');
+                            viewToggle.className = 'dev-preview-panorama-toggle';
+                            viewToggle.type = 'button';
+                            viewToggle.title = 'Switch to Panorama';
+                            viewToggle.setAttribute('aria-label', viewToggle.title);
+                            viewToggle.innerHTML = '<span aria-hidden="true">C</span>';
+
+                            slides.forEach((slide, index) => {
+                                if (slides.length < 2) return;
+                                const dot = document.createElement('button');
+                                dot.className = `dev-preview-panorama-dot${index === 0 ? ' active' : ''}`;
+                                dot.type = 'button';
+                                dot.setAttribute('aria-label', `Go to slide ${index + 1}`);
+                                dot.addEventListener('click', (event) => {
+                                    event.preventDefault();
+                                    event.stopPropagation();
+                                    blockElement.dataset.devPreviewPanoramaView = 'carousel';
+                                    viewToggle.title = 'Switch to Panorama';
+                                    viewToggle.setAttribute('aria-label', viewToggle.title);
+                                    viewToggle.querySelector('span')!.textContent = 'C';
+                                    slides.forEach((candidate) => candidate.removeAttribute('data-active'));
+                                    panoramaDots.querySelectorAll('.dev-preview-panorama-dot').forEach((candidate) => candidate.classList.remove('active'));
+                                    slide.setAttribute('data-active', '');
+                                    dot.classList.add('active');
+                                    track.scrollTo({ left: slide.offsetLeft - track.offsetLeft, behavior: 'smooth' });
+                                });
+                                panoramaDots.appendChild(dot);
+                            });
+
+                            viewToggle.addEventListener('click', (event) => {
+                                event.preventDefault();
+                                event.stopPropagation();
+                                const panorama = blockElement.dataset.devPreviewPanoramaView !== 'panorama';
+                                blockElement.dataset.devPreviewPanoramaView = panorama ? 'panorama' : 'carousel';
+                                viewToggle.title = panorama ? 'Switch to Carousel' : 'Switch to Panorama';
+                                viewToggle.setAttribute('aria-label', viewToggle.title);
+                                viewToggle.querySelector('span')!.textContent = panorama ? 'P' : 'C';
+                                track.scrollLeft = 0;
+                            });
+                            controls.append(panoramaDots, viewToggle);
+                            blockElement.insertBefore(controls, blockElement.querySelector(':scope > .photo-caption.bottom, :scope > .dev-block-toolbar'));
+                            return;
+                        }
+
                         if (slides.length < 2) return;
                         const dots = document.createElement('div');
                         dots.className = 'dev-preview-carousel-dots';
@@ -5025,33 +5464,42 @@
                             });
                             dots.appendChild(dot);
                         });
-                        track.insertAdjacentElement('afterend', dots);
+                        blockElement.insertBefore(dots, blockElement.querySelector(':scope > .photo-caption.bottom, :scope > .dev-block-toolbar'));
                     };
 
-                    const stageBlockType = () => {
-                        if (isTextBlock || !blockTypeButton) return;
-                        const currentType = pendingBlockTypeChanges.get(typeChangeKey)?.targetType || sourceType;
-                        const targetType = currentType === 'Row' ? 'PhotoCarousel' : 'Row';
-                        const matchesFile = targetType === sourceType;
+                    const closeBlockTypeMenu = () => {
+                        blockTypeControl?.classList.remove('is-open');
+                        blockTypeButton?.setAttribute('aria-expanded', 'false');
+                    };
+
+                    const stageBlockType = (targetMode: MediaBlockMode) => {
+                        if (isTextBlock || !blockTypeButton || sourceType === 'Text') return;
+                        const targetType: 'Row' | 'PhotoCarousel' = targetMode === 'Row' ? 'Row' : 'PhotoCarousel';
+                        const targetPanorama = targetMode === 'PhotoPanorama';
+                        const matchesFile = targetType === sourceType && targetPanorama === sourcePanorama;
                         if (matchesFile) {
                             pendingBlockTypeChanges.delete(typeChangeKey);
                         } else {
                             pendingBlockTypeChanges.set(typeChangeKey, {
-                                sourceType: sourceType as PendingBlockTypeChange['sourceType'],
+                                sourceType,
                                 targetType,
+                                sourcePanorama,
+                                targetPanorama,
                                 blockIndex,
                                 photoNames,
                             });
                         }
-                        blockTypeButton.querySelector('.dev-toolbar-text-icon')!.textContent = targetType === 'Row' ? 'R' : 'C';
-                        blockTypeButton.title = `Switch to ${targetType === 'Row' ? 'Carousel' : 'Row'}`;
-                        blockTypeButton.setAttribute('aria-label', blockTypeButton.title);
-                        blockTypeButton.classList.toggle('has-pending', !matchesFile);
-                        updateBlockTypePreview(targetType, matchesFile);
+                        blockTypeButton.querySelector('span')!.textContent = targetMode === 'Row' ? 'R' : targetMode === 'PhotoCarousel' ? 'C' : 'P';
+                        blockTypeOptions.forEach((option) => {
+                            option.setAttribute('aria-pressed', String(option.dataset.blockMode === targetMode));
+                        });
+                        blockTypeControl?.classList.toggle('has-pending', !matchesFile);
+                        closeBlockTypeMenu();
+                        updateBlockTypePreview(targetMode, matchesFile);
                         reconcileAutomaticBlockMargins();
                         syncToolbarPendingState(toolbar);
                         updateSaveButtonState();
-                        showToast(matchesFile ? 'ℹ️ Block type unchanged' : `📝 Pending switch to ${targetType === 'Row' ? 'Row' : 'Carousel'}`);
+                        showToast(matchesFile ? 'ℹ️ Block type unchanged' : `📝 Pending switch to ${mediaBlockLabel(targetMode)}`);
                     };
 
                     const closeInlineCaptionEditor = () => {
@@ -5334,7 +5782,20 @@
                     blockTypeButton?.addEventListener('click', (event) => {
                         event.preventDefault();
                         event.stopPropagation();
-                        stageBlockType();
+                        const willOpen = !blockTypeControl?.classList.contains('is-open');
+                        document.querySelectorAll<HTMLElement>('.dev-inline-block-type-control.is-open').forEach((control) => {
+                            control.classList.remove('is-open');
+                            control.querySelector('.dev-inline-block-type-current')?.setAttribute('aria-expanded', 'false');
+                        });
+                        blockTypeControl?.classList.toggle('is-open', willOpen);
+                        blockTypeButton.setAttribute('aria-expanded', String(willOpen));
+                    });
+                    blockTypeOptions.forEach((option) => {
+                        option.addEventListener('click', (event) => {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            stageBlockType(option.dataset.blockMode as MediaBlockMode);
+                        });
                     });
 
                     const stagedCaption = pendingCaptionChanges.get(captionChangeKey);
@@ -5351,13 +5812,18 @@
                         updateMarginPreview(stagedBlockMargin);
                         marginControl.classList.add('has-pending');
                     }
-                    if (stagedBlockType) updateBlockTypePreview(stagedBlockType, false);
+                    if (stagedBlockTypeChange) {
+                        updateBlockTypePreview(
+                            stagedBlockTypeChange.targetPanorama ? 'PhotoPanorama' : stagedBlockTypeChange.targetType,
+                            false,
+                        );
+                    }
                     syncToolbarPendingState(toolbar);
 
                     blockElement.addEventListener('click', (event) => {
                         if (!blockElement.classList.contains('dev-preview-as-carousel')) return;
-                        const track = blockElement.querySelector<HTMLElement>(':scope > .photo-row');
-                        const slide = (event.target as HTMLElement).closest<HTMLElement>('.photo-row > *');
+                        const track = blockElement.querySelector<HTMLElement>(':scope > .photo-row, :scope > .photo-panorama-stage > .photo-panorama-track');
+                        const slide = (event.target as HTMLElement).closest<HTMLElement>('.photo-row > *, .photo-panorama-track > *');
                         if (!track || !slide || !track.contains(slide) || slide.hasAttribute('data-active')) return;
 
                         event.preventDefault();
@@ -5377,8 +5843,8 @@
 
                     blockElement.addEventListener('pointerdown', (event) => {
                         if (!blockElement.classList.contains('dev-preview-as-row')) return;
-                        const track = blockElement.querySelector<HTMLElement>(':scope > .carousel-track');
-                        const slide = (event.target as HTMLElement).closest<HTMLElement>('.carousel-track > *');
+                        const track = blockElement.querySelector<HTMLElement>(':scope > .carousel-track, :scope > .photo-panorama-stage > .photo-panorama-track');
+                        const slide = (event.target as HTMLElement).closest<HTMLElement>('.carousel-track > *, .photo-panorama-track > *');
                         if (!track || !slide || !track.contains(slide)) return;
                         slide.setAttribute('data-active', '');
                     }, true);

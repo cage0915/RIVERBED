@@ -298,7 +298,9 @@ const titleSections = extractTitleSections(albumEntry.body);
      * adjacent boundaries to 1.5rem; explicit inline block margins still win.
      */
     .album-content > :global(*:has(+ .carousel-section:not(.dev-preview-as-row))),
-    .album-content > :global(.carousel-section:not(.dev-preview-as-row)) {
+    .album-content > :global(.carousel-section:not(.dev-preview-as-row)),
+    .album-content > :global(*:has(+ .photo-panorama-section)),
+    .album-content > :global(.photo-panorama-section) {
         margin-bottom: 1.5rem;
     }
 
@@ -426,14 +428,17 @@ const titleSections = extractTitleSections(albumEntry.body);
          * viewport edges.
          */
         .album-content > :global(.row-wrapper),
-        .album-content > :global(.carousel-section) {
+        .album-content > :global(.carousel-section),
+        .album-content > :global(.photo-panorama-section) {
             width: calc(100% + var(--album-mobile-gutter) + var(--album-mobile-gutter));
             margin-inline: calc(0rem - var(--album-mobile-gutter));
         }
 
         .album-content :global(.row-wrapper > .photo-caption),
         .album-content :global(.carousel-section > .photo-caption),
-        .album-content :global(.carousel-track > .photo-container .photo-caption--photo) {
+        .album-content :global(.photo-panorama-section > .photo-caption),
+        .album-content :global(.carousel-track > .photo-container .photo-caption--photo),
+        .album-content :global(.photo-panorama-section[data-view="carousel"] .photo-panorama-track > .photo-container .photo-caption--photo) {
             box-sizing: border-box;
             padding-inline: var(--album-mobile-gutter);
         }
@@ -501,9 +506,11 @@ const titleSections = extractTitleSections(albumEntry.body);
         }
 
         .album-content :global(.carousel-dots),
+        .album-content :global(.photo-panorama-controls),
         .album-content :global(.dev-preview-carousel-dots),
         .album-content :global(.row-wrapper > .photo-caption),
-        .album-content :global(.carousel-section > .photo-caption) {
+        .album-content :global(.carousel-section > .photo-caption),
+        .album-content :global(.photo-panorama-section > .photo-caption) {
             position: relative;
             z-index: 1;
         }

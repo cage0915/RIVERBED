@@ -1,5 +1,6 @@
 ---
 import RichText from "./RichText.astro";
+import PhotoPanorama from "./PhotoPanorama.astro";
 
 interface Props {
     /** Optional gap between slides (CSS value, default "0.5rem") */
@@ -12,6 +13,10 @@ interface Props {
     captionMargin?: string; // semantic caption space
     /** The index of the slide (0-based) to be centered on initial load */
     initialSlide?: number;
+    /** Enable the full-width carousel / joined-panorama view switcher. */
+    enablePanorama?: boolean;
+    /** View shown on load when enablePanorama is true. */
+    initialView?: "carousel" | "panorama";
     /** Optional caption for the carousel */
     caption?: string;
     /** Position and alignment of the caption (e.g. "center top", "right bottom") */
@@ -26,6 +31,8 @@ const {
     blockMargin,
     captionMargin,
     initialSlide = 0,
+    enablePanorama = false,
+    initialView = "carousel",
     caption,
     captionPosition = "center bottom"
 } = Astro.props;
@@ -55,40 +62,55 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
 const slideWidthPercent = 100 - peekPercent;
 ---
 
-<section
-    class="carousel-section group"
-    data-carousel
-    data-initial-slide={initialSlide}
-    style={styles.length > 0 ? styles.join(" ") : undefined}
-    data-dev-block={isDev ? "carousel" : undefined}
-    data-dev-caption={isDev && caption ? caption : undefined}
-    data-dev-caption-pos={isDev ? captionPosition : undefined}
-    data-dev-mb={isDev && mb ? mb : undefined}
-    data-dev-block-margin={isDev && (blockMargin || mb) ? blockMargin || mb : undefined}
->
-    {caption && parsedPos === 'top' && (
-        <div class="photo-caption top" style={`text-align: ${parsedAlign};`}>
-            <RichText text={caption} />
-        </div>
-    )}
-
-    <!-- Scroll track -->
-    <div
-        class="carousel-track"
-        style={`--slide-width: ${slideWidthPercent}%; --gap: ${gap};`}
+{enablePanorama ? (
+    <PhotoPanorama
+        initialView={initialView}
+        initialSlide={initialSlide}
+        mb={mb}
+        mt={mt}
+        blockMargin={blockMargin}
+        captionMargin={captionMargin}
+        caption={caption}
+        captionPosition={captionPosition}
     >
         <slot />
-    </div>
+    </PhotoPanorama>
+) : (
+    <section
+        class="carousel-section group"
+        data-carousel
+        data-initial-slide={initialSlide}
+        style={styles.length > 0 ? styles.join(" ") : undefined}
+        data-dev-block={isDev ? "carousel" : undefined}
+        data-dev-caption={isDev && caption ? caption : undefined}
+        data-dev-caption-pos={isDev ? captionPosition : undefined}
+        data-dev-mb={isDev && mb ? mb : undefined}
+        data-dev-block-margin={isDev && (blockMargin || mb) ? blockMargin || mb : undefined}
+    >
+        {caption && parsedPos === 'top' && (
+            <div class="photo-caption top" style={`text-align: ${parsedAlign};`}>
+                <RichText text={caption} />
+            </div>
+        )}
 
-    <!-- Expanding dots container -->
-    <div class="carousel-dots"></div>
-
-    {caption && parsedPos === 'bottom' && (
-        <div class="photo-caption bottom" style={`text-align: ${parsedAlign};`}>
-            <RichText text={caption} />
+        <!-- Scroll track -->
+        <div
+            class="carousel-track"
+            style={`--slide-width: ${slideWidthPercent}%; --gap: ${gap};`}
+        >
+            <slot />
         </div>
-    )}
-</section>
+
+        <!-- Expanding dots container -->
+        <div class="carousel-dots"></div>
+
+        {caption && parsedPos === 'bottom' && (
+            <div class="photo-caption bottom" style={`text-align: ${parsedAlign};`}>
+                <RichText text={caption} />
+            </div>
+        )}
+    </section>
+)}
 
 <script>
     import { installPageLifecycle } from "../lib/client-page-lifecycle";

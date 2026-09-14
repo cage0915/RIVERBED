@@ -1,0 +1,640 @@
+---
+import RichText from "./RichText.astro";
+
+type PanoramaView = "carousel" | "panorama";
+
+interface Props {
+    /** View shown when the block first loads. */
+    initialView?: PanoramaView;
+    /** Photo shown first when the carousel view loads (0-based). */
+    initialSlide?: number;
+    mb?: string;
+    mt?: string;
+    blockMargin?: string;
+    captionMargin?: string;
+    caption?: string;
+    captionPosition?: string;
+}
+
+const {
+    initialView = "carousel",
+    initialSlide = 0,
+    mb,
+    mt,
+    blockMargin,
+    captionMargin,
+    caption,
+    captionPosition = "center bottom",
+} = Astro.props;
+
+const view: PanoramaView = initialView === "panorama" ? "panorama" : "carousel";
+const isDev = import.meta.env.DEV;
+const parsedPos = captionPosition.includes("top") ? "top" : "bottom";
+const parsedAlign = captionPosition.includes("left")
+    ? "left"
+    : captionPosition.includes("right")
+      ? "right"
+      : "center";
+const hasTopCaption = caption && parsedPos === "top";
+const hasBottomCaption = caption && parsedPos === "bottom";
+const styles: string[] = [];
+const finalMT = mt || (hasTopCaption ? captionMargin : undefined);
+const finalMB = mb || blockMargin || (hasBottomCaption ? captionMargin : undefined);
+
+if (finalMT) styles.push(`margin-top: ${finalMT} !important;`);
+if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
+---
+
+<section
+    class="photo-panorama-section group"
+    data-photo-panorama
+    data-view={view}
+    data-initial-view={view}
+    data-initial-slide={initialSlide}
+    style={styles.length > 0 ? styles.join(" ") : undefined}
+    data-dev-block={isDev ? "carousel" : undefined}
+    data-dev-panorama={isDev ? "true" : undefined}
+    data-dev-caption={isDev && caption ? caption : undefined}
+    data-dev-caption-pos={isDev ? captionPosition : undefined}
+    data-dev-mb={isDev && mb ? mb : undefined}
+    data-dev-block-margin={isDev && (blockMargin || mb) ? blockMargin || mb : undefined}
+>
+    {hasTopCaption && (
+        <div class="photo-caption top" style={`text-align: ${parsedAlign};`}>
+            <RichText text={caption} />
+        </div>
+    )}
+
+    <div class="photo-panorama-stage">
+        <div class="photo-panorama-track" data-keyboard-navigation-target>
+            <slot />
+        </div>
+
+        <button
+            class="photo-panorama-arrow photo-panorama-arrow--previous"
+            type="button"
+            aria-label="Previous photo"
+        >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m15 18-6-6 6-6"></path>
+            </svg>
+        </button>
+        <button
+            class="photo-panorama-arrow photo-panorama-arrow--next"
+            type="button"
+            aria-label="Next photo"
+        >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m9 18 6-6-6-6"></path>
+            </svg>
+        </button>
+    </div>
+
+    <div class="photo-panorama-controls">
+        <div class="photo-panorama-dots" aria-label="Photo selector"></div>
+        <button
+            class="photo-panorama-view-toggle"
+            type="button"
+            aria-label={view === "carousel" ? "Switch to panorama view" : "Switch to carousel view"}
+            aria-pressed={view === "panorama" ? "true" : "false"}
+        >
+            <!-- Both symbols occupy the same 15 × 8 visual footprint. -->
+            <svg class="photo-panorama-view-icon photo-panorama-view-icon--carousel" viewBox="0 0 16 16" aria-hidden="true">
+                <rect x="0.5" y="4" width="3" height="8" rx="0.75"></rect>
+                <rect x="6.5" y="4" width="3" height="8" rx="0.75"></rect>
+                <rect x="12.5" y="4" width="3" height="8" rx="0.75"></rect>
+            </svg>
+            <svg class="photo-panorama-view-icon photo-panorama-view-icon--panorama" viewBox="0 0 16 16" aria-hidden="true">
+                <rect x="0.5" y="4" width="15" height="8" rx="0.75"></rect>
+            </svg>
+            <span class="photo-panorama-view-label" aria-live="polite">
+                {view === "carousel" ? "Carousel view" : "Panorama view"}
+            </span>
+        </button>
+    </div>
+
+    {hasBottomCaption && (
+        <div class="photo-caption bottom" style={`text-align: ${parsedAlign};`}>
+            <RichText text={caption} />
+        </div>
+    )}
+</section>
+
+<script>
+    import { installPageLifecycle } from "../lib/client-page-lifecycle";
+
+    type PanoramaView = "carousel" | "panorama";
+
+    installPageLifecycle(document, () => {
+        const controller = new AbortController();
+        const initializedSections: HTMLElement[] = [];
+        const generatedDots: HTMLButtonElement[] = [];
+        const resizeObservers: ResizeObserver[] = [];
+        const frameIds = new Set<number>();
+        const viewAnimations = new Set<Animation>();
+
+        const queueFrame = (callback: FrameRequestCallback) => {
+            const id = requestAnimationFrame((time) => {
+                frameIds.delete(id);
+                callback(time);
+            });
+            frameIds.add(id);
+            return id;
+        };
+
+        document.querySelectorAll<HTMLElement>("[data-photo-panorama]").forEach((section) => {
+            if (section.dataset.photoPanoramaReady) return;
+
+            const track = section.querySelector<HTMLElement>(".photo-panorama-track");
+            const stage = section.querySelector<HTMLElement>(".photo-panorama-stage");
+            const dotsContainer = section.querySelector<HTMLElement>(".photo-panorama-dots");
+            const toggle = section.querySelector<HTMLButtonElement>(".photo-panorama-view-toggle");
+            const viewLabel = section.querySelector<HTMLElement>(".photo-panorama-view-label");
+            const previous = section.querySelector<HTMLButtonElement>(".photo-panorama-arrow--previous");
+            const next = section.querySelector<HTMLButtonElement>(".photo-panorama-arrow--next");
+            if (!track || !stage || !dotsContainer || !toggle || !previous || !next) return;
+
+            section.dataset.photoPanoramaReady = "true";
+            initializedSections.push(section);
+
+            const slides = Array.from(track.children) as HTMLElement[];
+            const dots: HTMLButtonElement[] = [];
+            const requestedInitialIndex = Number.parseInt(section.dataset.initialSlide || "0", 10);
+            let activeIndex = Math.min(
+                Math.max(Number.isFinite(requestedInitialIndex) ? requestedInitialIndex : 0, 0),
+                Math.max(slides.length - 1, 0),
+            );
+            let scrollFrame = 0;
+            let isChangingView = false;
+
+            const currentView = (): PanoramaView =>
+                section.dataset.view === "panorama" ? "panorama" : "carousel";
+
+            const updateActiveState = (index: number) => {
+                activeIndex = Math.min(Math.max(index, 0), Math.max(slides.length - 1, 0));
+                slides.forEach((slide, slideIndex) => {
+                    slide.toggleAttribute("data-active", slideIndex === activeIndex);
+                });
+                dots.forEach((dot, dotIndex) => {
+                    const isActive = dotIndex === activeIndex;
+                    dot.classList.toggle("active", isActive);
+                    dot.setAttribute("aria-current", isActive ? "true" : "false");
+                });
+                previous.disabled = activeIndex === 0 || slides.length < 2;
+                next.disabled = activeIndex >= slides.length - 1 || slides.length < 2;
+            };
+
+            const scrollToSlide = (index: number, behavior: ScrollBehavior = "smooth") => {
+                const slide = slides[index];
+                if (!slide) return;
+                updateActiveState(index);
+                track.scrollTo({
+                    left: slide.offsetLeft - track.offsetLeft,
+                    behavior,
+                });
+            };
+
+            const setView = async (
+                nextView: PanoramaView,
+                announce = true,
+                animate = true,
+            ) => {
+                if (isChangingView) return;
+                const viewChanged = currentView() !== nextView;
+                const shouldAnimate = viewChanged
+                    && animate
+                    && !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+                const beforeRects = shouldAnimate
+                    ? slides.map((slide) => slide.getBoundingClientRect())
+                    : [];
+                const beforeStageHeight = shouldAnimate ? stage.getBoundingClientRect().height : 0;
+
+                isChangingView = true;
+                toggle.disabled = true;
+                section.dataset.view = nextView;
+                const isPanorama = nextView === "panorama";
+                toggle.setAttribute("aria-pressed", String(isPanorama));
+                toggle.setAttribute(
+                    "aria-label",
+                    isPanorama ? "Switch to carousel view" : "Switch to panorama view",
+                );
+                if (viewLabel) viewLabel.textContent = isPanorama ? "Panorama view" : "Carousel view";
+                updateActiveState(activeIndex);
+
+                if (isPanorama) track.scrollLeft = 0;
+                else scrollToSlide(activeIndex, "auto");
+
+                if (shouldAnimate) {
+                    // FLIP keeps every photo visually continuous while flex sizing changes.
+                    const afterRects = slides.map((slide) => slide.getBoundingClientRect());
+                    const afterStageHeight = stage.getBoundingClientRect().height;
+                    section.dataset.viewTransitioning = "true";
+                    const animations = slides.map((slide, index) => {
+                        const before = beforeRects[index];
+                        const after = afterRects[index];
+                        const animation = slide.animate([
+                            {
+                                transform: `translateX(${before.left - after.left}px) scaleX(${after.width ? before.width / after.width : 1})`,
+                                transformOrigin: "left center",
+                            },
+                            { transform: "translateX(0) scaleX(1)", transformOrigin: "left center" },
+                        ], {
+                            duration: 650,
+                            easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+                        });
+                        viewAnimations.add(animation);
+                        animation.finished.finally(() => viewAnimations.delete(animation)).catch(() => {});
+                        return animation;
+                    });
+                    if (Math.abs(beforeStageHeight - afterStageHeight) > 0.5) {
+                        const stageAnimation = stage.animate([
+                            { height: `${beforeStageHeight}px` },
+                            { height: `${afterStageHeight}px` },
+                        ], {
+                            duration: 650,
+                            easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+                        });
+                        viewAnimations.add(stageAnimation);
+                        stageAnimation.finished.finally(() => viewAnimations.delete(stageAnimation)).catch(() => {});
+                        animations.push(stageAnimation);
+                    }
+                    await Promise.allSettled(animations.map((animation) => animation.finished));
+                    if (controller.signal.aborted) return;
+                    delete section.dataset.viewTransitioning;
+                }
+
+                if (!isPanorama) scrollToSlide(activeIndex, "auto");
+                toggle.disabled = false;
+                isChangingView = false;
+
+                if (announce) {
+                    section.dispatchEvent(new CustomEvent("photo-panorama:viewchange", {
+                        detail: { view: nextView },
+                    }));
+                }
+            };
+
+            slides.forEach((slide, index) => {
+                slide.dataset.panoramaSlideIndex = String(index);
+                const image = slide.querySelector<HTMLImageElement>("img");
+                const applyRatio = () => {
+                    if (!image?.naturalWidth || !image.naturalHeight) return;
+                    slide.style.setProperty(
+                        "--panorama-grow",
+                        String((image.naturalWidth / image.naturalHeight) * 100),
+                    );
+                };
+                if (image?.complete) applyRatio();
+                else image?.addEventListener("load", applyRatio, { signal: controller.signal });
+
+                if (slides.length > 1) {
+                    const dot = document.createElement("button");
+                    dot.type = "button";
+                    dot.className = "photo-panorama-dot";
+                    dot.setAttribute("aria-label", `Go to photo ${index + 1}`);
+                    dot.addEventListener("click", async () => {
+                        if (isChangingView) return;
+                        if (currentView() === "panorama") await setView("carousel");
+                        queueFrame(() => scrollToSlide(index));
+                    }, { signal: controller.signal });
+                    dotsContainer.appendChild(dot);
+                    dots.push(dot);
+                    generatedDots.push(dot);
+                }
+            });
+
+            toggle.addEventListener("click", () => {
+                void setView(currentView() === "carousel" ? "panorama" : "carousel");
+            }, { signal: controller.signal });
+
+            previous.addEventListener("click", () => scrollToSlide(activeIndex - 1), {
+                signal: controller.signal,
+            });
+            next.addEventListener("click", () => scrollToSlide(activeIndex + 1), {
+                signal: controller.signal,
+            });
+
+            track.addEventListener("scroll", () => {
+                if (currentView() !== "carousel" || scrollFrame || isChangingView) return;
+                scrollFrame = queueFrame(() => {
+                    scrollFrame = 0;
+                    const trackCenter = track.scrollLeft + track.clientWidth / 2;
+                    let nearestIndex = activeIndex;
+                    let nearestDistance = Number.POSITIVE_INFINITY;
+                    slides.forEach((slide, index) => {
+                        const center = slide.offsetLeft - track.offsetLeft + slide.clientWidth / 2;
+                        const distance = Math.abs(trackCenter - center);
+                        if (distance < nearestDistance) {
+                            nearestDistance = distance;
+                            nearestIndex = index;
+                        }
+                    });
+                    updateActiveState(nearestIndex);
+                });
+            }, { passive: true, signal: controller.signal });
+
+            if (typeof ResizeObserver !== "undefined") {
+                const observer = new ResizeObserver(() => {
+                    if (currentView() === "carousel" && !isChangingView) scrollToSlide(activeIndex, "auto");
+                });
+                observer.observe(track);
+                resizeObservers.push(observer);
+            }
+
+            updateActiveState(activeIndex);
+            void setView(section.dataset.initialView === "panorama" ? "panorama" : "carousel", false, false);
+        });
+
+        return () => {
+            controller.abort();
+            resizeObservers.forEach((observer) => observer.disconnect());
+            viewAnimations.forEach((animation) => animation.cancel());
+            frameIds.forEach((id) => cancelAnimationFrame(id));
+            generatedDots.forEach((dot) => dot.remove());
+            initializedSections.forEach((section) => {
+                section.querySelectorAll<HTMLElement>(".photo-panorama-track > *").forEach((slide) => {
+                    slide.removeAttribute("data-active");
+                    slide.style.removeProperty("--panorama-grow");
+                    delete slide.dataset.panoramaSlideIndex;
+                });
+                delete section.dataset.photoPanoramaReady;
+            });
+        };
+    });
+</script>
+
+<style>
+    .photo-panorama-section {
+        position: relative;
+        display: flex;
+        width: 100%;
+        flex-direction: column;
+    }
+
+    .photo-panorama-stage {
+        position: relative;
+        width: 100%;
+    }
+
+    .photo-panorama-section[data-view-transitioning] .photo-panorama-stage {
+        overflow: clip;
+    }
+
+    .photo-panorama-section[data-view-transitioning] .photo-panorama-track,
+    .photo-panorama-section[data-view-transitioning] .photo-panorama-view-toggle {
+        pointer-events: none;
+    }
+
+    .photo-panorama-track {
+        display: flex;
+        width: 100%;
+        gap: 0;
+        padding-block: 3.5rem;
+        margin-block: -3.5rem;
+        scrollbar-width: none;
+    }
+
+    .photo-panorama-track::-webkit-scrollbar {
+        display: none;
+    }
+
+    .photo-panorama-track > :global(*) {
+        min-width: 0;
+    }
+
+    .photo-panorama-section[data-view="carousel"] .photo-panorama-track {
+        overflow-x: auto;
+        overscroll-behavior-x: contain;
+        scroll-snap-type: x mandatory;
+    }
+
+    .photo-panorama-section[data-view="carousel"] .photo-panorama-track > :global(*) {
+        flex: 0 0 100%;
+        scroll-snap-align: start;
+    }
+
+    .photo-panorama-section[data-view="panorama"] .photo-panorama-track {
+        overflow: visible;
+        scroll-snap-type: none;
+    }
+
+    .photo-panorama-section[data-view="panorama"] .photo-panorama-track > :global(*) {
+        flex: var(--panorama-grow, 100) 1 0%;
+    }
+
+    @media (min-width: 768px) {
+        .photo-panorama-section .photo-panorama-track :global(.photo-img) {
+            border-radius: 0;
+        }
+    }
+
+    @media (min-width: 768px) and (hover: hover) {
+        .photo-panorama-section[data-view="panorama"] .photo-panorama-track:hover :global(.tags-overlay) {
+            opacity: 1;
+        }
+    }
+
+    .photo-panorama-controls {
+        display: flex;
+        min-height: 1.5rem;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        margin-top: 0.75rem;
+    }
+
+    .photo-panorama-dots {
+        display: flex;
+        min-height: 1.5rem;
+        align-items: center;
+        justify-content: center;
+        gap: 0.35rem;
+    }
+
+    .photo-panorama-section :global(.photo-panorama-dot) {
+        width: 6px;
+        height: 6px;
+        padding: 0;
+        border: 0;
+        border-radius: 9999px;
+        background: rgba(100, 100, 100, 0.25);
+        cursor: pointer;
+        transition: width 0.3s ease, background-color 0.3s ease;
+    }
+
+    .photo-panorama-section :global(.photo-panorama-dot:hover) {
+        background: rgba(100, 100, 100, 0.5);
+    }
+
+    .photo-panorama-section :global(.photo-panorama-dot.active) {
+        width: 18px;
+        background: rgba(120, 120, 120, 0.8);
+    }
+
+    .photo-panorama-view-toggle {
+        position: relative;
+        display: inline-grid;
+        width: 2rem;
+        height: 1.5rem;
+        flex: 0 0 2rem;
+        place-items: center;
+        padding: 0;
+        border: 1px solid rgba(100, 100, 100, 0.2);
+        border-radius: 9999px;
+        color: rgba(100, 100, 100, 0.75);
+        background: transparent;
+        cursor: pointer;
+        transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+    }
+
+    .photo-panorama-view-toggle:hover,
+    .photo-panorama-view-toggle:focus-visible {
+        color: rgba(100, 100, 100, 1);
+        border-color: rgba(100, 100, 100, 0.55);
+        background: rgba(100, 100, 100, 0.08);
+    }
+
+    .photo-panorama-view-toggle:focus-visible,
+    .photo-panorama-arrow:focus-visible,
+    .photo-panorama-section :global(.photo-panorama-dot:focus-visible) {
+        outline: 2px solid rgba(59, 130, 246, 0.9);
+        outline-offset: 2px;
+    }
+
+    .photo-panorama-view-icon {
+        grid-area: 1 / 1;
+        width: 1rem;
+        height: 1rem;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1;
+        transition: opacity 0.18s ease, transform 0.18s ease;
+    }
+
+    .photo-panorama-section[data-view="carousel"] .photo-panorama-view-icon--panorama,
+    .photo-panorama-section[data-view="panorama"] .photo-panorama-view-icon--carousel {
+        opacity: 0;
+        transform: scale(0.75);
+    }
+
+    .photo-panorama-view-label {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+    }
+
+    .photo-panorama-arrow {
+        position: absolute;
+        z-index: 2;
+        top: 50%;
+        display: grid;
+        width: 2.25rem;
+        height: 2.25rem;
+        place-items: center;
+        padding: 0;
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        border-radius: 9999px;
+        color: white;
+        background: rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(6px);
+        cursor: pointer;
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(-50%) scale(0.9);
+        transition: opacity 0.2s ease, transform 0.2s ease, background-color 0.2s ease;
+    }
+
+    .photo-panorama-arrow svg {
+        width: 1.15rem;
+        height: 1.15rem;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .photo-panorama-arrow--previous {
+        left: 0.75rem;
+    }
+
+    .photo-panorama-arrow--next {
+        right: 0.75rem;
+    }
+
+    .photo-panorama-section[data-view="carousel"] .photo-panorama-stage:hover .photo-panorama-arrow:not(:disabled),
+    .photo-panorama-section[data-view="carousel"] .photo-panorama-arrow:focus-visible {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateY(-50%) scale(1);
+    }
+
+    .photo-panorama-arrow:hover {
+        background: rgba(0, 0, 0, 0.55);
+    }
+
+    .photo-panorama-arrow:disabled,
+    .photo-panorama-section[data-view="panorama"] .photo-panorama-arrow {
+        visibility: hidden;
+    }
+
+    :global(.photo-panorama-section > .photo-caption) {
+        color: #898989;
+        font-size: 0.875rem;
+    }
+
+    :global(.photo-panorama-section > .photo-caption.top) {
+        margin-bottom: 0.5rem;
+    }
+
+    :global(.photo-panorama-section > .photo-caption.bottom) {
+        margin-top: 0.5rem;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        .photo-panorama-section :global(.photo-panorama-dot) {
+            background: rgba(200, 200, 200, 0.25);
+        }
+
+        .photo-panorama-section :global(.photo-panorama-dot:hover) {
+            background: rgba(200, 200, 200, 0.5);
+        }
+
+        .photo-panorama-section :global(.photo-panorama-dot.active) {
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .photo-panorama-view-toggle {
+            color: rgba(220, 220, 220, 0.78);
+            border-color: rgba(255, 255, 255, 0.18);
+        }
+
+        .photo-panorama-view-toggle:hover,
+        .photo-panorama-view-toggle:focus-visible {
+            color: white;
+            border-color: rgba(255, 255, 255, 0.45);
+            background: rgba(255, 255, 255, 0.08);
+        }
+    }
+
+    @media (max-width: 767px) {
+        .photo-panorama-arrow {
+            display: none;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .photo-panorama-section :global(.photo-panorama-dot),
+        .photo-panorama-view-toggle,
+        .photo-panorama-view-icon,
+        .photo-panorama-arrow {
+            transition-duration: 0.01ms;
+        }
+    }
+</style>

@@ -59,7 +59,15 @@ export function serializePageBody(blocks: PageBlock[]) {
         if (remNumber(props.blockMargin) && remNumber(props.blockMargin) !== '0.5') {
             propsText += `\n  blockMargin="${props.blockMargin}"`;
         }
-        if (block.type === 'PhotoCarousel' && props.initialSlide) propsText += `\n  initialSlide={${props.initialSlide}}`;
+        if (block.type === 'PhotoCarousel' && props.enablePanorama === true) {
+            propsText += `\n  enablePanorama={true}`;
+        }
+        if (block.type === 'PhotoCarousel' && props.initialSlide) {
+            propsText += `\n  initialSlide={${props.initialSlide}}`;
+        }
+        if (block.type === 'PhotoCarousel' && props.enablePanorama === true && props.initialView === 'panorama') {
+            propsText += `\n  initialView="panorama"`;
+        }
         if (!props.blockMargin && remNumber(props.mb) && remNumber(props.mb) !== '0.5') {
             propsText += `\n  blockMargin="${props.mb}"`;
         }
