@@ -166,6 +166,22 @@ test('PhotoCarousel panorama serialization preserves its configured initial view
     assert.doesNotMatch(content, /<PhotoPanorama/);
 });
 
+test('single-photo panorama serializes a bounded display-only slice count', () => {
+    const single = createLayoutOnlyPageContent([{
+        type: 'PhotoCarousel',
+        props: { enablePanorama: true, panoramaSlices: 3 },
+        photos: [{ itemKey: 'one.jpg' }],
+    }]);
+    const multiple = createLayoutOnlyPageContent([{
+        type: 'PhotoCarousel',
+        props: { enablePanorama: true, panoramaSlices: 3 },
+        photos: [{ itemKey: 'one.jpg' }, { itemKey: 'two.jpg' }],
+    }]);
+
+    assert.match(single, /enablePanorama=\{true\}[\s\S]*?panoramaSlices=\{3\}/);
+    assert.doesNotMatch(multiple, /panoramaSlices/);
+});
+
 test('PhotoCarousel can enable full-width carousel and joined proportional views', () => {
     const carousel = readProjectFile('src/components/PhotoCarousel.astro');
     const panorama = readProjectFile('src/components/PhotoPanorama.astro');
@@ -180,6 +196,7 @@ test('PhotoCarousel can enable full-width carousel and joined proportional views
     assert.match(albumPage, /components=\{\{ Row, Photo: AlbumPhoto, Text, PhotoCarousel \}\}/);
     assert.match(panorama, /initialView\?: PanoramaView/);
     assert.match(panorama, /data-initial-view=\{view\}/);
+    assert.match(panorama, /data-panorama-slices=\{displaySlices\}/);
     assert.match(panorama, /data-view=\{view\}/);
     assert.match(panorama, /data-view="carousel"[^}]*\.photo-panorama-track > :global\(\*\)[\s\S]*?flex:\s*0 0 100%/);
     assert.match(panorama, /data-view="panorama"[^}]*\.photo-panorama-track > :global\(\*\)[\s\S]*?flex:\s*var\(--panorama-grow, 100\) 1 0%/);
@@ -194,15 +211,24 @@ test('PhotoCarousel can enable full-width carousel and joined proportional views
     assert.doesNotMatch(panorama, /tags-overlay[^}]*display:\s*none/);
     assert.match(panorama, /@media \(min-width: 768px\)\s*\{[\s\S]*?\.photo-panorama-section \.photo-panorama-track :global\(\.photo-img\)\s*\{\s*border-radius: 0/);
     assert.match(panorama, /data-view="panorama"[^}]*\.photo-panorama-track:hover :global\(\.tags-overlay\)/);
-    assert.match(panorama, /slide\.animate\(\[\s*\{[\s\S]*?translateX[\s\S]*?scaleX/);
+    assert.match(panorama, /const animations = slides\.map[\s\S]*?translateX[\s\S]*?scaleX[\s\S]*?slide\.animate\(keyframes/);
     assert.match(panorama, /duration: 650[\s\S]*?cubic-bezier\(0\.22, 1, 0\.36, 1\)/);
     assert.match(panorama, /await Promise\.allSettled\(animations\.map\(\(animation\) => animation\.finished\)\)/);
     assert.doesNotMatch(panorama, /scrollIntoView/);
+    assert.match(panorama, /sourceSlides\.length === 1 && requestedSlices > 1/);
+    assert.match(panorama, /sourceSlide\.cloneNode\(true\)/);
+    assert.match(panorama, /slides = sliceSlides/);
+    assert.match(panorama, /--panorama-slice-offset/);
+    assert.match(panorama, /\.photo-panorama-slice \.photo-wrapper\)\s*\{\s*overflow: hidden/);
+    assert.match(panorama, /data-single-photo-sliced[^}]*photo-panorama-single-source\)\s*\{\s*display: none/);
+    assert.match(panorama, /\.photo-panorama-controls\s*\{\s*position: relative;\s*z-index: 3/);
     assert.match(getStructure, /Row\|PhotoCarousel\|Text/);
     assert.match(getStructure, /props\.enablePanorama = true/);
+    assert.match(getStructure, /panoramaSlices=\\\{\(\\d\+\)\\\}/);
     assert.match(getStructure, /initialView="\(carousel\|panorama\)"/);
     assert.match(devTool, /label: 'Panorama', value: 'PhotoCarouselPanorama'/);
     assert.match(devTool, /class="photo-panorama-initial-view"/);
+    assert.match(devTool, /class="photo-panorama-slices" type="number" min="1" max="24"/);
     assert.match(devTool, /sourceType: 'Row' \| 'PhotoCarousel';\s*targetType: 'Row' \| 'PhotoCarousel';\s*sourcePanorama: boolean;\s*targetPanorama: boolean/);
     assert.match(devTool, /target\.props\.enablePanorama = true/);
 });

@@ -603,12 +603,29 @@
                         flex: var(--panorama-grow, 100) 1 0%;
                         min-width: 0;
                     }
+                    .dev-page-structure-preview[data-single-photo-sliced] .photo-panorama-single-source {
+                        display: none;
+                    }
+                    .dev-page-structure-preview .photo-panorama-slice .photo-wrapper {
+                        overflow: hidden;
+                    }
+                    .dev-page-structure-preview .photo-panorama-slice .photo-wrapper > .pswp-link,
+                    .dev-page-structure-preview .photo-panorama-slice .tags-overlay {
+                        width: var(--panorama-slice-width);
+                        max-width: none;
+                        transform: translateX(var(--panorama-slice-offset));
+                    }
+                    .dev-page-structure-preview .photo-panorama-slice .tags-overlay {
+                        right: auto;
+                    }
                     @media (min-width: 768px) and (hover: hover) {
                         .dev-page-structure-preview.photo-panorama-section[data-view="panorama"]:hover .tags-overlay {
                             opacity: 1;
                         }
                     }
                     .dev-page-structure-preview.photo-panorama-section .photo-panorama-controls {
+                        position: relative;
+                        z-index: 3;
                         display: flex;
                         min-height: 1.5rem;
                         align-items: center;
@@ -763,6 +780,14 @@
                         opacity: 1;
                         transform: none;
                         scroll-snap-align: none;
+                    }
+                    .dev-preview-as-row .photo-panorama-single-source,
+                    .dev-preview-as-carousel .photo-panorama-single-source {
+                        display: block !important;
+                    }
+                    .dev-preview-as-row .photo-panorama-slice,
+                    .dev-preview-as-carousel .photo-panorama-slice {
+                        display: none !important;
                     }
                     .dev-preview-as-carousel > .photo-panorama-stage > .photo-panorama-track {
                         display: flex;
@@ -1906,6 +1931,7 @@
                         } else {
                             delete target.props.enablePanorama;
                             delete target.props.initialView;
+                            delete target.props.panoramaSlices;
                         }
                     }
                     textChanges
@@ -2625,6 +2651,9 @@
 
                     const isPanorama = block.type === 'PhotoCarousel' && props.enablePanorama === true;
                     const isCarousel = block.type === 'PhotoCarousel' && !isPanorama;
+                    const panoramaSliceCount = isPanorama && block.photos?.length === 1
+                        ? Math.min(24, Math.max(1, Math.trunc(Number(props.panoramaSlices) || 1)))
+                        : 1;
                     const media = document.createElement(isCarousel || isPanorama ? 'section' : 'div');
                     media.className = `${isCarousel ? 'carousel-section group' : isPanorama ? 'photo-panorama-section group' : 'row-wrapper'} dev-page-structure-preview`;
                     media.dataset.devBlock = isCarousel || isPanorama ? 'carousel' : 'row';
@@ -2668,12 +2697,33 @@
                             track.appendChild(photoNode);
                         }
                     });
+                    const panoramaSliceSlides: HTMLElement[] = [];
+                    if (panoramaSliceCount > 1 && track.children.length === 1) {
+                        const sourceSlide = track.firstElementChild as HTMLElement;
+                        sourceSlide.classList.add('photo-panorama-single-source');
+                        media.dataset.singlePhotoSliced = 'true';
+                        for (let index = 0; index < panoramaSliceCount; index += 1) {
+                            const slice = sourceSlide.cloneNode(true) as HTMLElement;
+                            slice.classList.remove('photo-panorama-single-source');
+                            slice.classList.add('photo-panorama-slice');
+                            slice.dataset.panoramaGeneratedSlice = 'true';
+                            slice.style.setProperty('--panorama-slice-width', `${panoramaSliceCount * 100}%`);
+                            slice.style.setProperty('--panorama-slice-offset', `${(-index * 100) / panoramaSliceCount}%`);
+                            slice.querySelectorAll<HTMLElement>('[data-item-key]').forEach((node) => node.removeAttribute('data-item-key'));
+                            slice.querySelector('[data-photo-lightbox-link]')?.removeAttribute('data-photo-lightbox-link');
+                            slice.querySelector(':scope > .photo-caption--photo')?.remove();
+                            track.appendChild(slice);
+                            panoramaSliceSlides.push(slice);
+                        }
+                    }
                     media.appendChild(track);
 
                     if (isCarousel || isPanorama) {
                         const dots = document.createElement('div');
                         dots.className = isCarousel ? 'carousel-dots' : 'photo-panorama-dots';
-                        const slides = Array.from(track.children) as HTMLElement[];
+                        const slides = panoramaSliceSlides.length > 0
+                            ? panoramaSliceSlides
+                            : Array.from(track.children) as HTMLElement[];
                         const initialIndex = Math.min(Number(props.initialSlide) || 0, Math.max(0, slides.length - 1));
                         slides.forEach((slide, index) => {
                             slide.toggleAttribute('data-active', index === initialIndex);
@@ -2681,7 +2731,11 @@
                                 const image = slide.querySelector<HTMLImageElement>('img');
                                 const applyRatio = () => {
                                     if (!image?.naturalWidth || !image.naturalHeight) return;
-                                    slide.style.setProperty('--panorama-grow', String((image.naturalWidth / image.naturalHeight) * 100));
+                                    const ratio = (image.naturalWidth / image.naturalHeight) * 100;
+                                    slide.style.setProperty(
+                                        '--panorama-grow',
+                                        String(panoramaSliceSlides.length > 0 ? ratio / panoramaSliceCount : ratio),
+                                    );
                                 };
                                 if (image?.complete) applyRatio();
                                 else image?.addEventListener('load', applyRatio, { once: true });
@@ -3258,6 +3312,12 @@
                                                     <option value="panorama" ${block.props.initialView === 'panorama' ? 'selected' : ''}>Panorama</option>
                                                 </select>
                                             </label>
+                                            ${block.photos.length === 1 ? `
+                                                <label style="display:flex;align-items:center;justify-content:space-between;gap:.75rem;padding:0 0 .6rem;color:#64748b;font-size:.75rem;">
+                                                    Display slices
+                                                    <input class="photo-panorama-slices" type="number" min="1" max="24" step="1" inputmode="numeric" value="${Math.min(24, Math.max(1, Math.trunc(Number(block.props.panoramaSlices) || 1)))}" style="width:4rem;border:1px solid #cbd5e1;border-radius:4px;background:white;color:#334155;padding:.2rem .35rem;font-size:.75rem;text-align:right;" />
+                                                </label>
+                                            ` : ''}
                                         ` : ''}
                                         <div class="dev-pm-photo-list" data-block-idx="${bIdx}">
                                             ${block.photos.map((p: any, pIdx: number) => `
@@ -3350,12 +3410,14 @@
                                 block.type = 'PhotoCarousel';
                                 delete block.props.enablePanorama;
                                 delete block.props.initialView;
+                                delete block.props.panoramaSlices;
                             } else if (!block.props.enablePanorama) {
                                 block.props.enablePanorama = true;
                             } else {
                                 block.type = 'Row';
                                 delete block.props.enablePanorama;
                                 delete block.props.initialView;
+                                delete block.props.panoramaSlices;
                             }
                             syncManagedSpecialMargins([bIdx - 1, bIdx]);
                             renderTree();
@@ -3364,6 +3426,14 @@
                             const value = (event.currentTarget as HTMLSelectElement).value;
                             if (value === 'panorama') block.props.initialView = 'panorama';
                             else delete block.props.initialView;
+                            updatePageDirtyState();
+                        });
+                        blockEl.querySelector<HTMLInputElement>('.photo-panorama-slices')?.addEventListener('change', (event) => {
+                            const input = event.currentTarget as HTMLInputElement;
+                            const slices = Math.min(24, Math.max(1, Math.trunc(Number(input.value) || 1)));
+                            input.value = String(slices);
+                            if (slices > 1) block.props.panoramaSlices = slices;
+                            else delete block.props.panoramaSlices;
                             updatePageDirtyState();
                         });
                         blockEl.querySelector('.block-delete')?.addEventListener('click', () => {
@@ -5317,7 +5387,8 @@
                     ) => {
                         const track = blockElement.querySelector<HTMLElement>(':scope > .photo-row, :scope > .carousel-track, :scope > .photo-panorama-stage > .photo-panorama-track');
                         if (!track) return;
-                        const slides = Array.from(track.children) as HTMLElement[];
+                        const slides = Array.from(track.children)
+                            .filter((slide) => !(slide as HTMLElement).dataset.panoramaGeneratedSlice) as HTMLElement[];
 
                         const restoreOriginalLayout = () => {
                             blockElement.classList.remove('dev-preview-as-row', 'dev-preview-as-carousel', 'dev-preview-as-panorama');

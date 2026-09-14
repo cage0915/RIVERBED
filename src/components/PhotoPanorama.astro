@@ -8,6 +8,8 @@ interface Props {
     initialView?: PanoramaView;
     /** Photo shown first when the carousel view loads (0-based). */
     initialSlide?: number;
+    /** Equal display-only slices used when the block contains one photo. */
+    panoramaSlices?: number;
     mb?: string;
     mt?: string;
     blockMargin?: string;
@@ -19,6 +21,7 @@ interface Props {
 const {
     initialView = "carousel",
     initialSlide = 0,
+    panoramaSlices = 1,
     mb,
     mt,
     blockMargin,
@@ -28,6 +31,7 @@ const {
 } = Astro.props;
 
 const view: PanoramaView = initialView === "panorama" ? "panorama" : "carousel";
+const displaySlices = Math.min(24, Math.max(1, Math.trunc(Number(panoramaSlices) || 1)));
 const isDev = import.meta.env.DEV;
 const parsedPos = captionPosition.includes("top") ? "top" : "bottom";
 const parsedAlign = captionPosition.includes("left")
@@ -51,6 +55,7 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
     data-view={view}
     data-initial-view={view}
     data-initial-slide={initialSlide}
+    data-panorama-slices={displaySlices}
     style={styles.length > 0 ? styles.join(" ") : undefined}
     data-dev-block={isDev ? "carousel" : undefined}
     data-dev-panorama={isDev ? "true" : undefined}
@@ -129,6 +134,7 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
         const controller = new AbortController();
         const initializedSections: HTMLElement[] = [];
         const generatedDots: HTMLButtonElement[] = [];
+        const generatedSlices: HTMLElement[] = [];
         const resizeObservers: ResizeObserver[] = [];
         const frameIds = new Set<number>();
         const viewAnimations = new Set<Animation>();
@@ -157,7 +163,45 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
             section.dataset.photoPanoramaReady = "true";
             initializedSections.push(section);
 
-            const slides = Array.from(track.children) as HTMLElement[];
+            const sourceSlides = Array.from(track.children) as HTMLElement[];
+            let slides = sourceSlides;
+            const requestedSlices = Math.min(
+                24,
+                Math.max(1, Number.parseInt(section.dataset.panoramaSlices || "1", 10) || 1),
+            );
+            const sliceSlides: HTMLElement[] = [];
+            if (sourceSlides.length === 1 && requestedSlices > 1) {
+                const sourceSlide = sourceSlides[0];
+                const sourceLightbox = sourceSlide.querySelector<HTMLAnchorElement>("[data-photo-lightbox-link]");
+                sourceSlide.classList.add("photo-panorama-single-source");
+                section.dataset.singlePhotoSliced = "true";
+
+                for (let index = 0; index < requestedSlices; index += 1) {
+                    const slice = sourceSlide.cloneNode(true) as HTMLElement;
+                    slice.classList.remove("photo-panorama-single-source");
+                    slice.classList.add("photo-panorama-slice");
+                    slice.dataset.panoramaGeneratedSlice = "true";
+                    slice.style.setProperty("--panorama-slice-width", `${requestedSlices * 100}%`);
+                    slice.style.setProperty("--panorama-slice-offset", `${(-index * 100) / requestedSlices}%`);
+                    slice.querySelectorAll<HTMLElement>("[data-item-key]").forEach((node) => {
+                        node.removeAttribute("data-item-key");
+                        node.removeAttribute("data-dev");
+                    });
+                    slice.querySelector(":scope > .photo-caption--photo")?.remove();
+                    const sliceLightbox = slice.querySelector<HTMLAnchorElement>("[data-photo-lightbox-link]");
+                    if (sliceLightbox) {
+                        sliceLightbox.removeAttribute("data-photo-lightbox-link");
+                        sliceLightbox.addEventListener("click", (event) => {
+                            event.preventDefault();
+                            sourceLightbox?.click();
+                        }, { signal: controller.signal });
+                    }
+                    track.appendChild(slice);
+                    sliceSlides.push(slice);
+                    generatedSlices.push(slice);
+                }
+                slides = sliceSlides;
+            }
             const dots: HTMLButtonElement[] = [];
             const requestedInitialIndex = Number.parseInt(section.dataset.initialSlide || "0", 10);
             let activeIndex = Math.min(
@@ -232,13 +276,14 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
                     const animations = slides.map((slide, index) => {
                         const before = beforeRects[index];
                         const after = afterRects[index];
-                        const animation = slide.animate([
+                        const keyframes = [
                             {
                                 transform: `translateX(${before.left - after.left}px) scaleX(${after.width ? before.width / after.width : 1})`,
                                 transformOrigin: "left center",
                             },
                             { transform: "translateX(0) scaleX(1)", transformOrigin: "left center" },
-                        ], {
+                        ];
+                        const animation = slide.animate(keyframes, {
                             duration: 650,
                             easing: "cubic-bezier(0.22, 1, 0.36, 1)",
                         });
@@ -279,9 +324,10 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
                 const image = slide.querySelector<HTMLImageElement>("img");
                 const applyRatio = () => {
                     if (!image?.naturalWidth || !image.naturalHeight) return;
+                    const ratio = (image.naturalWidth / image.naturalHeight) * 100;
                     slide.style.setProperty(
                         "--panorama-grow",
-                        String((image.naturalWidth / image.naturalHeight) * 100),
+                        String(sliceSlides.length > 0 ? ratio / requestedSlices : ratio),
                     );
                 };
                 if (image?.complete) applyRatio();
@@ -351,12 +397,15 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
             viewAnimations.forEach((animation) => animation.cancel());
             frameIds.forEach((id) => cancelAnimationFrame(id));
             generatedDots.forEach((dot) => dot.remove());
+            generatedSlices.forEach((slice) => slice.remove());
             initializedSections.forEach((section) => {
                 section.querySelectorAll<HTMLElement>(".photo-panorama-track > *").forEach((slide) => {
                     slide.removeAttribute("data-active");
                     slide.style.removeProperty("--panorama-grow");
                     delete slide.dataset.panoramaSlideIndex;
                 });
+                section.querySelector(".photo-panorama-single-source")?.classList.remove("photo-panorama-single-source");
+                delete section.dataset.singlePhotoSliced;
                 delete section.dataset.photoPanoramaReady;
             });
         };
@@ -402,6 +451,26 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
         min-width: 0;
     }
 
+    .photo-panorama-section[data-single-photo-sliced]
+        .photo-panorama-track > :global(.photo-panorama-single-source) {
+        display: none;
+    }
+
+    .photo-panorama-section :global(.photo-panorama-slice .photo-wrapper) {
+        overflow: hidden;
+    }
+
+    .photo-panorama-section :global(.photo-panorama-slice .photo-wrapper > .pswp-link),
+    .photo-panorama-section :global(.photo-panorama-slice .tags-overlay) {
+        width: var(--panorama-slice-width);
+        max-width: none;
+        transform: translateX(var(--panorama-slice-offset));
+    }
+
+    .photo-panorama-section :global(.photo-panorama-slice .tags-overlay) {
+        right: auto;
+    }
+
     .photo-panorama-section[data-view="carousel"] .photo-panorama-track {
         overflow-x: auto;
         overscroll-behavior-x: contain;
@@ -435,6 +504,8 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
     }
 
     .photo-panorama-controls {
+        position: relative;
+        z-index: 3;
         display: flex;
         min-height: 1.5rem;
         align-items: center;

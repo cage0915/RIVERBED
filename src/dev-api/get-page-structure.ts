@@ -97,6 +97,11 @@ export const GET: APIRoute = async ({ request }) => {
         const initialViewMatch = propsStr.match(/initialView="(carousel|panorama)"/);
         if (initialViewMatch) props.initialView = initialViewMatch[1];
 
+        const panoramaSlicesMatch = propsStr.match(/panoramaSlices=\{(\d+)\}/);
+        if (panoramaSlicesMatch) {
+            props.panoramaSlices = Math.min(24, Math.max(1, parseInt(panoramaSlicesMatch[1])));
+        }
+
         // Parse Photos inside Block
         const photoRegex = /<Photo\s+([^>]*?)\/>/g;
         const photos: any[] = [];

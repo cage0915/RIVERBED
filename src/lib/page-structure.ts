@@ -68,6 +68,13 @@ export function serializePageBody(blocks: PageBlock[]) {
         if (block.type === 'PhotoCarousel' && props.enablePanorama === true && props.initialView === 'panorama') {
             propsText += `\n  initialView="panorama"`;
         }
+        const panoramaSlices = Math.min(24, Math.max(1, Math.trunc(Number(props.panoramaSlices) || 1)));
+        if (block.type === 'PhotoCarousel'
+            && props.enablePanorama === true
+            && block.photos?.length === 1
+            && panoramaSlices > 1) {
+            propsText += `\n  panoramaSlices={${panoramaSlices}}`;
+        }
         if (!props.blockMargin && remNumber(props.mb) && remNumber(props.mb) !== '0.5') {
             propsText += `\n  blockMargin="${props.mb}"`;
         }
