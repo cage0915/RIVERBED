@@ -2733,6 +2733,16 @@
                             slice.style.setProperty('--panorama-slice-offset', `${(-index * 100) / panoramaSliceCount}%`);
                             slice.style.setProperty('--panorama-slice-clip-start', `${(index * 100) / panoramaSliceCount}%`);
                             slice.style.setProperty('--panorama-slice-clip-end', `${((panoramaSliceCount - index - 1) * 100) / panoramaSliceCount}%`);
+                            slice.style.setProperty(
+                                '--panorama-slice-mobile-clip-start',
+                                index === 0 ? '0%' : `calc(${(index * 100) / panoramaSliceCount}% - 1px)`,
+                            );
+                            slice.style.setProperty(
+                                '--panorama-slice-mobile-clip-end',
+                                index === panoramaSliceCount - 1
+                                    ? '0%'
+                                    : `calc(${((panoramaSliceCount - index - 1) * 100) / panoramaSliceCount}% - 1px)`,
+                            );
                             const sourceWrapper = sourceSlide.querySelector<HTMLElement>('.photo-wrapper[data-item-key]');
                             const sliceWrapper = slice.querySelector<HTMLElement>('.photo-wrapper');
                             if (sliceWrapper && sourceWrapper?.dataset.itemKey) {

@@ -28,7 +28,7 @@
                 link.dataset.pswpHeight = image.naturalHeight.toString();
             };
 
-            if (image.complete) {
+            if (image.naturalWidth && image.naturalHeight) {
                 applyDimensions();
             } else if (listenForLoad && !awaitingDimensions.has(image)) {
                 awaitingDimensions.add(image);

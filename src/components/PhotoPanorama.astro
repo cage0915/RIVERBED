@@ -187,6 +187,16 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
                     slice.style.setProperty("--panorama-slice-offset", `${(-index * 100) / requestedSlices}%`);
                     slice.style.setProperty("--panorama-slice-clip-start", `${(index * 100) / requestedSlices}%`);
                     slice.style.setProperty("--panorama-slice-clip-end", `${((requestedSlices - index - 1) * 100) / requestedSlices}%`);
+                    slice.style.setProperty(
+                        "--panorama-slice-mobile-clip-start",
+                        index === 0 ? "0%" : `calc(${(index * 100) / requestedSlices}% - 1px)`,
+                    );
+                    slice.style.setProperty(
+                        "--panorama-slice-mobile-clip-end",
+                        index === requestedSlices - 1
+                            ? "0%"
+                            : `calc(${((requestedSlices - index - 1) * 100) / requestedSlices}% - 1px)`,
+                    );
                     const sliceWrapper = slice.querySelector<HTMLElement>(".photo-wrapper");
                     if (sliceWrapper && sourceItemKey) {
                         sliceWrapper.dataset.panoramaSourceItemKey = sourceItemKey;
@@ -718,6 +728,14 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
     }
 
     @media (max-width: 767px) {
+        .photo-panorama-section[data-view="panorama"][data-single-photo-sliced]
+            :global(.photo-panorama-slice .photo-wrapper > .pswp-link) {
+            clip-path: inset(
+                0 var(--panorama-slice-mobile-clip-end)
+                0 var(--panorama-slice-mobile-clip-start)
+            );
+        }
+
         .photo-panorama-arrow {
             display: none;
         }

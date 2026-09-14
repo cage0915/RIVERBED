@@ -220,8 +220,10 @@ test('PhotoCarousel can enable full-width carousel and joined proportional views
     assert.match(panorama, /slides = sliceSlides/);
     assert.match(panorama, /--panorama-slice-offset/);
     assert.match(panorama, /--panorama-slice-clip-start/);
+    assert.match(panorama, /--panorama-slice-mobile-clip-start/);
     assert.match(panorama, /\.photo-panorama-slice \.photo-wrapper\)\s*\{\s*overflow: visible/);
     assert.match(panorama, /clip-path: inset/);
+    assert.match(panorama, /data-view="panorama"[^}]*data-single-photo-sliced[\s\S]*?--panorama-slice-mobile-clip-end/);
     assert.match(panorama, /const owner = Math\.min[\s\S]*?if \(owner !== index\)[\s\S]*?marker\.style\.left/);
     assert.match(panorama, /sliceWrapper\.dataset\.panoramaSourceItemKey = sourceItemKey/);
     assert.match(panorama, /data-single-photo-sliced[^}]*photo-panorama-single-source\)\s*\{\s*display: none/);
@@ -971,6 +973,7 @@ test('media behavior uses page-scoped lifecycle owners with deterministic cleanu
     assert.match(photoLightbox, /installPageLifecycle/);
     assert.match(photoLightbox, /\[data-photo-lightbox-link\]/);
     assert.match(photoLightbox, /if \(!links\.length\) return/);
+    assert.match(photoLightbox, /if \(image\.naturalWidth && image\.naturalHeight\)/);
     assert.match(photoLightbox, /new AbortController\(\)/);
     assert.match(photoLightbox, /lightbox\.destroy\(\)/);
 
@@ -978,6 +981,7 @@ test('media behavior uses page-scoped lifecycle owners with deterministic cleanu
         photo,
         /<a[\s\S]*class="pswp-link block"[\s\S]*data-photo-lightbox-link/,
     );
+    assert.match(photo, /data-pswp-width=\{width\}[\s\S]*data-pswp-height=\{height\}/);
     assert.match(photo, /installPageLifecycle/);
     assert.match(photo, /new AbortController\(\)/);
     assert.match(photo, /signal: controller\.signal/);
