@@ -58,16 +58,20 @@
   <Photo itemKey="KCS07400.jpg" />
 </Row>
 
-<Row>
+<Row
+  blockMargin="1.5rem">
   <Photo itemKey="KCS07502.jpg" />
 </Row>
 
-<Row
+<PhotoCarousel
   caption="槍・穂高連峰 | 南岳與北穂高岳之間的V 字形細稜稱為大キレット (大切戶)，是槍穂高連峰路線中最險峻的路段之一。"
   captionPosition="left bottom"
-  blockMargin="1.5rem">
+  blockMargin="1.5rem"
+  enablePanorama={true}
+  initialView="panorama"
+  panoramaSlices={3}>
   <Photo itemKey="KCS07511.jpg" />
-</Row>
+</PhotoCarousel>
 
 <Row
   caption="高瀬湖"
