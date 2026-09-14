@@ -223,6 +223,7 @@ test('PhotoCarousel can enable full-width carousel and joined proportional views
     assert.match(panorama, /\.photo-panorama-slice \.photo-wrapper\)\s*\{\s*overflow: visible/);
     assert.match(panorama, /clip-path: inset/);
     assert.match(panorama, /const owner = Math\.min[\s\S]*?if \(owner !== index\)[\s\S]*?marker\.style\.left/);
+    assert.match(panorama, /sliceWrapper\.dataset\.panoramaSourceItemKey = sourceItemKey/);
     assert.match(panorama, /data-single-photo-sliced[^}]*photo-panorama-single-source\)\s*\{\s*display: none/);
     assert.match(panorama, /\.photo-panorama-controls\s*\{\s*position: relative;\s*z-index: 3/);
     assert.match(getStructure, /Row\|PhotoCarousel\|Text/);
@@ -232,6 +233,8 @@ test('PhotoCarousel can enable full-width carousel and joined proportional views
     assert.match(devTool, /label: 'Panorama', value: 'PhotoCarouselPanorama'/);
     assert.match(devTool, /class="photo-panorama-initial-view"/);
     assert.match(devTool, /class="photo-panorama-slices" type="number" min="1" max="24"/);
+    assert.match(devTool, /wrapper\.dataset\.itemKey \|\| wrapper\.dataset\.panoramaSourceItemKey/);
+    assert.match(devTool, /data-panorama-source-item-key/);
     assert.match(devTool, /sourceType: 'Row' \| 'PhotoCarousel';\s*targetType: 'Row' \| 'PhotoCarousel';\s*sourcePanorama: boolean;\s*targetPanorama: boolean/);
     assert.match(devTool, /target\.props\.enablePanorama = true/);
 });

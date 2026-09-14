@@ -173,6 +173,8 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
             if (sourceSlides.length === 1 && requestedSlices > 1) {
                 const sourceSlide = sourceSlides[0];
                 const sourceLightbox = sourceSlide.querySelector<HTMLAnchorElement>("[data-photo-lightbox-link]");
+                const sourceWrapper = sourceSlide.querySelector<HTMLElement>(".photo-wrapper[data-item-key]");
+                const sourceItemKey = sourceWrapper?.dataset.itemKey;
                 sourceSlide.classList.add("photo-panorama-single-source");
                 section.dataset.singlePhotoSliced = "true";
 
@@ -185,6 +187,12 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
                     slice.style.setProperty("--panorama-slice-offset", `${(-index * 100) / requestedSlices}%`);
                     slice.style.setProperty("--panorama-slice-clip-start", `${(index * 100) / requestedSlices}%`);
                     slice.style.setProperty("--panorama-slice-clip-end", `${((requestedSlices - index - 1) * 100) / requestedSlices}%`);
+                    const sliceWrapper = slice.querySelector<HTMLElement>(".photo-wrapper");
+                    if (sliceWrapper && sourceItemKey) {
+                        sliceWrapper.dataset.panoramaSourceItemKey = sourceItemKey;
+                        sliceWrapper.dataset.panoramaSliceIndex = String(index);
+                        sliceWrapper.dataset.panoramaSliceCount = String(requestedSlices);
+                    }
                     slice.querySelectorAll<HTMLElement>("[data-item-key]").forEach((node) => {
                         node.removeAttribute("data-item-key");
                         node.removeAttribute("data-dev");
