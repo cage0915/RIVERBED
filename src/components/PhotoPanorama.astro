@@ -183,10 +183,26 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
                     slice.dataset.panoramaGeneratedSlice = "true";
                     slice.style.setProperty("--panorama-slice-width", `${requestedSlices * 100}%`);
                     slice.style.setProperty("--panorama-slice-offset", `${(-index * 100) / requestedSlices}%`);
+                    slice.style.setProperty("--panorama-slice-clip-start", `${(index * 100) / requestedSlices}%`);
+                    slice.style.setProperty("--panorama-slice-clip-end", `${((requestedSlices - index - 1) * 100) / requestedSlices}%`);
                     slice.querySelectorAll<HTMLElement>("[data-item-key]").forEach((node) => {
                         node.removeAttribute("data-item-key");
                         node.removeAttribute("data-dev");
                     });
+                    slice.querySelectorAll<HTMLElement>(".tag-marker").forEach((marker) => {
+                        const tagName = marker.querySelector<HTMLElement>(".tag-name");
+                        const x = Number.parseFloat(tagName?.dataset.x || marker.style.left || "0");
+                        const owner = Math.min(
+                            requestedSlices - 1,
+                            Math.max(0, Math.floor((x / 100) * requestedSlices)),
+                        );
+                        if (owner !== index) {
+                            marker.remove();
+                            return;
+                        }
+                        marker.style.left = `${Math.min(100, Math.max(0, x * requestedSlices - index * 100))}%`;
+                    });
+                    slice.querySelector<HTMLElement>(".tags-overlay:empty")?.remove();
                     slice.querySelector(":scope > .photo-caption--photo")?.remove();
                     const sliceLightbox = slice.querySelector<HTMLAnchorElement>("[data-photo-lightbox-link]");
                     if (sliceLightbox) {
@@ -457,18 +473,17 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
     }
 
     .photo-panorama-section :global(.photo-panorama-slice .photo-wrapper) {
-        overflow: hidden;
+        overflow: visible;
     }
 
-    .photo-panorama-section :global(.photo-panorama-slice .photo-wrapper > .pswp-link),
-    .photo-panorama-section :global(.photo-panorama-slice .tags-overlay) {
+    .photo-panorama-section :global(.photo-panorama-slice .photo-wrapper > .pswp-link) {
         width: var(--panorama-slice-width);
         max-width: none;
         transform: translateX(var(--panorama-slice-offset));
-    }
-
-    .photo-panorama-section :global(.photo-panorama-slice .tags-overlay) {
-        right: auto;
+        clip-path: inset(
+            0 var(--panorama-slice-clip-end)
+            0 var(--panorama-slice-clip-start)
+        );
     }
 
     .photo-panorama-section[data-view="carousel"] .photo-panorama-track {

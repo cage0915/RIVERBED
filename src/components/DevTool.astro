@@ -607,16 +607,13 @@
                         display: none;
                     }
                     .dev-page-structure-preview .photo-panorama-slice .photo-wrapper {
-                        overflow: hidden;
+                        overflow: visible;
                     }
-                    .dev-page-structure-preview .photo-panorama-slice .photo-wrapper > .pswp-link,
-                    .dev-page-structure-preview .photo-panorama-slice .tags-overlay {
+                    .dev-page-structure-preview .photo-panorama-slice .photo-wrapper > .pswp-link {
                         width: var(--panorama-slice-width);
                         max-width: none;
                         transform: translateX(var(--panorama-slice-offset));
-                    }
-                    .dev-page-structure-preview .photo-panorama-slice .tags-overlay {
-                        right: auto;
+                        clip-path: inset(0 var(--panorama-slice-clip-end) 0 var(--panorama-slice-clip-start));
                     }
                     @media (min-width: 768px) and (hover: hover) {
                         .dev-page-structure-preview.photo-panorama-section[data-view="panorama"]:hover .tags-overlay {
@@ -2709,7 +2706,23 @@
                             slice.dataset.panoramaGeneratedSlice = 'true';
                             slice.style.setProperty('--panorama-slice-width', `${panoramaSliceCount * 100}%`);
                             slice.style.setProperty('--panorama-slice-offset', `${(-index * 100) / panoramaSliceCount}%`);
+                            slice.style.setProperty('--panorama-slice-clip-start', `${(index * 100) / panoramaSliceCount}%`);
+                            slice.style.setProperty('--panorama-slice-clip-end', `${((panoramaSliceCount - index - 1) * 100) / panoramaSliceCount}%`);
                             slice.querySelectorAll<HTMLElement>('[data-item-key]').forEach((node) => node.removeAttribute('data-item-key'));
+                            slice.querySelectorAll<HTMLElement>('.tag-marker').forEach((marker) => {
+                                const tagName = marker.querySelector<HTMLElement>('.tag-name');
+                                const x = Number.parseFloat(tagName?.dataset.x || marker.style.left || '0');
+                                const owner = Math.min(
+                                    panoramaSliceCount - 1,
+                                    Math.max(0, Math.floor((x / 100) * panoramaSliceCount)),
+                                );
+                                if (owner !== index) {
+                                    marker.remove();
+                                    return;
+                                }
+                                marker.style.left = `${Math.min(100, Math.max(0, x * panoramaSliceCount - index * 100))}%`;
+                            });
+                            slice.querySelector<HTMLElement>('.tags-overlay:empty')?.remove();
                             slice.querySelector('[data-photo-lightbox-link]')?.removeAttribute('data-photo-lightbox-link');
                             slice.querySelector(':scope > .photo-caption--photo')?.remove();
                             track.appendChild(slice);

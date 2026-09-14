@@ -219,7 +219,10 @@ test('PhotoCarousel can enable full-width carousel and joined proportional views
     assert.match(panorama, /sourceSlide\.cloneNode\(true\)/);
     assert.match(panorama, /slides = sliceSlides/);
     assert.match(panorama, /--panorama-slice-offset/);
-    assert.match(panorama, /\.photo-panorama-slice \.photo-wrapper\)\s*\{\s*overflow: hidden/);
+    assert.match(panorama, /--panorama-slice-clip-start/);
+    assert.match(panorama, /\.photo-panorama-slice \.photo-wrapper\)\s*\{\s*overflow: visible/);
+    assert.match(panorama, /clip-path: inset/);
+    assert.match(panorama, /const owner = Math\.min[\s\S]*?if \(owner !== index\)[\s\S]*?marker\.style\.left/);
     assert.match(panorama, /data-single-photo-sliced[^}]*photo-panorama-single-source\)\s*\{\s*display: none/);
     assert.match(panorama, /\.photo-panorama-controls\s*\{\s*position: relative;\s*z-index: 3/);
     assert.match(getStructure, /Row\|PhotoCarousel\|Text/);
