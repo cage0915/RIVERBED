@@ -74,7 +74,7 @@ if (!albumRecord) {
 
 const folderAlbums = (await getAlbumSummaries())
     .filter((candidate) => candidate.folder === folder)
-    .sort((left, right) => left.order - right.order || left.slug.localeCompare(right.slug));
+    .sort((left, right) => right.order - left.order || left.slug.localeCompare(right.slug));
 const albumIndex = folderAlbums.findIndex((candidate) => candidate.slug === albumEntry.slug);
 const previousAlbum = albumIndex > 0 ? folderAlbums[albumIndex - 1] : undefined;
 const nextAlbum = albumIndex >= 0 && albumIndex < folderAlbums.length - 1

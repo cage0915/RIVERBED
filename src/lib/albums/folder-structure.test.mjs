@@ -38,15 +38,6 @@ test("folder structure sorts manifests by order and returns full resolved cover 
         "k/other": { ...source, title: "Other" },
     }, "yama"), [
         {
-            id: "consumer",
-            slug: "yama/consumer",
-            title: "Consumer",
-            info: undefined,
-            coverKey: "yama/source/shared.jpg",
-            coverZoom: 1.3,
-            coverOffset: { x: 40, y: 70 },
-        },
-        {
             id: "source",
             slug: "yama/source",
             title: "Source",
@@ -54,6 +45,15 @@ test("folder structure sorts manifests by order and returns full resolved cover 
             coverKey: "yama/source/cover.jpg",
             coverZoom: 1.1,
             coverOffset: { x: 45, y: 55 },
+        },
+        {
+            id: "consumer",
+            slug: "yama/consumer",
+            title: "Consumer",
+            info: undefined,
+            coverKey: "yama/source/shared.jpg",
+            coverZoom: 1.3,
+            coverOffset: { x: 40, y: 70 },
         },
     ]);
 });

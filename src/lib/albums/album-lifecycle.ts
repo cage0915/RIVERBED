@@ -834,6 +834,8 @@ export function nextAlbumOrder(manifests: Record<string, AlbumManifest>, folder:
     const orders = Object.entries(manifests)
         .filter(([slug]) => slug.startsWith(`${folder}/`))
         .map(([, manifest]) => manifest.order);
+    // Album lists sort in descending order, so a newly published Album only
+    // needs one value after the current maximum. Existing manifests stay put.
     return orders.length === 0 ? 10 : Math.max(...orders) + 10;
 }
 

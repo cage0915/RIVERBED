@@ -100,10 +100,10 @@ test("production Album and Tag rendering read manifests through the catalog", ()
     assert.equal(fs.existsSync(path.join(sourceRoot, "utils/tags.ts")), false);
 });
 
-test("production repository pairs 67 minimal MDX sources with valid manifests", () => {
+test("production repository pairs 68 minimal MDX sources with valid manifests", () => {
     assert.deepEqual(validateAlbumRepository(projectRoot), {
-        albumCount: 67,
-        validCount: 67,
+        albumCount: 68,
+        validCount: 68,
         diagnostics: [],
     });
     const externalCover = JSON.parse(fs.readFileSync(

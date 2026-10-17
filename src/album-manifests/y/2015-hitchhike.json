@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "title": "Hitchhike",
   "info": "2015",
-  "order": 240,
+  "order": 20,
   "cover": {
     "photo": {
       "kind": "local",

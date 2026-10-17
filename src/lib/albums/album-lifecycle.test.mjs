@@ -21,6 +21,7 @@ import {
     executeAlbumPhotoRename,
     findAlbumDeletionConsumers,
     findExternalCoverConsumers,
+    nextAlbumOrder,
     replaceSourceFilesAtomically,
     withR2SourceAlbumLocks,
 } from './album-lifecycle.ts';
@@ -469,6 +470,15 @@ test('import commits slug-paired MDX and manifest together', async () => {
     assert.equal(JSON.parse(await readFile(path.join(root, 'src/album-manifests/yama/new-album.json'), 'utf8')).order, 20);
 });
 
+test('new Album order advances past the current maximum without renumbering existing Albums', () => {
+    assert.equal(nextAlbumOrder({}, 'yama'), 10);
+    assert.equal(nextAlbumOrder({
+        'yama/first': album({ order: 10 }),
+        'yama/second': album({ order: 40 }),
+        'k/other': album({ order: -100 }),
+    }, 'yama'), 50);
+});
+
 test('imported Album metadata round-trips through Page Manager without returning to MDX', async () => {
     const root = await mkdtemp(path.join(tmpdir(), 'riverbed-page-manager-boundary-'));
     await mkdir(path.join(root, 'src/album-manifests'), { recursive: true });
@@ -545,7 +555,7 @@ test('invalid import proposal creates neither source file', async () => {
     await assert.rejects(access(path.join(root, 'src/album-manifests/yama/new-album.json')), /ENOENT/);
 });
 
-test('concurrent imports serialize by folder and receive distinct next order values', async () => {
+test('concurrent imports serialize by folder and receive distinct increasing order values', async () => {
     const root = await mkdtemp(path.join(tmpdir(), 'riverbed-concurrent-import-'));
     await mkdir(path.join(root, 'src/album-manifests'), { recursive: true });
     const first = createAlbumImport({

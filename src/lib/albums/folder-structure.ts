@@ -17,7 +17,7 @@ export function createFolderStructure(
     return Object.entries(manifests)
         .filter(([slug]) => slug.startsWith(`${folder}/`))
         .sort(([leftSlug, left], [rightSlug, right]) =>
-            left.order - right.order || leftSlug.localeCompare(rightSlug)
+            right.order - left.order || leftSlug.localeCompare(rightSlug)
         )
         .map(([slug, manifest]) => ({
             id: slug.slice(folder.length + 1),

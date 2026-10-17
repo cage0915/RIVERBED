@@ -33,7 +33,7 @@ type IndexedAlbum = {
 };
 
 function compareAlbums(left: NormalizedAlbum, right: NormalizedAlbum): number {
-    return left.order - right.order || compareText(left.slug, right.slug);
+    return right.order - left.order || compareText(left.slug, right.slug);
 }
 
 function compareText(left: string, right: string): number {

@@ -52,13 +52,13 @@ test("normalizes local photos and sorts Albums by order then slug", () => {
     ]);
 
     assert.deepEqual(catalog.getAlbums().map((album) => album.slug), [
+        "yama/first",
         "k/elsewhere",
         "yama/second",
-        "yama/first",
     ]);
     assert.deepEqual(catalog.getAlbumsInFolder("yama").map((album) => album.slug), [
-        "yama/second",
         "yama/first",
+        "yama/second",
     ]);
     assert.equal(catalog.getAlbum("missing/album"), null);
     assert.deepEqual(catalog.getAlbum("yama/first").photos[0], {
@@ -101,24 +101,24 @@ test("projects tags only from MDX content in stable Album and content order", ()
 
     const tagged = catalog.getTaggedPhotos("白馬岳");
     assert.deepEqual(tagged.map((photo) => photo.assetKey), [
-        "yama/first/A.jpg",
         "yama/second/B.jpg",
+        "yama/first/A.jpg",
     ]);
     assert.deepEqual(tagged.map((photo) => photo.sourceAlbumSlug), [
-        "yama/first",
         "yama/second",
+        "yama/first",
     ]);
     assert.notEqual(tagged[0].sourceAlbumSlug, tagged[1].sourceAlbumSlug);
     assert.deepEqual(tagged.map((photo) => photo.caption), [
-        "First photo caption",
         "Second photo caption",
+        "First photo caption",
     ]);
     assert.deepEqual(tagged.map(({ sourceAlbumTitle, filename }) => ({
         sourceAlbumTitle,
         filename,
     })), [
-        { sourceAlbumTitle: "First", filename: "A.jpg" },
         { sourceAlbumTitle: "Second", filename: "B.jpg" },
+        { sourceAlbumTitle: "First", filename: "A.jpg" },
     ]);
     assert.ok(!tagged.some((photo) => photo.sourceAlbumSlug === "k/borrower"));
     assert.ok(tagged.every((photo) => photo.isContent === true));

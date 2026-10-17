@@ -471,9 +471,16 @@ export async function reorderFolderAlbums(
             throw new Error("Album order must contain the complete folder Album list");
         }
         const originals = Object.fromEntries(order.map((slug) => [slug, allManifests[slug]]));
+        const currentOrder = [...existing].sort((leftSlug, rightSlug) =>
+            allManifests[rightSlug].order - allManifests[leftSlug].order ||
+            leftSlug.localeCompare(rightSlug)
+        );
+        if (currentOrder.every((slug, index) => slug === order[index])) {
+            return order.map((slug) => ({ slug, manifest: originals[slug] }));
+        }
         const updated = Object.fromEntries(order.map((slug, index) => [
             slug,
-            parseAlbumManifest({ ...originals[slug], order: (index + 1) * 10 }, slug),
+            parseAlbumManifest({ ...originals[slug], order: (order.length - index) * 10 }, slug),
         ]));
         await replaceAlbumManifestFiles(projectRoot, updated, originals);
         return order.map((slug) => ({ slug, manifest: updated[slug] }));

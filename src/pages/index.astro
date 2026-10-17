@@ -18,7 +18,7 @@ const latestAlbum = [...allAlbums].sort((a, b) => {
         (a.publishedAt ? Date.parse(a.publishedAt) : 0);
     if (dateDifference !== 0) return dateDifference;
 
-    const orderDifference = a.order - b.order;
+    const orderDifference = b.order - a.order;
     return orderDifference || a.slug.localeCompare(b.slug);
 })[0];
 

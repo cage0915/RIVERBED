@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "title": "Casas de Haro",
   "info": "2026.4",
-  "order": 30,
+  "order": 10,
   "cover": {
     "photo": {
       "kind": "local",

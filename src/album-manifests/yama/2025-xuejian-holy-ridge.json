@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "title": "雪見望聖稜線",
   "info": "2025.1, 2025.2",
-  "order": 200,
+  "order": 80,
   "cover": {
     "photo": {
       "kind": "local",

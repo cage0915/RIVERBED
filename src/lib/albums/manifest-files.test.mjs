@@ -418,19 +418,19 @@ test("reorderFolderAlbums requires the complete unique folder list and assigns 1
     const project = await folderProject();
 
     const updated = await reorderFolderAlbums(project.root, "yama", [
-        "yama/third",
-        "yama/sample-album",
         "yama/second",
+        "yama/sample-album",
+        "yama/third",
     ]);
 
     assert.deepEqual(updated.map(({ slug, manifest }) => [slug, manifest.order]), [
-        ["yama/third", 10],
-        ["yama/sample-album", 20],
         ["yama/second", 30],
+        ["yama/sample-album", 20],
+        ["yama/third", 10],
     ]);
-    assert.equal((await readAlbumManifestFile(project.root, "yama/third")).order, 10);
-    assert.equal((await readAlbumManifestFile(project.root, albumSlug)).order, 20);
     assert.equal((await readAlbumManifestFile(project.root, "yama/second")).order, 30);
+    assert.equal((await readAlbumManifestFile(project.root, albumSlug)).order, 20);
+    assert.equal((await readAlbumManifestFile(project.root, "yama/third")).order, 10);
 
     for (const order of [
         ["yama/sample-album", "yama/second"],
@@ -440,6 +440,29 @@ test("reorderFolderAlbums requires the complete unique folder list and assigns 1
     ]) {
         await assert.rejects(reorderFolderAlbums(project.root, "yama", order), /complete|duplicate|folder|unknown/i);
     }
+});
+
+test("reorderFolderAlbums leaves manifest files untouched when the requested order is already displayed", async () => {
+    const project = await folderProject();
+    const files = [
+        path.join(path.dirname(project.file), "second.json"),
+        project.file,
+        path.join(path.dirname(project.file), "third.json"),
+    ];
+    const before = await Promise.all(files.map((file) => readFile(file, "utf8")));
+
+    const albums = await reorderFolderAlbums(project.root, "yama", [
+        "yama/third",
+        "yama/sample-album",
+        "yama/second",
+    ]);
+
+    assert.deepEqual(albums.map(({ slug, manifest }) => [slug, manifest.order]), [
+        ["yama/third", 90],
+        ["yama/sample-album", 40],
+        ["yama/second", 10],
+    ]);
+    assert.deepEqual(await Promise.all(files.map((file) => readFile(file, "utf8"))), before);
 });
 
 test("reorderFolderAlbums validates every proposal before replacing any manifest", async () => {
@@ -487,7 +510,7 @@ test("folder reorder serializes with overlapping single-manifest mutations", asy
 
     const updated = await readAlbumManifestFile(project.root, albumSlug);
     assert.equal(updated.info, "Concurrent info");
-    assert.equal(updated.order, 30);
+    assert.equal(updated.order, 10);
 });
 
 test("multi-manifest replacement rolls back an earlier replacement when a later rename fails", async () => {
