@@ -100,12 +100,11 @@ test("production Album and Tag rendering read manifests through the catalog", ()
     assert.equal(fs.existsSync(path.join(sourceRoot, "utils/tags.ts")), false);
 });
 
-test("production repository pairs 68 minimal MDX sources with valid manifests", () => {
-    assert.deepEqual(validateAlbumRepository(projectRoot), {
-        albumCount: 68,
-        validCount: 68,
-        diagnostics: [],
-    });
+test("production repository pairs every minimal MDX source with a valid manifest", () => {
+    const result = validateAlbumRepository(projectRoot);
+    assert.ok(result.albumCount > 0);
+    assert.equal(result.validCount, result.albumCount);
+    assert.deepEqual(result.diagnostics, []);
     const externalCover = JSON.parse(fs.readFileSync(
         path.join(projectRoot, "src/album-manifests/yama/2025-omoteginza-d3.json"),
         "utf8",

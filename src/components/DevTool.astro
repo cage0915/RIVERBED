@@ -29,6 +29,12 @@
     } from "../lib/rem-spacing";
     import { applyDefaultCaptionBoundaryMargin } from "../lib/page-structure";
     import { parseRichText } from "../lib/rich-text";
+    import {
+        sortPhotoImportFiles,
+        type PhotoImportSortDirection,
+        type PhotoImportSortKey,
+    } from "../lib/photo-import-sort";
+    import { selectPhotoImportIndex } from "../lib/photo-import-selection";
     import { R2_DOMAIN } from "../lib/constants";
 
     // Only run in development
@@ -166,6 +172,25 @@
                         gap: 0.6rem;
                         margin-top: 1rem;
                     }
+                    .dev-import-sort-button {
+                        padding: 0.3rem 0.55rem;
+                        border: 1px solid #cbd5e1;
+                        border-radius: 5px;
+                        background: #fff;
+                        color: #475569;
+                        font: inherit;
+                        cursor: pointer;
+                    }
+                    .dev-import-sort-button:hover {
+                        border-color: #94a3b8;
+                        background: #f8fafc;
+                        color: #0f172a;
+                    }
+                    .dev-import-sort-button.is-active {
+                        border-color: #2563eb;
+                        background: #eff6ff;
+                        color: #1d4ed8;
+                    }
                     .dev-import-photo {
                         position: relative;
                         padding: 0;
@@ -173,7 +198,7 @@
                         border: 2px solid transparent;
                         border-radius: 7px;
                         background: #e2e8f0;
-                        cursor: default;
+                        cursor: pointer;
                         aspect-ratio: 4 / 3;
                     }
                     .dev-import-photo img {
@@ -3967,11 +3992,15 @@
                                 Browse / add another photo folder
                                 <input data-import-field="files" type="file" accept="image/jpeg,image/png,image/webp,image/avif" multiple webkitdirectory style="display:none;" />
                             </label>
-                            <div style="display:flex;justify-content:space-between;margin-top:.65rem;color:#64748b;font-size:.75rem;">
-                                <span>Z: toggle selection · Arrow keys: navigate</span>
+                            <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.5rem;margin-top:.65rem;color:#64748b;font-size:.75rem;">
+                                <span>Click: select · Ctrl/⌘: toggle · Shift: range · Z: toggle</span>
+                                <div style="display:flex;align-items:center;gap:.4rem;">
+                                    <button data-import-sort-name class="dev-import-sort-button" type="button"></button>
+                                    <button data-import-sort-time class="dev-import-sort-button" type="button"></button>
+                                </div>
                                 <span data-import-count>0 selected · 0 photos</span>
                             </div>
-                            <div class="dev-import-grid" data-import-grid></div>
+                            <div class="dev-import-grid" data-import-grid role="listbox" aria-label="Photos" aria-multiselectable="true"></div>
                             <section data-import-staged-section style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid #e2e8f0;" hidden>
                                 <div style="display:flex;align-items:center;justify-content:space-between;color:#475569;font-size:.78rem;font-weight:600;">
                                     <span>Staged photos</span><span data-import-staged-count></span>
@@ -3995,6 +4024,8 @@
                 const stagedGrid = dialog.querySelector('[data-import-staged-grid]') as HTMLElement;
                 const stagedCount = dialog.querySelector('[data-import-staged-count]') as HTMLElement;
                 const count = dialog.querySelector('[data-import-count]') as HTMLElement;
+                const sortNameBtn = dialog.querySelector('[data-import-sort-name]') as HTMLButtonElement;
+                const sortTimeBtn = dialog.querySelector('[data-import-sort-time]') as HTMLButtonElement;
                 const stageBtn = dialog.querySelector('[data-import-action="stage"]') as HTMLButtonElement;
                 const preview = dialog.querySelector('[data-import-preview]') as HTMLElement;
                 const previewImage = dialog.querySelector('[data-import-preview-image]') as HTMLImageElement;
@@ -4003,9 +4034,12 @@
                 let files: File[] = [];
                 const stagedFiles: File[] = [...(options.stagedFiles || [])];
                 let currentIndex = 0;
+                let selectionAnchorIndex: number | null = null;
                 const selected = new Set<number>();
                 const objectUrls: string[] = [];
                 const stagedObjectUrls: string[] = [];
+                let sortKey: PhotoImportSortKey = 'name';
+                let sortDirection: PhotoImportSortDirection = 'asc';
 
                 const selectedFiles = () => [
                     ...stagedFiles,
@@ -4036,6 +4070,7 @@
                     grid.querySelectorAll('.dev-import-photo').forEach((element, index) => {
                         element.classList.toggle('is-current', index === currentIndex);
                         element.classList.toggle('is-selected', selected.has(index));
+                        element.setAttribute('aria-selected', String(selected.has(index)));
                         const checkbox = element.querySelector<HTMLInputElement>('.dev-import-photo-checkbox');
                         if (checkbox) checkbox.checked = selected.has(index);
                     });
@@ -4062,6 +4097,25 @@
                         stagedGrid.appendChild(card);
                     });
                 };
+                const applyPointerSelection = (
+                    event: MouseEvent,
+                    index: number,
+                    fromCheckbox = false,
+                ) => {
+                    currentIndex = index;
+                    const nextSelection = selectPhotoImportIndex({
+                        selected,
+                        index,
+                        anchorIndex: selectionAnchorIndex,
+                        itemCount: files.length,
+                        additive: event.ctrlKey || event.metaKey || (fromCheckbox && !event.shiftKey),
+                        range: event.shiftKey,
+                    });
+                    selected.clear();
+                    nextSelection.selected.forEach((selectedIndex) => selected.add(selectedIndex));
+                    selectionAnchorIndex = nextSelection.anchorIndex;
+                    updateState();
+                };
                 const renderFiles = () => {
                     objectUrls.splice(0).forEach(URL.revokeObjectURL);
                     grid.innerHTML = '';
@@ -4070,21 +4124,16 @@
                         objectUrls.push(url);
                         const card = document.createElement('div');
                         card.className = 'dev-import-photo';
+                        card.setAttribute('role', 'option');
                         card.tabIndex = 0;
                         card.innerHTML = `<img src="${url}" alt="" loading="lazy" /><input class="dev-import-photo-checkbox" type="checkbox" aria-label="Select photo" /><span></span>`;
                         (card.querySelector('span') as HTMLElement).textContent = file.name;
                         const checkbox = card.querySelector('.dev-import-photo-checkbox') as HTMLInputElement;
-                        const toggle = (next: boolean) => {
-                            currentIndex = index;
-                            if (next) selected.add(index);
-                            else selected.delete(index);
-                            updateState();
-                        };
                         card.addEventListener('click', (event) => {
                             if (event.target === checkbox) return;
-                            currentIndex = index;
+                            event.preventDefault();
+                            applyPointerSelection(event, index);
                             card.focus({ preventScroll: true });
-                            updateState();
                         });
                         card.addEventListener('dblclick', (event) => {
                             if (event.target === checkbox) return;
@@ -4093,18 +4142,69 @@
                             updateState();
                             preview.focus({ preventScroll: true });
                         });
-                        checkbox.addEventListener('change', () => toggle(checkbox.checked));
+                        checkbox.addEventListener('click', (event) => {
+                            event.stopPropagation();
+                            applyPointerSelection(event, index, true);
+                            card.focus({ preventScroll: true });
+                        });
                         grid.appendChild(card);
                     });
                     updateState();
                 };
+                const updateSortButtons = () => {
+                    const arrow = sortDirection === 'asc' ? '↑' : '↓';
+                    sortNameBtn.textContent = `Filename${sortKey === 'name' ? ` ${arrow}` : ''}`;
+                    sortTimeBtn.textContent = `Time${sortKey === 'time' ? ` ${arrow}` : ''}`;
+                    for (const [button, key, label] of [
+                        [sortNameBtn, 'name', 'filename'],
+                        [sortTimeBtn, 'time', 'modified time'],
+                    ] as const) {
+                        const active = sortKey === key;
+                        button.classList.toggle('is-active', active);
+                        button.setAttribute('aria-pressed', String(active));
+                        button.title = active
+                            ? `Switch ${label} to ${sortDirection === 'asc' ? 'descending' : 'ascending'} order`
+                            : `Sort by ${label} in ascending order`;
+                    }
+                };
+                const applyFileSort = () => {
+                    const selectedFilesBeforeSort = new Set(
+                        [...selected].map((index) => files[index]).filter(Boolean),
+                    );
+                    const currentFile = files[currentIndex];
+                    const selectionAnchorFile = selectionAnchorIndex === null
+                        ? undefined
+                        : files[selectionAnchorIndex];
+                    files = sortPhotoImportFiles(files, sortKey, sortDirection);
+                    selected.clear();
+                    files.forEach((file, index) => {
+                        if (selectedFilesBeforeSort.has(file)) selected.add(index);
+                    });
+                    currentIndex = currentFile ? Math.max(0, files.indexOf(currentFile)) : 0;
+                    selectionAnchorIndex = selectionAnchorFile
+                        ? Math.max(0, files.indexOf(selectionAnchorFile))
+                        : null;
+                    updateSortButtons();
+                    renderFiles();
+                };
+                const selectSortKey = (nextKey: PhotoImportSortKey) => {
+                    if (sortKey === nextKey) sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+                    else {
+                        sortKey = nextKey;
+                        sortDirection = 'asc';
+                    }
+                    applyFileSort();
+                };
+                sortNameBtn.addEventListener('click', () => selectSortKey('name'));
+                sortTimeBtn.addEventListener('click', () => selectSortKey('time'));
                 fileInput.addEventListener('change', () => {
                     const added = Array.from(fileInput.files || []).filter((file) => /\.(jpe?g|png|webp|avif)$/i.test(file.name));
                     if (added.length === 0) return;
                     stagedFiles.push(...[...selected].sort((a, b) => a - b).map((index) => files[index]));
-                    files = added;
+                    files = sortPhotoImportFiles(added, sortKey, sortDirection);
                     selected.clear();
                     currentIndex = 0;
+                    selectionAnchorIndex = null;
                     fileInput.value = '';
                     renderStaged();
                     renderFiles();
@@ -4135,6 +4235,7 @@
                     else if (event.key.toLowerCase() === 'z') {
                         if (selected.has(currentIndex)) selected.delete(currentIndex);
                         else selected.add(currentIndex);
+                        selectionAnchorIndex = currentIndex;
                     }
                     else return;
                     event.preventDefault();
@@ -4146,6 +4247,7 @@
                 };
                 dialog.addEventListener('keydown', keyHandler);
                 previewCheckbox.addEventListener('change', () => {
+                    selectionAnchorIndex = currentIndex;
                     if (previewCheckbox.checked) selected.add(currentIndex);
                     else selected.delete(currentIndex);
                     updateState();
@@ -4173,6 +4275,7 @@
                 });
                 dialog.addEventListener('close', cleanup, { once: true });
                 renderStaged();
+                updateSortButtons();
                 updateState();
                 dialog.showModal();
             }

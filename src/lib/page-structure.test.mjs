@@ -320,6 +320,32 @@ test('Page Manager photo thumbnails fall back from missing local assets to R2', 
     assert.match(devTool, /addEventListener\('error', useFallback, \{ once: true \}\)/);
 });
 
+test('Add Page and Add Photos can sort candidates by filename or time in either direction', () => {
+    const devTool = readProjectFile('src/components/DevTool.astro');
+
+    assert.match(devTool, /data-import-sort-name/);
+    assert.match(devTool, /data-import-sort-time/);
+    assert.match(devTool, /sortNameBtn\.addEventListener\('click', \(\) => selectSortKey\('name'\)\)/);
+    assert.match(devTool, /sortTimeBtn\.addEventListener\('click', \(\) => selectSortKey\('time'\)\)/);
+    assert.match(devTool, /if \(sortKey === nextKey\) sortDirection = sortDirection === 'asc' \? 'desc' : 'asc'/);
+    assert.match(devTool, /sortDirection = 'asc'/);
+    assert.match(devTool, /files = sortPhotoImportFiles\(files, sortKey, sortDirection\)/);
+    assert.match(devTool, /selectedFilesBeforeSort[\s\S]*?selectedFilesBeforeSort\.has\(file\)/);
+    assert.match(devTool, /files = sortPhotoImportFiles\(added, sortKey, sortDirection\)/);
+});
+
+test('Add Page and Add Photos support modifier-based multi-selection', () => {
+    const devTool = readProjectFile('src/components/DevTool.astro');
+
+    assert.match(devTool, /Click: select · Ctrl\/⌘: toggle · Shift: range/);
+    assert.match(devTool, /aria-multiselectable="true"/);
+    assert.match(devTool, /selectPhotoImportIndex\(\{/);
+    assert.match(devTool, /additive: event\.ctrlKey \|\| event\.metaKey \|\| \(fromCheckbox && !event\.shiftKey\)/);
+    assert.match(devTool, /range: event\.shiftKey/);
+    assert.match(devTool, /checkbox\.addEventListener\('click',[\s\S]*?applyPointerSelection\(event, index, true\)/);
+    assert.match(devTool, /selectionAnchorFile[\s\S]*?files\.indexOf\(selectionAnchorFile\)/);
+});
+
 test('Album R2 trash actions preserve the dry-run ETag', () => {
     const devTool = readProjectFile('src/components/DevTool.astro');
 
