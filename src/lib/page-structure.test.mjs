@@ -451,7 +451,7 @@ test('development block controls reveal on hover and place edit controls beside 
     assert.match(devTool, /const matchesFile = caption === fileCaption && captionPosition === fileCaptionPosition/);
     assert.match(devTool, /if \(matchesFile\) \{\s*pendingCaptionChanges\.delete\(captionChangeKey\)/);
     assert.match(devTool, /saveBtn\.innerHTML = ICONS\.pencil/);
-    assert.match(devTool, /if \(hasPendingBlockChanges\(\)\) \{\s*void savePendingBlockChangesOnly\(\);/);
+    assert.match(devTool, /if \(hasPendingChanges\(\)\) \{\s*void savePendingChanges\(\);/);
     assert.match(devTool, /setBlockEditMode\(true\)/);
     assert.match(devTool, /sessionStorage\.setItem\('dev-caption-save-scroll-y'/);
 });
@@ -459,9 +459,11 @@ test('development block controls reveal on hover and place edit controls beside 
 test('tag editing is a global toggle and inline page editors are mutually exclusive', () => {
     const devTool = readProjectFile('src/components/DevTool.astro');
 
-    assert.match(devTool, /tagToggle\.id = 'dev-tag-toggle'/);
-    assert.match(devTool, /scrollContainer\.appendChild\(tagToggle\)/);
-    assert.match(devTool, /setGlobalTagMode\(true\)/);
+    assert.match(devTool, /tagButton\.id = 'dev-tag-toggle'/);
+    assert.match(devTool, /actions\.append\(\s*tagButton,\s*managerButton,/);
+    assert.match(devTool, /const toggleInlineTagMode = \(\) => \{[\s\S]*?setGlobalTagMode\(!activeTagMode\);/);
+    assert.doesNotMatch(devTool, /const savePendingTagChangesOnly = async/);
+    assert.match(devTool, /if \(\(event\.target as HTMLElement\)\.closest\('\.dev-tag-edit-btn, \.tag-link'\)\) return;/);
     assert.match(devTool, /function closeOtherPageEditors\(except\?: HTMLElement\)/);
     assert.match(devTool, /document\.querySelector\('\.dev-page-inline-add-menu'\)\?\.remove\(\)/);
     assert.match(devTool, /document\.querySelectorAll<HTMLElement>\('\.dev-inline-caption-editor'\)/);
@@ -473,19 +475,21 @@ test('tag editing is a global toggle and inline page editors are mutually exclus
     assert.match(devTool, /const openInlineMarginEditor = \(\) => \{\s*if \(!canStartEditMode\('blocks'\)\) return;\s*closeOtherPageEditors/);
 });
 
-test('album utility controls place order editing and R2 sync outside Page Manager', () => {
+test('album utility controls expose one Edit blocks entry point and R2 sync outside Page Manager', () => {
     const devTool = readProjectFile('src/components/DevTool.astro');
 
     assert.doesNotMatch(devTool, /dev-pm-r2-sync|dev-pm-expand-all|ICONS\.expandAll|ICONS\.collapseAll/);
     assert.match(devTool, /gearBtn\.id = primaryButtonId/);
-    assert.match(devTool, /gearBtn\.innerHTML = isAlbumPage \? ICONS\.order : ICONS\.gear/);
-    assert.match(devTool, /gearBtn\.title = 'Edit order'/);
+    assert.match(devTool, /const primaryButtonId = isAlbumPage \? 'dev-save-btn' : 'dev-gear-btn';/);
+    assert.match(devTool, /gearBtn\.innerHTML = isAlbumPage \? ICONS\.pencil : ICONS\.gear/);
+    assert.match(devTool, /gearBtn\.title = 'Edit blocks'/);
+    assert.match(devTool, /setLayoutEditMode\(true\)/);
     assert.match(devTool, /syncBtn\.id = 'dev-album-sync-btn'/);
     assert.match(devTool, /syncBtn\.title = 'Sync with R2'/);
     assert.match(devTool, /void openAlbumSyncDialog\(albumSlug\)/);
     assert.match(
         devTool,
-        /const controls = \[\s*document\.getElementById\('dev-order-btn'\),\s*document\.getElementById\('dev-save-btn'\),\s*document\.getElementById\('dev-tag-toggle'\),\s*document\.getElementById\('dev-album-sync-btn'\)/,
+        /const controls = \[\s*document\.getElementById\('dev-save-btn'\),\s*document\.getElementById\('dev-album-sync-btn'\)/,
     );
 });
 
@@ -687,7 +691,7 @@ test('Page Manager leaves block creation and destructive actions to inline contr
     assert.match(devTool, /data-page-gap-index="\$\{bIdx \+ 1\}" title="Move here"/);
 });
 
-test('pending order, block, and tag controls use independent yellow save states', () => {
+test('pending layout and tag controls share the Edit blocks save state', () => {
     const devTool = readProjectFile('src/components/DevTool.astro');
 
     assert.match(
@@ -696,17 +700,17 @@ test('pending order, block, and tag controls use independent yellow save states'
     );
     assert.match(
         devTool,
-        /\.dev-save-btn\.has-pending,\s*\.dev-tag-toggle\.has-pending,\s*\.dev-order-btn\.has-pending\s*\{[\s\S]*?background: rgba\(234, 179, 8, 0\.9\)/,
+        /\.dev-save-btn\.has-pending,\s*\.dev-tag-toggle\.has-pending\s*\{[\s\S]*?background: rgba\(234, 179, 8, 0\.9\)/,
     );
     assert.match(devTool, /captionButton\?\.classList\.toggle\('has-pending', !matchesFile\)/);
     assert.match(devTool, /textButton\?\.classList\.toggle\('has-pending', !matchesFile\)/);
     assert.match(devTool, /marginControl\.classList\.toggle\('has-pending', !matchesFile\)/);
     assert.match(devTool, /tagToggle\.classList\.toggle\('has-pending', hasPendingTags\)/);
-    assert.match(devTool, /saveBtn\.classList\.toggle\('has-pending', hasPendingBlocks\)/);
-    assert.match(devTool, /const savePendingTagChangesOnly = async \(\) =>/);
-    assert.match(devTool, /const savePendingBlockChangesOnly = async \(\) =>/);
-    assert.match(devTool, /const savePendingOrderChangesOnly = async \(\) =>/);
-    assert.match(devTool, /const updateOrderButtonState = \(\) =>/);
+    assert.match(devTool, /saveBtn\.classList\.toggle\('has-pending', hasPendingEdits\)/);
+    assert.match(devTool, /const savePendingChanges = async \(\) =>/);
+    assert.doesNotMatch(devTool, /const savePendingTagChangesOnly = async/);
+    assert.doesNotMatch(devTool, /const savePendingBlockChangesOnly = async/);
+    assert.match(devTool, /let pendingLayoutChange: PendingPageStructureChange \| null = null;/);
     assert.match(devTool, /const block = toolbar\.closest<HTMLElement>\('\[data-dev-block\]'\)/);
 });
 
@@ -715,7 +719,7 @@ test('pending inline edits warn before full loads and Astro page transitions', (
 
     assert.match(
         devTool,
-        /const hasPendingBlockChanges = \(\) => \([\s\S]*?pendingCaptionChanges\.size > 0[\s\S]*?pendingTextChanges\.size > 0[\s\S]*?pendingBlockMarginChanges\.size > 0[\s\S]*?pendingBlockTypeChanges\.size > 0[\s\S]*?const hasPendingOrderChanges = \(\) => pendingOrderChange !== null;[\s\S]*?const hasPendingChanges = \(\) => hasPendingTagChanges\(\) \|\| hasPendingBlockChanges\(\) \|\| hasPendingOrderChanges\(\);/,
+        /const hasPendingBlockChanges = \(\) => \([\s\S]*?pendingCaptionChanges\.size > 0[\s\S]*?pendingTextChanges\.size > 0[\s\S]*?pendingBlockMarginChanges\.size > 0[\s\S]*?pendingBlockTypeChanges\.size > 0[\s\S]*?pendingLayoutChange !== null[\s\S]*?const hasPendingChanges = \(\) => hasPendingTagChanges\(\) \|\| hasPendingBlockChanges\(\);/,
     );
     assert.match(devTool, /window\.addEventListener\('beforeunload', handlePendingBeforeUnload\)/);
     assert.match(devTool, /event\.preventDefault\(\);\s*\(event as any\)\.returnValue = ''/);
@@ -728,36 +732,32 @@ test('pending inline edits warn before full loads and Astro page transitions', (
     assert.match(devTool, /const blocksSaved = tagsSaved && await savePendingPageChanges\(albumSlug\);\s*pendingSaveInProgress = false/);
 });
 
-test('Page Manager stages order changes independently from block changes', () => {
+test('Page Manager and inline block controls share one pending layout draft', () => {
     const devTool = readProjectFile('src/components/DevTool.astro');
 
     assert.match(devTool, /type PendingPageStructureChange = \{[\s\S]*?draft: PageStructureDraft;[\s\S]*?imports: File\[\]/);
-    assert.match(devTool, /pendingBlockStructureChange !== null/);
-    assert.match(devTool, /pendingOrderChange = \{\s*albumSlug,\s*draft: JSON\.parse\(JSON\.stringify\(draft\)\),\s*imports: \[\.\.\.pendingPageImports\]/);
+    assert.match(devTool, /pendingLayoutChange !== null/);
+    assert.match(devTool, /pendingLayoutChange = \{\s*albumSlug,\s*draft: JSON\.parse\(JSON\.stringify\(draft\)\),\s*imports: \[\.\.\.pendingPageImports\]/);
     assert.match(devTool, /structureChange\?\.imports\.forEach\(\(file\) => form\.append\('photos', file, file\.name\)\)/);
     assert.match(devTool, /removeLocal: structureChange\?\.draft\.removeLocal \|\| \[\]/);
-    assert.match(devTool, /renderPendingPageStructure\(albumSlug, pendingOrderChange\.draft, pendingOrderChange\.imports\)/);
+    assert.match(devTool, /renderPendingPageStructure\(albumSlug, pendingLayoutChange\.draft, pendingLayoutChange\.imports\)/);
     assert.match(devTool, /type: 'Text',[\s\S]*?__devKey: `pending-\$\{crypto\.randomUUID\(\)\}`,[\s\S]*?props: \{ blockMargin: '1\.5rem' \}/);
     assert.match(devTool, /text\.style\.marginBottom = props\.blockMargin \|\| props\.mb \|\| '0\.5rem'/);
     assert.doesNotMatch(devTool, /const confirmHandler = async \(\) => \{[\s\S]{0,1500}?fetch\("\/api\/save-page-manager"/);
 });
 
-test('editing modes block cross-mode pending changes and clean up order keyboard handling', () => {
+test('layout mode keeps block controls and order controls in one editing session', () => {
     const devTool = readProjectFile('src/components/DevTool.astro');
 
-    assert.match(devTool, /type AlbumEditMode = 'order' \| 'blocks' \| 'tags';/);
-    assert.match(devTool, /const pendingEditMode = \(\): AlbumEditMode \| null =>/);
-    assert.match(devTool, /const canStartEditMode = \(target: AlbumEditMode\) =>/);
-    assert.match(devTool, /if \(!canStartEditMode\('order'\)\) return;/);
-    assert.match(devTool, /if \(!canStartEditMode\('tags'\)\) return;/);
+    assert.match(devTool, /type AlbumEditMode = 'blocks' \| 'tags';/);
+    assert.match(devTool, /const canStartEditMode = \(_target: AlbumEditMode\) => !pendingSaveInProgress;/);
     assert.match(devTool, /if \(!canStartEditMode\('blocks'\)\) return;/);
-    assert.match(devTool, /savePendingPageChanges\(albumSlug, 'order'\)/);
+    assert.match(devTool, /const setLayoutEditMode = \(enabled: boolean\) => \{[\s\S]*?setBlockEditMode\(enabled\);[\s\S]*?setOrderEditMode\(enabled\);/);
     assert.match(devTool, /const updateEditModeAvailability = \(isSaving = pendingSaveInProgress\) =>/);
-    assert.match(devTool, /const activeMode: AlbumEditMode \| null = activeOrderMode/);
-    assert.match(devTool, /control\.classList\.toggle\('dev-edit-mode-hidden', hidden\)/);
-    assert.match(devTool, /const unavailable = isSaving \|\| Boolean\(pending && pending !== mode\);/);
-    assert.match(devTool, /control\.classList\.toggle\('dev-edit-mode-unavailable', unavailable && !hidden\)/);
-    assert.match(devTool, /if \(control instanceof HTMLButtonElement\) control\.disabled = unavailable;/);
+    assert.match(devTool, /\['dev-save-btn', 'dev-tag-toggle'\]\.forEach/);
+    assert.match(devTool, /control\.classList\.remove\('dev-edit-mode-hidden'\)/);
+    assert.match(devTool, /control\.classList\.toggle\('dev-edit-mode-unavailable', isSaving\)/);
+    assert.match(devTool, /if \(control instanceof HTMLButtonElement\) control\.disabled = isSaving;/);
     assert.match(devTool, /\.dev-edit-mode-hidden\s*\{\s*display: none !important;/);
     assert.match(devTool, /\.dev-gear-btn\.dev-edit-mode-unavailable,[\s\S]*?pointer-events: none;/);
     assert.match(devTool, /document\.addEventListener\('keydown', pageManagerKeydownHandler\)/);
@@ -767,19 +767,29 @@ test('editing modes block cross-mode pending changes and clean up order keyboard
 test('inline order mode exposes manager, block moves, and cross-block photo grouping', () => {
     const devTool = readProjectFile('src/components/DevTool.astro');
 
-    assert.match(devTool, /if \(activeOrderMode\) \{\s*setOrderEditMode\(false\);/);
+    assert.match(devTool, /const orderButton = document\.getElementById\('dev-save-btn'\);/);
     assert.match(devTool, /setOrderEditMode\(true\);/);
     assert.match(devTool, /managerButton\.title = 'Open order manager'/);
-    assert.match(devTool, /managerButton\.innerHTML = ICONS\.grid/);
+    assert.match(devTool, /managerButton\.innerHTML = ICONS\.order/);
     assert.match(devTool, /\.dev-order-actions\s*\{[\s\S]*?gap: 0\.75rem;/);
     assert.match(devTool, /createPhotoActionButton\('merge', 'Merge selected photos', ICONS\.mergeArrows\)/);
     assert.match(devTool, /createPhotoActionButton\('split', 'Split selected photos', ICONS\.splitArrows\)/);
     assert.match(devTool, /const createBlocksFromInlineOrderSelection = async/);
     assert.match(devTool, /inlineOrderSelectedPhotoNames\.size < 2/);
+    assert.match(devTool, /const hasSelection = isActive && inlineOrderSelectedPhotoNames\.size > 0;/);
+    assert.match(devTool, /button\.innerHTML = hasSelection \? ICONS\.check : icon;/);
+    assert.match(devTool, /if \(inlineOrderPhotoAction === action\) \{\s*if \(inlineOrderSelectedPhotoNames\.size === 0\) \{\s*clearInlineOrderInteraction\(\);\s*return;/);
     assert.match(devTool, /action === 'merge'\s*\? \[\{ type: 'Row'/);
     assert.match(devTool, /inlineOrderMovePhotoName/);
     assert.match(devTool, /inlineOrderInteractionAbortController\?\.abort\(\)/);
     assert.match(devTool, /signal: interactionAbortController\.signal/);
+    assert.match(devTool, /const clearInlineOrderInteraction = \(\) =>/);
+    assert.match(devTool, /const updateInlineFocusedActionState = \(\) =>/);
+    assert.match(devTool, /html\.dev-inline-focused-action \.dev-page-inline-add-zone,[\s\S]*?\.dev-block-toolbar[\s\S]*?display: none !important;/);
+    assert.match(devTool, /if \(!activeTagMode && !inlineOrderPhotoAction\) \{/);
+    assert.match(devTool, /if \(activeTagMode\) return;\s*document\.querySelectorAll<HTMLElement>\('\.album-content \[data-dev-block\] \.photo-wrapper'\)/);
+    assert.match(devTool, /const startInlineBlockPhotoAction = \([\s\S]*?clearInlineOrderInteraction\(\);/);
+    assert.match(devTool, /wrapper\.addEventListener\('click', \(event\) => \{\s*if \(\(event\.target as HTMLElement\)\.closest\('\.dev-tag-edit-btn, \.tag-link'\)\) return;\s*if \(activeInlineBlockAction\) return;/);
     assert.match(devTool, /void moveInlineOrderPhoto\(photoName, false\)/);
     assert.match(devTool, /void moveInlineOrderPhoto\(photoName, true\)/);
     assert.match(devTool, /inlineOrderMoveBlockKey/);

@@ -110,8 +110,9 @@
             const pendingTextChanges = new Map<string, PendingTextChange>();
             const pendingBlockMarginChanges = new Map<string, PendingBlockMarginChange>();
             const pendingBlockTypeChanges = new Map<string, PendingBlockTypeChange>();
-            let pendingBlockStructureChange: PendingPageStructureChange | null = null;
-            let pendingOrderChange: PendingPageStructureChange | null = null;
+            // Every layout operation edits one canonical draft. Order and block
+            // controls are separate interactions, not separate save snapshots.
+            let pendingLayoutChange: PendingPageStructureChange | null = null;
             let pendingStructurePhotoNodes: Map<string, HTMLElement> | null = null;
             const pendingStructureObjectUrls = new Map<File, string>();
             let pendingSaveInProgress = false;
@@ -1350,6 +1351,10 @@
                         color: white;
                         transform: none;
                     }
+                    html.dev-inline-focused-action .dev-page-inline-add-zone,
+                    html.dev-inline-focused-action .dev-block-toolbar {
+                        display: none !important;
+                    }
                     .dev-order-photo-selected {
                         outline: 3px solid #16a34a !important;
                         outline-offset: -3px;
@@ -1394,9 +1399,7 @@
                         bottom: 0.25rem;
                     }
                     .dev-tag-toggle:hover,
-                    .dev-tag-toggle.active,
-                    .dev-order-btn:hover,
-                    .dev-order-btn.active {
+                    .dev-tag-toggle.active {
                         background: rgba(59, 130, 246, 0.8);
                         color: white;
                         transform: none;
@@ -1427,8 +1430,7 @@
                         color: white;
                     }
                     .dev-save-btn.has-pending,
-                    .dev-tag-toggle.has-pending,
-                    .dev-order-btn.has-pending {
+                    .dev-tag-toggle.has-pending {
                         background: rgba(234, 179, 8, 0.9);
                         color: #18181b;
                         border-color: rgba(250, 204, 21, 0.95);
@@ -1960,8 +1962,9 @@
                 const tagToggle = document.getElementById('dev-tag-toggle') as HTMLButtonElement | null;
                 if (!tagToggle) return;
                 tagToggle.classList.toggle('has-pending', hasPendingTags);
+                tagToggle.classList.toggle('is-active', activeTagMode);
                 tagToggle.title = hasPendingTags
-                    ? 'Save pending tag changes'
+                    ? 'Finish editing to save tag changes'
                     : activeTagMode ? 'Finish editing tags' : 'Edit tags';
                 tagToggle.setAttribute('aria-label', tagToggle.title);
             };
@@ -1977,31 +1980,17 @@
                 || pendingTextChanges.size > 0
                 || pendingBlockMarginChanges.size > 0
                 || pendingBlockTypeChanges.size > 0
-                || pendingBlockStructureChange !== null
+                || pendingLayoutChange !== null
             );
-
-            const hasPendingOrderChanges = () => pendingOrderChange !== null;
 
             const hasPendingTagChanges = () => (
                 serializeTagMap(currentAlbumTagMap) !== serializeTagMap(savedAlbumTagMap)
             );
 
-            const hasPendingChanges = () => hasPendingTagChanges() || hasPendingBlockChanges() || hasPendingOrderChanges();
+            const hasPendingChanges = () => hasPendingTagChanges() || hasPendingBlockChanges();
 
-            type AlbumEditMode = 'order' | 'blocks' | 'tags';
-            const pendingEditMode = (): AlbumEditMode | null => {
-                if (hasPendingOrderChanges()) return 'order';
-                if (hasPendingBlockChanges()) return 'blocks';
-                if (hasPendingTagChanges()) return 'tags';
-                return null;
-            };
-
-            const canStartEditMode = (target: AlbumEditMode) => {
-                const pending = pendingEditMode();
-                if (!pending || pending === target) return true;
-                showToast(`⚠️ Save pending ${pending} changes before editing ${target}`);
-                return false;
-            };
+            type AlbumEditMode = 'blocks' | 'tags';
+            const canStartEditMode = (_target: AlbumEditMode) => !pendingSaveInProgress;
 
             const handlePendingBeforeUnload = (event: BeforeUnloadEvent) => {
                 if (pendingSaveInProgress || !hasPendingChanges()) return;
@@ -2023,19 +2012,18 @@
                 const saveBtn = document.getElementById('dev-save-btn') as HTMLButtonElement | null;
                 if (!saveBtn) return;
 
-                const hasPendingBlocks = hasPendingBlockChanges();
+                const hasPendingEdits = hasPendingChanges();
                 saveBtn.disabled = isSaving;
-                saveBtn.classList.toggle('has-pending', hasPendingBlocks);
-                saveBtn.classList.toggle('active', activeBlockEditMode && !hasPendingBlocks);
+                saveBtn.classList.toggle('has-pending', hasPendingEdits);
+                saveBtn.classList.toggle('active', activeBlockEditMode && !hasPendingEdits);
                 saveBtn.setAttribute('aria-pressed', String(activeBlockEditMode));
                 saveBtn.title = isSaving
                     ? 'Saving pending changes...'
-                    : hasPendingBlocks
-                        ? 'Save pending block changes'
-                        : activeBlockEditMode ? 'Finish editing blocks' : 'Edit blocks';
+                    : hasPendingEdits
+                        ? 'Finish editing and save changes'
+                        : activeBlockEditMode ? 'Finish editing' : 'Edit blocks';
                 saveBtn.setAttribute('aria-label', saveBtn.title);
                 updateGlobalTagPendingIndicator();
-                updateOrderButtonState();
                 updateEditModeAvailability(isSaving);
             };
 
@@ -2176,15 +2164,13 @@
                 }
             };
 
-            const savePendingPageChanges = async (albumSlug: string, mode: 'blocks' | 'order' = 'blocks') => {
-                const includeBlockEdits = mode === 'blocks';
-                const captionChanges = includeBlockEdits ? [...pendingCaptionChanges.entries()] : [];
-                const textChanges = includeBlockEdits ? [...pendingTextChanges.entries()] : [];
-                const marginChanges = includeBlockEdits ? [...pendingBlockMarginChanges.entries()] : [];
-                const typeChanges = includeBlockEdits ? [...pendingBlockTypeChanges.entries()] : [];
-                const pendingStructure = mode === 'blocks' ? pendingBlockStructureChange : pendingOrderChange;
-                const structureChange = pendingStructure?.albumSlug === albumSlug
-                    ? pendingStructure
+            const savePendingPageChanges = async (albumSlug: string) => {
+                const captionChanges = [...pendingCaptionChanges.entries()];
+                const textChanges = [...pendingTextChanges.entries()];
+                const marginChanges = [...pendingBlockMarginChanges.entries()];
+                const typeChanges = [...pendingBlockTypeChanges.entries()];
+                const structureChange = pendingLayoutChange?.albumSlug === albumSlug
+                    ? pendingLayoutChange
                     : null;
                 if (captionChanges.length === 0
                     && textChanges.length === 0
@@ -2354,67 +2340,12 @@
                     typeChanges.forEach(([key, change]) => {
                         if (pendingBlockTypeChanges.get(key) === change) pendingBlockTypeChanges.delete(key);
                     });
-                    if (mode === 'blocks' && pendingBlockStructureChange === structureChange) pendingBlockStructureChange = null;
-                    if (mode === 'order' && pendingOrderChange === structureChange) pendingOrderChange = null;
+                    if (pendingLayoutChange === structureChange) pendingLayoutChange = null;
                     return true;
                 } catch (error) {
                     showToast(`❌ ${error instanceof Error ? error.message : 'Failed to save block changes'}`);
                     return false;
                 }
-            };
-
-            const savePendingTagChangesOnly = async () => {
-                const albumSlug = getAlbumSlug();
-                if (!albumSlug) return showToast('❌ Cannot identify album');
-                if (!hasPendingTagChanges()) return;
-
-                pendingSaveInProgress = true;
-                updateSaveButtonState(true);
-                const saved = await savePendingTagChanges(albumSlug);
-                pendingSaveInProgress = false;
-                updateSaveButtonState();
-                if (saved) showToast('✅ Tag changes saved');
-            };
-
-            const savePendingBlockChangesOnly = async () => {
-                const albumSlug = getAlbumSlug();
-                if (!albumSlug) return showToast('❌ Cannot identify album');
-                if (!hasPendingBlockChanges()) return;
-
-                pendingSaveInProgress = true;
-                updateSaveButtonState(true);
-                // The dev server can apply an MDX update before the response returns.
-                sessionStorage.setItem('dev-caption-save-scroll-y', String(window.scrollY));
-                const saved = await savePendingPageChanges(albumSlug);
-                pendingSaveInProgress = false;
-                updateSaveButtonState();
-                if (!saved) {
-                    sessionStorage.removeItem('dev-caption-save-scroll-y');
-                    return;
-                }
-
-                showToast('✅ Block changes saved');
-                window.setTimeout(() => window.location.reload(), 500);
-            };
-
-            const savePendingOrderChangesOnly = async () => {
-                const albumSlug = getAlbumSlug();
-                if (!albumSlug) return showToast('❌ Cannot identify album');
-                if (!hasPendingOrderChanges()) return;
-
-                pendingSaveInProgress = true;
-                updateSaveButtonState(true);
-                sessionStorage.setItem('dev-caption-save-scroll-y', String(window.scrollY));
-                const saved = await savePendingPageChanges(albumSlug, 'order');
-                pendingSaveInProgress = false;
-                updateSaveButtonState();
-                if (!saved) {
-                    sessionStorage.removeItem('dev-caption-save-scroll-y');
-                    return;
-                }
-
-                showToast('✅ Order changes saved');
-                window.setTimeout(() => window.location.reload(), 500);
             };
 
             const savePendingChanges = async () => {
@@ -2424,7 +2355,7 @@
                     || pendingTextChanges.size > 0
                     || pendingBlockMarginChanges.size > 0
                     || pendingBlockTypeChanges.size > 0
-                    || pendingBlockStructureChange !== null;
+                    || pendingLayoutChange !== null;
                 const hasPendingTags = serializeTagMap(currentAlbumTagMap) !== serializeTagMap(savedAlbumTagMap);
                 if (!hasPendingBlockChanges && !hasPendingTags) return showToast('ℹ️ No pending changes');
 
@@ -2446,6 +2377,9 @@
                 showToast('✅ Pending changes saved');
                 if (hasPendingBlockChanges) {
                     window.setTimeout(() => window.location.reload(), 500);
+                } else {
+                    setGlobalTagMode(false);
+                    setLayoutEditMode(false);
                 }
             };
 
@@ -3316,11 +3250,9 @@
                     props: { ...(block.props || {}) },
                     __devKey: block.__devKey || `persisted-${index}`,
                 }));
-                const stagedStructure = pendingBlockStructureChange?.albumSlug === albumSlug
-                    ? pendingBlockStructureChange
-                    : pendingOrderChange?.albumSlug === albumSlug
-                        ? pendingOrderChange
-                        : null;
+                const stagedStructure = pendingLayoutChange?.albumSlug === albumSlug
+                    ? pendingLayoutChange
+                    : null;
                 return {
                     draft: stagedStructure
                         ? JSON.parse(JSON.stringify(stagedStructure.draft)) as PageStructureDraft
@@ -3361,7 +3293,7 @@
                         info: infoValue.trim() || undefined,
                         gap: remValueFromInput(defaultMarginValue) || undefined,
                     };
-                    pendingBlockStructureChange = { albumSlug, draft: page.draft, imports: page.imports };
+                    pendingLayoutChange = { albumSlug, draft: page.draft, imports: page.imports };
                     closeAlbumMetadataEditor();
                     renderPendingPageStructure(albumSlug, page.draft, page.imports);
                     updateSaveButtonState();
@@ -3470,12 +3402,12 @@
                             photos: files.map((file) => ({ itemKey: file.name })),
                         };
                     page.draft.blocks.splice(insertIndex, 0, newBlock);
-                    pendingBlockStructureChange = {
+                    pendingLayoutChange = {
                         albumSlug,
                         draft: page.draft,
                         imports: [...page.imports, ...files],
                     };
-                    renderPendingPageStructure(albumSlug, page.draft, pendingBlockStructureChange.imports);
+                    renderPendingPageStructure(albumSlug, page.draft, pendingLayoutChange.imports);
                     updateSaveButtonState();
                     showToast('📝 Pending page structure update');
                 } catch (error) {
@@ -3515,12 +3447,12 @@
 
                     targetBlock.photos ||= [];
                     targetBlock.photos.push(...files.map((file) => ({ itemKey: file.name })));
-                    pendingBlockStructureChange = {
+                    pendingLayoutChange = {
                         albumSlug,
                         draft: page.draft,
                         imports: [...page.imports, ...files],
                     };
-                    renderPendingPageStructure(albumSlug, page.draft, pendingBlockStructureChange.imports);
+                    renderPendingPageStructure(albumSlug, page.draft, pendingLayoutChange.imports);
                     updateSaveButtonState();
                     showToast('📝 Pending photos added to block');
                 } catch (error) {
@@ -3557,7 +3489,7 @@
                     if (!block) return showToast('❌ Block is no longer available');
                     page.draft.blocks.splice(index, 1);
                     reconcileDirectPhotoRemovals(page);
-                    pendingBlockStructureChange = { albumSlug, draft: page.draft, imports: page.imports };
+                    pendingLayoutChange = { albumSlug, draft: page.draft, imports: page.imports };
                     clearActiveInlineBlockAction();
                     renderPendingPageStructure(albumSlug, page.draft, page.imports);
                     updateSaveButtonState();
@@ -3579,7 +3511,7 @@
                     block.photos = (block.photos || []).filter((photo: any) => !photoNames.has(basename(photo.itemKey)));
                     if (block.photos.length === 0) page.draft.blocks.splice(index, 1);
                     reconcileDirectPhotoRemovals(page);
-                    pendingBlockStructureChange = { albumSlug, draft: page.draft, imports: page.imports };
+                    pendingLayoutChange = { albumSlug, draft: page.draft, imports: page.imports };
                     clearActiveInlineBlockAction();
                     renderPendingPageStructure(albumSlug, page.draft, page.imports);
                     updateSaveButtonState();
@@ -3611,7 +3543,7 @@
                     block.props ||= {};
                     if (initialSlide > 0) block.props.initialSlide = initialSlide;
                     else delete block.props.initialSlide;
-                    pendingBlockStructureChange = { albumSlug, draft: page.draft, imports: page.imports };
+                    pendingLayoutChange = { albumSlug, draft: page.draft, imports: page.imports };
                     clearActiveInlineBlockAction();
                     renderPendingPageStructure(albumSlug, page.draft, page.imports);
                     updateSaveButtonState();
@@ -3641,7 +3573,7 @@
                     block.props.enablePanorama = true;
                     if (initialView === 'panorama') block.props.initialView = 'panorama';
                     else delete block.props.initialView;
-                    pendingBlockStructureChange = { albumSlug, draft: page.draft, imports: page.imports };
+                    pendingLayoutChange = { albumSlug, draft: page.draft, imports: page.imports };
                     clearActiveInlineBlockAction();
                     renderPendingPageStructure(albumSlug, page.draft, page.imports);
                     updateSaveButtonState();
@@ -3711,6 +3643,7 @@
                 blockKey: string,
                 fallbackIndex: number,
             ) => {
+                clearInlineOrderInteraction();
                 activeInlineBlockAction = { kind, blockKey, fallbackIndex, selectedPhotos: new Set() };
                 block.classList.add('dev-block-photo-action');
                 block.classList.toggle('dev-block-photo-action--initial', kind === 'set-initial-photo');
@@ -3996,10 +3929,40 @@
                 message: string,
             ) => {
                 reconcileDirectPhotoRemovals(page);
-                pendingOrderChange = { albumSlug, draft: page.draft, imports: page.imports };
+                pendingLayoutChange = { albumSlug, draft: page.draft, imports: page.imports };
                 renderPendingPageStructure(albumSlug, page.draft, page.imports);
                 updateSaveButtonState();
                 showToast(message);
+            };
+
+            const clearInlineOrderInteraction = () => {
+                inlineOrderPhotoAction = null;
+                inlineOrderSelectedPhotoNames.clear();
+                inlineOrderLastSelectedPhotoName = null;
+                inlineOrderMovePhotoName = null;
+                inlineOrderMoveBlockKey = null;
+                if (activeOrderMode) initInlineOrderEditor();
+            };
+
+            const updateInlineFocusedActionState = () => {
+                document.documentElement.classList.toggle(
+                    'dev-inline-focused-action',
+                    activeTagMode
+                        || inlineOrderPhotoAction !== null
+                        || inlineOrderMovePhotoName !== null
+                        || inlineOrderMoveBlockKey !== null,
+                );
+            };
+
+            const toggleInlineTagMode = () => {
+                clearActiveInlineBlockAction();
+                inlineOrderPhotoAction = null;
+                inlineOrderSelectedPhotoNames.clear();
+                inlineOrderLastSelectedPhotoName = null;
+                inlineOrderMovePhotoName = null;
+                inlineOrderMoveBlockKey = null;
+                setGlobalTagMode(!activeTagMode);
+                initInlineOrderEditor();
             };
 
             const moveInlineOrderPhoto = async (targetPhotoName: string, insertAfter: boolean) => {
@@ -4122,6 +4085,7 @@
                 document.querySelectorAll<HTMLElement>('.dev-order-block-controls').forEach((block) => {
                     block.classList.remove('dev-order-block-controls');
                 });
+                updateInlineFocusedActionState();
                 if (!activeOrderMode) {
                     document.querySelectorAll<HTMLElement>('.dev-order-photo-selected, .dev-order-photo-move-target').forEach((photo) => {
                         photo.classList.remove('dev-order-photo-selected', 'dev-order-photo-move-target');
@@ -4131,7 +4095,7 @@
                 const interactionAbortController = new AbortController();
                 inlineOrderInteractionAbortController = interactionAbortController;
 
-                const orderButton = document.getElementById('dev-order-btn');
+                const orderButton = document.getElementById('dev-save-btn');
                 const scrollContainer = document.querySelector('.fixed.bottom-8.right-8.flex-col');
                 if (orderButton) {
                     const actions = document.createElement('div');
@@ -4142,8 +4106,23 @@
                     managerButton.className = 'dev-gear-btn in-container dev-order-action-button';
                     managerButton.title = 'Open order manager';
                     managerButton.setAttribute('aria-label', managerButton.title);
-                    managerButton.innerHTML = ICONS.grid;
-                    managerButton.addEventListener('click', () => void openPageManager(true));
+                    managerButton.innerHTML = ICONS.order;
+                    managerButton.addEventListener('click', () => {
+                        clearActiveInlineBlockAction();
+                        clearInlineOrderInteraction();
+                        void openPageManager(true);
+                    });
+
+                    const tagButton = document.createElement('button');
+                    tagButton.id = 'dev-tag-toggle';
+                    tagButton.type = 'button';
+                    tagButton.className = `dev-gear-btn in-container dev-order-action-button dev-tag-toggle${activeTagMode ? ' is-active' : ''}`;
+                    tagButton.innerHTML = ICONS.pin;
+                    tagButton.addEventListener('click', () => {
+                        if (pendingSaveInProgress) return;
+                        toggleInlineTagMode();
+                    });
+                    updateGlobalTagPendingIndicator();
 
                     const createPhotoActionButton = (
                         action: Exclude<InlineOrderPhotoAction, null>,
@@ -4153,17 +4132,25 @@
                         const button = document.createElement('button');
                         button.type = 'button';
                         const isActive = inlineOrderPhotoAction === action;
+                        const hasSelection = isActive && inlineOrderSelectedPhotoNames.size > 0;
                         button.className = `dev-gear-btn in-container dev-order-action-button${isActive ? ' is-active' : ''}`;
                         button.title = isActive
-                            ? `${label}: ${inlineOrderSelectedPhotoNames.size} selected; click to confirm`
+                            ? hasSelection
+                                ? `${label}: ${inlineOrderSelectedPhotoNames.size} selected; click to confirm`
+                                : `${label}: click again to cancel`
                             : label;
                         button.setAttribute('aria-label', button.title);
-                        button.innerHTML = isActive ? ICONS.check : icon;
+                        button.innerHTML = hasSelection ? ICONS.check : icon;
                         button.addEventListener('click', () => {
                             if (inlineOrderPhotoAction === action) {
+                                if (inlineOrderSelectedPhotoNames.size === 0) {
+                                    clearInlineOrderInteraction();
+                                    return;
+                                }
                                 void createBlocksFromInlineOrderSelection(action);
                                 return;
                             }
+                            clearActiveInlineBlockAction();
                             inlineOrderPhotoAction = action;
                             inlineOrderSelectedPhotoNames.clear();
                             inlineOrderLastSelectedPhotoName = null;
@@ -4174,12 +4161,14 @@
                         return button;
                     };
                     actions.append(
+                        tagButton,
                         managerButton,
                         createPhotoActionButton('merge', 'Merge selected photos', ICONS.mergeArrows),
                         createPhotoActionButton('split', 'Split selected photos', ICONS.splitArrows),
                     );
                     if (scrollContainer?.contains(orderButton)) scrollContainer.insertBefore(actions, orderButton.nextElementSibling);
                     else orderButton.insertAdjacentElement('afterend', actions);
+                    updateGlobalTagPendingIndicator();
                 }
 
                 const blocks = Array.from(document.querySelectorAll<HTMLElement>('.album-content [data-dev-block]'));
@@ -4189,39 +4178,43 @@
                     }, 50);
                     return;
                 }
-                blocks.forEach((block, index) => {
-                    block.classList.add('dev-order-block-controls');
-                    const blockKey = block.dataset.devBlockKey || `persisted-${index}`;
-                    const moveZone = document.createElement('div');
-                    moveZone.className = 'dev-order-block-move-zone';
-                    const moveButton = document.createElement('button');
-                    moveButton.type = 'button';
-                    const selected = inlineOrderMoveBlockKey === blockKey;
-                    if (inlineOrderMoveBlockKey && !selected) {
-                        moveButton.className = 'dev-page-inline-add-button dev-order-block-move-button is-move-target';
-                        moveButton.title = 'Move selected block here';
-                        moveButton.setAttribute('aria-label', moveButton.title);
-                        moveButton.innerHTML = ICONS.arrowRight;
-                    } else {
-                        moveButton.className = `dev-page-inline-add-button dev-order-block-move-button${selected ? ' is-selected' : ''}`;
-                        moveButton.title = selected ? 'Cancel move' : 'Click to move';
-                        moveButton.setAttribute('aria-label', moveButton.title);
-                        moveButton.innerHTML = selected ? ICONS.close : ICONS.drag;
-                    }
-                    moveButton.addEventListener('click', (event) => {
-                        event.stopPropagation();
+                if (!activeTagMode && !inlineOrderPhotoAction) {
+                    blocks.forEach((block, index) => {
+                        block.classList.add('dev-order-block-controls');
+                        const blockKey = block.dataset.devBlockKey || `persisted-${index}`;
+                        const moveZone = document.createElement('div');
+                        moveZone.className = 'dev-order-block-move-zone';
+                        const moveButton = document.createElement('button');
+                        moveButton.type = 'button';
+                        const selected = inlineOrderMoveBlockKey === blockKey;
                         if (inlineOrderMoveBlockKey && !selected) {
-                            void moveInlineOrderBlock(blockKey);
-                            return;
+                            moveButton.className = 'dev-page-inline-add-button dev-order-block-move-button is-move-target';
+                            moveButton.title = 'Move selected block here';
+                            moveButton.setAttribute('aria-label', moveButton.title);
+                            moveButton.innerHTML = ICONS.arrowRight;
+                        } else {
+                            moveButton.className = `dev-page-inline-add-button dev-order-block-move-button${selected ? ' is-selected' : ''}`;
+                            moveButton.title = selected ? 'Cancel move' : 'Click to move';
+                            moveButton.setAttribute('aria-label', moveButton.title);
+                            moveButton.innerHTML = selected ? ICONS.close : ICONS.drag;
                         }
-                        inlineOrderMoveBlockKey = selected ? null : blockKey;
-                        inlineOrderMovePhotoName = null;
-                        initInlineOrderEditor();
+                        moveButton.addEventListener('click', (event) => {
+                            event.stopPropagation();
+                            if (inlineOrderMoveBlockKey && !selected) {
+                                void moveInlineOrderBlock(blockKey);
+                                return;
+                            }
+                            clearActiveInlineBlockAction();
+                            inlineOrderMoveBlockKey = selected ? null : blockKey;
+                            inlineOrderMovePhotoName = null;
+                            initInlineOrderEditor();
+                        });
+                        moveZone.appendChild(moveButton);
+                        block.appendChild(moveZone);
                     });
-                    moveZone.appendChild(moveButton);
-                    block.appendChild(moveZone);
-                });
+                }
 
+                if (activeTagMode) return;
                 document.querySelectorAll<HTMLElement>('.album-content [data-dev-block] .photo-wrapper').forEach((wrapper) => {
                     const photoName = inlineOrderPhotoName(wrapper);
                     if (!photoName) return;
@@ -4231,6 +4224,8 @@
                     wrapper.classList.toggle('dev-order-photo-selected', selectedForAction || selectedForMove);
                     wrapper.classList.toggle('dev-order-photo-move-target', moveTarget);
                     wrapper.addEventListener('click', (event) => {
+                        if ((event.target as HTMLElement).closest('.dev-tag-edit-btn, .tag-link')) return;
+                        if (activeInlineBlockAction) return;
                         event.preventDefault();
                         event.stopPropagation();
                         if (inlineOrderPhotoAction) {
@@ -4295,7 +4290,7 @@
             async function openPageManager(keepOrderModeOnClose = false) {
                 const albumSlug = getAlbumSlug();
                 if (!albumSlug) return showToast("❌ Cannot identify album");
-                if (!canStartEditMode('order')) return;
+                if (!canStartEditMode('blocks')) return;
 
                 showToast("⌛ Loading structure...");
                 const res = await fetch(`/api/get-page-structure?albumSlug=${albumSlug}`);
@@ -4317,8 +4312,8 @@
                     return block;
                 });
                 const serverBlocks = normalizePageBlocks(data.blocks);
-                const stagedStructure = pendingOrderChange?.albumSlug === albumSlug
-                    ? pendingOrderChange
+                const stagedStructure = pendingLayoutChange?.albumSlug === albumSlug
+                    ? pendingLayoutChange
                     : null;
                 const displayedMetadata = stagedStructure?.draft.metadata || data.metadata || {};
                 const Tree = (window as any).Sortable ? (window as any).Sortable : await loadSortable();
@@ -4434,7 +4429,7 @@
                     const dirty = pageStateSnapshot() !== initialPageSnapshot;
                     confirmBtn.disabled = !dirty;
                     confirmBtn.title = dirty ? 'Add to pending changes' : 'No new changes';
-                    const hasStagedStructure = pendingOrderChange?.albumSlug === albumSlug;
+                    const hasStagedStructure = pendingLayoutChange?.albumSlug === albumSlug;
                     renameBtn.disabled = dirty || hasStagedStructure;
                     renameBtn.title = dirty || hasStagedStructure ? 'Save pending page changes before renaming photos' : 'Rename photos by current order';
                 };
@@ -4806,7 +4801,7 @@
                         removeLocal: draft.removeLocal,
                     });
                     if (stagedSnapshot === serverPageSnapshot) {
-                        pendingOrderChange = null;
+                        pendingLayoutChange = null;
                         renderPendingPageStructure(albumSlug, {
                             blocks: serverBlocks,
                             metadata: {
@@ -4818,12 +4813,12 @@
                         }, []);
                         showToast('ℹ️ Page structure unchanged');
                     } else {
-                        pendingOrderChange = {
+                        pendingLayoutChange = {
                             albumSlug,
                             draft: JSON.parse(JSON.stringify(draft)),
                             imports: [...pendingPageImports],
                         };
-                        renderPendingPageStructure(albumSlug, pendingOrderChange.draft, pendingOrderChange.imports);
+                        renderPendingPageStructure(albumSlug, pendingLayoutChange.draft, pendingLayoutChange.imports);
                         showToast('📝 Pending page structure update');
                     }
                     updateSaveButtonState();
@@ -6217,48 +6212,22 @@
                 const tagToggle = document.getElementById('dev-tag-toggle');
                 tagToggle?.classList.toggle('active', enabled);
                 tagToggle?.setAttribute('aria-pressed', String(enabled));
+                updateInlineFocusedActionState();
                 updateGlobalTagPendingIndicator();
                 updateEditModeAvailability();
             };
 
             let activeOrderMode = false;
 
-            const updateOrderButtonState = () => {
-                const orderBtn = document.getElementById('dev-order-btn') as HTMLButtonElement | null;
-                if (!orderBtn) return;
-                const hasPendingOrder = hasPendingOrderChanges();
-                orderBtn.classList.toggle('has-pending', hasPendingOrder);
-                orderBtn.classList.toggle('active', activeOrderMode && !hasPendingOrder);
-                orderBtn.setAttribute('aria-pressed', String(activeOrderMode));
-                orderBtn.title = hasPendingOrder
-                    ? 'Save pending order changes'
-                    : activeOrderMode ? 'Finish editing order' : 'Edit order';
-                orderBtn.setAttribute('aria-label', orderBtn.title);
-            };
-
             const updateEditModeAvailability = (isSaving = pendingSaveInProgress) => {
-                const pending = pendingEditMode();
-                const activeMode: AlbumEditMode | null = activeOrderMode
-                    ? 'order'
-                    : activeBlockEditMode
-                        ? 'blocks'
-                        : activeTagMode ? 'tags' : null;
-                const controls: Array<{ id: string; mode: AlbumEditMode }> = [
-                    { id: 'dev-order-btn', mode: 'order' },
-                    { id: 'dev-save-btn', mode: 'blocks' },
-                    { id: 'dev-tag-toggle', mode: 'tags' },
-                ];
-
-                controls.forEach(({ id, mode }) => {
+                ['dev-save-btn', 'dev-tag-toggle'].forEach((id) => {
                     const control = document.getElementById(id);
                     if (!control) return;
-                    const hidden = Boolean(activeMode && activeMode !== mode);
-                    const unavailable = isSaving || Boolean(pending && pending !== mode);
-                    control.classList.toggle('dev-edit-mode-hidden', hidden);
-                    control.classList.toggle('dev-edit-mode-unavailable', unavailable && !hidden);
-                    control.setAttribute('aria-hidden', String(hidden));
-                    control.setAttribute('aria-disabled', String(unavailable));
-                    if (control instanceof HTMLButtonElement) control.disabled = unavailable;
+                    control.classList.remove('dev-edit-mode-hidden');
+                    control.classList.toggle('dev-edit-mode-unavailable', isSaving);
+                    control.setAttribute('aria-hidden', 'false');
+                    control.setAttribute('aria-disabled', String(isSaving));
+                    if (control instanceof HTMLButtonElement) control.disabled = isSaving;
                 });
             };
 
@@ -6271,7 +6240,6 @@
                     inlineOrderMovePhotoName = null;
                     inlineOrderMoveBlockKey = null;
                 }
-                updateOrderButtonState();
                 updateEditModeAvailability();
                 initInlineOrderEditor();
             };
@@ -6292,12 +6260,18 @@
                 updateSaveButtonState();
             };
 
+            const setLayoutEditMode = (enabled: boolean) => {
+                setBlockEditMode(enabled);
+                setOrderEditMode(enabled);
+            };
+
             function closeOtherPageEditors(except?: HTMLElement) {
+                const keepLayoutEditMode = Boolean(activeBlockEditMode && except?.closest('[data-dev-block]'));
                 document.querySelector('.dev-page-inline-add-menu')?.remove();
                 clearActiveInlineBlockAction();
+                if (except?.closest('[data-dev-block]')) clearInlineOrderInteraction();
                 setGlobalTagMode(false);
-                setOrderEditMode(false);
-                if (!except?.closest('[data-dev-block]')) setBlockEditMode(false);
+                if (!keepLayoutEditMode) setLayoutEditMode(false);
                 if (!except?.matches('[data-dev-album-metadata-edit]')) closeAlbumMetadataEditor();
 
                 document.querySelectorAll<HTMLElement>('.dev-inline-caption-editor').forEach((editor) => {
@@ -6340,11 +6314,9 @@
                 if (!albumSlug) return;
 
                 let sourceBlocks: any[] = [];
-                const stagedStructure = pendingBlockStructureChange?.albumSlug === albumSlug
-                    ? pendingBlockStructureChange
-                    : pendingOrderChange?.albumSlug === albumSlug
-                        ? pendingOrderChange
-                        : null;
+                const stagedStructure = pendingLayoutChange?.albumSlug === albumSlug
+                    ? pendingLayoutChange
+                    : null;
                 if (stagedStructure) {
                     sourceBlocks = stagedStructure.draft.blocks;
                 } else {
@@ -7328,7 +7300,6 @@
                 injectStyles();
                 if (isMountainTagPage(window.location.pathname)) {
                     document.getElementById('dev-gear-btn')?.remove();
-                    document.getElementById('dev-order-btn')?.remove();
                     document.getElementById('dev-save-btn')?.remove();
                     document.getElementById('dev-tag-toggle')?.remove();
                     document.getElementById('dev-album-sync-btn')?.remove();
@@ -7343,7 +7314,6 @@
                 if (isAlbumPage) {
                     document.getElementById('dev-gear-btn')?.remove();
                 } else {
-                    document.getElementById('dev-order-btn')?.remove();
                     document.getElementById('dev-save-btn')?.remove();
                     document.getElementById('dev-tag-toggle')?.remove();
                     document.getElementById('dev-album-sync-btn')?.remove();
@@ -7354,14 +7324,14 @@
                     window.requestAnimationFrame(() => window.scrollTo({ top: Number(savedScrollY) }));
                 }
 
-                const primaryButtonId = isAlbumPage ? 'dev-order-btn' : 'dev-gear-btn';
+                const primaryButtonId = isAlbumPage ? 'dev-save-btn' : 'dev-gear-btn';
 
                 // Add the page-specific primary action.
                 if (!document.getElementById(primaryButtonId)) {
-                    const gearBtn = document.createElement('div');
+                    const gearBtn = document.createElement(isAlbumPage ? 'button' : 'div');
                     gearBtn.id = primaryButtonId;
-                    gearBtn.className = `dev-gear-btn${isAlbumPage ? ' dev-order-btn' : ''}`;
-                    gearBtn.innerHTML = isAlbumPage ? ICONS.order : ICONS.gear;
+                    gearBtn.className = isAlbumPage ? 'dev-save-btn' : 'dev-gear-btn';
+                    gearBtn.innerHTML = isAlbumPage ? ICONS.pencil : ICONS.gear;
 
                     if (isRootPage()) {
                         gearBtn.title = 'R2 Manager';
@@ -7373,20 +7343,23 @@
                         gearBtn.title = 'Folder Manager';
                         gearBtn.addEventListener('click', openFolderManager);
                     } else {
-                        gearBtn.title = 'Edit order';
+                        gearBtn.title = 'Edit blocks';
+                        gearBtn.setAttribute('aria-label', gearBtn.title);
+                        gearBtn.setAttribute('aria-pressed', 'false');
                         gearBtn.addEventListener('click', () => {
                             if (pendingSaveInProgress) return;
-                            if (activeOrderMode) {
-                                setOrderEditMode(false);
+                            if (hasPendingChanges()) {
+                                void savePendingChanges();
                                 return;
                             }
-                            if (hasPendingOrderChanges()) {
-                                void savePendingOrderChangesOnly();
+                            if (activeBlockEditMode) {
+                                setGlobalTagMode(false);
+                                setLayoutEditMode(false);
                                 return;
                             }
-                            if (!canStartEditMode('order')) return;
+                            if (!canStartEditMode('blocks')) return;
                             closeOtherPageEditors();
-                            setOrderEditMode(true);
+                            setLayoutEditMode(true);
                         });
                     }
 
@@ -7398,45 +7371,6 @@
                     } else {
                         document.body.appendChild(gearBtn);
                     }
-                }
-
-                if (
-                    !isRootPage() &&
-                    !isFolderPage() &&
-                    !isMountainTagIndex(window.location.pathname) &&
-                    !document.getElementById('dev-tag-toggle')
-                ) {
-                    const tagToggle = document.createElement('button');
-                    tagToggle.id = 'dev-tag-toggle';
-                    tagToggle.className = 'dev-gear-btn dev-tag-toggle';
-                    tagToggle.type = 'button';
-                    tagToggle.innerHTML = ICONS.pin;
-                    tagToggle.title = 'Edit tags';
-                    tagToggle.setAttribute('aria-label', 'Edit tags');
-                    tagToggle.setAttribute('aria-pressed', 'false');
-                    tagToggle.addEventListener('click', () => {
-                        if (pendingSaveInProgress) return;
-                        if (hasPendingTagChanges()) {
-                            void savePendingTagChangesOnly();
-                            return;
-                        }
-                        if (activeTagMode) {
-                            setGlobalTagMode(false);
-                            return;
-                        }
-                        if (!canStartEditMode('tags')) return;
-                        closeOtherPageEditors();
-                        setGlobalTagMode(true);
-                    });
-
-                    const scrollContainer = document.querySelector('.fixed.bottom-8.right-8.flex-col');
-                    if (scrollContainer) {
-                        tagToggle.classList.add('in-container');
-                        scrollContainer.appendChild(tagToggle);
-                    } else {
-                        document.body.appendChild(tagToggle);
-                    }
-                    updateGlobalTagPendingIndicator();
                 }
 
                 if (
@@ -7455,11 +7389,12 @@
                     saveBtn.setAttribute('aria-pressed', 'false');
                     saveBtn.addEventListener('click', () => {
                         if (pendingSaveInProgress) return;
-                        if (hasPendingBlockChanges()) {
-                            void savePendingBlockChangesOnly();
+                        if (hasPendingChanges()) {
+                            void savePendingChanges();
                             return;
                         }
                         if (activeBlockEditMode) {
+                            setGlobalTagMode(false);
                             setBlockEditMode(false);
                             return;
                         }
@@ -7489,7 +7424,7 @@
                         const albumSlug = getAlbumSlug();
                         if (!albumSlug) return showToast('❌ Cannot identify album');
                         if (hasPendingBlockChanges()) {
-                            return showToast('⚠️ Save pending block changes before syncing with R2');
+                            return showToast('⚠️ Save pending layout changes before syncing with R2');
                         }
                         void openAlbumSyncDialog(albumSlug);
                     });
@@ -7507,9 +7442,7 @@
                 if (isAlbumPage) {
                     const scrollContainer = document.querySelector('.fixed.bottom-8.right-8.flex-col');
                     const controls = [
-                        document.getElementById('dev-order-btn'),
                         document.getElementById('dev-save-btn'),
-                        document.getElementById('dev-tag-toggle'),
                         document.getElementById('dev-album-sync-btn'),
                     ];
                     if (scrollContainer) controls.forEach((control) => {
