@@ -110,11 +110,20 @@
             const pendingTextChanges = new Map<string, PendingTextChange>();
             const pendingBlockMarginChanges = new Map<string, PendingBlockMarginChange>();
             const pendingBlockTypeChanges = new Map<string, PendingBlockTypeChange>();
-            let pendingPageStructureChange: PendingPageStructureChange | null = null;
+            let pendingBlockStructureChange: PendingPageStructureChange | null = null;
+            let pendingOrderChange: PendingPageStructureChange | null = null;
             let pendingStructurePhotoNodes: Map<string, HTMLElement> | null = null;
             const pendingStructureObjectUrls = new Map<File, string>();
             let pendingSaveInProgress = false;
             let activeTagMode = false;
+            let activeBlockEditMode = false;
+            type InlineOrderPhotoAction = 'merge' | 'split' | null;
+            let inlineOrderPhotoAction: InlineOrderPhotoAction = null;
+            let inlineOrderSelectedPhotoNames = new Set<string>();
+            let inlineOrderLastSelectedPhotoName: string | null = null;
+            let inlineOrderMovePhotoName: string | null = null;
+            let inlineOrderMoveBlockKey: string | null = null;
+            let inlineOrderInteractionAbortController: AbortController | null = null;
             let activeMarginControl: HTMLElement | null = null;
             type InlineBlockAction = {
                 kind: 'delete-block' | 'delete-photos' | 'set-initial-photo';
@@ -193,8 +202,8 @@
                         top: -0.65rem;
                         bottom: auto;
                     }
-                    .dev-block-overlay:hover > .dev-page-inline-add-zone,
-                    .dev-block-overlay:focus-within > .dev-page-inline-add-zone {
+                    .dev-block-edit-mode .dev-block-overlay:hover > .dev-page-inline-add-zone,
+                    .dev-block-edit-mode .dev-block-overlay:focus-within > .dev-page-inline-add-zone {
                         opacity: 1;
                         visibility: visible;
                         pointer-events: auto;
@@ -449,8 +458,8 @@
                         pointer-events: none;
                         transition: opacity 0.2s ease;
                     }
-                    .dev-block-overlay:hover > .dev-block-toolbar,
-                    .dev-block-toolbar:focus-within,
+                    .dev-block-edit-mode .dev-block-overlay:hover > .dev-block-toolbar,
+                    .dev-block-edit-mode .dev-block-toolbar:focus-within,
                     .dev-block-toolbar.is-open {
                         opacity: 1;
                         pointer-events: auto;
@@ -501,12 +510,12 @@
                         display: none;
                         order: 0;
                     }
-                    .dev-block-overlay:hover > .dev-block-toolbar .dev-toolbar-btn,
-                    .dev-block-overlay:hover > .dev-block-toolbar .dev-inline-margin-control,
-                    .dev-block-overlay:hover > .dev-block-toolbar .dev-inline-block-type-control,
-                    .dev-block-overlay:focus-within > .dev-block-toolbar .dev-toolbar-btn,
-                    .dev-block-overlay:focus-within > .dev-block-toolbar .dev-inline-margin-control,
-                    .dev-block-overlay:focus-within > .dev-block-toolbar .dev-inline-block-type-control,
+                    .dev-block-edit-mode .dev-block-overlay:hover > .dev-block-toolbar .dev-toolbar-btn,
+                    .dev-block-edit-mode .dev-block-overlay:hover > .dev-block-toolbar .dev-inline-margin-control,
+                    .dev-block-edit-mode .dev-block-overlay:hover > .dev-block-toolbar .dev-inline-block-type-control,
+                    .dev-block-edit-mode .dev-block-overlay:focus-within > .dev-block-toolbar .dev-toolbar-btn,
+                    .dev-block-edit-mode .dev-block-overlay:focus-within > .dev-block-toolbar .dev-inline-margin-control,
+                    .dev-block-edit-mode .dev-block-overlay:focus-within > .dev-block-toolbar .dev-inline-block-type-control,
                     .dev-block-toolbar:focus-within .dev-toolbar-btn,
                     .dev-block-toolbar:focus-within .dev-inline-margin-control,
                     .dev-block-toolbar:focus-within .dev-inline-block-type-control,
@@ -1318,13 +1327,76 @@
                         color: white;
                         transform: rotate(45deg);
                     }
+                    .dev-gear-btn.dev-edit-mode-unavailable,
+                    .dev-save-btn.dev-edit-mode-unavailable {
+                        opacity: 0.45;
+                        cursor: not-allowed;
+                        pointer-events: none;
+                        transform: none;
+                    }
+                    .dev-edit-mode-hidden {
+                        display: none !important;
+                    }
+                    .dev-order-actions {
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        gap: 0.75rem;
+                        z-index: 50;
+                    }
+                    .dev-order-action-button:hover,
+                    .dev-order-action-button.is-active {
+                        background: rgba(59,130,246,0.82);
+                        color: white;
+                        transform: none;
+                    }
+                    .dev-order-photo-selected {
+                        outline: 3px solid #16a34a !important;
+                        outline-offset: -3px;
+                        cursor: copy !important;
+                    }
+                    .dev-order-photo-move-target {
+                        outline: 2px dashed #86efac !important;
+                        outline-offset: -3px;
+                        cursor: copy !important;
+                    }
+                    .dev-order-block-move-zone {
+                        position: absolute;
+                        top: 50%;
+                        right: 0;
+                        z-index: 90;
+                        display: flex;
+                        width: 2rem;
+                        height: 2rem;
+                        justify-content: center;
+                        transform: translate(50%, -50%);
+                    }
+                    .dev-order-block-controls {
+                        position: relative;
+                    }
+                    .dev-order-block-move-button.is-selected {
+                        border-color: rgba(59, 130, 246, 0.8);
+                        background: rgba(59, 130, 246, 0.8);
+                        color: white;
+                    }
+                    .dev-order-block-move-button.is-move-target {
+                        border-color: rgba(134, 239, 172, 0.85);
+                        color: #bbf7d0;
+                    }
                     .dev-tag-toggle:not(.in-container) {
                         position: fixed;
                         right: 2rem;
                         bottom: 4.75rem;
                     }
+                    .dev-album-sync-btn:not(.in-container) {
+                        position: fixed;
+                        right: 2rem;
+                        bottom: 0.25rem;
+                    }
                     .dev-tag-toggle:hover,
-                    .dev-tag-toggle.active {
+                    .dev-tag-toggle.active,
+                    .dev-order-btn:hover,
+                    .dev-order-btn.active {
                         background: rgba(59, 130, 246, 0.8);
                         color: white;
                         transform: none;
@@ -1349,11 +1421,14 @@
                         right: 2rem;
                         bottom: 2rem;
                     }
-                    .dev-save-btn:hover:not([disabled]) {
-                        background: rgba(16, 185, 129, 0.85);
+                    .dev-save-btn:hover:not([disabled]),
+                    .dev-save-btn.active {
+                        background: rgba(59, 130, 246, 0.8);
                         color: white;
                     }
-                    .dev-save-btn.has-pending {
+                    .dev-save-btn.has-pending,
+                    .dev-tag-toggle.has-pending,
+                    .dev-order-btn.has-pending {
                         background: rgba(234, 179, 8, 0.9);
                         color: #18181b;
                         border-color: rgba(250, 204, 21, 0.95);
@@ -1431,17 +1506,101 @@
                     .dev-pm-block.collapsed .dev-pm-photo-list {
                         display: none !important;
                     }
-                    .dev-pm-fm-section .dev-pm-fm-content {
+                    .dev-album-metadata-editor {
                         display: flex;
                         flex-direction: column;
-                        gap: 0.75rem;
-                        margin-top: 1rem;
+                        align-items: center;
+                        margin: 0.35rem auto 0;
                     }
-                    .dev-pm-fm-section.collapsed .dev-pm-fm-content {
-                        display: none !important;
+                    .dev-album-metadata-edit-button {
+                        display: flex;
+                        width: 2rem;
+                        height: 2rem;
+                        padding: 0;
+                        align-items: center;
+                        justify-content: center;
+                        border: 1px solid rgba(255,255,255,0.1);
+                        border-radius: 999px;
+                        background: rgba(255,255,255,0.2);
+                        backdrop-filter: blur(4px);
+                        color: rgba(161, 161, 170, 0.8);
+                        cursor: pointer;
+                        transition: all 0.3s;
                     }
-                    .dev-pm-fm-section.collapsed {
-                        margin-bottom: 0.75rem !important;
+                    .dev-album-metadata-edit-button:hover,
+                    .dev-album-metadata-edit-button:focus-visible,
+                    .dev-album-metadata-edit-button[aria-expanded="true"] {
+                        border-color: rgba(59, 130, 246, 0.8);
+                        background: rgba(59, 130, 246, 0.8);
+                        color: white;
+                        outline: none;
+                    }
+                    .dev-album-metadata-fields {
+                        display: grid;
+                        width: min(100%, 34rem);
+                        grid-template-columns: repeat(3, minmax(0, 1fr));
+                        gap: 0.5rem;
+                        margin-top: 0.65rem;
+                        padding: 0.65rem;
+                        border: 1px solid rgba(255,255,255,0.12);
+                        border-radius: 0.5rem;
+                        background: rgba(24,24,27,0.9);
+                        box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+                        text-align: left;
+                    }
+                    .dev-album-metadata-fields label {
+                        display: flex;
+                        min-width: 0;
+                        flex-direction: column;
+                        gap: 0.25rem;
+                        color: #a1a1aa;
+                        font-family: sans-serif;
+                        font-size: 0.7rem;
+                    }
+                    .dev-album-metadata-fields input {
+                        width: 100%;
+                        min-width: 0;
+                        box-sizing: border-box;
+                        padding: 0.4rem 0.5rem;
+                        border: 1px solid rgba(255,255,255,0.15);
+                        border-radius: 0.3rem;
+                        background: rgba(255,255,255,0.08);
+                        color: #f4f4f5;
+                        font: inherit;
+                        font-size: 0.8rem;
+                    }
+                    .dev-album-metadata-fields input:focus {
+                        border-color: #3b82f6;
+                        outline: none;
+                    }
+                    .dev-album-metadata-actions {
+                        display: flex;
+                        grid-column: 1 / -1;
+                        justify-content: flex-end;
+                        gap: 0.35rem;
+                    }
+                    .dev-album-metadata-actions button {
+                        display: flex;
+                        width: 1.8rem;
+                        height: 1.8rem;
+                        padding: 0;
+                        align-items: center;
+                        justify-content: center;
+                        border: 1px solid rgba(255,255,255,0.12);
+                        border-radius: 999px;
+                        background: rgba(255,255,255,0.08);
+                        color: #d4d4d8;
+                        cursor: pointer;
+                    }
+                    .dev-album-metadata-actions button:hover,
+                    .dev-album-metadata-actions button:focus-visible {
+                        border-color: rgba(59, 130, 246, 0.8);
+                        background: rgba(59, 130, 246, 0.8);
+                        color: white;
+                        outline: none;
+                    }
+                    @media (max-width: 560px) {
+                        .dev-album-metadata-fields { grid-template-columns: 1fr; }
                     }
                     .dev-pm-photo-list {
                         display: flex;
@@ -1488,25 +1647,6 @@
                         background: rgba(0,0,0,0.05);
                         color: #666;
                     }
-                    .dev-pm-photo-action {
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        padding: 4px;
-                        border: none;
-                        border-radius: 4px;
-                        background: none;
-                        color: #94a3b8;
-                        cursor: pointer;
-                    }
-                    .dev-pm-photo-action:hover {
-                        background: rgba(0,0,0,0.05);
-                        color: #475569;
-                    }
-                    .dev-pm-photo-action.delete-btn:hover {
-                        background: #fef2f2;
-                        color: #ef4444;
-                    }
                     .dev-pm-photo-menu {
                         position: absolute;
                         right: 0;
@@ -1537,10 +1677,6 @@
                     .dev-pm-photo-menu-item:hover {
                         background: #f1f5f9;
                         color: #1e293b;
-                    }
-                    .dev-pm-photo-menu-item.delete:hover {
-                        background: #fef2f2;
-                        color: #ef4444;
                     }
                     /* Photo move-select mode */
                     .pm-photo-selected {
@@ -1732,11 +1868,14 @@
                 close: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`,
                 trash: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`,
                 copy: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`,
+                mergeArrows: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 5 7 7 7-7"/><path d="M12 12v7"/><path d="m9 16 3 3 3-3"/></svg>`,
                 check: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`,
                 quote: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h1c0 2.2-1.8 4-4 4v3a7 7 0 0 0 7-7V5a2 2 0 0 0-2-2z"/><path d="M5 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h1c0 2.2-1.8 4-4 4v3a7 7 0 0 0 7-7V5a2 2 0 0 0-2-2z"/></svg>`,
                 refresh: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>`,
                 clipboard: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>`,
                 gear: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>`,
+                grid: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/></svg>`,
+                order: `<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16"></path><path d="M4 12h11"></path><path d="M4 18h7"></path><path d="m17 15 3 3-3 3"></path><path d="M20 18h-5"></path></svg>`,
                 plus: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>`,
                 drag: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 9 2 12 5 15"></polyline><polyline points="9 5 12 2 15 5"></polyline><polyline points="15 19 12 22 9 19"></polyline><polyline points="19 9 22 12 19 15"></polyline><line x1="2" y1="12" x2="22" y2="12"></line><line x1="12" y1="2" x2="12" y2="22"></line></svg>`,
                 type: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 4 20 8 16 12"></polyline><line x1="4" y1="8" x2="20" y2="8"></line><polyline points="8 20 4 16 8 12"></polyline><line x1="4" y1="16" x2="20" y2="16"></line></svg>`,
@@ -1745,10 +1884,9 @@
                 dots: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.5"></circle><circle cx="19" cy="12" r="1.5"></circle><circle cx="5" cy="12" r="1.5"></circle></svg>`,
                 slideOne: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M10 10l2-2"/></svg>`,
                 image: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>`,
-                expandAll: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>`,
-                collapseAll: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 20 5-5 5 5"/><path d="m7 4 5 5 5-5"/></svg>`,
                 rename: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>`,
                 split: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3"/><path d="M16 3h3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-3"/><line x1="12" y1="3" x2="12" y2="21"/></svg>`,
+                splitArrows: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v7"/><path d="m12 12-7 7"/><path d="m12 12 7 7"/><path d="m5 16 0 3 3 0"/><path d="m19 16 0 3-3 0"/></svg>`,
                 arrowRight: `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg>`,
                 cloudSync: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="4" x2="19" y2="4"/><polyline points="12 8 12 20"/><polyline points="8 12 12 8 16 12"/></svg>`,
                 download: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg>`
@@ -1819,7 +1957,13 @@
 
             const updateGlobalTagPendingIndicator = () => {
                 const hasPendingTags = serializeTagMap(currentAlbumTagMap) !== serializeTagMap(savedAlbumTagMap);
-                document.getElementById('dev-tag-toggle')?.classList.toggle('has-pending', hasPendingTags);
+                const tagToggle = document.getElementById('dev-tag-toggle') as HTMLButtonElement | null;
+                if (!tagToggle) return;
+                tagToggle.classList.toggle('has-pending', hasPendingTags);
+                tagToggle.title = hasPendingTags
+                    ? 'Save pending tag changes'
+                    : activeTagMode ? 'Finish editing tags' : 'Edit tags';
+                tagToggle.setAttribute('aria-label', tagToggle.title);
             };
 
             const updateBlockTagPendingIndicator = (_block: HTMLElement) => updateGlobalTagPendingIndicator();
@@ -1828,14 +1972,36 @@
                 updateGlobalTagPendingIndicator();
             };
 
-            const hasPendingChanges = () => (
-                serializeTagMap(currentAlbumTagMap) !== serializeTagMap(savedAlbumTagMap)
-                || pendingCaptionChanges.size > 0
+            const hasPendingBlockChanges = () => (
+                pendingCaptionChanges.size > 0
                 || pendingTextChanges.size > 0
                 || pendingBlockMarginChanges.size > 0
                 || pendingBlockTypeChanges.size > 0
-                || pendingPageStructureChange !== null
+                || pendingBlockStructureChange !== null
             );
+
+            const hasPendingOrderChanges = () => pendingOrderChange !== null;
+
+            const hasPendingTagChanges = () => (
+                serializeTagMap(currentAlbumTagMap) !== serializeTagMap(savedAlbumTagMap)
+            );
+
+            const hasPendingChanges = () => hasPendingTagChanges() || hasPendingBlockChanges() || hasPendingOrderChanges();
+
+            type AlbumEditMode = 'order' | 'blocks' | 'tags';
+            const pendingEditMode = (): AlbumEditMode | null => {
+                if (hasPendingOrderChanges()) return 'order';
+                if (hasPendingBlockChanges()) return 'blocks';
+                if (hasPendingTagChanges()) return 'tags';
+                return null;
+            };
+
+            const canStartEditMode = (target: AlbumEditMode) => {
+                const pending = pendingEditMode();
+                if (!pending || pending === target) return true;
+                showToast(`⚠️ Save pending ${pending} changes before editing ${target}`);
+                return false;
+            };
 
             const handlePendingBeforeUnload = (event: BeforeUnloadEvent) => {
                 if (pendingSaveInProgress || !hasPendingChanges()) return;
@@ -1857,25 +2023,20 @@
                 const saveBtn = document.getElementById('dev-save-btn') as HTMLButtonElement | null;
                 if (!saveBtn) return;
 
-                const hasPendingTagChanges = serializeTagMap(currentAlbumTagMap) !== serializeTagMap(savedAlbumTagMap);
-                const hasPendingCaptionChanges = pendingCaptionChanges.size > 0;
-                const hasPendingTextChanges = pendingTextChanges.size > 0;
-                const hasPendingMarginChanges = pendingBlockMarginChanges.size > 0;
-                const hasPendingTypeChanges = pendingBlockTypeChanges.size > 0;
-                const hasPendingStructureChanges = pendingPageStructureChange !== null;
-                const hasPendingBlockChanges = hasPendingCaptionChanges
-                    || hasPendingTextChanges
-                    || hasPendingMarginChanges
-                    || hasPendingTypeChanges
-                    || hasPendingStructureChanges;
-                const hasPendingChanges = hasPendingTagChanges || hasPendingBlockChanges;
-                saveBtn.disabled = isSaving || !hasPendingChanges;
-                saveBtn.classList.toggle('has-pending', hasPendingChanges);
+                const hasPendingBlocks = hasPendingBlockChanges();
+                saveBtn.disabled = isSaving;
+                saveBtn.classList.toggle('has-pending', hasPendingBlocks);
+                saveBtn.classList.toggle('active', activeBlockEditMode && !hasPendingBlocks);
+                saveBtn.setAttribute('aria-pressed', String(activeBlockEditMode));
                 saveBtn.title = isSaving
                     ? 'Saving pending changes...'
-                    : hasPendingChanges
-                        ? `Save pending ${hasPendingTagChanges && hasPendingBlockChanges ? 'tag and block' : hasPendingBlockChanges ? 'block' : 'tag'} changes`
-                        : 'No pending changes';
+                    : hasPendingBlocks
+                        ? 'Save pending block changes'
+                        : activeBlockEditMode ? 'Finish editing blocks' : 'Edit blocks';
+                saveBtn.setAttribute('aria-label', saveBtn.title);
+                updateGlobalTagPendingIndicator();
+                updateOrderButtonState();
+                updateEditModeAvailability(isSaving);
             };
 
             const rememberMountainName = (name: string, region?: MountainRegion) => {
@@ -2015,13 +2176,15 @@
                 }
             };
 
-            const savePendingPageChanges = async (albumSlug: string) => {
-                const captionChanges = [...pendingCaptionChanges.entries()];
-                const textChanges = [...pendingTextChanges.entries()];
-                const marginChanges = [...pendingBlockMarginChanges.entries()];
-                const typeChanges = [...pendingBlockTypeChanges.entries()];
-                const structureChange = pendingPageStructureChange?.albumSlug === albumSlug
-                    ? pendingPageStructureChange
+            const savePendingPageChanges = async (albumSlug: string, mode: 'blocks' | 'order' = 'blocks') => {
+                const includeBlockEdits = mode === 'blocks';
+                const captionChanges = includeBlockEdits ? [...pendingCaptionChanges.entries()] : [];
+                const textChanges = includeBlockEdits ? [...pendingTextChanges.entries()] : [];
+                const marginChanges = includeBlockEdits ? [...pendingBlockMarginChanges.entries()] : [];
+                const typeChanges = includeBlockEdits ? [...pendingBlockTypeChanges.entries()] : [];
+                const pendingStructure = mode === 'blocks' ? pendingBlockStructureChange : pendingOrderChange;
+                const structureChange = pendingStructure?.albumSlug === albumSlug
+                    ? pendingStructure
                     : null;
                 if (captionChanges.length === 0
                     && textChanges.length === 0
@@ -2191,12 +2354,67 @@
                     typeChanges.forEach(([key, change]) => {
                         if (pendingBlockTypeChanges.get(key) === change) pendingBlockTypeChanges.delete(key);
                     });
-                    if (pendingPageStructureChange === structureChange) pendingPageStructureChange = null;
+                    if (mode === 'blocks' && pendingBlockStructureChange === structureChange) pendingBlockStructureChange = null;
+                    if (mode === 'order' && pendingOrderChange === structureChange) pendingOrderChange = null;
                     return true;
                 } catch (error) {
                     showToast(`❌ ${error instanceof Error ? error.message : 'Failed to save block changes'}`);
                     return false;
                 }
+            };
+
+            const savePendingTagChangesOnly = async () => {
+                const albumSlug = getAlbumSlug();
+                if (!albumSlug) return showToast('❌ Cannot identify album');
+                if (!hasPendingTagChanges()) return;
+
+                pendingSaveInProgress = true;
+                updateSaveButtonState(true);
+                const saved = await savePendingTagChanges(albumSlug);
+                pendingSaveInProgress = false;
+                updateSaveButtonState();
+                if (saved) showToast('✅ Tag changes saved');
+            };
+
+            const savePendingBlockChangesOnly = async () => {
+                const albumSlug = getAlbumSlug();
+                if (!albumSlug) return showToast('❌ Cannot identify album');
+                if (!hasPendingBlockChanges()) return;
+
+                pendingSaveInProgress = true;
+                updateSaveButtonState(true);
+                // The dev server can apply an MDX update before the response returns.
+                sessionStorage.setItem('dev-caption-save-scroll-y', String(window.scrollY));
+                const saved = await savePendingPageChanges(albumSlug);
+                pendingSaveInProgress = false;
+                updateSaveButtonState();
+                if (!saved) {
+                    sessionStorage.removeItem('dev-caption-save-scroll-y');
+                    return;
+                }
+
+                showToast('✅ Block changes saved');
+                window.setTimeout(() => window.location.reload(), 500);
+            };
+
+            const savePendingOrderChangesOnly = async () => {
+                const albumSlug = getAlbumSlug();
+                if (!albumSlug) return showToast('❌ Cannot identify album');
+                if (!hasPendingOrderChanges()) return;
+
+                pendingSaveInProgress = true;
+                updateSaveButtonState(true);
+                sessionStorage.setItem('dev-caption-save-scroll-y', String(window.scrollY));
+                const saved = await savePendingPageChanges(albumSlug, 'order');
+                pendingSaveInProgress = false;
+                updateSaveButtonState();
+                if (!saved) {
+                    sessionStorage.removeItem('dev-caption-save-scroll-y');
+                    return;
+                }
+
+                showToast('✅ Order changes saved');
+                window.setTimeout(() => window.location.reload(), 500);
             };
 
             const savePendingChanges = async () => {
@@ -2206,7 +2424,7 @@
                     || pendingTextChanges.size > 0
                     || pendingBlockMarginChanges.size > 0
                     || pendingBlockTypeChanges.size > 0
-                    || pendingPageStructureChange !== null;
+                    || pendingBlockStructureChange !== null;
                 const hasPendingTags = serializeTagMap(currentAlbumTagMap) !== serializeTagMap(savedAlbumTagMap);
                 if (!hasPendingBlockChanges && !hasPendingTags) return showToast('ℹ️ No pending changes');
 
@@ -3077,6 +3295,7 @@
                 activeMarginControl = null;
                 void initToolbars();
                 initInlineBlockAdder();
+                window.requestAnimationFrame(() => initInlineOrderEditor());
             };
 
             const directBlockOptions = [
@@ -3097,9 +3316,11 @@
                     props: { ...(block.props || {}) },
                     __devKey: block.__devKey || `persisted-${index}`,
                 }));
-                const stagedStructure = pendingPageStructureChange?.albumSlug === albumSlug
-                    ? pendingPageStructureChange
-                    : null;
+                const stagedStructure = pendingBlockStructureChange?.albumSlug === albumSlug
+                    ? pendingBlockStructureChange
+                    : pendingOrderChange?.albumSlug === albumSlug
+                        ? pendingOrderChange
+                        : null;
                 return {
                     draft: stagedStructure
                         ? JSON.parse(JSON.stringify(stagedStructure.draft)) as PageStructureDraft
@@ -3117,7 +3338,102 @@
                 };
             };
 
+            const closeAlbumMetadataEditor = () => {
+                document.querySelector<HTMLElement>('[data-dev-album-metadata-fields]')?.remove();
+                document.querySelector<HTMLButtonElement>('[data-dev-album-metadata-edit]')?.setAttribute('aria-expanded', 'false');
+            };
+
+            const stageDirectAlbumMetadata = async (
+                titleValue: string,
+                infoValue: string,
+                defaultMarginValue: string,
+            ) => {
+                if (!canStartEditMode('blocks')) return;
+                const albumSlug = getAlbumSlug();
+                const title = titleValue.trim();
+                if (!albumSlug) return;
+                if (!title) return showToast('❌ Album title is required');
+                try {
+                    const page = await getDirectPageStructure(albumSlug);
+                    page.draft.metadata = {
+                        ...page.draft.metadata,
+                        title,
+                        info: infoValue.trim() || undefined,
+                        gap: remValueFromInput(defaultMarginValue) || undefined,
+                    };
+                    pendingBlockStructureChange = { albumSlug, draft: page.draft, imports: page.imports };
+                    closeAlbumMetadataEditor();
+                    renderPendingPageStructure(albumSlug, page.draft, page.imports);
+                    updateSaveButtonState();
+                    showToast('📝 Pending album metadata update');
+                } catch (error) {
+                    showToast(`❌ ${error instanceof Error ? error.message : 'Failed to update album metadata'}`);
+                }
+            };
+
+            function initAlbumMetadataEditor() {
+                const heading = document.querySelector<HTMLElement>('[data-album-heading]');
+                const title = heading?.querySelector<HTMLElement>('[data-album-title]');
+                if (!heading || !title || heading.querySelector('[data-dev-album-metadata-edit]')) return;
+
+                const editor = document.createElement('div');
+                editor.className = 'dev-album-metadata-editor';
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'dev-album-metadata-edit-button';
+                button.dataset.devAlbumMetadataEdit = '';
+                button.title = 'Edit album metadata';
+                button.setAttribute('aria-label', button.title);
+                button.setAttribute('aria-expanded', 'false');
+                button.innerHTML = ICONS.pencil;
+                editor.appendChild(button);
+                title.insertAdjacentElement('afterend', editor);
+
+                button.addEventListener('click', () => {
+                    if (editor.querySelector('[data-dev-album-metadata-fields]')) {
+                        closeAlbumMetadataEditor();
+                        return;
+                    }
+                    if (!canStartEditMode('blocks')) return;
+                    closeOtherPageEditors(button);
+                    const fields = document.createElement('form');
+                    fields.className = 'dev-album-metadata-fields';
+                    fields.dataset.devAlbumMetadataFields = '';
+                    fields.innerHTML = `
+                        <label>Title<input class="dev-album-metadata-title" type="text" /></label>
+                        <label>Info<input class="dev-album-metadata-info" type="text" /></label>
+                        <label>Default block margin<input class="dev-album-metadata-margin" type="number" step="0.1" inputmode="decimal" placeholder="0.5" /></label>
+                        <div class="dev-album-metadata-actions">
+                            <button type="submit" title="Stage album metadata" aria-label="Stage album metadata">${ICONS.check}</button>
+                            <button type="button" data-dev-album-metadata-cancel title="Cancel" aria-label="Cancel">${ICONS.close}</button>
+                        </div>
+                    `;
+                    editor.appendChild(fields);
+                    button.setAttribute('aria-expanded', 'true');
+                    const titleInput = fields.querySelector<HTMLInputElement>('.dev-album-metadata-title')!;
+                    const infoInput = fields.querySelector<HTMLInputElement>('.dev-album-metadata-info')!;
+                    const marginInput = fields.querySelector<HTMLInputElement>('.dev-album-metadata-margin')!;
+                    fields.querySelector('[data-dev-album-metadata-cancel]')?.addEventListener('click', closeAlbumMetadataEditor);
+                    fields.addEventListener('submit', (event) => {
+                        event.preventDefault();
+                        void stageDirectAlbumMetadata(titleInput.value, infoInput.value, marginInput.value);
+                    });
+                    void getDirectPageStructure(getAlbumSlug() || '')
+                        .then((page) => {
+                            titleInput.value = page.draft.metadata.title || '';
+                            infoInput.value = page.draft.metadata.info || '';
+                            marginInput.value = remValueForInput(page.draft.metadata.gap);
+                            titleInput.focus();
+                        })
+                        .catch((error) => {
+                            closeAlbumMetadataEditor();
+                            showToast(`❌ ${error instanceof Error ? error.message : 'Failed to load album metadata'}`);
+                        });
+                });
+            }
+
             const stageDirectBlock = async (type: string, insertIndex: number, files: File[] = []) => {
+                if (!canStartEditMode('blocks')) return;
                 const albumSlug = getAlbumSlug();
                 if (!albumSlug) return showToast('❌ Cannot identify album');
 
@@ -3154,12 +3470,12 @@
                             photos: files.map((file) => ({ itemKey: file.name })),
                         };
                     page.draft.blocks.splice(insertIndex, 0, newBlock);
-                    pendingPageStructureChange = {
+                    pendingBlockStructureChange = {
                         albumSlug,
                         draft: page.draft,
                         imports: [...page.imports, ...files],
                     };
-                    renderPendingPageStructure(albumSlug, page.draft, pendingPageStructureChange.imports);
+                    renderPendingPageStructure(albumSlug, page.draft, pendingBlockStructureChange.imports);
                     updateSaveButtonState();
                     showToast('📝 Pending page structure update');
                 } catch (error) {
@@ -3168,6 +3484,7 @@
             };
 
             const stageDirectBlockPhotos = async (blockKey: string, fallbackIndex: number, files: File[]) => {
+                if (!canStartEditMode('blocks')) return;
                 const albumSlug = getAlbumSlug();
                 if (!albumSlug || files.length === 0) return;
 
@@ -3198,12 +3515,12 @@
 
                     targetBlock.photos ||= [];
                     targetBlock.photos.push(...files.map((file) => ({ itemKey: file.name })));
-                    pendingPageStructureChange = {
+                    pendingBlockStructureChange = {
                         albumSlug,
                         draft: page.draft,
                         imports: [...page.imports, ...files],
                     };
-                    renderPendingPageStructure(albumSlug, page.draft, pendingPageStructureChange.imports);
+                    renderPendingPageStructure(albumSlug, page.draft, pendingBlockStructureChange.imports);
                     updateSaveButtonState();
                     showToast('📝 Pending photos added to block');
                 } catch (error) {
@@ -3231,6 +3548,7 @@
             };
 
             const stageDirectBlockDeletion = async (blockKey: string, fallbackIndex: number) => {
+                if (!canStartEditMode('blocks')) return;
                 const albumSlug = getAlbumSlug();
                 if (!albumSlug) return;
                 try {
@@ -3239,7 +3557,7 @@
                     if (!block) return showToast('❌ Block is no longer available');
                     page.draft.blocks.splice(index, 1);
                     reconcileDirectPhotoRemovals(page);
-                    pendingPageStructureChange = { albumSlug, draft: page.draft, imports: page.imports };
+                    pendingBlockStructureChange = { albumSlug, draft: page.draft, imports: page.imports };
                     clearActiveInlineBlockAction();
                     renderPendingPageStructure(albumSlug, page.draft, page.imports);
                     updateSaveButtonState();
@@ -3250,6 +3568,7 @@
             };
 
             const stageDirectPhotoDeletion = async (blockKey: string, fallbackIndex: number, photoNames: Set<string>) => {
+                if (!canStartEditMode('blocks')) return;
                 const albumSlug = getAlbumSlug();
                 if (!albumSlug || photoNames.size === 0) return;
                 try {
@@ -3260,7 +3579,7 @@
                     block.photos = (block.photos || []).filter((photo: any) => !photoNames.has(basename(photo.itemKey)));
                     if (block.photos.length === 0) page.draft.blocks.splice(index, 1);
                     reconcileDirectPhotoRemovals(page);
-                    pendingPageStructureChange = { albumSlug, draft: page.draft, imports: page.imports };
+                    pendingBlockStructureChange = { albumSlug, draft: page.draft, imports: page.imports };
                     clearActiveInlineBlockAction();
                     renderPendingPageStructure(albumSlug, page.draft, page.imports);
                     updateSaveButtonState();
@@ -3270,26 +3589,65 @@
                 }
             };
 
-            const stageDirectInitialPhoto = async (blockKey: string, fallbackIndex: number, photoName: string) => {
+            const stageDirectInitialPhoto = async (
+                blockKey: string,
+                fallbackIndex: number,
+                photoName: string,
+                allowPendingCarousel = false,
+            ) => {
+                if (!canStartEditMode('blocks')) return;
                 const albumSlug = getAlbumSlug();
                 if (!albumSlug || !photoName) return;
                 try {
                     const page = await getDirectPageStructure(albumSlug);
                     const { block } = findDirectTargetBlock(page, blockKey, fallbackIndex);
-                    if (!block || block.type !== 'PhotoCarousel') return showToast('❌ This is no longer a carousel');
+                    if (!block || (block.type !== 'PhotoCarousel' && !allowPendingCarousel)) {
+                        return showToast('❌ This is no longer a carousel');
+                    }
+                    if (allowPendingCarousel && block.type !== 'PhotoCarousel') block.type = 'PhotoCarousel';
                     const basename = (value: string) => value.replace(/^\/+/, '').split('/').pop() || value;
                     const initialSlide = (block.photos || []).findIndex((photo: any) => basename(photo.itemKey) === photoName);
                     if (initialSlide < 0) return showToast('❌ Photo is no longer available');
                     block.props ||= {};
                     if (initialSlide > 0) block.props.initialSlide = initialSlide;
                     else delete block.props.initialSlide;
-                    pendingPageStructureChange = { albumSlug, draft: page.draft, imports: page.imports };
+                    pendingBlockStructureChange = { albumSlug, draft: page.draft, imports: page.imports };
                     clearActiveInlineBlockAction();
                     renderPendingPageStructure(albumSlug, page.draft, page.imports);
                     updateSaveButtonState();
                     showToast('📝 Pending initial photo update');
                 } catch (error) {
                     showToast(`❌ ${error instanceof Error ? error.message : 'Failed to set initial photo'}`);
+                }
+            };
+
+            const stageDirectInitialView = async (
+                blockKey: string,
+                fallbackIndex: number,
+                initialView: 'carousel' | 'panorama',
+                allowPendingPanorama = false,
+            ) => {
+                if (!canStartEditMode('blocks')) return;
+                const albumSlug = getAlbumSlug();
+                if (!albumSlug) return;
+                try {
+                    const page = await getDirectPageStructure(albumSlug);
+                    const { block } = findDirectTargetBlock(page, blockKey, fallbackIndex);
+                    if (!block || (block.props?.enablePanorama !== true && !allowPendingPanorama)) {
+                        return showToast('❌ This is no longer a panorama');
+                    }
+                    block.type = 'PhotoCarousel';
+                    block.props ||= {};
+                    block.props.enablePanorama = true;
+                    if (initialView === 'panorama') block.props.initialView = 'panorama';
+                    else delete block.props.initialView;
+                    pendingBlockStructureChange = { albumSlug, draft: page.draft, imports: page.imports };
+                    clearActiveInlineBlockAction();
+                    renderPendingPageStructure(albumSlug, page.draft, page.imports);
+                    updateSaveButtonState();
+                    showToast(`📝 Pending initial view: ${initialView}`);
+                } catch (error) {
+                    showToast(`❌ ${error instanceof Error ? error.message : 'Failed to set initial view'}`);
                 }
             };
 
@@ -3395,7 +3753,7 @@
             const openInlineBlockActionMenu = (
                 anchor: HTMLElement,
                 block: HTMLElement,
-                targetBlock: { key: string; index: number; isMedia: boolean; isCarousel: boolean },
+                targetBlock: { key: string; index: number; isMedia: boolean; isCarousel: boolean; isPanorama: boolean },
             ) => {
                 closeOtherPageEditors(anchor);
                 clearActiveInlineBlockAction();
@@ -3431,7 +3789,14 @@
                         const action = activeInlineBlockAction;
                         if (kind === 'delete-block') void stageDirectBlockDeletion(targetBlock.key, targetBlock.index);
                         else if (kind === 'delete-photos' && action) void stageDirectPhotoDeletion(targetBlock.key, targetBlock.index, action.selectedPhotos);
-                        else if (kind === 'set-initial-photo' && action) void stageDirectInitialPhoto(targetBlock.key, targetBlock.index, [...action.selectedPhotos][0]);
+                        else if (kind === 'set-initial-photo' && action) {
+                            void stageDirectInitialPhoto(
+                                targetBlock.key,
+                                targetBlock.index,
+                                [...action.selectedPhotos][0],
+                                targetBlock.isCarousel,
+                            );
+                        }
                         document.removeEventListener('click', closeMenu);
                     });
                     menu.append(confirm, cancel);
@@ -3447,9 +3812,40 @@
                     });
                     menu.appendChild(option);
                 };
+                const showInitialViewOptions = () => {
+                    menu.replaceChildren();
+                    (['carousel', 'panorama'] as const).forEach((initialView) => {
+                        const option = document.createElement('button');
+                        option.type = 'button';
+                        option.textContent = initialView === 'carousel' ? 'Carousel' : 'Panorama';
+                        option.addEventListener('click', (event) => {
+                            event.stopPropagation();
+                            menu.remove();
+                            document.removeEventListener('click', closeMenu);
+                            void stageDirectInitialView(
+                                targetBlock.key,
+                                targetBlock.index,
+                                initialView,
+                                targetBlock.isPanorama,
+                            );
+                        });
+                        menu.appendChild(option);
+                    });
+                    positionInlineActionMenu(menu, anchor);
+                };
                 addOption('Delete Block', 'delete-block');
                 if (targetBlock.isMedia) addOption('Delete Photos', 'delete-photos');
                 if (targetBlock.isCarousel) addOption('Set Initial Photo', 'set-initial-photo');
+                if (targetBlock.isPanorama) {
+                    const initialViewOption = document.createElement('button');
+                    initialViewOption.type = 'button';
+                    initialViewOption.textContent = 'Set Initial View';
+                    initialViewOption.addEventListener('click', (event) => {
+                        event.stopPropagation();
+                        showInitialViewOptions();
+                    });
+                    menu.appendChild(initialViewOption);
+                }
                 document.body.appendChild(menu);
                 positionInlineActionMenu(menu, anchor);
                 window.setTimeout(() => document.addEventListener('click', closeMenu), 0);
@@ -3546,11 +3942,17 @@
                     });
                     addZone.appendChild(button);
                     if (block && !before) {
-                        const targetBlock = {
-                            key: block.dataset.devBlockKey || `persisted-${insertIndex - 1}`,
-                            index: insertIndex - 1,
-                            isMedia: block.dataset.devBlock !== 'text',
-                            isCarousel: block.dataset.devBlock === 'carousel',
+                        const getTargetBlock = () => {
+                            const stagedBlockTypeChange = pendingBlockTypeChanges.get(block.dataset.devTypeChangeKey || '');
+                            const stagedType = stagedBlockTypeChange?.targetType;
+                            const displayedType = stagedType || block.dataset.devSourceType || block.dataset.devBlock;
+                            return {
+                                key: block.dataset.devBlockKey || `persisted-${insertIndex - 1}`,
+                                index: insertIndex - 1,
+                                isMedia: block.dataset.devBlock !== 'text',
+                                isCarousel: displayedType === 'PhotoCarousel' || displayedType === 'carousel',
+                                isPanorama: stagedBlockTypeChange?.targetPanorama ?? block.dataset.devPanorama === 'true',
+                            };
                         };
                         const moreButton = document.createElement('button');
                         moreButton.type = 'button';
@@ -3560,7 +3962,7 @@
                         moreButton.innerHTML = ICONS.dots;
                         moreButton.addEventListener('click', (event) => {
                             event.stopPropagation();
-                            openInlineBlockActionMenu(moreButton, block, targetBlock);
+                            openInlineBlockActionMenu(moreButton, block, getTargetBlock());
                         });
                         addZone.appendChild(moreButton);
                     }
@@ -3576,6 +3978,290 @@
                 blocks.forEach((block, index) => block.appendChild(createAddZone(index + 1, false, block)));
             }
 
+            const inlineOrderPhotoName = (wrapper: HTMLElement) => directPhotoName(wrapper);
+
+            const getInlineOrderPhotoPosition = (blocks: any[], photoName: string) => {
+                for (let blockIndex = 0; blockIndex < blocks.length; blockIndex += 1) {
+                    const photoIndex = (blocks[blockIndex].photos || []).findIndex((photo: any) =>
+                        (photo.itemKey || '').replace(/^.*\//, '') === photoName,
+                    );
+                    if (photoIndex >= 0) return { blockIndex, photoIndex };
+                }
+                return null;
+            };
+
+            const stageInlineOrderChange = (
+                albumSlug: string,
+                page: Awaited<ReturnType<typeof getDirectPageStructure>>,
+                message: string,
+            ) => {
+                reconcileDirectPhotoRemovals(page);
+                pendingOrderChange = { albumSlug, draft: page.draft, imports: page.imports };
+                renderPendingPageStructure(albumSlug, page.draft, page.imports);
+                updateSaveButtonState();
+                showToast(message);
+            };
+
+            const moveInlineOrderPhoto = async (targetPhotoName: string, insertAfter: boolean) => {
+                const sourcePhotoName = inlineOrderMovePhotoName;
+                const albumSlug = getAlbumSlug();
+                if (!sourcePhotoName || !albumSlug) return;
+                if (sourcePhotoName === targetPhotoName) {
+                    inlineOrderMovePhotoName = null;
+                    initInlineOrderEditor();
+                    return;
+                }
+
+                try {
+                    const page = await getDirectPageStructure(albumSlug);
+                    const source = getInlineOrderPhotoPosition(page.draft.blocks, sourcePhotoName);
+                    if (!source) return showToast('❌ Selected photo is no longer available');
+                    const [movedPhoto] = page.draft.blocks[source.blockIndex].photos.splice(source.photoIndex, 1);
+                    if (page.draft.blocks[source.blockIndex].photos.length === 0) {
+                        page.draft.blocks.splice(source.blockIndex, 1);
+                    }
+                    const target = getInlineOrderPhotoPosition(page.draft.blocks, targetPhotoName);
+                    if (!target || !movedPhoto) return showToast('❌ Target photo is no longer available');
+                    page.draft.blocks[target.blockIndex].photos.splice(target.photoIndex + (insertAfter ? 1 : 0), 0, movedPhoto);
+                    inlineOrderMovePhotoName = null;
+                    stageInlineOrderChange(albumSlug, page, '📝 Pending photo move');
+                } catch (error) {
+                    showToast(`❌ ${error instanceof Error ? error.message : 'Failed to move photo'}`);
+                }
+            };
+
+            const moveInlineOrderBlock = async (targetBlockKey: string) => {
+                const sourceBlockKey = inlineOrderMoveBlockKey;
+                const albumSlug = getAlbumSlug();
+                if (!sourceBlockKey || !albumSlug) return;
+                if (sourceBlockKey === targetBlockKey) {
+                    inlineOrderMoveBlockKey = null;
+                    initInlineOrderEditor();
+                    return;
+                }
+
+                try {
+                    const page = await getDirectPageStructure(albumSlug);
+                    const sourceIndex = page.draft.blocks.findIndex((block: any) => block.__devKey === sourceBlockKey);
+                    if (sourceIndex < 0) return showToast('❌ Selected block is no longer available');
+                    const [movedBlock] = page.draft.blocks.splice(sourceIndex, 1);
+                    const targetIndex = page.draft.blocks.findIndex((block: any) => block.__devKey === targetBlockKey);
+                    if (targetIndex < 0 || !movedBlock) return showToast('❌ Target block is no longer available');
+                    page.draft.blocks.splice(targetIndex + 1, 0, movedBlock);
+                    inlineOrderMoveBlockKey = null;
+                    stageInlineOrderChange(albumSlug, page, '📝 Pending block move');
+                } catch (error) {
+                    showToast(`❌ ${error instanceof Error ? error.message : 'Failed to move block'}`);
+                }
+            };
+
+            const createBlocksFromInlineOrderSelection = async (action: Exclude<InlineOrderPhotoAction, null>) => {
+                const albumSlug = getAlbumSlug();
+                if (!albumSlug) return;
+                if (inlineOrderSelectedPhotoNames.size < 2) {
+                    return showToast('⚠️ Select at least two photos');
+                }
+
+                try {
+                    const page = await getDirectPageStructure(albumSlug);
+                    const selectedPhotos = page.draft.blocks.flatMap((block: any) =>
+                        (block.photos || []).filter((photo: any) =>
+                            inlineOrderSelectedPhotoNames.has((photo.itemKey || '').replace(/^.*\//, '')),
+                        ),
+                    );
+                    const lastSelectedName = inlineOrderLastSelectedPhotoName;
+                    const lastSource = lastSelectedName
+                        ? getInlineOrderPhotoPosition(page.draft.blocks, lastSelectedName)
+                        : null;
+                    if (!lastSource || selectedPhotos.length < 2) {
+                        return showToast('❌ Selected photos are no longer available');
+                    }
+                    const lastSourceKey = page.draft.blocks[lastSource.blockIndex].__devKey;
+                    page.draft.blocks.forEach((block: any) => {
+                        if (block.type !== 'Text') {
+                            block.photos = (block.photos || []).filter((photo: any) =>
+                                !inlineOrderSelectedPhotoNames.has((photo.itemKey || '').replace(/^.*\//, '')),
+                            );
+                        }
+                    });
+                    const insertionBeforeRemoval = page.draft.blocks
+                        .slice(0, lastSource.blockIndex)
+                        .filter((block: any) => block.type === 'Text' || (block.photos || []).length > 0).length;
+                    page.draft.blocks = page.draft.blocks.filter((block: any) =>
+                        block.type === 'Text' || (block.photos || []).length > 0,
+                    );
+                    const survivingLastSource = page.draft.blocks.findIndex((block: any) => block.__devKey === lastSourceKey);
+                    const insertIndex = survivingLastSource >= 0 ? survivingLastSource + 1 : insertionBeforeRemoval;
+                    const newBlocks = action === 'merge'
+                        ? [{ type: 'Row', __devKey: `pending-${crypto.randomUUID()}`, props: {}, photos: selectedPhotos }]
+                        : selectedPhotos.map((photo: any) => ({
+                            type: 'Row',
+                            __devKey: `pending-${crypto.randomUUID()}`,
+                            props: {},
+                            photos: [photo],
+                        }));
+                    page.draft.blocks.splice(insertIndex, 0, ...newBlocks);
+                    inlineOrderPhotoAction = null;
+                    inlineOrderSelectedPhotoNames.clear();
+                    inlineOrderLastSelectedPhotoName = null;
+                    stageInlineOrderChange(
+                        albumSlug,
+                        page,
+                        action === 'merge' ? '📝 Pending photo merge' : '📝 Pending individual photo blocks',
+                    );
+                } catch (error) {
+                    showToast(`❌ ${error instanceof Error ? error.message : 'Failed to create blocks'}`);
+                }
+            };
+
+            function initInlineOrderEditor() {
+                inlineOrderInteractionAbortController?.abort();
+                inlineOrderInteractionAbortController = null;
+                document.querySelector<HTMLElement>('[data-dev-inline-order-actions]')?.remove();
+                document.querySelectorAll<HTMLElement>('.dev-order-block-move-zone').forEach((zone) => zone.remove());
+                document.querySelectorAll<HTMLElement>('.dev-order-block-controls').forEach((block) => {
+                    block.classList.remove('dev-order-block-controls');
+                });
+                if (!activeOrderMode) {
+                    document.querySelectorAll<HTMLElement>('.dev-order-photo-selected, .dev-order-photo-move-target').forEach((photo) => {
+                        photo.classList.remove('dev-order-photo-selected', 'dev-order-photo-move-target');
+                    });
+                    return;
+                }
+                const interactionAbortController = new AbortController();
+                inlineOrderInteractionAbortController = interactionAbortController;
+
+                const orderButton = document.getElementById('dev-order-btn');
+                const scrollContainer = document.querySelector('.fixed.bottom-8.right-8.flex-col');
+                if (orderButton) {
+                    const actions = document.createElement('div');
+                    actions.className = 'dev-order-actions';
+                    actions.dataset.devInlineOrderActions = '';
+                    const managerButton = document.createElement('button');
+                    managerButton.type = 'button';
+                    managerButton.className = 'dev-gear-btn in-container dev-order-action-button';
+                    managerButton.title = 'Open order manager';
+                    managerButton.setAttribute('aria-label', managerButton.title);
+                    managerButton.innerHTML = ICONS.grid;
+                    managerButton.addEventListener('click', () => void openPageManager(true));
+
+                    const createPhotoActionButton = (
+                        action: Exclude<InlineOrderPhotoAction, null>,
+                        label: string,
+                        icon: string,
+                    ) => {
+                        const button = document.createElement('button');
+                        button.type = 'button';
+                        const isActive = inlineOrderPhotoAction === action;
+                        button.className = `dev-gear-btn in-container dev-order-action-button${isActive ? ' is-active' : ''}`;
+                        button.title = isActive
+                            ? `${label}: ${inlineOrderSelectedPhotoNames.size} selected; click to confirm`
+                            : label;
+                        button.setAttribute('aria-label', button.title);
+                        button.innerHTML = isActive ? ICONS.check : icon;
+                        button.addEventListener('click', () => {
+                            if (inlineOrderPhotoAction === action) {
+                                void createBlocksFromInlineOrderSelection(action);
+                                return;
+                            }
+                            inlineOrderPhotoAction = action;
+                            inlineOrderSelectedPhotoNames.clear();
+                            inlineOrderLastSelectedPhotoName = null;
+                            inlineOrderMovePhotoName = null;
+                            inlineOrderMoveBlockKey = null;
+                            initInlineOrderEditor();
+                        });
+                        return button;
+                    };
+                    actions.append(
+                        managerButton,
+                        createPhotoActionButton('merge', 'Merge selected photos', ICONS.mergeArrows),
+                        createPhotoActionButton('split', 'Split selected photos', ICONS.splitArrows),
+                    );
+                    if (scrollContainer?.contains(orderButton)) scrollContainer.insertBefore(actions, orderButton.nextElementSibling);
+                    else orderButton.insertAdjacentElement('afterend', actions);
+                }
+
+                const blocks = Array.from(document.querySelectorAll<HTMLElement>('.album-content [data-dev-block]'));
+                if (blocks.length === 0) {
+                    window.setTimeout(() => {
+                        if (activeOrderMode) initInlineOrderEditor();
+                    }, 50);
+                    return;
+                }
+                blocks.forEach((block, index) => {
+                    block.classList.add('dev-order-block-controls');
+                    const blockKey = block.dataset.devBlockKey || `persisted-${index}`;
+                    const moveZone = document.createElement('div');
+                    moveZone.className = 'dev-order-block-move-zone';
+                    const moveButton = document.createElement('button');
+                    moveButton.type = 'button';
+                    const selected = inlineOrderMoveBlockKey === blockKey;
+                    if (inlineOrderMoveBlockKey && !selected) {
+                        moveButton.className = 'dev-page-inline-add-button dev-order-block-move-button is-move-target';
+                        moveButton.title = 'Move selected block here';
+                        moveButton.setAttribute('aria-label', moveButton.title);
+                        moveButton.innerHTML = ICONS.arrowRight;
+                    } else {
+                        moveButton.className = `dev-page-inline-add-button dev-order-block-move-button${selected ? ' is-selected' : ''}`;
+                        moveButton.title = selected ? 'Cancel move' : 'Click to move';
+                        moveButton.setAttribute('aria-label', moveButton.title);
+                        moveButton.innerHTML = selected ? ICONS.close : ICONS.drag;
+                    }
+                    moveButton.addEventListener('click', (event) => {
+                        event.stopPropagation();
+                        if (inlineOrderMoveBlockKey && !selected) {
+                            void moveInlineOrderBlock(blockKey);
+                            return;
+                        }
+                        inlineOrderMoveBlockKey = selected ? null : blockKey;
+                        inlineOrderMovePhotoName = null;
+                        initInlineOrderEditor();
+                    });
+                    moveZone.appendChild(moveButton);
+                    block.appendChild(moveZone);
+                });
+
+                document.querySelectorAll<HTMLElement>('.album-content [data-dev-block] .photo-wrapper').forEach((wrapper) => {
+                    const photoName = inlineOrderPhotoName(wrapper);
+                    if (!photoName) return;
+                    const selectedForAction = inlineOrderSelectedPhotoNames.has(photoName);
+                    const selectedForMove = inlineOrderMovePhotoName === photoName;
+                    const moveTarget = Boolean(inlineOrderMovePhotoName && !selectedForMove && !inlineOrderPhotoAction);
+                    wrapper.classList.toggle('dev-order-photo-selected', selectedForAction || selectedForMove);
+                    wrapper.classList.toggle('dev-order-photo-move-target', moveTarget);
+                    wrapper.addEventListener('click', (event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        if (inlineOrderPhotoAction) {
+                            if (inlineOrderSelectedPhotoNames.has(photoName)) {
+                                inlineOrderSelectedPhotoNames.delete(photoName);
+                                if (inlineOrderLastSelectedPhotoName === photoName) inlineOrderLastSelectedPhotoName = null;
+                            } else {
+                                inlineOrderSelectedPhotoNames.add(photoName);
+                                inlineOrderLastSelectedPhotoName = photoName;
+                            }
+                            inlineOrderMovePhotoName = null;
+                            initInlineOrderEditor();
+                            return;
+                        }
+                        if (!inlineOrderMovePhotoName || inlineOrderMovePhotoName === photoName) {
+                            inlineOrderMovePhotoName = inlineOrderMovePhotoName === photoName ? null : photoName;
+                            inlineOrderMoveBlockKey = null;
+                            initInlineOrderEditor();
+                            return;
+                        }
+                        void moveInlineOrderPhoto(photoName, false);
+                    }, { capture: true, signal: interactionAbortController.signal });
+                    wrapper.addEventListener('contextmenu', (event) => {
+                        if (!inlineOrderMovePhotoName || inlineOrderPhotoAction) return;
+                        event.preventDefault();
+                        event.stopPropagation();
+                        void moveInlineOrderPhoto(photoName, true);
+                    }, { capture: true, signal: interactionAbortController.signal });
+                });
+            }
+
             function createPageManagerDialog() {
                 let existing = document.getElementById("dev-pm-dialog") as HTMLDialogElement;
                 if (existing) return existing;
@@ -3585,46 +4271,15 @@
                 dialog.innerHTML = `
                     <div style="display: flex; flex-direction: column; height: 80vh; max-height: 800px; width: 600px; max-width: 90vw; background: white; border-radius: 12px; overflow: hidden; font-family: sans-serif;">
                         <div style="padding: 1rem 1.5rem; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; background: #fafafa;">
-                            <h3 style="margin: 0; font-size: 1rem; color: #333;">Page Manager</h3>
+                            <h3 style="margin: 0; font-size: 1rem; color: #333;">Edit order</h3>
                             <div class="dev-manager-header-actions">
-                                <button id="dev-pm-r2-sync" class="dev-manager-header-button" type="button" title="Sync Current Album with R2" aria-label="Sync Current Album with R2">${ICONS.refresh}</button>
-                                <button id="dev-pm-expand-all" class="dev-manager-header-button" type="button" title="Expand / Collapse All" aria-label="Expand or collapse all">${ICONS.expandAll}</button>
                                 <button id="dev-pm-rename" class="dev-manager-header-button" type="button" title="Rename photos by current order" aria-label="Rename photos by current order">${ICONS.rename}</button>
                                 <button id="dev-pm-confirm" class="dev-manager-header-button dev-manager-header-button--save" type="button" title="No pending changes" aria-label="Save Changes" disabled>${ICONS.check}</button>
                                 <button id="dev-pm-close" class="dev-manager-header-button" type="button" title="Close" aria-label="Close">${ICONS.close}</button>
                             </div>
                         </div>
                         <div id="dev-pm-content" style="flex: 1; overflow-y: auto; padding: 1.5rem;">
-                            <!-- Frontmatter Form -->
-                            <div id="dev-pm-fm-section" class="dev-pm-fm-section collapsed" style="margin-bottom: 1.5rem; padding: 0.75rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
-                                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                    <button id="dev-pm-fm-toggle" style="background: none; border: none; cursor: pointer; color: #666; padding: 4px; display: flex; align-items: center; transition: transform 0.2s;">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                                    </button>
-                                    <h4 style="margin: 0; font-size: 0.85rem; color: #475569; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 0.5rem; flex: 1; cursor: pointer;">
-                                        ${ICONS.pencil} Album Metadata
-                                    </h4>
-                                </div>
-                                <div class="dev-pm-fm-content">
-                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
-                                        <label style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.75rem; color: #64748b;">
-                                            Title
-                                            <input type="text" id="dev-pm-title" style="width: 100%; box-sizing: border-box; padding: 0.4rem 0.6rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;" />
-                                        </label>
-                                        <label style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.75rem; color: #64748b;">
-                                            Info
-                                            <input type="text" id="dev-pm-info" style="width: 100%; box-sizing: border-box; padding: 0.4rem 0.6rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;" />
-                                        </label>
-                                    </div>
-                                    <label style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.75rem; color: #64748b;">
-                                        Block Gap
-                                        <input type="number" id="dev-pm-gap" step="0.1" inputmode="decimal" placeholder="0.5" style="width: 100%; box-sizing: border-box; padding: 0.4rem 0.6rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;" />
-                                    </label>
-                                </div>
-                            </div>
-
                             <div id="dev-pm-tree" class="dev-pm-tree"></div>
-                            <input id="dev-pm-native-photo-picker" type="file" accept="image/jpeg,image/png,image/webp,image/avif" multiple hidden />
                         </div>
                     </div>
                 `;
@@ -3637,13 +4292,16 @@
                 return dialog;
             }
 
-            async function openPageManager() {
+            async function openPageManager(keepOrderModeOnClose = false) {
                 const albumSlug = getAlbumSlug();
                 if (!albumSlug) return showToast("❌ Cannot identify album");
+                if (!canStartEditMode('order')) return;
 
                 showToast("⌛ Loading structure...");
                 const res = await fetch(`/api/get-page-structure?albumSlug=${albumSlug}`);
                 if (!res.ok) return showToast("❌ Failed to load structure");
+
+                setOrderEditMode(true);
 
                 const data = await res.json();
                 const normalizePageBlocks = (blocks: any[]) => JSON.parse(JSON.stringify(blocks)).map((block: any, index: number) => {
@@ -3659,8 +4317,8 @@
                     return block;
                 });
                 const serverBlocks = normalizePageBlocks(data.blocks);
-                const stagedStructure = pendingPageStructureChange?.albumSlug === albumSlug
-                    ? pendingPageStructureChange
+                const stagedStructure = pendingOrderChange?.albumSlug === albumSlug
+                    ? pendingOrderChange
                     : null;
                 const displayedMetadata = stagedStructure?.draft.metadata || data.metadata || {};
                 const Tree = (window as any).Sortable ? (window as any).Sortable : await loadSortable();
@@ -3669,12 +4327,7 @@
                 const treeContainer = dialog.querySelector("#dev-pm-tree") as HTMLElement;
                 const closeBtn = dialog.querySelector("#dev-pm-close") as HTMLButtonElement;
                 const confirmBtn = dialog.querySelector("#dev-pm-confirm") as HTMLButtonElement;
-                const nativePhotoPicker = dialog.querySelector("#dev-pm-native-photo-picker") as HTMLInputElement;
-                const expandAllBtn = dialog.querySelector("#dev-pm-expand-all") as HTMLButtonElement;
                 const renameBtn = dialog.querySelector("#dev-pm-rename") as HTMLButtonElement;
-                const r2SyncBtn = dialog.querySelector("#dev-pm-r2-sync") as HTMLButtonElement;
-
-                r2SyncBtn.addEventListener('click', () => openAlbumSyncDialog(albumSlug));
 
                 renameBtn.addEventListener('click', () => {
                     const orderedKeys = currentBlocks.flatMap((b: any) => b.photos.map((p: any) => p.itemKey));
@@ -3694,39 +4347,14 @@
                     });
                 });
 
-                // FM Form elements
-                const fTitle = dialog.querySelector("#dev-pm-title") as HTMLInputElement;
-                const fInfo = dialog.querySelector("#dev-pm-info") as HTMLInputElement;
-
                 const fmData = {
-                    title: String(displayedMetadata.title || ''),
-                    info: String(displayedMetadata.info || ''),
                     coverKey: String(data.metadata?.cover?.assetKey || ''),
                 };
-                fTitle.value = fmData.title;
-                fInfo.value = fmData.info;
-
-                const fGap = dialog.querySelector("#dev-pm-gap") as HTMLInputElement;
-                fGap.value = remValueForInput(displayedMetadata.gap);
-
-                const fmSection = dialog.querySelector("#dev-pm-fm-section") as HTMLElement;
-                const fmToggle = dialog.querySelector("#dev-pm-fm-toggle") as HTMLButtonElement;
-                const fmTitle = fmSection.querySelector("h4") as HTMLElement;
-
-                const updateFMState = () => {
-                    const isCollapsed = fmSection.classList.contains('collapsed');
-                    fmToggle.style.transform = isCollapsed ? 'rotate(0deg)' : 'rotate(90deg)';
-                };
-
-                const toggleFM = (e: Event) => {
-                    e.stopPropagation();
-                    fmSection.classList.toggle('collapsed');
-                    updateFMState();
-                };
-
-                fmToggle.addEventListener('click', toggleFM);
-                fmTitle.addEventListener('click', toggleFM);
-                updateFMState();
+                const pageManagerMetadata = () => ({
+                    title: String(displayedMetadata.title || '').trim(),
+                    info: String(displayedMetadata.info || '').trim(),
+                    gap: remValueFromInput(remValueForInput(displayedMetadata.gap)),
+                });
 
                 let currentBlocks = normalizePageBlocks(stagedStructure?.draft.blocks || serverBlocks);
                 let collapsedBlocks: Set<number> = new Set(
@@ -3786,11 +4414,7 @@
                     pendingPageImports = retainedImports;
                 };
                 const pageStateSnapshot = () => JSON.stringify({
-                    metadata: {
-                        title: fTitle.value.trim(),
-                        info: fInfo.value.trim(),
-                        gap: remValueFromInput(fGap.value),
-                    },
+                    metadata: pageManagerMetadata(),
                     blocks: currentBlocks,
                     imports: pendingPageImports.map((file) => `${file.name}:${file.size}:${file.lastModified}`),
                     removeLocal: [...pendingLocalRemovals].sort(),
@@ -3810,9 +4434,7 @@
                     const dirty = pageStateSnapshot() !== initialPageSnapshot;
                     confirmBtn.disabled = !dirty;
                     confirmBtn.title = dirty ? 'Add to pending changes' : 'No new changes';
-                    const hasStagedStructure = pendingPageStructureChange?.albumSlug === albumSlug;
-                    r2SyncBtn.disabled = dirty || hasStagedStructure;
-                    r2SyncBtn.title = dirty || hasStagedStructure ? 'Save pending page changes before syncing R2' : 'Sync Current Album with R2';
+                    const hasStagedStructure = pendingOrderChange?.albumSlug === albumSlug;
                     renameBtn.disabled = dirty || hasStagedStructure;
                     renameBtn.title = dirty || hasStagedStructure ? 'Save pending page changes before renaming photos' : 'Rename photos by current order';
                 };
@@ -3843,66 +4465,6 @@
                     renderTree();
                 };
 
-                const stageNewBlockFiles = (files: File[]) => {
-                    const referenced = referencedPhotoNames();
-                    const pendingNames = new Set(pendingPageImports.map((file) => file.name));
-                    const localNames = new Set(localPhotos.map((photo) => photo.name));
-                    const incomingNames = new Set<string>();
-                    const duplicate = files.find((file) => {
-                        const alreadySeen = incomingNames.has(file.name);
-                        incomingNames.add(file.name);
-                        return alreadySeen || referenced.has(file.name) || pendingNames.has(file.name) || localNames.has(file.name);
-                    });
-                    if (duplicate) {
-                        showToast(`❌ ${duplicate.name} already exists in this album; use its existing entry`);
-                        return false;
-                    }
-                    pendingPageImports.push(...files);
-                    return true;
-                };
-
-                const choosePhotosForBlock = (onFiles: (files: File[]) => void) => {
-                    nativePhotoPicker.value = '';
-                    nativePhotoPicker.onchange = () => {
-                        const files = Array.from(nativePhotoPicker.files || []);
-                        nativePhotoPicker.value = '';
-                        if (files.length) onFiles(files);
-                    };
-                    nativePhotoPicker.click();
-                };
-
-                const insertPreparedBlock = (newBlock: any, index: number) => {
-                    currentBlocks.splice(index, 0, newBlock);
-                    syncManagedSpecialMargins([index - 1, index]);
-                    const shifted = new Set<number>();
-                    collapsedBlocks.forEach((item: number) => shifted.add(item >= index ? item + 1 : item));
-                    collapsedBlocks = shifted;
-                    selectedBlock = null;
-                    renderTree();
-                };
-
-                const insertBlockAt = (type: string, index: number) => {
-                    if (type === 'Text') {
-                        insertPreparedBlock({
-                            type: 'Text',
-                            __devKey: `pending-${crypto.randomUUID()}`,
-                            props: { blockMargin: '1.5rem' },
-                            text: '',
-                            photos: [],
-                        }, index);
-                        return;
-                    }
-                    choosePhotosForBlock((files) => {
-                        if (!stageNewBlockFiles(files)) return;
-                        insertPreparedBlock({
-                            type: type === 'PhotoCarouselPanorama' ? 'PhotoCarousel' : type,
-                            __devKey: `pending-${crypto.randomUUID()}`,
-                            props: type === 'PhotoCarouselPanorama' ? { enablePanorama: true } : {},
-                            photos: files.map((file) => ({ itemKey: file.name })),
-                        }, index);
-                    });
-                };
-
                 const moveSelectedBlockToGap = (gapIndex: number) => {
                     if (selectedBlock === null) return;
                     const from = selectedBlock;
@@ -3916,40 +4478,6 @@
                     collapsedBlocks = new Set(collapsedFlags.flatMap((value: boolean, index: number) => value ? [index] : []));
                     selectedBlock = null;
                     renderTree();
-                };
-
-                const openInlineBlockMenu = (anchor: HTMLElement, index: number) => {
-                    document.getElementById('dev-pm-inline-add-menu')?.remove();
-                    const host = anchor.parentElement as HTMLElement;
-                    host.style.position = host.classList.contains('dev-pm-inline-add-zone') ? 'absolute' : 'relative';
-                    const menu = document.createElement('div');
-                    menu.id = 'dev-pm-inline-add-menu';
-                    menu.style.cssText = 'position:absolute;top:calc(100% + .2rem);left:50%;transform:translateX(-50%);background:white;border:1px solid #e2e8f0;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.15);padding:.4rem;display:flex;gap:.25rem;z-index:220;white-space:nowrap;';
-                    [
-                        { label: 'Row', value: 'Row' },
-                        { label: 'Carousel', value: 'PhotoCarousel' },
-                        { label: 'Panorama', value: 'PhotoCarouselPanorama' },
-                        { label: 'Text', value: 'Text' },
-                    ].forEach(({ label, value }) => {
-                        const button = document.createElement('button');
-                        button.type = 'button';
-                        button.textContent = label;
-                        button.style.cssText = 'padding:.35rem .6rem;border:0;border-radius:4px;background:none;color:#334155;cursor:pointer;font-size:.75rem;';
-                        button.addEventListener('click', (event) => {
-                            event.stopPropagation();
-                            menu.remove();
-                            document.removeEventListener('click', closeMenu);
-                            insertBlockAt(value, index);
-                        });
-                        menu.appendChild(button);
-                    });
-                    host.appendChild(menu);
-                    const closeMenu = (event: MouseEvent) => {
-                        if (menu.contains(event.target as Node) || event.target === anchor) return;
-                        menu.remove();
-                        document.removeEventListener('click', closeMenu);
-                    };
-                    window.setTimeout(() => document.addEventListener('click', closeMenu), 0);
                 };
 
                 const syncManagedSpecialMargins = (boundaryIndexes: number[]) => {
@@ -3990,20 +4518,9 @@
                     sortableInstances = [];
 
                     treeContainer.innerHTML = '';
-                    if (currentBlocks.length === 0) {
-                        const emptyAdd = document.createElement('div');
-                        emptyAdd.style.cssText = 'display:flex;justify-content:center;padding:1rem 0;';
-                        emptyAdd.innerHTML = `<button class="dev-manager-header-button" type="button" title="Add Block" aria-label="Add Block" style="position:relative;border:1px solid #cbd5e1;">${ICONS.plus}</button>`;
-                        const button = emptyAdd.querySelector('button') as HTMLElement;
-                        button.addEventListener('click', (event) => {
-                            event.stopPropagation();
-                            openInlineBlockMenu(button, 0);
-                        });
-                        treeContainer.appendChild(emptyAdd);
-                    }
                     reconcileRemovedPhotos();
                     const gapSelectionMode = selectedBlock !== null;
-                    const gapButtonIcon = gapSelectionMode ? ICONS.arrowRight : ICONS.plus;
+                    const gapButtonIcon = ICONS.arrowRight;
                     currentBlocks.forEach((block: any, bIdx: number) => {
                         const isCollapsed = collapsedBlocks.has(bIdx);
                         const blockEl = document.createElement('div');
@@ -4018,7 +4535,7 @@
                                     ? `<button class="block-drag-handle selected" title="Cancel move">${ICONS.drag}</button>`
                                     : `<button class="block-drag-handle" title="Click to move / drag">${ICONS.drag}</button>`
                                 }
-                                <button class="block-toggle block-type-badge" title="Toggle Type (${block.type}${block.props.enablePanorama ? ' + Panorama' : ''})" ${block.type === 'Text' ? 'disabled style="opacity:0.5;cursor:default;"' : ''}>${block.type === 'PhotoCarousel' ? (block.props.enablePanorama ? 'P' : 'C') : block.type === 'Text' ? 'T' : 'R'}</button>
+                                <span class="block-type-badge" title="${block.type}${block.props.enablePanorama ? ' + Panorama' : ''}">${block.type === 'PhotoCarousel' ? (block.props.enablePanorama ? 'P' : 'C') : block.type === 'Text' ? 'T' : 'R'}</span>
                                 ${isCollapsed && block.type === 'Text' && block.text ? `
                                 <div style="flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 0.75rem; color: #64748b; padding: 0 0.25rem; ${block.props.size === 'title' ? 'font-weight: 700;' : ''}">${block.text}</div>
                                 ` : isCollapsed && block.type !== 'Text' && isLocalhost && block.photos.length > 0 ? `
@@ -4029,10 +4546,6 @@
                                         return `<img ${photoPreviewAttributes(p.itemKey)} loading="lazy" title="${p.itemKey.split('/').pop()}" data-bidx="${bIdx}" data-pidx="${pIdx}" class="pm-thumb-click${isSel ? ' pm-photo-selected' : ''}${isTarget ? ' pm-move-target' : ''}" style="cursor:${selectedPhoto ? 'copy' : 'pointer'};${isSel ? 'outline:2px solid #2563eb;outline-offset:1px;opacity:1;' : ''}" />`;
                                     }).join('')}
                                 </div>` : '<div style="flex:1;"></div>'}
-                                <div style="display:flex; align-items:center; gap:0.25rem; flex-shrink:0;">
-                                    ${block.type !== 'Text' ? `<button class="block-add-photos" title="Add Photos" aria-label="Add Photos" style="background:none;border:none;cursor:pointer;color:#777;padding:4px;">${ICONS.plus}</button>` : ''}
-                                    <button class="block-delete" title="Delete Block" style="background: none; border: none; cursor: pointer; color: #ef4444; padding: 4px;">${ICONS.trash}</button>
-                                </div>
                             </div>
                             <div class="dev-pm-block-content" style="display: ${isCollapsed ? 'none' : 'block'}; padding-left: 1rem;">
                                 ${block.type === 'Text' ? (() => {
@@ -4042,13 +4555,6 @@
                                 })() : (() => {
                                     return `
                                         ${block.type === 'PhotoCarousel' && block.props.enablePanorama ? `
-                                            <label style="display:flex;align-items:center;justify-content:space-between;gap:.75rem;padding:.35rem 0 .6rem;color:#64748b;font-size:.75rem;">
-                                                Initial view
-                                                <select class="photo-panorama-initial-view" style="border:1px solid #cbd5e1;border-radius:4px;background:white;color:#334155;padding:.2rem .35rem;font-size:.75rem;">
-                                                    <option value="carousel" ${(block.props.initialView || 'carousel') === 'carousel' ? 'selected' : ''}>Carousel</option>
-                                                    <option value="panorama" ${block.props.initialView === 'panorama' ? 'selected' : ''}>Panorama</option>
-                                                </select>
-                                            </label>
                                             ${block.photos.length === 1 ? `
                                                 <label style="display:flex;align-items:center;justify-content:space-between;gap:.75rem;padding:0 0 .6rem;color:#64748b;font-size:.75rem;">
                                                     Display slices
@@ -4062,32 +4568,25 @@
                                                     <span style="color: #999;">${ICONS.drag}</span>
                                                     ${isLocalhost ? `<img ${photoPreviewAttributes(p.itemKey)} loading="lazy" style="width:40px;height:30px;object-fit:cover;border-radius:3px;flex-shrink:0;" />` : ''}
                                                     <span style="flex: 1;">${p.itemKey.split('/').pop()}</span>
-                                                    ${block.type === 'PhotoCarousel' && pIdx === (block.props.initialSlide ?? 0) ? `<span style="display: flex; align-items: center; margin-right: 4px; color: #2563eb;" title="Initial Slide">${ICONS.slideOne}</span>` : ''}
                                                     ${block.type === 'PhotoCarousel' || block.photos.length > 1 ? `<div style="position: relative;">
                                                         <button class="photo-menu-trigger dev-pm-photo-menu-btn" title="Options">${ICONS.dots}</button>
                                                         <div class="dev-pm-photo-menu">
-                                                            ${block.type === 'PhotoCarousel' ? `
-                                                            <div class="dev-pm-photo-menu-item initial-slide-btn">
-                                                                ${ICONS.slideOne} Set as Initial Slide
-                                                            </div>
-                                                            ` : ''}
                                                             ${block.photos.length > 1 ? `
                                                             <div class="dev-pm-photo-menu-item split-btn">
                                                                 ${ICONS.split} Extract to own block
                                                             </div>` : ''}
                                                         </div>
                                                     </div>` : ''}
-                                                    <button class="delete-btn dev-pm-photo-action" type="button" title="Delete Photo" aria-label="Delete ${p.itemKey.split('/').pop()}">${ICONS.trash}</button>
                                                 </div>
                                             `).join('')}
                                         </div>
                                     `;
                                 })()}
                             </div>
-                            ${bIdx === 0
-                                ? `<div class="dev-pm-inline-add-zone dev-pm-inline-add-zone--before${gapSelectionMode ? ' is-active' : ''}"><button class="dev-pm-inline-add-button" type="button" data-page-gap-index="0" title="${gapSelectionMode ? 'Move here' : 'Add block before'}">${gapButtonIcon}</button></div>`
+                            ${gapSelectionMode && bIdx === 0
+                                ? `<div class="dev-pm-inline-add-zone dev-pm-inline-add-zone--before is-active"><button class="dev-pm-inline-add-button" type="button" data-page-gap-index="0" title="Move here">${gapButtonIcon}</button></div>`
                                 : ''}
-                            <div class="dev-pm-inline-add-zone${gapSelectionMode ? ' is-active' : ''}"><button class="dev-pm-inline-add-button" type="button" data-page-gap-index="${bIdx + 1}" title="${gapSelectionMode ? 'Move here' : 'Add block here'}">${gapButtonIcon}</button></div>
+                            ${gapSelectionMode ? `<div class="dev-pm-inline-add-zone is-active"><button class="dev-pm-inline-add-button" type="button" data-page-gap-index="${bIdx + 1}" title="Move here">${gapButtonIcon}</button></div>` : ''}
                         `;
 
                         blockEl.querySelectorAll<HTMLImageElement>('img[data-pm-fallback-url]').forEach((image) => {
@@ -4107,7 +4606,6 @@
                                 event.stopPropagation();
                                 const gapIndex = Number(button.dataset.pageGapIndex);
                                 if (selectedBlock !== null) moveSelectedBlockToGap(gapIndex);
-                                else openInlineBlockMenu(button, gapIndex);
                             });
                         });
 
@@ -4126,45 +4624,6 @@
                             renderTree();
                         });
 
-                        // Expand / Collapse All toggle (bound once, updates icon each render)
-                        if (bIdx === 0) {
-                            const allCollapsed = currentBlocks.length > 0 && collapsedBlocks.size === currentBlocks.length;
-                            expandAllBtn.title = allCollapsed ? 'Expand All' : 'Collapse All';
-                            expandAllBtn.innerHTML = allCollapsed ? ICONS.expandAll : ICONS.collapseAll;
-                            expandAllBtn.onclick = () => {
-                                if (collapsedBlocks.size === currentBlocks.length) {
-                                    collapsedBlocks.clear();
-                                } else {
-                                    currentBlocks.forEach((_: any, i: number) => collapsedBlocks.add(i));
-                                }
-                                renderTree();
-                            };
-                        }
-                        blockEl.querySelector('.block-toggle')?.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            if (block.type === 'Text') return;
-                            if (block.type === 'Row') {
-                                block.type = 'PhotoCarousel';
-                                delete block.props.enablePanorama;
-                                delete block.props.initialView;
-                                delete block.props.panoramaSlices;
-                            } else if (!block.props.enablePanorama) {
-                                block.props.enablePanorama = true;
-                            } else {
-                                block.type = 'Row';
-                                delete block.props.enablePanorama;
-                                delete block.props.initialView;
-                                delete block.props.panoramaSlices;
-                            }
-                            syncManagedSpecialMargins([bIdx - 1, bIdx]);
-                            renderTree();
-                        });
-                        blockEl.querySelector<HTMLSelectElement>('.photo-panorama-initial-view')?.addEventListener('change', (event) => {
-                            const value = (event.currentTarget as HTMLSelectElement).value;
-                            if (value === 'panorama') block.props.initialView = 'panorama';
-                            else delete block.props.initialView;
-                            updatePageDirtyState();
-                        });
                         blockEl.querySelector<HTMLInputElement>('.photo-panorama-slices')?.addEventListener('change', (event) => {
                             const input = event.currentTarget as HTMLInputElement;
                             const slices = Math.min(24, Math.max(1, Math.trunc(Number(input.value) || 1)));
@@ -4173,29 +4632,13 @@
                             else delete block.props.panoramaSlices;
                             updatePageDirtyState();
                         });
-                        blockEl.querySelector('.block-delete')?.addEventListener('click', () => {
-                            if (confirm("Delete this block? Any local photos no longer referenced by this page will move to the system Trash when you save.")) {
-                                currentBlocks.splice(bIdx, 1);
-                                syncManagedSpecialMargins(currentBlocks.map((_: any, index: number) => index));
-                                renderTree();
-                            }
-                        });
-
-                        blockEl.querySelector('.block-add-photos')?.addEventListener('click', (event) => {
-                            event.stopPropagation();
-                            choosePhotosForBlock((files) => {
-                                if (!stageNewBlockFiles(files)) return;
-                                block.photos.push(...files.map((file) => ({ itemKey: file.name })));
-                                renderTree();
-                            });
-                        });
                         blockEl.querySelectorAll('.dev-pm-photo').forEach((photoEl, pIdx) => {
                             const pMenuTrigger = photoEl.querySelector('.photo-menu-trigger');
                             const pMenu = photoEl.querySelector('.dev-pm-photo-menu');
                             const photo = block.photos[pIdx];
 
                             photoEl.addEventListener('click', (e) => {
-                                if ((e.target as HTMLElement).closest('.photo-menu-trigger, .dev-pm-photo-menu, .dev-pm-photo-action')) return;
+                                if ((e.target as HTMLElement).closest('.photo-menu-trigger, .dev-pm-photo-menu')) return;
                                 e.stopPropagation();
                                 handlePhotoClick(bIdx, pIdx, false);
                             });
@@ -4214,12 +4657,6 @@
                                     if (m !== pMenu) m.classList.remove('active');
                                 });
                                 pMenu?.classList.toggle('active');
-                            });
-
-                            photoEl.querySelector('.initial-slide-btn')?.addEventListener('click', (e) => {
-                                e.stopPropagation();
-                                block.props.initialSlide = pIdx;
-                                renderTree();
                             });
 
                             photoEl.querySelector('.split-btn')?.addEventListener('click', (e) => {
@@ -4244,20 +4681,6 @@
                                 renderTree();
                             });
 
-                            photoEl.querySelector('.delete-btn')?.addEventListener('click', (e) => {
-                                e.stopPropagation();
-                                if (confirm(`Delete photo from this page: ${photo.itemKey}?\n\nIf its local copy is no longer referenced, it will move to the system Trash when you save.`)) {
-                                    block.photos.splice(pIdx, 1);
-                                    if (block.photos.length === 0) {
-                                        currentBlocks.splice(bIdx, 1);
-                                    }
-                                    // Reset initialSlide if it's now out of bounds
-                                    if (block.props.initialSlide >= block.photos.length) {
-                                        block.props.initialSlide = 0;
-                                    }
-                                    renderTree();
-                                }
-                            });
                         });
 
                         // Thumb strip click-to-move
@@ -4334,17 +4757,20 @@
                         renderTree();
                     }
                 };
-                document.addEventListener('keydown', (e: KeyboardEvent) => {
+                const pageManagerKeydownHandler = (e: KeyboardEvent) => {
                     if (e.key === 'Escape') {
                         if (selectedPhoto) { selectedPhoto = null; renderTree(); }
                         else if (selectedBlock !== null) { selectedBlock = null; renderTree(); }
                     }
-                });
+                };
+                document.addEventListener('keydown', pageManagerKeydownHandler);
                 document.addEventListener('click', globalClickHandler);
 
                 const closeDialog = () => {
                     dialog.close();
+                    if (!keepOrderModeOnClose) setOrderEditMode(false);
                     document.removeEventListener('click', globalClickHandler);
+                    document.removeEventListener('keydown', pageManagerKeydownHandler);
                     closeBtn.removeEventListener('click', closeHandler);
                     confirmBtn.removeEventListener('click', confirmHandler);
                     importObjectUrls.forEach((url) => URL.revokeObjectURL(url));
@@ -4353,7 +4779,7 @@
                 };
 
                 const closeHandler = () => {
-                    if (!confirmBtn.disabled && !confirm('Discard unstaged Page Manager changes?')) return;
+                    if (!confirmBtn.disabled && !confirm('Discard unstaged order changes?')) return;
                     closeDialog();
                 };
 
@@ -4363,9 +4789,9 @@
                     const draft: PageStructureDraft = {
                         blocks: blocksToSave,
                         metadata: {
-                            title: fTitle.value.trim(),
-                            info: fInfo.value.trim() || undefined,
-                            gap: remValueFromInput(fGap.value) || undefined,
+                            title: pageManagerMetadata().title,
+                            info: pageManagerMetadata().info || undefined,
+                            gap: pageManagerMetadata().gap || undefined,
                         },
                         removeLocal: [...pendingLocalRemovals].sort(),
                     };
@@ -4380,7 +4806,7 @@
                         removeLocal: draft.removeLocal,
                     });
                     if (stagedSnapshot === serverPageSnapshot) {
-                        pendingPageStructureChange = null;
+                        pendingOrderChange = null;
                         renderPendingPageStructure(albumSlug, {
                             blocks: serverBlocks,
                             metadata: {
@@ -4392,12 +4818,12 @@
                         }, []);
                         showToast('ℹ️ Page structure unchanged');
                     } else {
-                        pendingPageStructureChange = {
+                        pendingOrderChange = {
                             albumSlug,
                             draft: JSON.parse(JSON.stringify(draft)),
                             imports: [...pendingPageImports],
                         };
-                        renderPendingPageStructure(albumSlug, pendingPageStructureChange.draft, pendingPageStructureChange.imports);
+                        renderPendingPageStructure(albumSlug, pendingOrderChange.draft, pendingOrderChange.imports);
                         showToast('📝 Pending page structure update');
                     }
                     updateSaveButtonState();
@@ -5791,12 +6217,88 @@
                 const tagToggle = document.getElementById('dev-tag-toggle');
                 tagToggle?.classList.toggle('active', enabled);
                 tagToggle?.setAttribute('aria-pressed', String(enabled));
+                updateGlobalTagPendingIndicator();
+                updateEditModeAvailability();
+            };
+
+            let activeOrderMode = false;
+
+            const updateOrderButtonState = () => {
+                const orderBtn = document.getElementById('dev-order-btn') as HTMLButtonElement | null;
+                if (!orderBtn) return;
+                const hasPendingOrder = hasPendingOrderChanges();
+                orderBtn.classList.toggle('has-pending', hasPendingOrder);
+                orderBtn.classList.toggle('active', activeOrderMode && !hasPendingOrder);
+                orderBtn.setAttribute('aria-pressed', String(activeOrderMode));
+                orderBtn.title = hasPendingOrder
+                    ? 'Save pending order changes'
+                    : activeOrderMode ? 'Finish editing order' : 'Edit order';
+                orderBtn.setAttribute('aria-label', orderBtn.title);
+            };
+
+            const updateEditModeAvailability = (isSaving = pendingSaveInProgress) => {
+                const pending = pendingEditMode();
+                const activeMode: AlbumEditMode | null = activeOrderMode
+                    ? 'order'
+                    : activeBlockEditMode
+                        ? 'blocks'
+                        : activeTagMode ? 'tags' : null;
+                const controls: Array<{ id: string; mode: AlbumEditMode }> = [
+                    { id: 'dev-order-btn', mode: 'order' },
+                    { id: 'dev-save-btn', mode: 'blocks' },
+                    { id: 'dev-tag-toggle', mode: 'tags' },
+                ];
+
+                controls.forEach(({ id, mode }) => {
+                    const control = document.getElementById(id);
+                    if (!control) return;
+                    const hidden = Boolean(activeMode && activeMode !== mode);
+                    const unavailable = isSaving || Boolean(pending && pending !== mode);
+                    control.classList.toggle('dev-edit-mode-hidden', hidden);
+                    control.classList.toggle('dev-edit-mode-unavailable', unavailable && !hidden);
+                    control.setAttribute('aria-hidden', String(hidden));
+                    control.setAttribute('aria-disabled', String(unavailable));
+                    if (control instanceof HTMLButtonElement) control.disabled = unavailable;
+                });
+            };
+
+            const setOrderEditMode = (enabled: boolean) => {
+                activeOrderMode = enabled;
+                if (!enabled) {
+                    inlineOrderPhotoAction = null;
+                    inlineOrderSelectedPhotoNames.clear();
+                    inlineOrderLastSelectedPhotoName = null;
+                    inlineOrderMovePhotoName = null;
+                    inlineOrderMoveBlockKey = null;
+                }
+                updateOrderButtonState();
+                updateEditModeAvailability();
+                initInlineOrderEditor();
+            };
+
+            const setBlockEditMode = (enabled: boolean) => {
+                activeBlockEditMode = enabled;
+                document.documentElement.classList.toggle('dev-block-edit-mode', enabled);
+                if (!enabled) {
+                    document.querySelectorAll<HTMLElement>('.dev-block-toolbar.is-open').forEach((toolbar) => {
+                        toolbar.classList.remove('is-open');
+                        toolbar.querySelectorAll<HTMLElement>('.dev-toolbar-btn.active').forEach((button) => button.classList.remove('active'));
+                        toolbar.querySelectorAll<HTMLButtonElement>('[aria-expanded="true"]').forEach((button) => button.setAttribute('aria-expanded', 'false'));
+                    });
+                }
+                const saveBtn = document.getElementById('dev-save-btn');
+                saveBtn?.classList.toggle('active', enabled && !hasPendingBlockChanges());
+                saveBtn?.setAttribute('aria-pressed', String(enabled));
+                updateSaveButtonState();
             };
 
             function closeOtherPageEditors(except?: HTMLElement) {
                 document.querySelector('.dev-page-inline-add-menu')?.remove();
                 clearActiveInlineBlockAction();
                 setGlobalTagMode(false);
+                setOrderEditMode(false);
+                if (!except?.closest('[data-dev-block]')) setBlockEditMode(false);
+                if (!except?.matches('[data-dev-album-metadata-edit]')) closeAlbumMetadataEditor();
 
                 document.querySelectorAll<HTMLElement>('.dev-inline-caption-editor').forEach((editor) => {
                     editor.remove();
@@ -5817,7 +6319,7 @@
                     toolbar.querySelectorAll<HTMLButtonElement>('[aria-expanded="true"]').forEach((button) => button.setAttribute('aria-expanded', 'false'));
                 });
                 document.querySelectorAll<HTMLElement>('.dev-inline-margin-control.is-open').forEach((control) => {
-                    if (control === except || control.contains(except)) return;
+                    if (control === except || (except && control.contains(except))) return;
                     const input = control.querySelector<HTMLInputElement>('.dev-inline-margin-input');
                     if (input) {
                         input.value = control.dataset.marginValue || input.value;
@@ -5827,7 +6329,7 @@
                     if (activeMarginControl === control) activeMarginControl = null;
                 });
                 document.querySelectorAll<HTMLElement>('.dev-inline-block-type-control.is-open').forEach((control) => {
-                    if (control === except || control.contains(except)) return;
+                    if (control === except || (except && control.contains(except))) return;
                     control.classList.remove('is-open');
                     control.querySelector('.dev-inline-block-type-current')?.setAttribute('aria-expanded', 'false');
                 });
@@ -5838,9 +6340,11 @@
                 if (!albumSlug) return;
 
                 let sourceBlocks: any[] = [];
-                const stagedStructure = pendingPageStructureChange?.albumSlug === albumSlug
-                    ? pendingPageStructureChange
-                    : null;
+                const stagedStructure = pendingBlockStructureChange?.albumSlug === albumSlug
+                    ? pendingBlockStructureChange
+                    : pendingOrderChange?.albumSlug === albumSlug
+                        ? pendingOrderChange
+                        : null;
                 if (stagedStructure) {
                     sourceBlocks = stagedStructure.draft.blocks;
                 } else {
@@ -6130,6 +6634,7 @@
                     };
 
                     const openInlineMarginEditor = () => {
+                        if (!canStartEditMode('blocks')) return;
                         closeOtherPageEditors(marginControl);
                         if (activeMarginControl && activeMarginControl !== marginControl) {
                             const previousInput = activeMarginControl.querySelector<HTMLInputElement>('.dev-inline-margin-input');
@@ -6382,6 +6887,7 @@
                     };
 
                     const stageBlockType = (targetMode: MediaBlockMode) => {
+                        if (!canStartEditMode('blocks')) return;
                         if (isTextBlock || !blockTypeButton || sourceType === 'Text') return;
                         const targetType: 'Row' | 'PhotoCarousel' = targetMode === 'Row' ? 'Row' : 'PhotoCarousel';
                         const targetPanorama = targetMode === 'PhotoPanorama';
@@ -6422,6 +6928,7 @@
                     };
 
                     const openInlineCaptionEditor = () => {
+                        if (!canStartEditMode('blocks')) return;
                         closeOtherPageEditors(captionButton || undefined);
                         closeInlineCaptionEditor();
 
@@ -6556,6 +7063,7 @@
                     };
 
                     const openInlineTextEditor = () => {
+                        if (!canStartEditMode('blocks')) return;
                         closeOtherPageEditors(textButton || undefined);
                         closeInlineTextEditor();
 
@@ -6820,25 +7328,40 @@
                 injectStyles();
                 if (isMountainTagPage(window.location.pathname)) {
                     document.getElementById('dev-gear-btn')?.remove();
+                    document.getElementById('dev-order-btn')?.remove();
                     document.getElementById('dev-save-btn')?.remove();
+                    document.getElementById('dev-tag-toggle')?.remove();
+                    document.getElementById('dev-album-sync-btn')?.remove();
                     return;
                 }
                 syncAlbumTagStateFromDom();
                 initToolbars();
                 initInlineBlockAdder();
+                initAlbumMetadataEditor();
                 initFolderCoverEditors();
+                const isAlbumPage = !isRootPage() && !isFolderPage() && !isMountainTagIndex(window.location.pathname);
+                if (isAlbumPage) {
+                    document.getElementById('dev-gear-btn')?.remove();
+                } else {
+                    document.getElementById('dev-order-btn')?.remove();
+                    document.getElementById('dev-save-btn')?.remove();
+                    document.getElementById('dev-tag-toggle')?.remove();
+                    document.getElementById('dev-album-sync-btn')?.remove();
+                }
                 const savedScrollY = sessionStorage.getItem('dev-caption-save-scroll-y');
                 if (savedScrollY) {
                     sessionStorage.removeItem('dev-caption-save-scroll-y');
                     window.requestAnimationFrame(() => window.scrollTo({ top: Number(savedScrollY) }));
                 }
 
-                // Add Gear button
-                if (!document.getElementById('dev-gear-btn')) {
+                const primaryButtonId = isAlbumPage ? 'dev-order-btn' : 'dev-gear-btn';
+
+                // Add the page-specific primary action.
+                if (!document.getElementById(primaryButtonId)) {
                     const gearBtn = document.createElement('div');
-                    gearBtn.id = 'dev-gear-btn';
-                    gearBtn.className = 'dev-gear-btn';
-                    gearBtn.innerHTML = ICONS.gear;
+                    gearBtn.id = primaryButtonId;
+                    gearBtn.className = `dev-gear-btn${isAlbumPage ? ' dev-order-btn' : ''}`;
+                    gearBtn.innerHTML = isAlbumPage ? ICONS.order : ICONS.gear;
 
                     if (isRootPage()) {
                         gearBtn.title = 'R2 Manager';
@@ -6850,10 +7373,20 @@
                         gearBtn.title = 'Folder Manager';
                         gearBtn.addEventListener('click', openFolderManager);
                     } else {
-                        gearBtn.title = 'Page Manager';
+                        gearBtn.title = 'Edit order';
                         gearBtn.addEventListener('click', () => {
+                            if (pendingSaveInProgress) return;
+                            if (activeOrderMode) {
+                                setOrderEditMode(false);
+                                return;
+                            }
+                            if (hasPendingOrderChanges()) {
+                                void savePendingOrderChangesOnly();
+                                return;
+                            }
+                            if (!canStartEditMode('order')) return;
                             closeOtherPageEditors();
-                            void openPageManager();
+                            setOrderEditMode(true);
                         });
                     }
 
@@ -6878,14 +7411,20 @@
                     tagToggle.className = 'dev-gear-btn dev-tag-toggle';
                     tagToggle.type = 'button';
                     tagToggle.innerHTML = ICONS.pin;
-                    tagToggle.title = 'Edit Tags';
-                    tagToggle.setAttribute('aria-label', 'Edit Tags');
+                    tagToggle.title = 'Edit tags';
+                    tagToggle.setAttribute('aria-label', 'Edit tags');
                     tagToggle.setAttribute('aria-pressed', 'false');
                     tagToggle.addEventListener('click', () => {
+                        if (pendingSaveInProgress) return;
+                        if (hasPendingTagChanges()) {
+                            void savePendingTagChangesOnly();
+                            return;
+                        }
                         if (activeTagMode) {
                             setGlobalTagMode(false);
                             return;
                         }
+                        if (!canStartEditMode('tags')) return;
                         closeOtherPageEditors();
                         setGlobalTagMode(true);
                     });
@@ -6893,8 +7432,7 @@
                     const scrollContainer = document.querySelector('.fixed.bottom-8.right-8.flex-col');
                     if (scrollContainer) {
                         tagToggle.classList.add('in-container');
-                        const saveButton = scrollContainer.querySelector('#dev-save-btn');
-                        scrollContainer.insertBefore(tagToggle, saveButton || null);
+                        scrollContainer.appendChild(tagToggle);
                     } else {
                         document.body.appendChild(tagToggle);
                     }
@@ -6911,10 +7449,24 @@
                     saveBtn.id = 'dev-save-btn';
                     saveBtn.className = 'dev-save-btn';
                     saveBtn.type = 'button';
-                    saveBtn.innerHTML = ICONS.cloudSync;
-                    saveBtn.title = 'No pending changes';
-                    saveBtn.disabled = true;
-                    saveBtn.addEventListener('click', savePendingChanges);
+                    saveBtn.innerHTML = ICONS.pencil;
+                    saveBtn.title = 'Edit blocks';
+                    saveBtn.setAttribute('aria-label', 'Edit blocks');
+                    saveBtn.setAttribute('aria-pressed', 'false');
+                    saveBtn.addEventListener('click', () => {
+                        if (pendingSaveInProgress) return;
+                        if (hasPendingBlockChanges()) {
+                            void savePendingBlockChangesOnly();
+                            return;
+                        }
+                        if (activeBlockEditMode) {
+                            setBlockEditMode(false);
+                            return;
+                        }
+                        if (!canStartEditMode('blocks')) return;
+                        closeOtherPageEditors(saveBtn);
+                        setBlockEditMode(true);
+                    });
 
                     const scrollContainer = document.querySelector('.fixed.bottom-8.right-8.flex-col');
                     if (scrollContainer) {
@@ -6923,6 +7475,46 @@
                     } else {
                         document.body.appendChild(saveBtn);
                     }
+                }
+
+                if (isAlbumPage && !document.getElementById('dev-album-sync-btn')) {
+                    const syncBtn = document.createElement('button');
+                    syncBtn.id = 'dev-album-sync-btn';
+                    syncBtn.className = 'dev-gear-btn dev-album-sync-btn';
+                    syncBtn.type = 'button';
+                    syncBtn.innerHTML = ICONS.refresh;
+                    syncBtn.title = 'Sync with R2';
+                    syncBtn.setAttribute('aria-label', 'Sync with R2');
+                    syncBtn.addEventListener('click', () => {
+                        const albumSlug = getAlbumSlug();
+                        if (!albumSlug) return showToast('❌ Cannot identify album');
+                        if (hasPendingBlockChanges()) {
+                            return showToast('⚠️ Save pending block changes before syncing with R2');
+                        }
+                        void openAlbumSyncDialog(albumSlug);
+                    });
+
+                    const scrollContainer = document.querySelector('.fixed.bottom-8.right-8.flex-col');
+                    if (scrollContainer) {
+                        syncBtn.classList.add('in-container');
+                        scrollContainer.appendChild(syncBtn);
+                    } else {
+                        document.body.appendChild(syncBtn);
+                    }
+                }
+
+                // Keep the album controls directly below Scroll to bottom in their intended order.
+                if (isAlbumPage) {
+                    const scrollContainer = document.querySelector('.fixed.bottom-8.right-8.flex-col');
+                    const controls = [
+                        document.getElementById('dev-order-btn'),
+                        document.getElementById('dev-save-btn'),
+                        document.getElementById('dev-tag-toggle'),
+                        document.getElementById('dev-album-sync-btn'),
+                    ];
+                    if (scrollContainer) controls.forEach((control) => {
+                        if (control) scrollContainer.appendChild(control);
+                    });
                 }
 
                 updateSaveButtonState();
