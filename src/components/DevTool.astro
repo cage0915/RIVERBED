@@ -117,6 +117,7 @@
             const pendingStructureObjectUrls = new Map<File, string>();
             let pendingSaveInProgress = false;
             let activeTagMode = false;
+            let copiedTagName: string | null = null;
             let activeBlockEditMode = false;
             type InlineOrderPhotoAction = 'merge' | 'split' | null;
             let inlineOrderPhotoAction: InlineOrderPhotoAction = null;
@@ -1203,6 +1204,10 @@
                     .dev-block-overlay.dev-tag-mode .photo-wrapper img {
                         cursor: crosshair !important;
                     }
+                    html.dev-tag-copy-active .dev-block-overlay.dev-tag-mode .photo-wrapper,
+                    html.dev-tag-copy-active .dev-block-overlay.dev-tag-mode .photo-wrapper img {
+                        cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M12 4v6M12 14v6M4 12h6M14 12h6' stroke='white' stroke-width='3' stroke-linecap='round'/%3E%3Cpath d='M12 4v6M12 14v6M4 12h6M14 12h6' stroke='black' stroke-width='1' stroke-linecap='round'/%3E%3Crect x='17' y='17' width='12' height='13' rx='2' fill='%23facc15' stroke='white' stroke-width='1.5'/%3E%3Cpath d='M20 17v-2.5h6V17M20 22h6M20 25h4' fill='none' stroke='%23854d0e' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") 12 12, crosshair !important;
+                    }
                     .tags-overlay {
                         position: absolute;
                         inset: 0;
@@ -1938,6 +1943,13 @@
             const getPhotoIdFromWrapper = (wrapper: HTMLElement) =>
                 wrapper.dataset.itemKey || wrapper.dataset.panoramaSourceItemKey || '';
 
+            const setCopiedTagName = (name: string | null) => {
+                copiedTagName = name;
+                document.documentElement.classList.toggle('dev-tag-copy-active', Boolean(name));
+                if (name) localStorage.setItem('devCopiedTagName', name);
+                else localStorage.removeItem('devCopiedTagName');
+            };
+
             const escapeHtml = (value: string) => value
                 .replaceAll('&', '&amp;')
                 .replaceAll('<', '&lt;')
@@ -2565,7 +2577,7 @@
                     const copyHandler = () => {
                         const tagName = input.value.trim();
                         if (tagName) {
-                            localStorage.setItem('devCopiedTagName', tagName);
+                            setCopiedTagName(tagName);
                             showToast(`📄 Copied tag: ${tagName}`);
                         }
                         dialog.close();
@@ -3942,6 +3954,14 @@
                 inlineOrderMovePhotoName = null;
                 inlineOrderMoveBlockKey = null;
                 if (activeOrderMode) initInlineOrderEditor();
+            };
+
+            const cancelInlineOrderMove = () => {
+                if (!inlineOrderMovePhotoName && !inlineOrderMoveBlockKey) return false;
+                inlineOrderMovePhotoName = null;
+                inlineOrderMoveBlockKey = null;
+                initInlineOrderEditor();
+                return true;
             };
 
             const updateInlineFocusedActionState = () => {
@@ -6147,6 +6167,26 @@
                 }
             };
 
+            const pasteCopiedTagAtPointer = (e: MouseEvent, wrapper: HTMLElement) => {
+                if (!copiedTagName) return false;
+                const img = wrapper.querySelector('img');
+                const photoId = getPhotoIdFromWrapper(wrapper);
+                if (!img || !photoId) return false;
+
+                const rect = img.getBoundingClientRect();
+                const x = ((e.clientX - rect.left) / rect.width) * 100;
+                const y = ((e.clientY - rect.top) / rect.height) * 100;
+                const photoKey = getTagKeyFromPhotoId(photoId);
+                currentAlbumTagMap = addOrUpdateTag(currentAlbumTagMap, photoKey, {
+                    name: copiedTagName,
+                    x,
+                    y,
+                });
+                renderTagOverlaysForPhoto(photoId);
+                showToast(`📋 Pasted "${copiedTagName}"`);
+                return true;
+            };
+
             const initTagEditButtons = () => {
                 document.querySelectorAll('.tag-link').forEach((link) => {
                     const nameSpan = link.querySelector('.tag-name') as HTMLElement;
@@ -7292,9 +7332,23 @@
                     if (!wrapper.closest('.dev-tag-mode')) return;
                     e.preventDefault();
                     e.stopPropagation();
+                    if (pasteCopiedTagAtPointer(e as MouseEvent, wrapper as HTMLElement)) return;
                     performTagging(e as MouseEvent, wrapper as HTMLElement);
                 }
             }, true);
+
+            window.addEventListener('keydown', (event) => {
+                if (event.key !== 'Escape' || document.querySelector('dialog[open]')) return;
+                if (cancelInlineOrderMove()) {
+                    event.preventDefault();
+                    return;
+                }
+                if (activeTagMode && copiedTagName) {
+                    event.preventDefault();
+                    setCopiedTagName(null);
+                    showToast('ℹ️ Tag copy cancelled');
+                }
+            });
 
             const init = () => {
                 injectStyles();

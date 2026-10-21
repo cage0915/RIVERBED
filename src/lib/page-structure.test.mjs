@@ -784,6 +784,8 @@ test('inline order mode exposes manager, block moves, and cross-block photo grou
     assert.match(devTool, /inlineOrderInteractionAbortController\?\.abort\(\)/);
     assert.match(devTool, /signal: interactionAbortController\.signal/);
     assert.match(devTool, /const clearInlineOrderInteraction = \(\) =>/);
+    assert.match(devTool, /const cancelInlineOrderMove = \(\) => \{[\s\S]*?inlineOrderMovePhotoName = null;[\s\S]*?inlineOrderMoveBlockKey = null;/);
+    assert.match(devTool, /if \(cancelInlineOrderMove\(\)\) \{\s*event\.preventDefault\(\);/);
     assert.match(devTool, /const updateInlineFocusedActionState = \(\) =>/);
     assert.match(devTool, /html\.dev-inline-focused-action \.dev-page-inline-add-zone,[\s\S]*?\.dev-block-toolbar[\s\S]*?display: none !important;/);
     assert.match(devTool, /if \(!activeTagMode && !inlineOrderPhotoAction\) \{/);
@@ -799,6 +801,20 @@ test('inline order mode exposes manager, block moves, and cross-block photo grou
     assert.match(devTool, /dev-page-inline-add-button dev-order-block-move-button/);
     assert.match(devTool, /dev-order-photo-selected[\s\S]*?outline: 3px solid #16a34a/);
     assert.match(devTool, /openPageManager\(true\)/);
+});
+
+test('copied tags paste directly on right click and Escape clears the copy state', () => {
+    const devTool = readProjectFile('src/components/DevTool.astro');
+
+    assert.match(devTool, /let copiedTagName: string \| null = null;/);
+    assert.match(devTool, /const setCopiedTagName = \(name: string \| null\) =>/);
+    assert.match(devTool, /html\.dev-tag-copy-active[\s\S]*?cursor: url\("data:image\/svg\+xml/);
+    assert.match(devTool, /fill='%23facc15'/);
+    assert.match(devTool, /M12 4v6M12 14v6M4 12h6M14 12h6/);
+    assert.match(devTool, /const pasteCopiedTagAtPointer = \(e: MouseEvent, wrapper: HTMLElement\) =>/);
+    assert.match(devTool, /if \(pasteCopiedTagAtPointer\(e as MouseEvent, wrapper as HTMLElement\)\) return;/);
+    assert.match(devTool, /setCopiedTagName\(tagName\);/);
+    assert.match(devTool, /if \(activeTagMode && copiedTagName\) \{[\s\S]*?setCopiedTagName\(null\);/);
 });
 
 test('page-level add controls expose every block gap and insert at the selected gap', () => {
