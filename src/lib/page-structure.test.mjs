@@ -360,8 +360,11 @@ test('direct block margin control stages changes for the shared save action', ()
 
     assert.match(
         devTool,
-        /dev-inline-margin-control[\s\S]*?dev-inline-margin-input[\s\S]*?dev-inline-margin-save/,
+        /dev-inline-margin-control[\s\S]*?dev-inline-margin-input/,
     );
+    assert.match(devTool, /marginInput\.addEventListener\('keydown',[\s\S]*?event\.key === 'Enter'[\s\S]*?stageBlockMargin\(\)/);
+    assert.match(devTool, /event\.key === 'Escape'[\s\S]*?closeInlineMarginEditor\(\)/);
+    assert.doesNotMatch(devTool, /dev-inline-margin-(?:save|cancel)/);
     assert.match(devTool, /pendingBlockMarginChanges\.set\(pendingMarginKey/);
     assert.match(
         devTool,
@@ -383,7 +386,7 @@ test('Page Manager delegates all Text settings to the direct Text toolbar', () =
     const getStructure = readProjectFile('src/dev-api/get-page-structure.ts');
 
     assert.doesNotMatch(devTool, /dev-pm-margin-control|text-block-mt|text-block-mb|text-block-content|text-block-align|text-block-size/);
-    assert.match(devTool, /dev-btn-text[\s\S]*?dev-toolbar-text-icon[\s\S]*?>T</);
+    assert.match(devTool, /dev-btn-text[\s\S]*?title="Edit Text"[\s\S]*?\$\{ICONS\.quote\}/);
     assert.match(devTool, /dev-inline-text-input[\s\S]*?dev-inline-text-align[\s\S]*?dev-inline-text-type/);
     assert.match(devTool, /pendingTextChanges\.set\(pendingTextKey/);
     assert.match(devTool, /textButton\?\.classList\.toggle\('has-pending', !matchesFile\)/);
@@ -400,7 +403,7 @@ test('Page Manager delegates caption editing to the direct block toolbar', () =>
     assert.match(devTool, /dev-inline-caption-editor/);
 });
 
-test('development block toolbar stacks tag editing above a bottom-aligned caption control', () => {
+test('development block controls reveal on hover and place edit controls beside the add control', () => {
     const devTool = readProjectFile('src/components/DevTool.astro');
 
     assert.match(
@@ -409,12 +412,15 @@ test('development block toolbar stacks tag editing above a bottom-aligned captio
     );
     assert.match(
         devTool,
-        /\.dev-block-overlay:hover > \.dev-block-toolbar,[\s\S]*?\.dev-block-toolbar\.has-caption/,
+        /\.dev-block-overlay:hover > \.dev-block-toolbar,[\s\S]*?\.dev-block-toolbar\.is-open/,
     );
+    assert.match(devTool, /\.dev-block-overlay:hover > \.dev-page-inline-add-zone,[\s\S]*?opacity: 1;/);
     assert.match(devTool, /\.dev-block-overlay::before\s*\{[\s\S]*?left:\s*-3\.25rem;[\s\S]*?width:\s*3\.25rem;/);
-    assert.match(devTool, /toolbar\.innerHTML = `[\s\S]*?dev-btn-tag[\s\S]*?dev-btn-caption/);
-    assert.match(devTool, /const setBlockTagMode = \(block: HTMLElement\)/);
-    assert.match(devTool, /activeTagBlock === block[\s\S]*?closeActiveTagBlock\(\)/);
+    assert.match(devTool, /dev-inline-margin-control, \.dev-inline-block-type-control, \.dev-btn-caption, \.dev-btn-text/);
+    assert.match(devTool, /dev-btn-caption, \.dev-block-toolbar \.dev-btn-text/);
+    assert.match(devTool, /dev-btn-text[\s\S]*?title="Edit Text"[\s\S]*?\$\{ICONS\.quote\}/);
+    assert.match(devTool, /const setGlobalTagMode = \(enabled: boolean\)/);
+    assert.match(devTool, /document\.querySelectorAll<HTMLElement>\('\[data-dev-block\]'\)[\s\S]*?dev-tag-mode/);
     assert.match(devTool, /dev-block-overlay\.dev-tag-mode \.tags-overlay/);
     assert.match(devTool, /\.dev-block-overlay\.dev-tag-mode \.photo-wrapper[\s\S]*?cursor: crosshair/);
     assert.doesNotMatch(devTool, /\n\s+\.photo-wrapper\s*\{\s*cursor: crosshair/);
@@ -426,6 +432,53 @@ test('development block toolbar stacks tag editing above a bottom-aligned captio
     assert.match(devTool, /if \(matchesFile\) \{\s*pendingCaptionChanges\.delete\(captionChangeKey\)/);
     assert.match(devTool, /saveBtn\.addEventListener\('click', savePendingChanges\)/);
     assert.match(devTool, /sessionStorage\.setItem\('dev-caption-save-scroll-y'/);
+});
+
+test('tag editing is a global toggle and inline page editors are mutually exclusive', () => {
+    const devTool = readProjectFile('src/components/DevTool.astro');
+
+    assert.match(devTool, /tagToggle\.id = 'dev-tag-toggle'/);
+    assert.match(devTool, /scrollContainer\.insertBefore\(tagToggle, saveButton \|\| null\)/);
+    assert.match(devTool, /setGlobalTagMode\(true\)/);
+    assert.match(devTool, /function closeOtherPageEditors\(except\?: HTMLElement\)/);
+    assert.match(devTool, /document\.querySelector\('\.dev-page-inline-add-menu'\)\?\.remove\(\)/);
+    assert.match(devTool, /document\.querySelectorAll<HTMLElement>\('\.dev-inline-caption-editor'\)/);
+    assert.match(devTool, /document\.querySelectorAll<HTMLElement>\('\.dev-inline-text-editor'\)/);
+    assert.match(devTool, /document\.querySelectorAll<HTMLElement>\('\.dev-inline-margin-control\.is-open'\)/);
+    assert.match(devTool, /document\.querySelectorAll<HTMLElement>\('\.dev-inline-block-type-control\.is-open'\)/);
+    assert.match(devTool, /const openInlineCaptionEditor = \(\) => \{\s*closeOtherPageEditors/);
+    assert.match(devTool, /const openInlineTextEditor = \(\) => \{\s*closeOtherPageEditors/);
+    assert.match(devTool, /const openInlineMarginEditor = \(\) => \{\s*closeOtherPageEditors/);
+});
+
+test('media block add menus can add photos to their own block through the shared pending structure', () => {
+    const devTool = readProjectFile('src/components/DevTool.astro');
+
+    assert.match(devTool, /const stageDirectBlockPhotos = async \(blockKey: string, fallbackIndex: number, files: File\[\]\)/);
+    assert.match(devTool, /targetBlock\.photos\.push\(\.\.\.files\.map\(\(file\) => \(\{ itemKey: file\.name \}\)\)\)/);
+    assert.match(devTool, /const chooseDirectBlockPhotoAddition = \(blockKey: string, fallbackIndex: number\)/);
+    assert.match(devTool, /targetBlock\?\.isMedia[\s\S]*?addPhotosButton\.textContent = 'Add Photos'/);
+    assert.match(devTool, /isMedia: block\.dataset\.devBlock !== 'text'/);
+    assert.match(devTool, /already exists in this album; use its existing entry/);
+});
+
+test('block action menu confirms photo deletion and carousel initial-photo selection inline', () => {
+    const devTool = readProjectFile('src/components/DevTool.astro');
+
+    assert.match(devTool, /moreButton\.className = 'dev-page-inline-more-button'/);
+    assert.match(devTool, /moreButton\.innerHTML = ICONS\.dots/);
+    assert.match(devTool, /const openInlineBlockActionMenu = \(/);
+    assert.match(devTool, /addOption\('Delete Block', 'delete-block'\)/);
+    assert.match(devTool, /addOption\('Delete Photos', 'delete-photos'\)/);
+    assert.match(devTool, /addOption\('Set Initial Photo', 'set-initial-photo'\)/);
+    assert.match(devTool, /const stageDirectBlockDeletion = async/);
+    assert.match(devTool, /const stageDirectPhotoDeletion = async/);
+    assert.match(devTool, /const stageDirectInitialPhoto = async/);
+    assert.match(devTool, /block\.props\.initialSlide = initialSlide/);
+    assert.match(devTool, /dev-inline-photo-selected[\s\S]*?outline: 3px solid #dc2626/);
+    assert.match(devTool, /dev-block-photo-action--initial[\s\S]*?outline-color: #2563eb/);
+    assert.match(devTool, /confirm\.innerHTML = kind === 'set-initial-photo' \? ICONS\.check : ICONS\.trash/);
+    assert.match(devTool, /cancel\.innerHTML = ICONS\.close/);
 });
 
 test('pending captions share the component presentation used by persisted captions', () => {
@@ -532,15 +585,17 @@ test('tagged photos reveal tags without a grey image overlay on hover or touch',
     );
 });
 
-test('media block type chooser expands left with direct R C P choices and saves through shared pending changes', () => {
+test('media block type chooser keeps abbreviated trigger and expands with full lowercase labels', () => {
     const devTool = readProjectFile('src/components/DevTool.astro');
 
     assert.match(
         devTool,
-        /dev-inline-margin-control[\s\S]*?dev-inline-block-type-control has-data[\s\S]*?\['Row', 'R'\][\s\S]*?\['PhotoCarousel', 'C'\][\s\S]*?\['PhotoPanorama', 'P'\]/,
+        /dev-inline-margin-control[\s\S]*?dev-inline-block-type-control has-data[\s\S]*?\['Row', 'row'\][\s\S]*?\['PhotoCarousel', 'carousel'\][\s\S]*?\['PhotoPanorama', 'panorama'\]/,
     );
-    assert.match(devTool, /\.dev-inline-block-type-control\.is-open\s*\{\s*width: 6rem;\s*margin-left: -4rem;/);
-    assert.match(devTool, /\.dev-inline-block-type-control\.is-open \.dev-inline-block-type-current\s*\{\s*display: none;/);
+    assert.match(devTool, /\.dev-page-inline-add-zone \.dev-inline-block-type-options\s*\{[\s\S]*?flex-direction: row;/);
+    assert.match(devTool, /const mediaBlockLabel = [\s\S]*?'row'[\s\S]*?'carousel'[\s\S]*?'panorama'/);
+    assert.match(devTool, /const mediaBlockAbbreviation = [\s\S]*?'R'[\s\S]*?'C'[\s\S]*?'P'/);
+    assert.match(devTool, /dev-inline-block-type-current[\s\S]*?\$\{mediaBlockAbbreviation\(displayedMediaType\)\}/);
     assert.match(devTool, /stageBlockType\(option\.dataset\.blockMode as MediaBlockMode\)/);
     assert.match(devTool, /pendingBlockTypeChanges\.set\(typeChangeKey/);
     assert.match(devTool, /target\.type = change\.targetType/);
@@ -596,9 +651,9 @@ test('pending block controls and the shared save action use the yellow state', (
     assert.match(devTool, /captionButton\?\.classList\.toggle\('has-pending', !matchesFile\)/);
     assert.match(devTool, /textButton\?\.classList\.toggle\('has-pending', !matchesFile\)/);
     assert.match(devTool, /marginControl\.classList\.toggle\('has-pending', !matchesFile\)/);
-    assert.match(devTool, /dev-btn-tag'\)\?\.classList\.toggle\('has-pending', hasPendingTags\)/);
+    assert.match(devTool, /document\.getElementById\('dev-tag-toggle'\)\?\.classList\.toggle\('has-pending', hasPendingTags\)/);
     assert.match(devTool, /saveBtn\.classList\.toggle\('has-pending', hasPendingChanges\)/);
-    assert.match(devTool, /\.dev-block-toolbar\.has-pending/);
+    assert.match(devTool, /const block = toolbar\.closest<HTMLElement>\('\[data-dev-block\]'\)/);
 });
 
 test('pending inline edits warn before full loads and Astro page transitions', () => {
@@ -631,6 +686,18 @@ test('Page Manager stages structure changes for the shared pending save action',
     assert.match(devTool, /type: 'Text',[\s\S]*?__devKey: `pending-\$\{crypto\.randomUUID\(\)\}`,[\s\S]*?props: \{ blockMargin: '1\.5rem' \}/);
     assert.match(devTool, /text\.style\.marginBottom = props\.blockMargin \|\| props\.mb \|\| '0\.5rem'/);
     assert.doesNotMatch(devTool, /const confirmHandler = async \(\) => \{[\s\S]{0,1500}?fetch\("\/api\/save-page-manager"/);
+});
+
+test('page-level add controls expose every block gap and insert at the selected gap', () => {
+    const devTool = readProjectFile('src/components/DevTool.astro');
+
+    assert.match(devTool, /\.dev-page-inline-add-zone--before/);
+    assert.match(devTool, /\.dev-page-inline-add-menu\s*\{[\s\S]*?position: fixed;/);
+    assert.match(devTool, /blocks\[0\]\.appendChild\(createAddZone\(0, true\)\)/);
+    assert.match(devTool, /blocks\.forEach\(\(block, index\) => block\.appendChild\(createAddZone\(index \+ 1, false, block\)\)\)/);
+    assert.match(devTool, /page\.draft\.blocks\.splice\(insertIndex, 0, newBlock\)/);
+    assert.match(devTool, /openDirectBlockMenu\(\s*button,\s*insertIndex,/);
+    assert.match(devTool, /dev-inline-margin-control, \.dev-inline-block-type-control/);
 });
 
 test('pending Text presentation follows its block identity after structure reordering', () => {
