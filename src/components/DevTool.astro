@@ -119,6 +119,7 @@
             let activeTagMode = false;
             let copiedTagName: string | null = null;
             let activeBlockEditMode = false;
+            let pendingTextBlockEditorKey: string | null = null;
             type InlineOrderPhotoAction = 'merge' | 'split' | null;
             let inlineOrderPhotoAction: InlineOrderPhotoAction = null;
             let inlineOrderSelectedPhotoNames = new Set<string>();
@@ -650,6 +651,13 @@
                     }
                     .dev-block-overlay {
                         position: relative;
+                    }
+                    /* Carousel tracks extend above their layout box for photo
+                       tag overflow. Keep editable Text above that transparent
+                       hit area so a title immediately before a carousel still
+                       receives hover and double-click events. */
+                    .dev-block-edit-mode .dev-block-overlay[data-dev-block="text"] {
+                        z-index: 1;
                     }
                     .dev-block-overlay::before {
                         content: '';
@@ -3202,6 +3210,7 @@
                 });
 
                 albumContent.replaceChildren(fragment);
+                document.dispatchEvent(new CustomEvent('album:content-replaced'));
                 albumContent.querySelectorAll<HTMLImageElement>('img[data-dev-fallback-url]').forEach((image) => {
                     delete image.dataset.devFallbackReady;
                     const useFallback = () => {
@@ -3422,6 +3431,7 @@
                             photos: files.map((file) => ({ itemKey: file.name })),
                         };
                     page.draft.blocks.splice(insertIndex, 0, newBlock);
+                    if (type === 'Text') pendingTextBlockEditorKey = newBlock.__devKey;
                     pendingLayoutChange = {
                         albumSlug,
                         draft: page.draft,
@@ -4049,8 +4059,13 @@
             const createBlocksFromInlineOrderSelection = async (action: Exclude<InlineOrderPhotoAction, null>) => {
                 const albumSlug = getAlbumSlug();
                 if (!albumSlug) return;
-                if (inlineOrderSelectedPhotoNames.size < 2) {
-                    return showToast('⚠️ Select at least two photos');
+                const minimumSelection = action === 'merge' ? 2 : 1;
+                if (inlineOrderSelectedPhotoNames.size < minimumSelection) {
+                    return showToast(
+                        action === 'merge'
+                            ? '⚠️ Select at least two photos'
+                            : '⚠️ Select at least one photo',
+                    );
                 }
 
                 try {
@@ -4064,7 +4079,7 @@
                     const lastSource = lastSelectedName
                         ? getInlineOrderPhotoPosition(page.draft.blocks, lastSelectedName)
                         : null;
-                    if (!lastSource || selectedPhotos.length < 2) {
+                    if (!lastSource || selectedPhotos.length < minimumSelection) {
                         return showToast('❌ Selected photos are no longer available');
                     }
                     const lastSourceKey = page.draft.blocks[lastSource.blockIndex].__devKey;
@@ -4103,6 +4118,26 @@
                 } catch (error) {
                     showToast(`❌ ${error instanceof Error ? error.message : 'Failed to create blocks'}`);
                 }
+            };
+
+            const triggerInlinePhotoAction = (action: Exclude<InlineOrderPhotoAction, null>) => {
+                if (pendingSaveInProgress) return;
+                if (inlineOrderPhotoAction === action) {
+                    if (inlineOrderSelectedPhotoNames.size === 0) {
+                        clearInlineOrderInteraction();
+                        return;
+                    }
+                    void createBlocksFromInlineOrderSelection(action);
+                    return;
+                }
+                clearActiveInlineBlockAction();
+                setGlobalTagMode(false);
+                inlineOrderPhotoAction = action;
+                inlineOrderSelectedPhotoNames.clear();
+                inlineOrderLastSelectedPhotoName = null;
+                inlineOrderMovePhotoName = null;
+                inlineOrderMoveBlockKey = null;
+                initInlineOrderEditor();
             };
 
             function initInlineOrderEditor() {
@@ -4169,23 +4204,7 @@
                             : label;
                         button.setAttribute('aria-label', button.title);
                         button.innerHTML = hasSelection ? ICONS.check : icon;
-                        button.addEventListener('click', () => {
-                            if (inlineOrderPhotoAction === action) {
-                                if (inlineOrderSelectedPhotoNames.size === 0) {
-                                    clearInlineOrderInteraction();
-                                    return;
-                                }
-                                void createBlocksFromInlineOrderSelection(action);
-                                return;
-                            }
-                            clearActiveInlineBlockAction();
-                            inlineOrderPhotoAction = action;
-                            inlineOrderSelectedPhotoNames.clear();
-                            inlineOrderLastSelectedPhotoName = null;
-                            inlineOrderMovePhotoName = null;
-                            inlineOrderMoveBlockKey = null;
-                            initInlineOrderEditor();
-                        });
+                        button.addEventListener('click', () => triggerInlinePhotoAction(action));
                         return button;
                     };
                     actions.append(
@@ -6296,6 +6315,7 @@
                 activeBlockEditMode = enabled;
                 document.documentElement.classList.toggle('dev-block-edit-mode', enabled);
                 if (!enabled) {
+                    pendingTextBlockEditorKey = null;
                     closeAlbumMetadataEditor();
                     document.querySelector<HTMLElement>('.dev-album-metadata-editor')?.remove();
                     document.querySelectorAll<HTMLElement>('.dev-block-toolbar.is-open').forEach((toolbar) => {
@@ -7293,6 +7313,11 @@
                         if (!track || !slide || !track.contains(slide)) return;
                         slide.setAttribute('data-active', '');
                     }, true);
+
+                    if (isTextBlock && pendingTextBlockEditorKey === blockKey) {
+                        pendingTextBlockEditorKey = null;
+                        openInlineTextEditor();
+                    }
                 });
                 reconcileAutomaticBlockMargins();
                 initTagEditButtons();
@@ -7353,6 +7378,39 @@
             }, true);
 
             window.addEventListener('keydown', (event) => {
+                const target = event.target instanceof Element ? event.target : null;
+                const isEditingText = Boolean(
+                    target?.closest('dialog, input, textarea, select, [role="textbox"]')
+                    || (target instanceof HTMLElement && target.isContentEditable),
+                );
+
+                if (
+                    activeBlockEditMode
+                    && activeOrderMode
+                    && !pendingSaveInProgress
+                    && !isEditingText
+                    && !document.querySelector('dialog[open]')
+                    && !event.altKey
+                    && !event.ctrlKey
+                    && !event.metaKey
+                ) {
+                    if (event.key === 'F1') {
+                        event.preventDefault();
+                        toggleInlineTagMode();
+                        return;
+                    }
+                    if (event.key === 'F2') {
+                        event.preventDefault();
+                        triggerInlinePhotoAction('merge');
+                        return;
+                    }
+                    if (event.key === 'F3') {
+                        event.preventDefault();
+                        triggerInlinePhotoAction('split');
+                        return;
+                    }
+                }
+
                 if (event.key !== 'Escape' || document.querySelector('dialog[open]')) return;
                 if (cancelInlineOrderMove()) {
                     event.preventDefault();

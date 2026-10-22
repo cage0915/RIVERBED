@@ -217,7 +217,7 @@ const titleSections = extractTitleSections(albumEntry.body);
             >
                 <nav
                     aria-label="Album sections"
-                    class="pointer-events-auto flex max-w-28 flex-col items-start gap-2 text-left"
+                    class="album-breadcrumb-nav pointer-events-auto flex flex-col items-start gap-2 text-left"
                 >
                     {titleSections.map((section) => (
                         <a
@@ -266,10 +266,27 @@ const titleSections = extractTitleSections(albumEntry.body);
      */
     @media (min-width: 1280px) {
         .album-page[data-has-breadcrumb="true"] {
-            padding-left: clamp(
+            --album-breadcrumb-gap: 1rem;
+            --album-breadcrumb-content-offset: clamp(
                 0px,
                 calc(42.375rem - 50vw),
                 2.5rem
+            );
+            padding-left: var(--album-breadcrumb-content-offset);
+        }
+
+        /*
+         * The space between the viewport edge and the album media grows on
+         * wide screens. Let the rail use that space instead of keeping its
+         * labels confined to 7rem, while preserving a 1rem breathing room
+         * before the photo blocks.
+         */
+        .album-page[data-has-breadcrumb="true"] .album-breadcrumb-nav {
+            width: max(
+                7rem,
+                calc(
+                    50vw - 34.375rem - var(--album-breadcrumb-gap) + var(--album-breadcrumb-content-offset)
+                )
             );
         }
     }
@@ -958,7 +975,11 @@ const titleSections = extractTitleSections(albumEntry.body);
 
         const controller = new AbortController();
         areAllTagsVisible = false;
-        const breadcrumbObserver = initAlbumBreadcrumbs();
+        let breadcrumbObserver = initAlbumBreadcrumbs();
+        document.addEventListener("album:content-replaced", () => {
+            breadcrumbObserver?.disconnect();
+            breadcrumbObserver = initAlbumBreadcrumbs();
+        }, { signal: controller.signal });
         initAlbumTagToggle(controller.signal);
         const cleanupPhotoGrid = initAlbumPhotoGrid(controller.signal);
         const article = page.querySelector<HTMLElement>('.album-content');

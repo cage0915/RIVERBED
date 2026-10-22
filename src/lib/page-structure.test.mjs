@@ -440,6 +440,10 @@ test('development block controls reveal on hover and place edit controls beside 
     );
     assert.match(devTool, /\.dev-block-edit-mode \.dev-block-overlay:hover > \.dev-page-inline-add-zone,[\s\S]*?opacity: 1;/);
     assert.match(devTool, /\.dev-block-overlay::before\s*\{[\s\S]*?left:\s*-3\.25rem;[\s\S]*?width:\s*3\.25rem;/);
+    assert.match(
+        devTool,
+        /\.dev-block-edit-mode \.dev-block-overlay\[data-dev-block="text"\]\s*\{[\s\S]*?z-index:\s*1;/,
+    );
     assert.match(devTool, /dev-inline-margin-control, \.dev-inline-block-type-control, \.dev-btn-caption, \.dev-btn-text/);
     assert.match(devTool, /dev-btn-caption, \.dev-block-toolbar \.dev-btn-text/);
     assert.match(devTool, /dev-btn-text[\s\S]*?title="Edit Text"[\s\S]*?\$\{ICONS\.quote\}/);
@@ -780,7 +784,11 @@ test('inline order mode exposes manager, block moves, and cross-block photo grou
     assert.match(devTool, /createPhotoActionButton\('merge', 'Merge selected photos', ICONS\.mergeArrows\)/);
     assert.match(devTool, /createPhotoActionButton\('split', 'Split selected photos', ICONS\.splitArrows\)/);
     assert.match(devTool, /const createBlocksFromInlineOrderSelection = async/);
-    assert.match(devTool, /inlineOrderSelectedPhotoNames\.size < 2/);
+    assert.match(devTool, /const triggerInlinePhotoAction = \(action: Exclude<InlineOrderPhotoAction, null>\) =>/);
+    assert.match(devTool, /button\.addEventListener\('click', \(\) => triggerInlinePhotoAction\(action\)\)/);
+    assert.match(devTool, /const minimumSelection = action === 'merge' \? 2 : 1;/);
+    assert.match(devTool, /inlineOrderSelectedPhotoNames\.size < minimumSelection/);
+    assert.match(devTool, /selectedPhotos\.length < minimumSelection/);
     assert.match(devTool, /const hasSelection = isActive && inlineOrderSelectedPhotoNames\.size > 0;/);
     assert.match(devTool, /button\.innerHTML = hasSelection \? ICONS\.check : icon;/);
     assert.match(devTool, /if \(inlineOrderPhotoAction === action\) \{\s*if \(inlineOrderSelectedPhotoNames\.size === 0\) \{\s*clearInlineOrderInteraction\(\);\s*return;/);
@@ -806,6 +814,16 @@ test('inline order mode exposes manager, block moves, and cross-block photo grou
     assert.match(devTool, /dev-page-inline-add-button dev-order-block-move-button/);
     assert.match(devTool, /dev-order-photo-selected[\s\S]*?outline: 3px solid #16a34a/);
     assert.match(devTool, /openPageManager\(true\)/);
+});
+
+test('inline editor provides F1 tag, F2 merge, and F3 split shortcuts', () => {
+    const devTool = readProjectFile('src/components/DevTool.astro');
+
+    assert.match(devTool, /target\?\.closest\('dialog, input, textarea, select, \[role="textbox"\]'\)/);
+    assert.match(devTool, /activeBlockEditMode[\s\S]*?activeOrderMode[\s\S]*?!isEditingText/);
+    assert.match(devTool, /event\.key === 'F1'[\s\S]*?toggleInlineTagMode\(\)/);
+    assert.match(devTool, /event\.key === 'F2'[\s\S]*?triggerInlinePhotoAction\('merge'\)/);
+    assert.match(devTool, /event\.key === 'F3'[\s\S]*?triggerInlinePhotoAction\('split'\)/);
 });
 
 test('copied tags paste directly on right click and Escape clears the copy state', () => {
@@ -843,6 +861,29 @@ test('pending Text presentation follows its block identity after structure reord
     assert.match(devTool, /const stagedText = findPendingTextEntry\(\)\?\.\[1\]/);
     assert.match(devTool, /appendPendingRichText\(textContent, text\)/);
     assert.match(devTool, /const \{ __devKey: _devKey, \.\.\.persistedBlock \} = block/);
+});
+
+test('pending layout rendering restores breadcrumb anchors', () => {
+    const devTool = readProjectFile('src/components/DevTool.astro');
+    const albumPage = readProjectFile('src/pages/[folder]/[album].astro');
+
+    assert.match(devTool, /albumContent\.replaceChildren\(fragment\);\s*document\.dispatchEvent\(new CustomEvent\('album:content-replaced'\)\);/);
+    assert.match(albumPage, /let breadcrumbObserver = initAlbumBreadcrumbs\(\);/);
+    assert.match(
+        albumPage,
+        /document\.addEventListener\("album:content-replaced", \(\) => \{\s*breadcrumbObserver\?\.disconnect\(\);\s*breadcrumbObserver = initAlbumBreadcrumbs\(\);/,
+    );
+});
+
+test('a newly added Text block immediately opens its editor', () => {
+    const devTool = readProjectFile('src/components/DevTool.astro');
+
+    assert.match(devTool, /let pendingTextBlockEditorKey: string \| null = null;/);
+    assert.match(devTool, /if \(type === 'Text'\) pendingTextBlockEditorKey = newBlock\.__devKey;/);
+    assert.match(
+        devTool,
+        /if \(isTextBlock && pendingTextBlockEditorKey === blockKey\) \{\s*pendingTextBlockEditorKey = null;\s*openInlineTextEditor\(\);\s*\}/,
+    );
 });
 
 test('persistent toolbar controls match the resting appearance of hovered empty controls', () => {
