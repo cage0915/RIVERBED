@@ -3236,6 +3236,7 @@
                 } else {
                     info?.remove();
                 }
+                initAlbumMetadataEditor();
 
                 setGlobalTagMode(false);
                 activeMarginControl = null;
@@ -3318,7 +3319,14 @@
             function initAlbumMetadataEditor() {
                 const heading = document.querySelector<HTMLElement>('[data-album-heading]');
                 const title = heading?.querySelector<HTMLElement>('[data-album-title]');
-                if (!heading || !title || heading.querySelector('[data-dev-album-metadata-edit]')) return;
+                if (!heading || !title) return;
+                const existingEditor = heading.querySelector<HTMLElement>('.dev-album-metadata-editor');
+                const info = heading.querySelector<HTMLElement>('[data-album-info]');
+                if (existingEditor) {
+                    (info || title).insertAdjacentElement('afterend', existingEditor);
+                    return;
+                }
+                if (!activeBlockEditMode) return;
 
                 const editor = document.createElement('div');
                 editor.className = 'dev-album-metadata-editor';
@@ -3331,7 +3339,7 @@
                 button.setAttribute('aria-expanded', 'false');
                 button.innerHTML = ICONS.pencil;
                 editor.appendChild(button);
-                title.insertAdjacentElement('afterend', editor);
+                (info || title).insertAdjacentElement('afterend', editor);
 
                 button.addEventListener('click', () => {
                     if (editor.querySelector('[data-dev-album-metadata-fields]')) {
@@ -6288,11 +6296,15 @@
                 activeBlockEditMode = enabled;
                 document.documentElement.classList.toggle('dev-block-edit-mode', enabled);
                 if (!enabled) {
+                    closeAlbumMetadataEditor();
+                    document.querySelector<HTMLElement>('.dev-album-metadata-editor')?.remove();
                     document.querySelectorAll<HTMLElement>('.dev-block-toolbar.is-open').forEach((toolbar) => {
                         toolbar.classList.remove('is-open');
                         toolbar.querySelectorAll<HTMLElement>('.dev-toolbar-btn.active').forEach((button) => button.classList.remove('active'));
                         toolbar.querySelectorAll<HTMLButtonElement>('[aria-expanded="true"]').forEach((button) => button.setAttribute('aria-expanded', 'false'));
                     });
+                } else {
+                    initAlbumMetadataEditor();
                 }
                 const saveBtn = document.getElementById('dev-save-btn');
                 saveBtn?.classList.toggle('active', enabled && !hasPendingBlockChanges());
@@ -6306,7 +6318,10 @@
             };
 
             function closeOtherPageEditors(except?: HTMLElement) {
-                const keepLayoutEditMode = Boolean(activeBlockEditMode && except?.closest('[data-dev-block]'));
+                const keepLayoutEditMode = Boolean(
+                    activeBlockEditMode
+                    && (except?.closest('[data-dev-block]') || except?.matches('[data-dev-album-metadata-edit]')),
+                );
                 document.querySelector('.dev-page-inline-add-menu')?.remove();
                 clearActiveInlineBlockAction();
                 if (except?.closest('[data-dev-block]')) clearInlineOrderInteraction();
@@ -7449,12 +7464,12 @@
                         }
                         if (activeBlockEditMode) {
                             setGlobalTagMode(false);
-                            setBlockEditMode(false);
+                            setLayoutEditMode(false);
                             return;
                         }
                         if (!canStartEditMode('blocks')) return;
                         closeOtherPageEditors(saveBtn);
-                        setBlockEditMode(true);
+                        setLayoutEditMode(true);
                     });
 
                     const scrollContainer = document.querySelector('.fixed.bottom-8.right-8.flex-col');

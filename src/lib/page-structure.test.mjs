@@ -309,7 +309,7 @@ test('Page Manager route and UI use structured manifest metadata without frontma
     assert.doesNotMatch(devTool, /frontmatter:\s*newFM|parseFM\(data\.frontmatter\)/);
 });
 
-test('album metadata is edited below the page title instead of in Page Manager', () => {
+test('album metadata editing is an Edit blocks control below the album info', () => {
     const albumPage = readProjectFile('src/pages/[folder]/[album].astro');
     const devTool = readProjectFile('src/components/DevTool.astro');
 
@@ -317,6 +317,10 @@ test('album metadata is edited below the page title instead of in Page Manager',
     assert.match(devTool, /function initAlbumMetadataEditor\(\)/);
     assert.match(devTool, /data-dev-album-metadata-edit/);
     assert.match(devTool, /dev-album-metadata-edit-button/);
+    assert.match(devTool, /if \(!activeBlockEditMode\) return;/);
+    assert.match(devTool, /\(info \|\| title\)\.insertAdjacentElement\('afterend', editor\);/);
+    assert.match(devTool, /closeAlbumMetadataEditor\(\);\s*document\.querySelector<HTMLElement>\('\.dev-album-metadata-editor'\)\?\.remove\(\);/);
+    assert.match(devTool, /\} else \{\s*initAlbumMetadataEditor\(\);/);
     assert.match(devTool, /Title<input class="dev-album-metadata-title"/);
     assert.match(devTool, /Info<input class="dev-album-metadata-info"/);
     assert.match(devTool, /Default block margin<input class="dev-album-metadata-margin"/);
@@ -452,7 +456,7 @@ test('development block controls reveal on hover and place edit controls beside 
     assert.match(devTool, /if \(matchesFile\) \{\s*pendingCaptionChanges\.delete\(captionChangeKey\)/);
     assert.match(devTool, /saveBtn\.innerHTML = ICONS\.pencil/);
     assert.match(devTool, /if \(hasPendingChanges\(\)\) \{\s*void savePendingChanges\(\);/);
-    assert.match(devTool, /setBlockEditMode\(true\)/);
+    assert.match(devTool, /setLayoutEditMode\(true\)/);
     assert.match(devTool, /sessionStorage\.setItem\('dev-caption-save-scroll-y'/);
 });
 
@@ -484,6 +488,7 @@ test('album utility controls expose one Edit blocks entry point and R2 sync outs
     assert.match(devTool, /gearBtn\.innerHTML = isAlbumPage \? ICONS\.pencil : ICONS\.gear/);
     assert.match(devTool, /gearBtn\.title = 'Edit blocks'/);
     assert.match(devTool, /setLayoutEditMode\(true\)/);
+    assert.match(devTool, /saveBtn\.addEventListener\('click', \(\) => \{[\s\S]*?if \(activeBlockEditMode\) \{\s*setGlobalTagMode\(false\);\s*setLayoutEditMode\(false\);/);
     assert.match(devTool, /syncBtn\.id = 'dev-album-sync-btn'/);
     assert.match(devTool, /syncBtn\.title = 'Sync with R2'/);
     assert.match(devTool, /void openAlbumSyncDialog\(albumSlug\)/);
