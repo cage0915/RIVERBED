@@ -216,13 +216,17 @@ test('PhotoPanorama is a standalone block with full-width carousel and joined pr
     assert.match(panorama, /@media \(max-width: 767px\)[\s\S]*?\.photo-panorama-arrow\s*\{\s*display:\s*none/);
     assert.match(panorama, /@media \(max-width: 767px\)[\s\S]*?\[data-view="carousel"\] \.photo-panorama-track\s*\{\s*scroll-snap-type: none/);
     assert.match(panorama, /if \(track\.clientWidth === observedWidth\) return/);
+    assert.match(panorama, /@media \(max-width: 767px\)[\s\S]*?\.photo-panorama-dots\s*\{\s*display: none/);
     assert.equal((panorama.match(/viewBox="0 0 16 16"/g) || []).length, 2);
     assert.match(panorama, /photo-panorama-view-icon--carousel[\s\S]*?<rect x="0\.5" y="4" width="3" height="8"[\s\S]*?<rect x="6\.5" y="4" width="3" height="8"[\s\S]*?<rect x="12\.5" y="4" width="3" height="8"/);
     assert.match(panorama, /photo-panorama-view-icon--panorama[\s\S]*?<rect x="0\.5" y="4" width="15" height="8"/);
     assert.doesNotMatch(panorama, /tags-overlay[^}]*display:\s*none/);
     assert.match(panorama, /@media \(min-width: 768px\)\s*\{[\s\S]*?\.photo-panorama-section \.photo-panorama-track :global\(\.photo-img\)\s*\{\s*border-radius: 0/);
     assert.match(panorama, /data-view="panorama"[^}]*\.photo-panorama-track:hover :global\(\.tags-overlay\)/);
-    assert.match(panorama, /const animations = slides\.map[\s\S]*?translateX[\s\S]*?scaleX[\s\S]*?slide\.animate\(keyframes/);
+    assert.match(panorama, /const animations = slides\.map[\s\S]*?translate\([^)]*before\.top - after\.top[\s\S]*?scale\([\s\S]*?transformOrigin: "top left"[\s\S]*?slide\.animate\(keyframes/);
+    assert.doesNotMatch(panorama, /scaleX\(/);
+    assert.match(panorama, /const keepBottomEdge = isPanorama[\s\S]*?stage\.getBoundingClientRect\(\)\.bottom - beforeStageRect\.bottom[\s\S]*?window\.scrollBy\(\{ top: drift, behavior: "instant" \}\)/);
+    assert.match(panorama, /html:has\(\.photo-panorama-section\[data-view-transitioning\]\)\)\s*\{\s*overflow-anchor: none/);
     assert.match(panorama, /useMobileCarouselReveal[\s\S]*?nextView === "carousel"[\s\S]*?activeIndex > 0[\s\S]*?max-width: 767px/);
     assert.match(panorama, /const keyframes = useMobileCarouselReveal[\s\S]*?opacity: 0[\s\S]*?opacity: 1/);
     assert.match(panorama, /duration: 650[\s\S]*?cubic-bezier\(0\.22, 1, 0\.36, 1\)/);
@@ -1513,4 +1517,14 @@ test("album photo grid keeps the shared previous and next navigation visible", (
         albumPage,
         /\.album-page\[data-grid-active="true"\][\s\S]{0,160}:global\(\.album-pagination\)\s*\{[\s\S]{0,80}display:\s*none/,
     );
+});
+
+test('sliced panoramas open the lightbox from their visible slices instead of the hidden source', () => {
+    const lightbox = readProjectFile('src/components/PhotoLightbox.astro');
+
+    assert.match(lightbox, /addFilter\("thumbBounds"/);
+    assert.match(lightbox, /closest<HTMLElement>\("\[data-single-photo-sliced\]"\)/);
+    assert.match(lightbox, /section\.dataset\.view !== "panorama"\) return fade/);
+    assert.match(lightbox, /\.photo-panorama-slice \.photo-wrapper/);
+    assert.match(lightbox, /return \{ x: left, y: top, w: right - left \}/);
 });

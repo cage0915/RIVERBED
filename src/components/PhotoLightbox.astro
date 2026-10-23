@@ -47,6 +47,28 @@
             pswpModule: () => import("photoswipe"),
         });
 
+        // A sliced panorama opens from its hidden source photo, whose bounds are 0×0
+        // at the viewport origin. Zoom from the joined slices in panorama view; in
+        // carousel view only one slice is visible, so fall back to a fade.
+        lightbox.addFilter("thumbBounds", (thumbBounds, itemData) => {
+            const section = itemData.element?.closest<HTMLElement>("[data-single-photo-sliced]");
+            if (!section) return thumbBounds!;
+            // The typings require Bounds, but PhotoSwipe fades when it receives none.
+            const fade = undefined as unknown as NonNullable<typeof thumbBounds>;
+            if (section.dataset.view !== "panorama") return fade;
+
+            const rects = Array.from(
+                section.querySelectorAll<HTMLElement>(".photo-panorama-slice .photo-wrapper"),
+                (slice) => slice.getBoundingClientRect(),
+            ).filter((rect) => rect.width > 0);
+            if (!rects.length) return fade;
+
+            const left = Math.min(...rects.map((rect) => rect.left));
+            const right = Math.max(...rects.map((rect) => rect.right));
+            const top = Math.min(...rects.map((rect) => rect.top));
+            return { x: left, y: top, w: right - left };
+        });
+
         lightbox.on("beforeOpen", () => {
             links.forEach((link) => hydrateDimensions(link));
         });
