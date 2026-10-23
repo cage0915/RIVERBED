@@ -435,7 +435,12 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
             }, { passive: true, signal: controller.signal });
 
             if (typeof ResizeObserver !== "undefined") {
+                // Re-align only when the width changes, so height-only resizes (images
+                // loading, mobile browser chrome) don't pull a free-scrolled track back.
+                let observedWidth = track.clientWidth;
                 const observer = new ResizeObserver(() => {
+                    if (track.clientWidth === observedWidth) return;
+                    observedWidth = track.clientWidth;
                     if (currentView() === "carousel" && !isChangingView) scrollToSlide(activeIndex, "auto");
                 });
                 observer.observe(track);
@@ -624,7 +629,6 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
     }
 
     .photo-panorama-view-toggle:focus-visible,
-    .photo-panorama-arrow:focus-visible,
     .photo-panorama-section :global(.photo-panorama-dot:focus-visible) {
         outline: 2px solid rgba(59, 130, 246, 0.9);
         outline-offset: 2px;
@@ -661,56 +665,54 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
     .photo-panorama-arrow {
         position: absolute;
         z-index: 2;
-        top: 50%;
+        top: 0;
+        bottom: 0;
         display: grid;
-        width: 2.25rem;
-        height: 2.25rem;
+        width: 3rem;
         place-items: center;
         padding: 0;
-        border: 1px solid rgba(255, 255, 255, 0.35);
-        border-radius: 9999px;
+        border: 0;
         color: white;
-        background: rgba(0, 0, 0, 0.3);
-        backdrop-filter: blur(6px);
+        background: rgba(0, 0, 0, 0.12);
         cursor: pointer;
         opacity: 0;
         pointer-events: none;
-        transform: translateY(-50%) scale(0.9);
-        transition: opacity 0.2s ease, transform 0.2s ease, background-color 0.2s ease;
+        transition: opacity 0.2s ease;
     }
 
     .photo-panorama-arrow svg {
-        width: 1.15rem;
-        height: 1.15rem;
+        width: 1.5rem;
+        height: 1.5rem;
         fill: none;
         stroke: currentColor;
         stroke-width: 2;
         stroke-linecap: round;
         stroke-linejoin: round;
+        filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
     }
 
     .photo-panorama-arrow--previous {
-        left: 0.75rem;
+        left: 0;
     }
 
     .photo-panorama-arrow--next {
-        right: 0.75rem;
+        right: 0;
     }
 
     .photo-panorama-section[data-view="carousel"] .photo-panorama-stage:hover .photo-panorama-arrow:not(:disabled),
     .photo-panorama-section[data-view="carousel"] .photo-panorama-arrow:focus-visible {
         opacity: 1;
         pointer-events: auto;
-        transform: translateY(-50%) scale(1);
-    }
-
-    .photo-panorama-arrow:hover {
-        background: rgba(0, 0, 0, 0.55);
     }
 
     .photo-panorama-arrow:disabled,
     .photo-panorama-section[data-view="panorama"] .photo-panorama-arrow {
         visibility: hidden;
+    }
+
+    .photo-panorama-arrow:focus-visible {
+        outline: 2px solid rgba(59, 130, 246, 0.9);
+        outline-offset: -2px;
     }
 
     :global(.photo-panorama-section > .photo-caption) {
@@ -763,6 +765,11 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
 
         .photo-panorama-arrow {
             display: none;
+        }
+
+        /* Touch scrolling can rest anywhere instead of snapping slide by slide. */
+        .photo-panorama-section[data-view="carousel"] .photo-panorama-track {
+            scroll-snap-type: none;
         }
     }
 

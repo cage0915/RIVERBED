@@ -214,6 +214,8 @@ test('PhotoPanorama is a standalone block with full-width carousel and joined pr
     assert.match(panorama, /photo-panorama-arrow--next/);
     assert.match(panorama, /photo-panorama-stage:hover \.photo-panorama-arrow:not\(:disabled\)/);
     assert.match(panorama, /@media \(max-width: 767px\)[\s\S]*?\.photo-panorama-arrow\s*\{\s*display:\s*none/);
+    assert.match(panorama, /@media \(max-width: 767px\)[\s\S]*?\[data-view="carousel"\] \.photo-panorama-track\s*\{\s*scroll-snap-type: none/);
+    assert.match(panorama, /if \(track\.clientWidth === observedWidth\) return/);
     assert.equal((panorama.match(/viewBox="0 0 16 16"/g) || []).length, 2);
     assert.match(panorama, /photo-panorama-view-icon--carousel[\s\S]*?<rect x="0\.5" y="4" width="3" height="8"[\s\S]*?<rect x="6\.5" y="4" width="3" height="8"[\s\S]*?<rect x="12\.5" y="4" width="3" height="8"/);
     assert.match(panorama, /photo-panorama-view-icon--panorama[\s\S]*?<rect x="0\.5" y="4" width="15" height="8"/);
@@ -569,25 +571,53 @@ test('carousel edge slides use scrollable spacers so every active photo shares o
     const carousel = readProjectFile('src/components/PhotoCarousel.astro');
     const devTool = readProjectFile('src/components/DevTool.astro');
 
-    assert.match(carousel, /--carousel-edge:\s*calc\(\(100% - var\(--slide-width, 80%\)\) \/ 2\)/);
+    assert.match(carousel, /--carousel-edge:\s*calc\(\(100% - var\(--slide-width, 100%\)\) \/ 2\)/);
     assert.match(carousel, /\.carousel-track::before,[\s\S]*?\.carousel-track::after[\s\S]*?flex:\s*0 0 var\(--carousel-edge\)/);
     assert.match(carousel, /\.carousel-track::before\s*\{[\s\S]*?margin-inline-end:\s*calc\(-1 \* var\(--gap, 0\.5rem\)\)/);
     assert.match(carousel, /\.carousel-track::after\s*\{[\s\S]*?margin-inline-start:\s*calc\(-1 \* var\(--gap, 0\.5rem\)\)/);
     assert.doesNotMatch(carousel, /padding-inline:\s*calc\(\(100% - var\(--slide-width/);
 
-    assert.match(devTool, /\.dev-page-structure-preview \.carousel-track::before,[\s\S]*?flex:\s*0 0 10%/);
-    assert.match(devTool, /\.dev-preview-as-carousel > \.photo-row::before,[\s\S]*?flex:\s*0 0 10%/);
+    assert.match(devTool, /\.dev-page-structure-preview \.carousel-track::before,[\s\S]*?flex:\s*0 0 calc\(\(100% - var\(--slide-width, 100%\)\) \/ 2\)/);
+    assert.match(devTool, /\.dev-preview-as-carousel > \.photo-row::before,[\s\S]*?flex:\s*0 0 0%/);
     assert.match(devTool, /\.dev-preview-as-row > \.carousel-track::before,[\s\S]*?display:\s*none/);
 });
 
-test('carousel defaults show more of the adjacent photos with a tighter gap', () => {
+test('carousel defaults to full-width slides with arrows and an adjustable peek', () => {
     const carousel = readProjectFile('src/components/PhotoCarousel.astro');
     const devTool = readProjectFile('src/components/DevTool.astro');
 
     assert.match(carousel, /gap = "0\.5rem"/);
-    assert.match(carousel, /peekPercent = 20/);
-    assert.match(devTool, /\.dev-page-structure-preview \.carousel-track > \*[\s\S]*?flex:\s*0 0 80%/);
-    assert.match(devTool, /\.dev-preview-as-carousel > \.photo-row > \*[\s\S]*?flex:\s*0 0 80% !important/);
+    assert.match(carousel, /peekPercent = 0/);
+    assert.match(carousel, /const showArrows = peek === 0/);
+    assert.match(carousel, /\{showArrows && \([\s\S]*?carousel-arrow--previous[\s\S]*?carousel-arrow--next/);
+    assert.match(carousel, /previous\.disabled = activeIndex <= 0/);
+    assert.match(carousel, /next\.disabled = activeIndex >= slides\.length - 1/);
+    assert.match(carousel, /--carousel-arrow-top/);
+    assert.match(carousel, /height: var\(--carousel-arrow-height, 100%\)/);
+    assert.doesNotMatch(carousel, /carousel-arrow:hover/);
+    assert.doesNotMatch(carousel, /carousel-arrow\)\s*\{[^}]*border-radius/);
+    assert.match(carousel, /@media \(max-width: 767px\)\s*\{\s*:global\(\.carousel-section > \.carousel-arrow\)\s*\{\s*display: none/);
+    assert.match(carousel, /data-peek-percent=\{isDev \? peek : undefined\}/);
+    assert.match(devTool, /\.dev-page-structure-preview \.carousel-track > \*[\s\S]*?flex:\s*0 0 var\(--slide-width, 100%\)/);
+    assert.match(devTool, /\.dev-preview-as-carousel > \.photo-row > \*[\s\S]*?flex:\s*0 0 100% !important/);
+    assert.match(devTool, /peekOption\.textContent = 'Set Peek'/);
+    assert.match(devTool, /const stageDirectPeekPercent = async/);
+    assert.match(devTool, /className = `carousel-arrow carousel-arrow--\$\{direction\}`/);
+});
+
+test('carousel peek percent serializes only when set on a carousel', () => {
+    const photos = [{ itemKey: 'one.jpg' }, { itemKey: 'two.jpg' }];
+    const peek = createLayoutOnlyPageContent([{ type: 'PhotoCarousel', props: { peekPercent: 20, initialSlide: 1 }, photos }]);
+    const none = createLayoutOnlyPageContent([{ type: 'PhotoCarousel', props: { peekPercent: 0 }, photos }]);
+    const clamped = createLayoutOnlyPageContent([{ type: 'PhotoCarousel', props: { peekPercent: 150 }, photos }]);
+    const panorama = createLayoutOnlyPageContent([{ type: 'PhotoPanorama', props: { peekPercent: 20 }, photos }]);
+    const getStructure = readProjectFile('src/dev-api/get-page-structure.ts');
+
+    assert.match(peek, /<PhotoCarousel\s+initialSlide=\{1\}\s+peekPercent=\{20\}>/);
+    assert.doesNotMatch(none, /peekPercent/);
+    assert.match(clamped, /peekPercent=\{90\}/);
+    assert.doesNotMatch(panorama, /peekPercent/);
+    assert.match(getStructure, /peekPercent=\\\{\(\\d\+\)\\\}/);
 });
 
 test('mobile album media is full bleed while captions keep the content gutter', () => {

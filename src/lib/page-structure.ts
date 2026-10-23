@@ -63,6 +63,10 @@ export function serializePageBody(blocks: PageBlock[]) {
         if ((block.type === 'PhotoCarousel' || isPanorama) && props.initialSlide) {
             propsText += `\n  initialSlide={${props.initialSlide}}`;
         }
+        const peekPercent = Math.min(90, Math.max(0, Math.trunc(Number(props.peekPercent) || 0)));
+        if (block.type === 'PhotoCarousel' && peekPercent > 0) {
+            propsText += `\n  peekPercent={${peekPercent}}`;
+        }
         if (isPanorama && props.initialView === 'panorama') {
             propsText += `\n  initialView="panorama"`;
         }

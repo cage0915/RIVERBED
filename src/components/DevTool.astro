@@ -328,7 +328,7 @@
                     .dev-page-inline-action-menu [data-inline-action-confirm="initial"] {
                         color: #2563eb;
                     }
-                    .dev-page-inline-action-menu .dev-inline-slices-label {
+                    .dev-page-inline-action-menu .dev-inline-number-label {
                         display: flex;
                         align-items: center;
                         gap: .4rem;
@@ -336,7 +336,7 @@
                         color: #64748b;
                         font-size: .75rem;
                     }
-                    .dev-page-inline-action-menu .dev-inline-slices-input {
+                    .dev-page-inline-action-menu .dev-inline-number-input {
                         width: 3.5rem;
                         padding: .25rem .35rem;
                         border: 1px solid #e2e8f0;
@@ -347,7 +347,7 @@
                         font-size: .75rem;
                         text-align: right;
                     }
-                    .dev-page-inline-action-menu .dev-inline-slices-input:focus {
+                    .dev-page-inline-action-menu .dev-inline-number-input:focus {
                         border-color: #2563eb;
                         outline: none;
                     }
@@ -751,13 +751,13 @@
                         margin-block: -3.5rem;
                         overflow-x: auto;
                         scroll-snap-type: x mandatory;
-                        scroll-padding-inline: 10%;
+                        scroll-padding-inline: calc((100% - var(--slide-width, 100%)) / 2);
                         scrollbar-width: none;
                     }
                     .dev-page-structure-preview .carousel-track::before,
                     .dev-page-structure-preview .carousel-track::after {
                         content: "";
-                        flex: 0 0 10%;
+                        flex: 0 0 calc((100% - var(--slide-width, 100%)) / 2);
                         pointer-events: none;
                     }
                     .dev-page-structure-preview .carousel-track::before {
@@ -768,7 +768,7 @@
                     }
                     .dev-page-structure-preview .carousel-track::-webkit-scrollbar { display: none; }
                     .dev-page-structure-preview .carousel-track > * {
-                        flex: 0 0 80%;
+                        flex: 0 0 var(--slide-width, 100%);
                         min-width: 0;
                         opacity: 0.65;
                         transform: scale(0.95);
@@ -910,13 +910,13 @@
                         margin-block: -3.5rem;
                         overflow-x: auto;
                         scroll-snap-type: x mandatory;
-                        scroll-padding-inline: 10%;
+                        scroll-padding-inline: 0;
                         scrollbar-width: none;
                     }
                     .dev-preview-as-carousel > .photo-row::before,
                     .dev-preview-as-carousel > .photo-row::after {
                         content: "";
-                        flex: 0 0 10%;
+                        flex: 0 0 0%;
                         pointer-events: none;
                     }
                     .dev-preview-as-carousel > .photo-row::before {
@@ -929,7 +929,7 @@
                         display: none;
                     }
                     .dev-preview-as-carousel > .photo-row > * {
-                        flex: 0 0 80% !important;
+                        flex: 0 0 100% !important;
                         min-width: 0;
                         opacity: 0.65;
                         transform: scale(0.95);
@@ -980,7 +980,8 @@
                         transform: none;
                         scroll-snap-align: none;
                     }
-                    .dev-preview-as-row > .carousel-dots {
+                    .dev-preview-as-row > .carousel-dots,
+                    .dev-preview-as-row > .carousel-arrow {
                         display: none;
                     }
                     .dev-preview-as-row > .photo-panorama-stage,
@@ -1019,13 +1020,13 @@
                         margin-block: -3.5rem;
                         overflow-x: auto;
                         scroll-snap-type: x mandatory;
-                        scroll-padding-inline: 10%;
+                        scroll-padding-inline: 0;
                         scrollbar-width: none;
                     }
                     .dev-preview-as-carousel > .photo-panorama-stage > .photo-panorama-track::before,
                     .dev-preview-as-carousel > .photo-panorama-stage > .photo-panorama-track::after {
                         content: "";
-                        flex: 0 0 10%;
+                        flex: 0 0 0%;
                         pointer-events: none;
                     }
                     .dev-preview-as-carousel > .photo-panorama-stage > .photo-panorama-track::before {
@@ -1035,7 +1036,7 @@
                         margin-inline-start: -0.5rem;
                     }
                     .dev-preview-as-carousel > .photo-panorama-stage > .photo-panorama-track > * {
-                        flex: 0 0 80% !important;
+                        flex: 0 0 100% !important;
                         min-width: 0;
                         opacity: 0.65;
                         transform: scale(0.95);
@@ -1051,7 +1052,8 @@
                     .dev-preview-as-carousel .photo-panorama-arrow {
                         display: none;
                     }
-                    .dev-preview-as-panorama > .carousel-dots {
+                    .dev-preview-as-panorama > .carousel-dots,
+                    .dev-preview-as-panorama > .carousel-arrow {
                         display: none;
                     }
                     .dev-preview-as-panorama > :is(.photo-row, .carousel-track) {
@@ -3057,6 +3059,8 @@
                     media.dataset.devBlock = isCarousel || isPanorama ? 'carousel' : 'row';
                     if (isPanorama) media.dataset.devPanorama = 'true';
                     if (isPanorama) media.dataset.panoramaSlices = String(panoramaSliceCount);
+                    const peekPercent = isCarousel ? Math.min(90, Math.max(0, Math.trunc(Number(props.peekPercent) || 0))) : 0;
+                    if (isCarousel) media.dataset.peekPercent = String(peekPercent);
                     media.dataset.devBlockKey = block.__devKey || '';
                     const caption = String(props.caption || '');
                     const captionPosition = String(props.captionPosition || 'center bottom');
@@ -3088,6 +3092,7 @@
                     const track = document.createElement('div');
                     track.className = isCarousel ? 'carousel-track' : isPanorama ? 'photo-panorama-track' : 'photo-row';
                     if (!isCarousel && !isPanorama) track.dataset.photoRow = '';
+                    if (isCarousel) track.style.setProperty('--slide-width', `${100 - peekPercent}%`);
                     (block.photos || []).forEach((photo: any) => {
                         const photoNode = getPhotoNode(photo.itemKey);
                         if (photoNode) {
@@ -3213,6 +3218,34 @@
                             media.appendChild(controls);
                         } else {
                             media.appendChild(dots);
+                            if (peekPercent === 0 && slides.length > 1) {
+                                const arrows = (['previous', 'next'] as const).map((direction) => {
+                                    const arrow = document.createElement('button');
+                                    arrow.type = 'button';
+                                    arrow.className = `carousel-arrow carousel-arrow--${direction}`;
+                                    arrow.setAttribute('aria-label', direction === 'previous' ? 'Previous photo' : 'Next photo');
+                                    arrow.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${direction === 'previous' ? 'm15 18-6-6 6-6' : 'm9 18 6-6-6-6'}"></path></svg>`;
+                                    media.appendChild(arrow);
+                                    return arrow;
+                                });
+                                const activeSlideIndex = () => Math.max(0, slides.findIndex((slide) => slide.hasAttribute('data-active')));
+                                const updateArrows = () => {
+                                    arrows[0].disabled = activeSlideIndex() <= 0;
+                                    arrows[1].disabled = activeSlideIndex() >= slides.length - 1;
+                                };
+                                arrows.forEach((arrow, offset) => arrow.addEventListener('click', () => {
+                                    (dots.children[activeSlideIndex() + (offset === 0 ? -1 : 1)] as HTMLElement | undefined)?.click();
+                                }));
+                                dots.addEventListener('click', updateArrows);
+                                updateArrows();
+                                new ResizeObserver(() => {
+                                    const trackStyle = getComputedStyle(track);
+                                    const paddingTop = parseFloat(trackStyle.paddingTop) || 0;
+                                    const paddingBottom = parseFloat(trackStyle.paddingBottom) || 0;
+                                    media.style.setProperty('--carousel-arrow-top', `${track.offsetTop + paddingTop}px`);
+                                    media.style.setProperty('--carousel-arrow-height', `${track.offsetHeight - paddingTop - paddingBottom}px`);
+                                }).observe(media);
+                            }
                         }
                     } else {
                         Array.from(track.children).forEach((photo) => {
@@ -3633,6 +3666,35 @@
                 }
             };
 
+            const stageDirectPeekPercent = async (
+                blockKey: string,
+                fallbackIndex: number,
+                peekPercent: number,
+                pendingType?: 'PhotoCarousel' | 'PhotoPanorama',
+            ) => {
+                if (!canStartEditMode('blocks')) return;
+                const albumSlug = getAlbumSlug();
+                if (!albumSlug) return;
+                try {
+                    const page = await getDirectPageStructure(albumSlug);
+                    const { block } = findDirectTargetBlock(page, blockKey, fallbackIndex);
+                    if (!block || (block.type !== 'PhotoCarousel' && pendingType !== 'PhotoCarousel')) {
+                        return showToast('❌ This is no longer a carousel');
+                    }
+                    block.type = 'PhotoCarousel';
+                    block.props ||= {};
+                    if (peekPercent > 0) block.props.peekPercent = peekPercent;
+                    else delete block.props.peekPercent;
+                    pendingLayoutChange = { albumSlug, draft: page.draft, imports: page.imports };
+                    clearActiveInlineBlockAction();
+                    renderPendingPageStructure(albumSlug, page.draft, page.imports);
+                    updateSaveButtonState();
+                    showToast(`📝 Pending carousel peek: ${peekPercent}%`);
+                } catch (error) {
+                    showToast(`❌ ${error instanceof Error ? error.message : 'Failed to set carousel peek'}`);
+                }
+            };
+
             const stageDirectPanoramaSlices = async (
                 blockKey: string,
                 fallbackIndex: number,
@@ -3853,24 +3915,31 @@
                     });
                     positionInlineActionMenu(menu, anchor);
                 };
-                const showPanoramaSlicesInput = () => {
+                const showNumberInput = (options: {
+                    label: string;
+                    title: string;
+                    min: number;
+                    max: number;
+                    value: number;
+                    submit: (value: number) => void;
+                }) => {
                     menu.replaceChildren();
                     const label = document.createElement('label');
-                    label.className = 'dev-inline-slices-label';
-                    label.textContent = 'Slices';
+                    label.className = 'dev-inline-number-label';
+                    label.textContent = options.label;
                     const input = document.createElement('input');
                     input.type = 'number';
-                    input.className = 'dev-inline-slices-input';
-                    input.min = '1';
-                    input.max = '24';
+                    input.className = 'dev-inline-number-input';
+                    input.min = String(options.min);
+                    input.max = String(options.max);
                     input.step = '1';
                     input.inputMode = 'numeric';
-                    input.value = String(Math.min(24, Math.max(1, Number.parseInt(block.dataset.panoramaSlices || '1', 10) || 1)));
+                    input.value = String(options.value);
                     label.appendChild(input);
                     const confirm = document.createElement('button');
                     confirm.type = 'button';
                     confirm.setAttribute('data-inline-action-confirm', 'initial');
-                    confirm.title = 'Confirm slices';
+                    confirm.title = options.title;
                     confirm.setAttribute('aria-label', confirm.title);
                     confirm.innerHTML = ICONS.check;
                     const cancel = document.createElement('button');
@@ -3879,10 +3948,10 @@
                     cancel.setAttribute('aria-label', 'Cancel');
                     cancel.innerHTML = ICONS.close;
                     const submit = () => {
-                        const slices = Math.min(24, Math.max(1, Math.trunc(Number(input.value) || 1)));
+                        const value = Math.min(options.max, Math.max(options.min, Math.trunc(Number(input.value) || options.min)));
                         menu.remove();
                         document.removeEventListener('click', closeMenu);
-                        void stageDirectPanoramaSlices(targetBlock.key, targetBlock.index, slices, targetBlock.isPanorama);
+                        options.submit(value);
                     };
                     confirm.addEventListener('click', (event) => {
                         event.stopPropagation();
@@ -3906,9 +3975,35 @@
                     input.focus();
                     input.select();
                 };
+                const showPanoramaSlicesInput = () => showNumberInput({
+                    label: 'Slices',
+                    title: 'Confirm slices',
+                    min: 1,
+                    max: 24,
+                    value: Math.min(24, Math.max(1, Number.parseInt(block.dataset.panoramaSlices || '1', 10) || 1)),
+                    submit: (slices) => void stageDirectPanoramaSlices(targetBlock.key, targetBlock.index, slices, targetBlock.isPanorama),
+                });
+                const showPeekPercentInput = () => showNumberInput({
+                    label: 'Peek %',
+                    title: 'Confirm peek',
+                    min: 0,
+                    max: 90,
+                    value: Math.min(90, Math.max(0, Number.parseInt(block.dataset.peekPercent || '0', 10) || 0)),
+                    submit: (peekPercent) => void stageDirectPeekPercent(targetBlock.key, targetBlock.index, peekPercent, targetBlock.pendingType),
+                });
                 addOption('Delete Block', 'delete-block');
                 if (targetBlock.isMedia) addOption('Delete Photos', 'delete-photos');
                 if (targetBlock.isCarousel) addOption('Set Initial Photo', 'set-initial-photo');
+                if (targetBlock.isCarousel && !targetBlock.isPanorama) {
+                    const peekOption = document.createElement('button');
+                    peekOption.type = 'button';
+                    peekOption.textContent = 'Set Peek';
+                    peekOption.addEventListener('click', (event) => {
+                        event.stopPropagation();
+                        showPeekPercentInput();
+                    });
+                    menu.appendChild(peekOption);
+                }
                 if (targetBlock.isPanorama) {
                     const initialViewOption = document.createElement('button');
                     initialViewOption.type = 'button';

@@ -95,6 +95,13 @@ export const GET: APIRoute = async ({ request }) => {
             type = 'PhotoPanorama';
         }
 
+        if (type === 'PhotoCarousel') {
+            const peekPercentMatch = propsStr.match(/peekPercent=\{(\d+)\}/);
+            if (peekPercentMatch) {
+                props.peekPercent = Math.min(90, Math.max(0, parseInt(peekPercentMatch[1])));
+            }
+        }
+
         if (type === 'PhotoPanorama') {
             const initialViewMatch = propsStr.match(/initialView="(carousel|panorama)"/);
             if (initialViewMatch) props.initialView = initialViewMatch[1];

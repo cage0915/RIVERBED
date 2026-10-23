@@ -4,7 +4,7 @@ import RichText from "./RichText.astro";
 interface Props {
     /** Optional gap between slides (CSS value, default "0.5rem") */
     gap?: string;
-    /** Percentage of the track NOT occupied by the active slide, split as side peeking (default 20 → ~10% each side) */
+    /** Percentage of the track NOT occupied by the active slide, split as side peeking (default 0 → full width with arrows) */
     peekPercent?: number;
     mb?: string; // technical override
     mt?: string; // technical override
@@ -20,7 +20,7 @@ interface Props {
 
 const {
     gap = "0.5rem",
-    peekPercent = 20,
+    peekPercent = 0,
     mb,
     mt,
     blockMargin,
@@ -52,7 +52,9 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
 
 // Each slide occupies (100 - peekPercent)% of the scroll container width.
 // Half the remaining is distributed to each side as a "peek".
-const slideWidthPercent = 100 - peekPercent;
+const peek = Math.min(90, Math.max(0, Math.trunc(Number(peekPercent) || 0)));
+const slideWidthPercent = 100 - peek;
+const showArrows = peek === 0;
 ---
 
 <section
@@ -65,6 +67,7 @@ const slideWidthPercent = 100 - peekPercent;
     data-dev-caption-pos={isDev ? captionPosition : undefined}
     data-dev-mb={isDev && mb ? mb : undefined}
     data-dev-block-margin={isDev && (blockMargin || mb) ? blockMargin || mb : undefined}
+    data-peek-percent={isDev ? peek : undefined}
 >
     {caption && parsedPos === 'top' && (
         <div class="photo-caption top" style={`text-align: ${parsedAlign};`}>
@@ -79,6 +82,21 @@ const slideWidthPercent = 100 - peekPercent;
     >
         <slot />
     </div>
+
+    {showArrows && (
+        <>
+            <button class="carousel-arrow carousel-arrow--previous" type="button" aria-label="Previous photo" disabled>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="m15 18-6-6 6-6"></path>
+                </svg>
+            </button>
+            <button class="carousel-arrow carousel-arrow--next" type="button" aria-label="Next photo" disabled>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="m9 18 6-6-6-6"></path>
+                </svg>
+            </button>
+        </>
+    )}
 
     <!-- Expanding dots container -->
     <div class="carousel-dots"></div>
@@ -98,6 +116,7 @@ const slideWidthPercent = 100 - peekPercent;
         const observers: IntersectionObserver[] = [];
         const initialPositionTimers: number[] = [];
         const initializedSections: HTMLElement[] = [];
+        const resizeObservers: ResizeObserver[] = [];
         const generatedDots: HTMLButtonElement[] = [];
 
         document
@@ -118,6 +137,38 @@ const slideWidthPercent = 100 - peekPercent;
 
                 const slides = Array.from(track.querySelectorAll<HTMLElement>(":scope > *"));
                 const dots: HTMLButtonElement[] = [];
+                const previous = section.querySelector<HTMLButtonElement>(".carousel-arrow--previous");
+                const next = section.querySelector<HTMLButtonElement>(".carousel-arrow--next");
+                let activeIndex = 0;
+                const updateArrows = () => {
+                    if (previous) previous.disabled = activeIndex <= 0;
+                    if (next) next.disabled = activeIndex >= slides.length - 1;
+                };
+                const centerSlide = (index: number) => {
+                    const slide = slides[index];
+                    if (!slide) return;
+                    track.scrollTo({
+                        left: slide.offsetLeft - track.offsetLeft - (track.clientWidth - slide.clientWidth) / 2,
+                        behavior: "smooth"
+                    });
+                };
+                if (previous && next) {
+                    previous.addEventListener("click", () => centerSlide(activeIndex - 1), { signal: controller.signal });
+                    next.addEventListener("click", () => centerSlide(activeIndex + 1), { signal: controller.signal });
+                    // Arrows sit beside the track, so match them to the photo area
+                    // (excluding the track's tag padding) regardless of captions and dots.
+                    const positionArrows = () => {
+                        const trackStyle = getComputedStyle(track);
+                        const paddingTop = parseFloat(trackStyle.paddingTop) || 0;
+                        const paddingBottom = parseFloat(trackStyle.paddingBottom) || 0;
+                        section.style.setProperty("--carousel-arrow-top", `${track.offsetTop + paddingTop}px`);
+                        section.style.setProperty("--carousel-arrow-height", `${track.offsetHeight - paddingTop - paddingBottom}px`);
+                    };
+                    const resizeObserver = new ResizeObserver(positionArrows);
+                    resizeObserver.observe(section);
+                    resizeObservers.push(resizeObserver);
+                    positionArrows();
+                }
 
                 // Generate dots if there are multiple slides
                 if (dotsContainer && slides.length > 1) {
@@ -179,10 +230,11 @@ const slideWidthPercent = 100 - peekPercent;
                                 dots.forEach((dot) => dot.classList.remove("active"));
 
                                 (entry.target as HTMLElement).setAttribute("data-active", "");
-                                const activeIndex = parseInt((entry.target as HTMLElement).dataset.slideIndex || "0");
+                                activeIndex = parseInt((entry.target as HTMLElement).dataset.slideIndex || "0");
                                 if (dots[activeIndex]) {
                                     dots[activeIndex].classList.add("active");
                                 }
+                                updateArrows();
                             }
                         });
                     },
@@ -209,6 +261,8 @@ const slideWidthPercent = 100 - peekPercent;
                 // Setup initial active slide and scroll position
                 const initialIndex = parseInt(section.dataset.initialSlide || "0");
                 const targetSlide = slides[initialIndex] || slides[0];
+                activeIndex = slides[initialIndex] ? initialIndex : 0;
+                updateArrows();
 
                 if (targetSlide && initialIndex > 0) {
                     targetSlide.setAttribute("data-active", "");
@@ -228,6 +282,7 @@ const slideWidthPercent = 100 - peekPercent;
         return () => {
             controller.abort();
             observers.forEach((observer) => observer.disconnect());
+            resizeObservers.forEach((observer) => observer.disconnect());
             initialPositionTimers.forEach((timer) => clearTimeout(timer));
             generatedDots.forEach((dot) => dot.remove());
             initializedSections.forEach((section) => {
@@ -239,6 +294,8 @@ const slideWidthPercent = 100 - peekPercent;
                     });
                 delete (section as any)._carouselObserver;
                 delete section.dataset.carouselReady;
+                section.style.removeProperty("--carousel-arrow-top");
+                section.style.removeProperty("--carousel-arrow-height");
             });
         };
     });
@@ -254,7 +311,7 @@ const slideWidthPercent = 100 - peekPercent;
 
     /* ── Scroll track ────────────────────────────────────────────── */
     .carousel-track {
-        --carousel-edge: calc((100% - var(--slide-width, 80%)) / 2);
+        --carousel-edge: calc((100% - var(--slide-width, 100%)) / 2);
         display: flex;
         flex-direction: row;
         gap: var(--gap, 0.5rem);
@@ -303,7 +360,7 @@ const slideWidthPercent = 100 - peekPercent;
 
     /* ── Each direct child = one slide ──────────────────────────── */
     .carousel-track > :global(*) {
-        flex: 0 0 var(--slide-width, 80%);
+        flex: 0 0 var(--slide-width, 100%);
         scroll-snap-align: center;
         min-width: 0;
 
@@ -377,6 +434,72 @@ const slideWidthPercent = 100 - peekPercent;
         }
         .carousel-section :global(.carousel-dot.active) {
             background: rgba(255, 255, 255, 0.8);
+        }
+    }
+
+    /* ── Arrows (full-width carousels only) ─────────────────────────
+       Global so the dev tool's pending page-structure preview can reuse them. */
+    :global(.carousel-section > .carousel-arrow) {
+        position: absolute;
+        z-index: 2;
+        top: var(--carousel-arrow-top, 0);
+        display: grid;
+        width: 3rem;
+        height: var(--carousel-arrow-height, 100%);
+        place-items: center;
+        padding: 0;
+        border: 0;
+        color: white;
+        background: rgba(0, 0, 0, 0.12);
+        cursor: pointer;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+    }
+
+    :global(.carousel-section > .carousel-arrow svg) {
+        width: 1.5rem;
+        height: 1.5rem;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
+    }
+
+    :global(.carousel-section > .carousel-arrow--previous) {
+        left: 0;
+    }
+
+    :global(.carousel-section > .carousel-arrow--next) {
+        right: 0;
+    }
+
+    :global(.carousel-section:hover > .carousel-arrow:not(:disabled)),
+    :global(.carousel-section > .carousel-arrow:focus-visible) {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    :global(.carousel-section > .carousel-arrow:focus-visible) {
+        outline: 2px solid rgba(59, 130, 246, 0.9);
+        outline-offset: -2px;
+    }
+
+    :global(.carousel-section > .carousel-arrow:disabled) {
+        visibility: hidden;
+    }
+
+    @media (max-width: 767px) {
+        :global(.carousel-section > .carousel-arrow) {
+            display: none;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        :global(.carousel-section > .carousel-arrow) {
+            transition-duration: 0.01ms;
         }
     }
 
