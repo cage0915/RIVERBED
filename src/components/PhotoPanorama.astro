@@ -442,6 +442,14 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
                 signal: controller.signal,
             });
 
+            // ContentKeyboardNavigation sends Left/Right here; only the carousel view pages.
+            section.addEventListener("keyboard-page", (event) => {
+                if (currentView() !== "carousel" || slides.length < 2) return;
+                event.preventDefault();
+                if (isChangingView) return;
+                scrollToSlide(activeIndex + (event as CustomEvent<{ direction: number }>).detail.direction);
+            }, { signal: controller.signal });
+
             track.addEventListener("scroll", () => {
                 if (currentView() !== "carousel" || scrollFrame || isChangingView) return;
                 scrollFrame = queueFrame(() => {
@@ -701,41 +709,46 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
         top: 0;
         bottom: 0;
         display: grid;
-        width: 3rem;
+        width: 2rem;
         place-items: center;
         padding: 0;
         border: 0;
-        color: white;
-        background: rgba(0, 0, 0, 0.12);
+        color: rgba(100, 100, 100, 0.75);
+        /* Tinted so the whole click strip reads as a target, not just the icon. */
+        background: rgba(100, 100, 100, 0.16);
         cursor: pointer;
+        /* Stays hit-testable while transparent so hovering the arrow strip itself reveals it. */
         opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.2s ease;
+        transition: opacity 0.2s ease, color 0.2s ease, background-color 0.2s ease;
+    }
+
+    .photo-panorama-arrow:hover {
+        color: rgba(100, 100, 100, 1);
+        background: rgba(100, 100, 100, 0.28);
     }
 
     .photo-panorama-arrow svg {
-        width: 1.5rem;
-        height: 1.5rem;
+        width: 1.25rem;
+        height: 1.25rem;
         fill: none;
         stroke: currentColor;
         stroke-width: 2;
         stroke-linecap: round;
         stroke-linejoin: round;
-        filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
     }
 
+    /* Arrows sit beside the photo (within the page gutter) so they never cover it. */
     .photo-panorama-arrow--previous {
-        left: 0;
+        right: 100%;
     }
 
     .photo-panorama-arrow--next {
-        right: 0;
+        left: 100%;
     }
 
     .photo-panorama-section[data-view="carousel"] .photo-panorama-stage:hover .photo-panorama-arrow:not(:disabled),
     .photo-panorama-section[data-view="carousel"] .photo-panorama-arrow:focus-visible {
         opacity: 1;
-        pointer-events: auto;
     }
 
     .photo-panorama-arrow:disabled,
@@ -745,7 +758,7 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
 
     .photo-panorama-arrow:focus-visible {
         outline: 2px solid rgba(59, 130, 246, 0.9);
-        outline-offset: -2px;
+        outline-offset: 0;
     }
 
     :global(.photo-panorama-section > .photo-caption) {
@@ -777,6 +790,16 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
         .photo-panorama-view-toggle {
             color: rgba(220, 220, 220, 0.78);
             border-color: rgba(255, 255, 255, 0.18);
+        }
+
+        .photo-panorama-arrow {
+            color: rgba(220, 220, 220, 0.78);
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .photo-panorama-arrow:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.22);
         }
 
         .photo-panorama-view-toggle:hover,

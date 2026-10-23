@@ -603,7 +603,9 @@ test('carousel defaults to full-width slides with arrows and an adjustable peek'
     assert.match(carousel, /next\.disabled = activeIndex >= slides\.length - 1/);
     assert.match(carousel, /--carousel-arrow-top/);
     assert.match(carousel, /height: var\(--carousel-arrow-height, 100%\)/);
-    assert.doesNotMatch(carousel, /carousel-arrow:hover/);
+    assert.match(carousel, /carousel-arrow--previous\)\s*\{\s*right: 100%/);
+    assert.match(carousel, /carousel-arrow--next\)\s*\{\s*left: 100%/);
+    assert.match(carousel, /addEventListener\("keyboard-page"/);
     assert.doesNotMatch(carousel, /carousel-arrow\)\s*\{[^}]*border-radius/);
     assert.match(carousel, /@media \(max-width: 767px\)\s*\{\s*:global\(\.carousel-section > \.carousel-arrow\)\s*\{\s*display: none/);
     assert.match(carousel, /data-peek-percent=\{isDev \? peek : undefined\}/);

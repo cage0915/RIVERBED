@@ -1,6 +1,27 @@
 <script>
     import { installPageLifecycle } from "../lib/client-page-lifecycle";
 
+    // The pageable block with the most on-screen height, if at least half of it
+    // (or half the viewport, for blocks taller than the screen) is visible.
+    const findMainPager = (navbarHeight: number) => {
+        const viewportHeight = window.innerHeight - navbarHeight;
+        let best: HTMLElement | null = null;
+        let bestVisible = 0;
+        document
+            .querySelectorAll<HTMLElement>("[data-carousel], [data-photo-panorama]")
+            .forEach((section) => {
+                const rect = section.getBoundingClientRect();
+                if (rect.height === 0) return;
+                const visible = Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, navbarHeight);
+                if (visible < Math.min(rect.height, viewportHeight) / 2) return;
+                if (visible > bestVisible) {
+                    best = section;
+                    bestVisible = visible;
+                }
+            });
+        return best as HTMLElement | null;
+    };
+
     installPageLifecycle(document, () => {
         const controller = new AbortController();
 
@@ -27,6 +48,27 @@
                 : eventElement?.parentElement;
             if (editableElement?.isContentEditable) return;
 
+            const navbarHeight = 110;
+
+            // Left/Right page the carousel or panorama filling the screen; Up/Down
+            // (and Left/Right when nothing can page) keep jumping between blocks.
+            if (
+                (e.key === "ArrowLeft" || e.key === "ArrowRight") &&
+                !e.altKey && !e.metaKey && !e.ctrlKey &&
+                !document.querySelector(".pswp--open")
+            ) {
+                const pager = findMainPager(navbarHeight);
+                const pageEvent = new CustomEvent("keyboard-page", {
+                    cancelable: true,
+                    detail: { direction: e.key === "ArrowRight" ? 1 : -1 },
+                });
+                // The component cancels the event when it handles the page turn.
+                if (pager && !pager.dispatchEvent(pageEvent)) {
+                    e.preventDefault();
+                    return;
+                }
+            }
+
             const targets = Array.from(
                 document.querySelectorAll<HTMLElement>(
                     "[data-keyboard-navigation-target]",
@@ -34,7 +76,6 @@
             ).filter((target) => target.getClientRects().length > 0);
             if (targets.length === 0) return;
 
-            const navbarHeight = 110;
             const scrollPadding = 20;
             const currentPos = window.scrollY + navbarHeight + scrollPadding;
 
