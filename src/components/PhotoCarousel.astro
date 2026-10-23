@@ -526,7 +526,11 @@ const showArrows = peek === 0;
 
     /* Caption nodes can also be created by the pending page-structure preview,
        so this presentation must not depend on Astro's scoped attribute. */
+    /* The track's tag padding (3.5rem, cancelled by a negative margin)
+       overlaps the caption, so lift the caption above it to keep links clickable. */
     :global(.carousel-section > .photo-caption) {
+        position: relative;
+        z-index: 1;
         font-size: 0.875rem;
         color: #898989;
     }
