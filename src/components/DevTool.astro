@@ -328,6 +328,29 @@
                     .dev-page-inline-action-menu [data-inline-action-confirm="initial"] {
                         color: #2563eb;
                     }
+                    .dev-page-inline-action-menu .dev-inline-slices-label {
+                        display: flex;
+                        align-items: center;
+                        gap: .4rem;
+                        padding: 0 .35rem;
+                        color: #64748b;
+                        font-size: .75rem;
+                    }
+                    .dev-page-inline-action-menu .dev-inline-slices-input {
+                        width: 3.5rem;
+                        padding: .25rem .35rem;
+                        border: 1px solid #e2e8f0;
+                        border-radius: 4px;
+                        background: #fff;
+                        color: #334155;
+                        font: inherit;
+                        font-size: .75rem;
+                        text-align: right;
+                    }
+                    .dev-page-inline-action-menu .dev-inline-slices-input:focus {
+                        border-color: #2563eb;
+                        outline: none;
+                    }
                     .dev-block-photo-action .photo-wrapper {
                         cursor: pointer !important;
                     }
@@ -3036,6 +3059,7 @@
                     media.className = `${isCarousel ? 'carousel-section group' : isPanorama ? 'photo-panorama-section group' : 'row-wrapper'} dev-page-structure-preview`;
                     media.dataset.devBlock = isCarousel || isPanorama ? 'carousel' : 'row';
                     if (isPanorama) media.dataset.devPanorama = 'true';
+                    if (isPanorama) media.dataset.panoramaSlices = String(panoramaSliceCount);
                     media.dataset.devBlockKey = block.__devKey || '';
                     const caption = String(props.caption || '');
                     const captionPosition = String(props.captionPosition || 'center bottom');
@@ -3613,6 +3637,37 @@
                 }
             };
 
+            const stageDirectPanoramaSlices = async (
+                blockKey: string,
+                fallbackIndex: number,
+                slices: number,
+                allowPendingPanorama = false,
+            ) => {
+                if (!canStartEditMode('blocks')) return;
+                const albumSlug = getAlbumSlug();
+                if (!albumSlug) return;
+                try {
+                    const page = await getDirectPageStructure(albumSlug);
+                    const { block } = findDirectTargetBlock(page, blockKey, fallbackIndex);
+                    if (!block || (block.props?.enablePanorama !== true && !allowPendingPanorama)) {
+                        return showToast('❌ This is no longer a panorama');
+                    }
+                    if ((block.photos || []).length !== 1) return showToast('❌ Slices require a single-photo panorama');
+                    block.type = 'PhotoCarousel';
+                    block.props ||= {};
+                    block.props.enablePanorama = true;
+                    if (slices > 1) block.props.panoramaSlices = slices;
+                    else delete block.props.panoramaSlices;
+                    pendingLayoutChange = { albumSlug, draft: page.draft, imports: page.imports };
+                    clearActiveInlineBlockAction();
+                    renderPendingPageStructure(albumSlug, page.draft, page.imports);
+                    updateSaveButtonState();
+                    showToast(`📝 Pending panorama slices: ${slices}`);
+                } catch (error) {
+                    showToast(`❌ ${error instanceof Error ? error.message : 'Failed to set panorama slices'}`);
+                }
+            };
+
             const chooseDirectBlockPhotos = (type: string, insertIndex: number) => {
                 const picker = document.createElement('input');
                 picker.type = 'file';
@@ -3796,6 +3851,59 @@
                     });
                     positionInlineActionMenu(menu, anchor);
                 };
+                const showPanoramaSlicesInput = () => {
+                    menu.replaceChildren();
+                    const label = document.createElement('label');
+                    label.className = 'dev-inline-slices-label';
+                    label.textContent = 'Slices';
+                    const input = document.createElement('input');
+                    input.type = 'number';
+                    input.className = 'dev-inline-slices-input';
+                    input.min = '1';
+                    input.max = '24';
+                    input.step = '1';
+                    input.inputMode = 'numeric';
+                    input.value = String(Math.min(24, Math.max(1, Number.parseInt(block.dataset.panoramaSlices || '1', 10) || 1)));
+                    label.appendChild(input);
+                    const confirm = document.createElement('button');
+                    confirm.type = 'button';
+                    confirm.setAttribute('data-inline-action-confirm', 'initial');
+                    confirm.title = 'Confirm slices';
+                    confirm.setAttribute('aria-label', confirm.title);
+                    confirm.innerHTML = ICONS.check;
+                    const cancel = document.createElement('button');
+                    cancel.type = 'button';
+                    cancel.title = 'Cancel';
+                    cancel.setAttribute('aria-label', 'Cancel');
+                    cancel.innerHTML = ICONS.close;
+                    const submit = () => {
+                        const slices = Math.min(24, Math.max(1, Math.trunc(Number(input.value) || 1)));
+                        menu.remove();
+                        document.removeEventListener('click', closeMenu);
+                        void stageDirectPanoramaSlices(targetBlock.key, targetBlock.index, slices, targetBlock.isPanorama);
+                    };
+                    confirm.addEventListener('click', (event) => {
+                        event.stopPropagation();
+                        submit();
+                    });
+                    cancel.addEventListener('click', (event) => {
+                        event.stopPropagation();
+                        clearActiveInlineBlockAction();
+                        document.removeEventListener('click', closeMenu);
+                    });
+                    input.addEventListener('keydown', (event) => {
+                        event.stopPropagation();
+                        if (event.key === 'Enter') submit();
+                        else if (event.key === 'Escape') {
+                            clearActiveInlineBlockAction();
+                            document.removeEventListener('click', closeMenu);
+                        }
+                    });
+                    menu.append(label, confirm, cancel);
+                    positionInlineActionMenu(menu, anchor);
+                    input.focus();
+                    input.select();
+                };
                 addOption('Delete Block', 'delete-block');
                 if (targetBlock.isMedia) addOption('Delete Photos', 'delete-photos');
                 if (targetBlock.isCarousel) addOption('Set Initial Photo', 'set-initial-photo');
@@ -3808,6 +3916,19 @@
                         showInitialViewOptions();
                     });
                     menu.appendChild(initialViewOption);
+                    const photoNames = new Set(
+                        Array.from(block.querySelectorAll<HTMLElement>('.photo-wrapper')).map(directPhotoName).filter(Boolean),
+                    );
+                    if (photoNames.size === 1) {
+                        const slicesOption = document.createElement('button');
+                        slicesOption.type = 'button';
+                        slicesOption.textContent = 'Set Slices';
+                        slicesOption.addEventListener('click', (event) => {
+                            event.stopPropagation();
+                            showPanoramaSlicesInput();
+                        });
+                        menu.appendChild(slicesOption);
+                    }
                 }
                 document.body.appendChild(menu);
                 positionInlineActionMenu(menu, anchor);
