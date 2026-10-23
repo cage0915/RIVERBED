@@ -38,12 +38,12 @@ export const GET: APIRoute = async ({ request }) => {
 
     // 2. Extract Blocks
     // Regex to match the supported album layout blocks.
-    const blockRegex = /<(Row|PhotoCarousel|Text)\b([^>]*?)>([\s\S]*?)<\/\1>/g;
+    const blockRegex = /<(Row|PhotoCarousel|PhotoPanorama|Text)\b([^>]*?)>([\s\S]*?)<\/\1>/g;
     const blocks: any[] = [];
     let match;
 
     while ((match = blockRegex.exec(body)) !== null) {
-        const type = match[1];
+        let type = match[1];
         const propsStr = match[2];
         const innerContent = match[3];
 
@@ -90,16 +90,19 @@ export const GET: APIRoute = async ({ request }) => {
         const initialSlideMatch = propsStr.match(/initialSlide=\{(\d+)\}/);
         if (initialSlideMatch) props.initialSlide = parseInt(initialSlideMatch[1]);
 
-        if (/\benablePanorama(?:=\{true\})?(?=\s|$)/.test(propsStr)) {
-            props.enablePanorama = true;
+        // Legacy syntax: <PhotoCarousel enablePanorama> is read as a PhotoPanorama block.
+        if (type === 'PhotoCarousel' && /\benablePanorama(?:=\{true\})?(?=\s|$)/.test(propsStr)) {
+            type = 'PhotoPanorama';
         }
 
-        const initialViewMatch = propsStr.match(/initialView="(carousel|panorama)"/);
-        if (initialViewMatch) props.initialView = initialViewMatch[1];
+        if (type === 'PhotoPanorama') {
+            const initialViewMatch = propsStr.match(/initialView="(carousel|panorama)"/);
+            if (initialViewMatch) props.initialView = initialViewMatch[1];
 
-        const panoramaSlicesMatch = propsStr.match(/panoramaSlices=\{(\d+)\}/);
-        if (panoramaSlicesMatch) {
-            props.panoramaSlices = Math.min(24, Math.max(1, parseInt(panoramaSlicesMatch[1])));
+            const panoramaSlicesMatch = propsStr.match(/panoramaSlices=\{(\d+)\}/);
+            if (panoramaSlicesMatch) {
+                props.panoramaSlices = Math.min(24, Math.max(1, parseInt(panoramaSlicesMatch[1])));
+            }
         }
 
         // Parse Photos inside Block

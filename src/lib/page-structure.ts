@@ -59,20 +59,15 @@ export function serializePageBody(blocks: PageBlock[]) {
         if (remNumber(props.blockMargin) && remNumber(props.blockMargin) !== '0.5') {
             propsText += `\n  blockMargin="${props.blockMargin}"`;
         }
-        if (block.type === 'PhotoCarousel' && props.enablePanorama === true) {
-            propsText += `\n  enablePanorama={true}`;
-        }
-        if (block.type === 'PhotoCarousel' && props.initialSlide) {
+        const isPanorama = block.type === 'PhotoPanorama';
+        if ((block.type === 'PhotoCarousel' || isPanorama) && props.initialSlide) {
             propsText += `\n  initialSlide={${props.initialSlide}}`;
         }
-        if (block.type === 'PhotoCarousel' && props.enablePanorama === true && props.initialView === 'panorama') {
+        if (isPanorama && props.initialView === 'panorama') {
             propsText += `\n  initialView="panorama"`;
         }
         const panoramaSlices = Math.min(24, Math.max(1, Math.trunc(Number(props.panoramaSlices) || 1)));
-        if (block.type === 'PhotoCarousel'
-            && props.enablePanorama === true
-            && block.photos?.length === 1
-            && panoramaSlices > 1) {
+        if (isPanorama && block.photos?.length === 1 && panoramaSlices > 1) {
             propsText += `\n  panoramaSlices={${panoramaSlices}}`;
         }
         if (!props.blockMargin && remNumber(props.mb) && remNumber(props.mb) !== '0.5') {

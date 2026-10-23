@@ -4,6 +4,7 @@ import Layout from "../../layouts/Layout.astro";
 import Row from "../../components/Row.astro";
 import AlbumPhoto from "../../components/AlbumPhoto.astro";
 import PhotoCarousel from "../../components/PhotoCarousel.astro";
+import PhotoPanorama from "../../components/PhotoPanorama.astro";
 import Text from "../../components/Text.astro";
 import AlbumPagination from "../../components/AlbumPagination.astro";
 // Captions use 300 and rich text/headings use 700 on album routes only.
@@ -250,7 +251,7 @@ const titleSections = extractTitleSections(albumEntry.body);
             class="album-content"
             style={albumRecord.gap ? `--album-block-gap: ${albumRecord.gap}` : undefined}
         >
-            <Content components={{ Row, Photo: AlbumPhoto, Text, PhotoCarousel }} />
+            <Content components={{ Row, Photo: AlbumPhoto, Text, PhotoCarousel, PhotoPanorama }} />
         </article>
 
         <AlbumPagination previous={previousAlbum} next={nextAlbum} />

@@ -48,8 +48,10 @@
                 description: string;
                 region: MountainRegion;
             };
+            type MediaBlockType = 'Row' | 'PhotoCarousel' | 'PhotoPanorama';
+            const isCarouselLikeType = (type: unknown) => type === 'PhotoCarousel' || type === 'PhotoPanorama';
             type PendingCaptionChange = {
-                sourceType: 'Row' | 'PhotoCarousel';
+                sourceType: MediaBlockType;
                 blockIndex: number;
                 photoNames: string[];
                 caption: string;
@@ -70,7 +72,7 @@
                 originalTextType: 'caption' | 'title';
             };
             type PendingBlockMarginChange = {
-                sourceType: 'Row' | 'PhotoCarousel' | 'Text';
+                sourceType: MediaBlockType | 'Text';
                 blockKey?: string;
                 blockIndex: number;
                 photoNames: string[];
@@ -80,10 +82,8 @@
                 automaticSpacingKey?: string;
             };
             type PendingBlockTypeChange = {
-                sourceType: 'Row' | 'PhotoCarousel';
-                targetType: 'Row' | 'PhotoCarousel';
-                sourcePanorama: boolean;
-                targetPanorama: boolean;
+                sourceType: MediaBlockType;
+                targetType: MediaBlockType;
                 blockIndex: number;
                 photoNames: string[];
             };
@@ -2324,10 +2324,7 @@
                         const target = structure.blocks[targetIndex];
                         target.type = change.targetType;
                         target.props = { ...(target.props || {}) };
-                        if (change.targetType === 'PhotoCarousel' && change.targetPanorama) {
-                            target.props.enablePanorama = true;
-                        } else {
-                            delete target.props.enablePanorama;
+                        if (change.targetType !== 'PhotoPanorama') {
                             delete target.props.initialView;
                             delete target.props.panoramaSlices;
                         }
@@ -3050,8 +3047,8 @@
                         return;
                     }
 
-                    const isPanorama = block.type === 'PhotoCarousel' && props.enablePanorama === true;
-                    const isCarousel = block.type === 'PhotoCarousel' && !isPanorama;
+                    const isPanorama = block.type === 'PhotoPanorama';
+                    const isCarousel = block.type === 'PhotoCarousel';
                     const panoramaSliceCount = isPanorama && block.photos?.length === 1
                         ? Math.min(24, Math.max(1, Math.trunc(Number(props.panoramaSlices) || 1)))
                         : 1;
@@ -3281,7 +3278,7 @@
             const directBlockOptions = [
                 { label: 'Row', value: 'Row' },
                 { label: 'Carousel', value: 'PhotoCarousel' },
-                { label: 'Panorama', value: 'PhotoCarouselPanorama' },
+                { label: 'Panorama', value: 'PhotoPanorama' },
                 { label: 'Text', value: 'Text' },
             ];
 
@@ -3449,9 +3446,9 @@
                             photos: [],
                         }
                         : {
-                            type: type === 'PhotoCarouselPanorama' ? 'PhotoCarousel' : type,
+                            type,
                             __devKey: `pending-${crypto.randomUUID()}`,
-                            props: type === 'PhotoCarouselPanorama' ? { enablePanorama: true } : {},
+                            props: {},
                             photos: files.map((file) => ({ itemKey: file.name })),
                         };
                     page.draft.blocks.splice(insertIndex, 0, newBlock);
@@ -3579,7 +3576,7 @@
                 blockKey: string,
                 fallbackIndex: number,
                 photoName: string,
-                allowPendingCarousel = false,
+                pendingType?: 'PhotoCarousel' | 'PhotoPanorama',
             ) => {
                 if (!canStartEditMode('blocks')) return;
                 const albumSlug = getAlbumSlug();
@@ -3587,10 +3584,10 @@
                 try {
                     const page = await getDirectPageStructure(albumSlug);
                     const { block } = findDirectTargetBlock(page, blockKey, fallbackIndex);
-                    if (!block || (block.type !== 'PhotoCarousel' && !allowPendingCarousel)) {
+                    if (!block || (!isCarouselLikeType(block.type) && !pendingType)) {
                         return showToast('❌ This is no longer a carousel');
                     }
-                    if (allowPendingCarousel && block.type !== 'PhotoCarousel') block.type = 'PhotoCarousel';
+                    if (pendingType) block.type = pendingType;
                     const basename = (value: string) => value.replace(/^\/+/, '').split('/').pop() || value;
                     const initialSlide = (block.photos || []).findIndex((photo: any) => basename(photo.itemKey) === photoName);
                     if (initialSlide < 0) return showToast('❌ Photo is no longer available');
@@ -3619,12 +3616,11 @@
                 try {
                     const page = await getDirectPageStructure(albumSlug);
                     const { block } = findDirectTargetBlock(page, blockKey, fallbackIndex);
-                    if (!block || (block.props?.enablePanorama !== true && !allowPendingPanorama)) {
+                    if (!block || (block.type !== 'PhotoPanorama' && !allowPendingPanorama)) {
                         return showToast('❌ This is no longer a panorama');
                     }
-                    block.type = 'PhotoCarousel';
+                    block.type = 'PhotoPanorama';
                     block.props ||= {};
-                    block.props.enablePanorama = true;
                     if (initialView === 'panorama') block.props.initialView = 'panorama';
                     else delete block.props.initialView;
                     pendingLayoutChange = { albumSlug, draft: page.draft, imports: page.imports };
@@ -3649,13 +3645,12 @@
                 try {
                     const page = await getDirectPageStructure(albumSlug);
                     const { block } = findDirectTargetBlock(page, blockKey, fallbackIndex);
-                    if (!block || (block.props?.enablePanorama !== true && !allowPendingPanorama)) {
+                    if (!block || (block.type !== 'PhotoPanorama' && !allowPendingPanorama)) {
                         return showToast('❌ This is no longer a panorama');
                     }
                     if ((block.photos || []).length !== 1) return showToast('❌ Slices require a single-photo panorama');
-                    block.type = 'PhotoCarousel';
+                    block.type = 'PhotoPanorama';
                     block.props ||= {};
-                    block.props.enablePanorama = true;
                     if (slices > 1) block.props.panoramaSlices = slices;
                     else delete block.props.panoramaSlices;
                     pendingLayoutChange = { albumSlug, draft: page.draft, imports: page.imports };
@@ -3771,7 +3766,14 @@
             const openInlineBlockActionMenu = (
                 anchor: HTMLElement,
                 block: HTMLElement,
-                targetBlock: { key: string; index: number; isMedia: boolean; isCarousel: boolean; isPanorama: boolean },
+                targetBlock: {
+                    key: string;
+                    index: number;
+                    isMedia: boolean;
+                    isCarousel: boolean;
+                    isPanorama: boolean;
+                    pendingType?: 'PhotoCarousel' | 'PhotoPanorama';
+                },
             ) => {
                 closeOtherPageEditors(anchor);
                 clearActiveInlineBlockAction();
@@ -3812,7 +3814,7 @@
                                 targetBlock.key,
                                 targetBlock.index,
                                 [...action.selectedPhotos][0],
-                                targetBlock.isCarousel,
+                                targetBlock.pendingType,
                             );
                         }
                         document.removeEventListener('click', closeMenu);
@@ -4030,12 +4032,14 @@
                             const stagedBlockTypeChange = pendingBlockTypeChanges.get(block.dataset.devTypeChangeKey || '');
                             const stagedType = stagedBlockTypeChange?.targetType;
                             const displayedType = stagedType || block.dataset.devSourceType || block.dataset.devBlock;
+                            const isPanorama = stagedType ? stagedType === 'PhotoPanorama' : block.dataset.devPanorama === 'true';
                             return {
                                 key: block.dataset.devBlockKey || `persisted-${insertIndex - 1}`,
                                 index: insertIndex - 1,
                                 isMedia: block.dataset.devBlock !== 'text',
-                                isCarousel: displayedType === 'PhotoCarousel' || displayedType === 'carousel',
-                                isPanorama: stagedBlockTypeChange?.targetPanorama ?? block.dataset.devPanorama === 'true',
+                                isCarousel: isCarouselLikeType(displayedType) || displayedType === 'carousel',
+                                isPanorama,
+                                pendingType: stagedType && stagedType !== 'Row' ? stagedType : undefined,
                             };
                         };
                         const moreButton = document.createElement('button');
@@ -4648,8 +4652,8 @@
                         const block = currentBlocks[index];
                         const nextBlock = currentBlocks[index + 1];
                         if (!block) return false;
-                        if (block.type === 'Text' || block.type === 'PhotoCarousel') return true;
-                        if (nextBlock?.type === 'PhotoCarousel') return true;
+                        if (block.type === 'Text' || isCarouselLikeType(block.type)) return true;
+                        if (isCarouselLikeType(nextBlock?.type)) return true;
 
                         const captionPosition = String(block.props?.captionPosition || 'center bottom');
                         if (block.props?.caption && captionPosition.includes('bottom') && nextBlock) return true;
@@ -4698,7 +4702,7 @@
                                     ? `<button class="block-drag-handle selected" title="Cancel move">${ICONS.drag}</button>`
                                     : `<button class="block-drag-handle" title="Click to move / drag">${ICONS.drag}</button>`
                                 }
-                                <span class="block-type-badge" title="${block.type}${block.props.enablePanorama ? ' + Panorama' : ''}">${block.type === 'PhotoCarousel' ? (block.props.enablePanorama ? 'P' : 'C') : block.type === 'Text' ? 'T' : 'R'}</span>
+                                <span class="block-type-badge" title="${block.type}">${block.type === 'PhotoPanorama' ? 'P' : block.type === 'PhotoCarousel' ? 'C' : block.type === 'Text' ? 'T' : 'R'}</span>
                                 ${isCollapsed && block.type === 'Text' && block.text ? `
                                 <div style="flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 0.75rem; color: #64748b; padding: 0 0.25rem; ${block.props.size === 'title' ? 'font-weight: 700;' : ''}">${block.text}</div>
                                 ` : isCollapsed && block.type !== 'Text' && isLocalhost && block.photos.length > 0 ? `
@@ -4717,7 +4721,7 @@
                                     `;
                                 })() : (() => {
                                     return `
-                                        ${block.type === 'PhotoCarousel' && block.props.enablePanorama ? `
+                                        ${block.type === 'PhotoPanorama' ? `
                                             ${block.photos.length === 1 ? `
                                                 <label style="display:flex;align-items:center;justify-content:space-between;gap:.75rem;padding:0 0 .6rem;color:#64748b;font-size:.75rem;">
                                                     Display slices
@@ -4731,7 +4735,7 @@
                                                     <span style="color: #999;">${ICONS.drag}</span>
                                                     ${isLocalhost ? `<img ${photoPreviewAttributes(p.itemKey)} loading="lazy" style="width:40px;height:30px;object-fit:cover;border-radius:3px;flex-shrink:0;" />` : ''}
                                                     <span style="flex: 1;">${p.itemKey.split('/').pop()}</span>
-                                                    ${block.type === 'PhotoCarousel' || block.photos.length > 1 ? `<div style="position: relative;">
+                                                    ${isCarouselLikeType(block.type) || block.photos.length > 1 ? `<div style="position: relative;">
                                                         <button class="photo-menu-trigger dev-pm-photo-menu-btn" title="Options">${ICONS.dots}</button>
                                                         <div class="dev-pm-photo-menu">
                                                             ${block.photos.length > 1 ? `
@@ -6535,7 +6539,7 @@
                                 ? pendingBlockTypeChanges.get(typeChangeKey)?.targetType || sourceType
                                 : sourceType;
                             if (targetType === 'Text') required.add(index);
-                            if (targetType === 'PhotoCarousel') {
+                            if (isCarouselLikeType(targetType)) {
                                 if (index > 0) required.add(index - 1);
                                 required.add(index);
                             }
@@ -6595,11 +6599,13 @@
                     const toolbar = document.createElement('div');
                     const blockElement = block as HTMLElement;
                     const isTextBlock = blockElement.dataset.devBlock === 'text';
-                    const sourceType: 'Row' | 'PhotoCarousel' | 'Text' = isTextBlock
+                    const sourceType: MediaBlockType | 'Text' = isTextBlock
                         ? 'Text'
-                        : blockElement.dataset.devBlock === 'carousel'
-                          ? 'PhotoCarousel'
-                          : 'Row';
+                        : blockElement.dataset.devBlock !== 'carousel'
+                          ? 'Row'
+                          : blockElement.dataset.devPanorama === 'true'
+                            ? 'PhotoPanorama'
+                            : 'PhotoCarousel';
                     const sourceBlock = sourceBlocks[blockIndex]?.type === sourceType
                         ? sourceBlocks[blockIndex]
                         : undefined;
@@ -6625,21 +6631,14 @@
                     const marginChangeKey = `${isTextBlock ? textChangeKey : captionChangeKey}:margin`;
                     const typeChangeKey = `${captionChangeKey}:type`;
                     blockElement.dataset.devTypeChangeKey = typeChangeKey;
-                    type MediaBlockMode = 'Row' | 'PhotoCarousel' | 'PhotoPanorama';
-                    const sourcePanorama = sourceType === 'PhotoCarousel'
-                        && (sourceBlock?.props?.enablePanorama === true || blockElement.dataset.devPanorama === 'true');
                     const stagedBlockTypeChange = pendingBlockTypeChanges.get(typeChangeKey);
                     const stagedBlockType = stagedBlockTypeChange?.targetType;
                     const displayedBlockType = stagedBlockType || sourceType;
-                    const mediaBlockLabel = (type: 'Row' | 'PhotoCarousel' | 'PhotoPanorama') =>
+                    const mediaBlockLabel = (type: MediaBlockType) =>
                         type === 'Row' ? 'row' : type === 'PhotoCarousel' ? 'carousel' : 'panorama';
-                    const mediaBlockAbbreviation = (type: 'Row' | 'PhotoCarousel' | 'PhotoPanorama') =>
+                    const mediaBlockAbbreviation = (type: MediaBlockType) =>
                         type === 'Row' ? 'R' : type === 'PhotoCarousel' ? 'C' : 'P';
-                    const displayedMediaType: MediaBlockMode = displayedBlockType === 'Text'
-                        ? 'Row'
-                        : stagedBlockTypeChange?.targetPanorama || (!stagedBlockTypeChange && sourcePanorama)
-                            ? 'PhotoPanorama'
-                            : displayedBlockType;
+                    const displayedMediaType: MediaBlockType = displayedBlockType === 'Text' ? 'Row' : displayedBlockType;
                     const rootFontSize = Number.parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
                     const marginInPixels = Number.parseFloat(getComputedStyle(blockElement).marginBottom);
                     const visibleMargin = `${Math.round(((Number.isFinite(marginInPixels) ? marginInPixels : 0) / rootFontSize) * 1000) / 1000}rem`;
@@ -6649,8 +6648,8 @@
                         : '';
                     const isLastAlbumBlock = albumContent?.lastElementChild === blockElement;
                     const rowDefaultMargin = isLastAlbumBlock ? '0rem' : (albumGap || '0.5rem');
-                    const defaultMarginForType = (blockType: 'Row' | 'PhotoCarousel' | 'Text') => {
-                        if (blockType === 'PhotoCarousel' || blockType === 'Text') return '0.5rem';
+                    const defaultMarginForType = (blockType: MediaBlockType | 'Text') => {
+                        if (isCarouselLikeType(blockType) || blockType === 'Text') return '0.5rem';
                         return rowDefaultMargin;
                     };
                     const originalBlockMargin = sourceBlock?.props?.blockMargin
@@ -6785,7 +6784,7 @@
                         const displayedType = pendingBlockTypeChanges.get(typeChangeKey)?.targetType || sourceType;
                         const effectiveMargin = blockMargin || (isTextBlock
                             ? defaultMarginForType('Text')
-                            : defaultMarginForType(displayedType as 'Row' | 'PhotoCarousel'));
+                            : defaultMarginForType(displayedType));
                         blockElement.style.setProperty('margin-bottom', effectiveMargin, 'important');
                         if (blockMargin) blockElement.dataset.devBlockMargin = blockMargin;
                         else delete blockElement.dataset.devBlockMargin;
@@ -6893,7 +6892,7 @@
                     });
 
                     const updateBlockTypePreview = (
-                        targetType: 'Row' | 'PhotoCarousel' | 'PhotoPanorama',
+                        targetType: MediaBlockType,
                         matchesFile: boolean,
                     ) => {
                         const track = blockElement.querySelector<HTMLElement>(':scope > .photo-row, :scope > .carousel-track, :scope > .photo-panorama-stage > .photo-panorama-track');
@@ -7054,20 +7053,17 @@
                         blockTypeButton?.setAttribute('aria-expanded', 'false');
                     };
 
-                    const stageBlockType = (targetMode: MediaBlockMode) => {
+                    const stageBlockType = (targetMode: MediaBlockType) => {
                         if (!canStartEditMode('blocks')) return;
                         if (isTextBlock || !blockTypeButton || sourceType === 'Text') return;
-                        const targetType: 'Row' | 'PhotoCarousel' = targetMode === 'Row' ? 'Row' : 'PhotoCarousel';
-                        const targetPanorama = targetMode === 'PhotoPanorama';
-                        const matchesFile = targetType === sourceType && targetPanorama === sourcePanorama;
+                        const targetType = targetMode;
+                        const matchesFile = targetType === sourceType;
                         if (matchesFile) {
                             pendingBlockTypeChanges.delete(typeChangeKey);
                         } else {
                             pendingBlockTypeChanges.set(typeChangeKey, {
                                 sourceType,
                                 targetType,
-                                sourcePanorama,
-                                targetPanorama,
                                 blockIndex,
                                 photoNames,
                             });
@@ -7380,7 +7376,7 @@
                         option.addEventListener('click', (event) => {
                             event.preventDefault();
                             event.stopPropagation();
-                            stageBlockType(option.dataset.blockMode as MediaBlockMode);
+                            stageBlockType(option.dataset.blockMode as MediaBlockType);
                         });
                     });
 
@@ -7400,7 +7396,7 @@
                     }
                     if (stagedBlockTypeChange) {
                         updateBlockTypePreview(
-                            stagedBlockTypeChange.targetPanorama ? 'PhotoPanorama' : stagedBlockTypeChange.targetType,
+                            stagedBlockTypeChange.targetType,
                             false,
                         );
                     }

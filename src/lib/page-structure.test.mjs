@@ -149,10 +149,10 @@ test('Text serialization uses one bottom block margin and retires legacy Text ma
     assert.doesNotMatch(content, /blockMargin="0\.5rem"/);
 });
 
-test('PhotoCarousel panorama serialization preserves its configured initial view and slide', () => {
+test('PhotoPanorama serialization preserves its configured initial view and slide', () => {
     const content = createLayoutOnlyPageContent([{
-        type: 'PhotoCarousel',
-        props: { enablePanorama: true, initialView: 'panorama', initialSlide: 2 },
+        type: 'PhotoPanorama',
+        props: { initialView: 'panorama', initialSlide: 2 },
         photos: [
             { itemKey: 'one.jpg' },
             { itemKey: 'two.jpg' },
@@ -160,40 +160,49 @@ test('PhotoCarousel panorama serialization preserves its configured initial view
         ],
     }]);
 
-    assert.match(content, /<PhotoCarousel\s+enablePanorama=\{true\}\s+initialSlide=\{2\}\s+initialView="panorama">/);
+    assert.match(content, /<PhotoPanorama\s+initialSlide=\{2\}\s+initialView="panorama">/);
     assert.match(content, /<Photo itemKey="three\.jpg" \/>/);
-    assert.match(content, /<\/PhotoCarousel>/);
-    assert.doesNotMatch(content, /<PhotoPanorama/);
+    assert.match(content, /<\/PhotoPanorama>/);
+    assert.doesNotMatch(content, /<PhotoCarousel|enablePanorama/);
+});
+
+test('PhotoCarousel serialization drops panorama-only props', () => {
+    const content = createLayoutOnlyPageContent([{
+        type: 'PhotoCarousel',
+        props: { initialView: 'panorama', panoramaSlices: 3, initialSlide: 1 },
+        photos: [{ itemKey: 'one.jpg' }, { itemKey: 'two.jpg' }],
+    }]);
+
+    assert.match(content, /<PhotoCarousel\s+initialSlide=\{1\}>/);
+    assert.doesNotMatch(content, /initialView|panoramaSlices|enablePanorama/);
 });
 
 test('single-photo panorama serializes a bounded display-only slice count', () => {
     const single = createLayoutOnlyPageContent([{
-        type: 'PhotoCarousel',
-        props: { enablePanorama: true, panoramaSlices: 3 },
+        type: 'PhotoPanorama',
+        props: { panoramaSlices: 3 },
         photos: [{ itemKey: 'one.jpg' }],
     }]);
     const multiple = createLayoutOnlyPageContent([{
-        type: 'PhotoCarousel',
-        props: { enablePanorama: true, panoramaSlices: 3 },
+        type: 'PhotoPanorama',
+        props: { panoramaSlices: 3 },
         photos: [{ itemKey: 'one.jpg' }, { itemKey: 'two.jpg' }],
     }]);
 
-    assert.match(single, /enablePanorama=\{true\}[\s\S]*?panoramaSlices=\{3\}/);
+    assert.match(single, /<PhotoPanorama\s+panoramaSlices=\{3\}>/);
     assert.doesNotMatch(multiple, /panoramaSlices/);
 });
 
-test('PhotoCarousel can enable full-width carousel and joined proportional views', () => {
+test('PhotoPanorama is a standalone block with full-width carousel and joined proportional views', () => {
     const carousel = readProjectFile('src/components/PhotoCarousel.astro');
     const panorama = readProjectFile('src/components/PhotoPanorama.astro');
     const albumPage = readProjectFile('src/pages/[folder]/[album].astro');
     const getStructure = readProjectFile('src/dev-api/get-page-structure.ts');
     const devTool = readProjectFile('src/components/DevTool.astro');
 
-    assert.match(carousel, /enablePanorama\?: boolean/);
-    assert.match(carousel, /\{enablePanorama \? \(/);
-    assert.match(carousel, /<PhotoPanorama/);
-    assert.doesNotMatch(albumPage, /import PhotoPanorama/);
-    assert.match(albumPage, /components=\{\{ Row, Photo: AlbumPhoto, Text, PhotoCarousel \}\}/);
+    assert.doesNotMatch(carousel, /enablePanorama|PhotoPanorama|panoramaSlices/);
+    assert.match(albumPage, /import PhotoPanorama from "\.\.\/\.\.\/components\/PhotoPanorama\.astro"/);
+    assert.match(albumPage, /components=\{\{ Row, Photo: AlbumPhoto, Text, PhotoCarousel, PhotoPanorama \}\}/);
     assert.match(panorama, /initialView\?: PanoramaView/);
     assert.match(panorama, /data-initial-view=\{view\}/);
     assert.match(panorama, /data-panorama-slices=\{displaySlices\}/);
@@ -232,11 +241,12 @@ test('PhotoCarousel can enable full-width carousel and joined proportional views
     assert.match(panorama, /data-single-photo-sliced[^}]*photo-panorama-single-source\)\s*\{\s*display: none/);
     assert.match(panorama, /\.photo-panorama-controls\s*\{\s*position: relative;\s*z-index: 3/);
     assert.match(panorama, /data-view="panorama"\] \.photo-panorama-dots\s*\{\s*display: none/);
-    assert.match(getStructure, /Row\|PhotoCarousel\|Text/);
-    assert.match(getStructure, /props\.enablePanorama = true/);
+    assert.match(getStructure, /Row\|PhotoCarousel\|PhotoPanorama\|Text/);
+    assert.match(getStructure, /type === 'PhotoCarousel' && \/\\benablePanorama[\s\S]*?type = 'PhotoPanorama'/);
     assert.match(getStructure, /panoramaSlices=\\\{\(\\d\+\)\\\}/);
     assert.match(getStructure, /initialView="\(carousel\|panorama\)"/);
-    assert.match(devTool, /label: 'Panorama', value: 'PhotoCarouselPanorama'/);
+    assert.match(devTool, /label: 'Panorama', value: 'PhotoPanorama'/);
+    assert.doesNotMatch(devTool, /enablePanorama|targetPanorama|sourcePanorama/);
     assert.doesNotMatch(devTool, /photo-panorama-initial-view/);
     assert.match(devTool, /const stageDirectInitialView = async/);
     assert.match(devTool, /initialView: 'carousel' \| 'panorama'/);
@@ -245,8 +255,11 @@ test('PhotoCarousel can enable full-width carousel and joined proportional views
     assert.match(devTool, /class="photo-panorama-slices" type="number" min="1" max="24"/);
     assert.match(devTool, /wrapper\.dataset\.itemKey \|\| wrapper\.dataset\.panoramaSourceItemKey/);
     assert.match(devTool, /data-panorama-source-item-key/);
-    assert.match(devTool, /sourceType: 'Row' \| 'PhotoCarousel';\s*targetType: 'Row' \| 'PhotoCarousel';\s*sourcePanorama: boolean;\s*targetPanorama: boolean/);
-    assert.match(devTool, /target\.props\.enablePanorama = true/);
+    assert.match(devTool, /type MediaBlockType = 'Row' \| 'PhotoCarousel' \| 'PhotoPanorama'/);
+    assert.match(devTool, /sourceType: MediaBlockType;\s*targetType: MediaBlockType;/);
+    assert.match(devTool, /if \(change\.targetType !== 'PhotoPanorama'\) \{\s*delete target\.props\.initialView;\s*delete target\.props\.panoramaSlices/);
+    assert.match(devTool, /slicesOption\.textContent = 'Set Slices'/);
+    assert.match(devTool, /const stageDirectPanoramaSlices = async/);
 });
 
 test('caption spacing is applied when direct block changes are saved', () => {
@@ -524,12 +537,12 @@ test('block action menu confirms photo deletion and carousel initial-photo selec
     assert.match(devTool, /addOption\('Set Initial Photo', 'set-initial-photo'\)/);
     assert.match(devTool, /targetBlock\.isPanorama/);
     assert.match(devTool, /const stagedBlockTypeChange = pendingBlockTypeChanges\.get\(block\.dataset\.devTypeChangeKey \|\| ''\)/);
-    assert.match(devTool, /isCarousel: displayedType === 'PhotoCarousel' \|\| displayedType === 'carousel'/);
+    assert.match(devTool, /isCarousel: isCarouselLikeType\(displayedType\) \|\| displayedType === 'carousel'/);
     assert.match(devTool, /const stageDirectBlockDeletion = async/);
     assert.match(devTool, /const stageDirectPhotoDeletion = async/);
     assert.match(devTool, /const stageDirectInitialPhoto = async/);
-    assert.match(devTool, /allowPendingCarousel = false/);
-    assert.match(devTool, /allowPendingCarousel && block\.type !== 'PhotoCarousel'\) block\.type = 'PhotoCarousel'/);
+    assert.match(devTool, /pendingType\?: 'PhotoCarousel' \| 'PhotoPanorama'/);
+    assert.match(devTool, /if \(pendingType\) block\.type = pendingType/);
     assert.match(devTool, /block\.props\.initialSlide = initialSlide/);
     assert.match(devTool, /dev-inline-photo-selected[\s\S]*?outline: 3px solid #dc2626/);
     assert.match(devTool, /dev-block-photo-action--initial[\s\S]*?outline-color: #2563eb/);
@@ -652,10 +665,9 @@ test('media block type chooser keeps abbreviated trigger and expands with full l
     assert.match(devTool, /const mediaBlockLabel = [\s\S]*?'row'[\s\S]*?'carousel'[\s\S]*?'panorama'/);
     assert.match(devTool, /const mediaBlockAbbreviation = [\s\S]*?'R'[\s\S]*?'C'[\s\S]*?'P'/);
     assert.match(devTool, /dev-inline-block-type-current[\s\S]*?\$\{mediaBlockAbbreviation\(displayedMediaType\)\}/);
-    assert.match(devTool, /stageBlockType\(option\.dataset\.blockMode as MediaBlockMode\)/);
+    assert.match(devTool, /stageBlockType\(option\.dataset\.blockMode as MediaBlockType\)/);
     assert.match(devTool, /pendingBlockTypeChanges\.set\(typeChangeKey/);
     assert.match(devTool, /target\.type = change\.targetType/);
-    assert.match(devTool, /change\.targetType === 'PhotoCarousel' && change\.targetPanorama/);
     assert.match(devTool, /pendingBlockTypeChanges\.size > 0/);
     assert.match(devTool, /const updateBlockTypePreview = \(/);
     assert.match(devTool, /updateBlockTypePreview\(targetMode, matchesFile\)/);
@@ -665,8 +677,8 @@ test('media block type chooser keeps abbreviated trigger and expands with full l
     assert.match(devTool, /image\.naturalWidth \/ image\.naturalHeight/);
     assert.match(devTool, /restoreOriginalLayout\(\)/);
     assert.match(devTool, /const rowDefaultMargin = isLastAlbumBlock \? '0rem' : \(albumGap \|\| '0\.5rem'\)/);
-    assert.match(devTool, /if \(blockType === 'PhotoCarousel' \|\| blockType === 'Text'\) return '0\.5rem'/);
-    assert.match(devTool, /if \(targetType === 'PhotoCarousel'\) \{\s*if \(index > 0\) required\.add\(index - 1\);\s*required\.add\(index\)/);
+    assert.match(devTool, /if \(isCarouselLikeType\(blockType\) \|\| blockType === 'Text'\) return '0\.5rem'/);
+    assert.match(devTool, /if \(isCarouselLikeType\(targetType\)\) \{\s*if \(index > 0\) required\.add\(index - 1\);\s*required\.add\(index\)/);
     assert.match(devTool, /updateBlockTypePreview\(targetMode, matchesFile\);\s*reconcileAutomaticBlockMargins\(\)/);
     assert.match(devTool, /dev-preview-as-panorama/);
     assert.match(devTool, /dev-preview-panorama-controls/);
