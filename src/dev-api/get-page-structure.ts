@@ -40,6 +40,7 @@ export const GET: APIRoute = async ({ request }) => {
     // Regex to match the supported album layout blocks.
     const blockRegex = /<(Row|PhotoCarousel|PhotoPanorama|Text)\b([^>]*?)>([\s\S]*?)<\/\1>/g;
     const blocks: any[] = [];
+    let columnCount = 0;
     let match;
 
     while ((match = blockRegex.exec(body)) !== null) {
@@ -112,15 +113,20 @@ export const GET: APIRoute = async ({ request }) => {
             }
         }
 
-        // Parse Photos inside Block
-        const photoRegex = /<Photo\s+([^>]*?)\/>/g;
+        // Parse Photos inside Block. Photos inside a Row's <Column> share a column id.
+        const photoRegex = /<Photo\s+([^>]*?)\/>|<(\/?)Column\b[^>]*>/g;
         const photos: any[] = [];
+        let column: string | undefined;
         let pMatch;
         while ((pMatch = photoRegex.exec(innerContent)) !== null) {
+            if (pMatch[1] === undefined) {
+                column = pMatch[2] || type !== 'Row' ? undefined : `column-${columnCount++}`;
+                continue;
+            }
             const pPropsStr = pMatch[1];
             const itemKeyMatch = pPropsStr.match(/itemKey="([^"]*)"/);
             if (itemKeyMatch) {
-                photos.push({ itemKey: itemKeyMatch[1] });
+                photos.push(column ? { itemKey: itemKeyMatch[1], column } : { itemKey: itemKeyMatch[1] });
             }
         }
 

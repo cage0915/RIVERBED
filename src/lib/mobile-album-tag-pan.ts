@@ -1,3 +1,5 @@
+import { measureRowItem, rowItemWidths } from './photo-row-layout';
+
 /** Keep tag overflow inside each media scroller instead of widening the page. */
 export function installMobileAlbumTagPan(article: HTMLElement) {
     const mobile = window.matchMedia('(max-width: 767px)');
@@ -49,14 +51,12 @@ export function installMobileAlbumTagPan(article: HTMLElement) {
                 // consume the flexible space and shrink the photographs.
                 const gap = parseFloat(getComputedStyle(track).columnGap) || 0;
                 const available = track.clientWidth - gap * (slides.length - 1);
-                const weights = slides.map(slide => {
-                    const image = slide.querySelector('img');
-                    return image?.naturalWidth && image.naturalHeight
-                        ? image.naturalWidth / image.naturalHeight : 1;
-                });
-                const total = weights.reduce((sum, weight) => sum + weight, 0);
+                const widths = rowItemWidths(
+                    slides.map(slide => measureRowItem(slide) ?? { ratio: 1, extraHeight: 0 }),
+                    available,
+                );
                 slides.forEach((slide, index) => slide.style.setProperty(
-                    '--mobile-photo-width', `${available * weights[index] / total}px`,
+                    '--mobile-photo-width', `${widths[index]}px`,
                 ));
                 track.setAttribute('data-mobile-row-pan', '');
             } else {

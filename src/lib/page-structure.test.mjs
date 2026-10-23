@@ -5,6 +5,10 @@ import test from 'node:test';
 import {
     applyDefaultCaptionBoundaryMargin,
     createLayoutOnlyPageContent,
+    movePageBlock,
+    movePagePhotos,
+    rowCells,
+    serializePageBody,
     referencedLocalNames,
 } from './page-structure.ts';
 
@@ -202,7 +206,7 @@ test('PhotoPanorama is a standalone block with full-width carousel and joined pr
 
     assert.doesNotMatch(carousel, /enablePanorama|PhotoPanorama|panoramaSlices/);
     assert.match(albumPage, /import PhotoPanorama from "\.\.\/\.\.\/components\/PhotoPanorama\.astro"/);
-    assert.match(albumPage, /components=\{\{ Row, Photo: AlbumPhoto, Text, PhotoCarousel, PhotoPanorama \}\}/);
+    assert.match(albumPage, /components=\{\{ Row, Column, Photo: AlbumPhoto, Text, PhotoCarousel, PhotoPanorama \}\}/);
     assert.match(panorama, /initialView\?: PanoramaView/);
     assert.match(panorama, /data-initial-view=\{view\}/);
     assert.match(panorama, /data-panorama-slices=\{displaySlices\}/);
@@ -820,7 +824,7 @@ test('layout mode keeps block controls and order controls in one editing session
     assert.match(devTool, /document\.removeEventListener\('keydown', pageManagerKeydownHandler\)/);
 });
 
-test('inline order mode exposes manager, block moves, and cross-block photo grouping', () => {
+test('inline order mode exposes manager, leveled moves, and cross-block photo grouping', () => {
     const devTool = readProjectFile('src/components/DevTool.astro');
 
     assert.match(devTool, /const orderButton = document\.getElementById\('dev-save-btn'\);/);
@@ -840,25 +844,27 @@ test('inline order mode exposes manager, block moves, and cross-block photo grou
     assert.match(devTool, /button\.innerHTML = hasSelection \? ICONS\.check : icon;/);
     assert.match(devTool, /if \(inlineOrderPhotoAction === action\) \{\s*if \(inlineOrderSelectedPhotoNames\.size === 0\) \{\s*clearInlineOrderInteraction\(\);\s*return;/);
     assert.match(devTool, /action === 'merge'\s*\? \[\{ type: 'Row'/);
-    assert.match(devTool, /inlineOrderMovePhotoName/);
+    assert.match(devTool, /let inlineOrderMove: InlineOrderMove \| null = null;/);
     assert.match(devTool, /inlineOrderInteractionAbortController\?\.abort\(\)/);
     assert.match(devTool, /signal: interactionAbortController\.signal/);
     assert.match(devTool, /const clearInlineOrderInteraction = \(\) =>/);
-    assert.match(devTool, /const cancelInlineOrderMove = \(\) => \{[\s\S]*?inlineOrderMovePhotoName = null;[\s\S]*?inlineOrderMoveBlockKey = null;/);
+    assert.match(devTool, /const cancelInlineOrderMove = \(\) => \{\s*if \(!inlineOrderMove\) return false;\s*inlineOrderMove = null;/);
     assert.match(devTool, /if \(cancelInlineOrderMove\(\)\) \{\s*event\.preventDefault\(\);/);
     assert.match(devTool, /const updateInlineFocusedActionState = \(\) =>/);
     assert.match(devTool, /html\.dev-inline-focused-action \.dev-page-inline-add-zone,[\s\S]*?\.dev-block-toolbar[\s\S]*?display: none !important;/);
-    assert.match(devTool, /if \(!activeTagMode && !inlineOrderPhotoAction\) \{/);
     assert.match(devTool, /if \(activeTagMode\) return;\s*document\.querySelectorAll<HTMLElement>\('\.album-content \[data-dev-block\] \.photo-wrapper'\)/);
     assert.match(devTool, /const startInlineBlockPhotoAction = \([\s\S]*?clearInlineOrderInteraction\(\);/);
     assert.match(devTool, /wrapper\.addEventListener\('click', \(event\) => \{\s*if \(\(event\.target as HTMLElement\)\.closest\('\.dev-tag-edit-btn, \.tag-link'\)\) return;\s*if \(activeInlineBlockAction\) return;/);
-    assert.match(devTool, /void moveInlineOrderPhoto\(photoName, false\)/);
-    assert.match(devTool, /void moveInlineOrderPhoto\(photoName, true\)/);
-    assert.match(devTool, /inlineOrderMoveBlockKey/);
-    assert.match(devTool, /Move selected block here/);
-    assert.match(devTool, /moveZone\.className = 'dev-order-block-move-zone'/);
-    assert.match(devTool, /\.dev-order-block-move-zone\s*\{[\s\S]*?top: 50%;[\s\S]*?right: 0;[\s\S]*?transform: translate\(50%, -50%\)/);
-    assert.match(devTool, /dev-page-inline-add-button dev-order-block-move-button/);
+    // Repeated clicks widen the selection; the drop target follows the selected level.
+    assert.match(devTool, /level: 'photo', photoName, blockKey \} : \{ level: 'block', blockKey \}/);
+    assert.match(devTool, /current\.level === 'photo' && wrapper && inlineOrderColumnOf\(wrapper\)[\s\S]*?level: 'column'/);
+    assert.match(devTool, /inlineOrderMove = current\.level === 'block' \? null : \{ level: 'block', blockKey \};/);
+    assert.match(devTool, /\(move\.level === 'column' && !isRow\)\) return null;/);
+    assert.match(devTool, /const direction: MoveDirection = !isRow \|\| Math\.abs\(dx\) >= Math\.abs\(dy\)/);
+    assert.match(devTool, /movePageBlock\(page\.draft\.blocks, move\.blockKey, drop\.targetBlockKey/);
+    assert.match(devTool, /movePagePhotos\(\s*page\.draft\.blocks,\s*\{ level: move\.level, photoName: move\.photoName \}/);
+    assert.match(devTool, /\.dev-order-drop-indicator\s*\{[\s\S]*?pointer-events: none;/);
+    assert.doesNotMatch(devTool, /dev-order-block-move-zone|moveInlineOrderPhoto|inlineOrderMoveBlockKey/);
     assert.match(devTool, /dev-order-photo-selected[\s\S]*?outline: 3px solid #16a34a/);
     assert.match(devTool, /openPageManager\(true\)/);
 });
@@ -1528,4 +1534,104 @@ test('sliced panoramas open the lightbox from their visible slices instead of th
     assert.match(lightbox, /section\.dataset\.view !== "panorama"\) return fade/);
     assert.match(lightbox, /\.photo-panorama-slice \.photo-wrapper/);
     assert.match(lightbox, /return \{ x: left, y: top, w: right - left \}/);
+});
+
+const row = (...cells) => ({
+    type: 'Row',
+    __devKey: cells.map((cell) => [].concat(cell).join('+')).join('|'),
+    props: {},
+    photos: cells.flatMap((cell, index) => Array.isArray(cell)
+        ? cell.map((name) => ({ itemKey: name, column: `c-${cell[0]}-${index}` }))
+        : [{ itemKey: cell }]),
+});
+const layout = (blocks) => blocks.map((block) => rowCells(block.photos)
+    .map(({ start, end, column }) => {
+        const names = block.photos.slice(start, end).map((photo) => photo.itemKey);
+        return column ? `[${names.join(' ')}]` : names[0];
+    })
+    .join(' '));
+let columnIds = 0;
+const nextColumnId = () => `new-${columnIds += 1}`;
+
+test('row cells group consecutive column members and dissolve singletons', () => {
+    assert.deepEqual(rowCells([
+        { itemKey: 'a', column: 'x' },
+        { itemKey: 'b', column: 'x' },
+        { itemKey: 'c', column: 'y' },
+        { itemKey: 'd' },
+    ]), [{ start: 0, end: 2, column: 'x' }, { start: 2, end: 3 }, { start: 3, end: 4 }]);
+});
+
+test('serialized rows wrap column cells and leave other blocks flat', () => {
+    const body = serializePageBody([
+        row(['a', 'b'], 'c'),
+        { type: 'PhotoCarousel', props: {}, photos: [{ itemKey: 'd', column: 'x' }, { itemKey: 'e', column: 'x' }] },
+    ]);
+    assert.equal(body, [
+        '<Row>',
+        '  <Column>',
+        '    <Photo itemKey="a" />',
+        '    <Photo itemKey="b" />',
+        '  </Column>',
+        '  <Photo itemKey="c" />',
+        '</Row>',
+        '',
+        '<PhotoCarousel>',
+        '  <Photo itemKey="d" />',
+        '  <Photo itemKey="e" />',
+        '</PhotoCarousel>',
+    ].join('\n'));
+});
+
+test('photo moves join rows sideways and columns vertically', () => {
+    let blocks = [row('a', 'b'), row('c')];
+    assert.equal(movePagePhotos(blocks, { level: 'photo', photoName: 'c' }, 'a', 'down', nextColumnId), true);
+    assert.deepEqual(layout(blocks), ['[a c] b']);
+
+    blocks = [row(['a', 'b'], 'c')];
+    movePagePhotos(blocks, { level: 'photo', photoName: 'c' }, 'a', 'down', nextColumnId);
+    assert.deepEqual(layout(blocks), ['[a c b]']);
+
+    blocks = [row(['a', 'b'], 'c')];
+    movePagePhotos(blocks, { level: 'photo', photoName: 'c' }, 'b', 'left', nextColumnId);
+    assert.deepEqual(layout(blocks), ['c [a b]']);
+
+    blocks = [row(['a', 'b'], 'c')];
+    movePagePhotos(blocks, { level: 'photo', photoName: 'a' }, 'c', 'right', nextColumnId);
+    assert.deepEqual(layout(blocks), ['b c a']);
+});
+
+test('column moves keep the stack sideways and merge vertically', () => {
+    let blocks = [row(['a', 'b'], 'c'), row('d')];
+    movePagePhotos(blocks, { level: 'column', photoName: 'b' }, 'd', 'right', nextColumnId);
+    assert.deepEqual(layout(blocks), ['c', 'd [a b]']);
+
+    blocks = [row(['a', 'b'], ['c', 'd'])];
+    movePagePhotos(blocks, { level: 'column', photoName: 'a' }, 'd', 'down', nextColumnId);
+    assert.deepEqual(layout(blocks), ['[c d a b]']);
+
+    blocks = [row(['a', 'b'], 'c')];
+    movePagePhotos(blocks, { level: 'column', photoName: 'a' }, 'c', 'up', nextColumnId);
+    assert.deepEqual(layout(blocks), ['[a b c]']);
+});
+
+test('invalid photo drops leave the layout untouched', () => {
+    const blocks = [row(['a', 'b'], 'c'), { type: 'PhotoCarousel', __devKey: 'k', props: {}, photos: [{ itemKey: 'd' }] }];
+    const snapshot = JSON.stringify(blocks);
+    assert.equal(movePagePhotos(blocks, { level: 'column', photoName: 'a' }, 'b', 'left', nextColumnId), false);
+    assert.equal(movePagePhotos(blocks, { level: 'photo', photoName: 'c' }, 'd', 'up', nextColumnId), false);
+    assert.equal(movePagePhotos(blocks, { level: 'column', photoName: 'a' }, 'd', 'left', nextColumnId), false);
+    assert.equal(JSON.stringify(blocks), snapshot);
+
+    assert.equal(movePagePhotos(blocks, { level: 'photo', photoName: 'c' }, 'd', 'right', nextColumnId), true);
+    assert.deepEqual(blocks.map((block) => block.photos.map((photo) => photo.itemKey)), [['a', 'b'], ['d', 'c']]);
+});
+
+test('block moves land above or below the target block', () => {
+    const blocks = [row('a'), row('b'), row('c')];
+    assert.equal(movePageBlock(blocks, 'c', 'a', 'up'), true);
+    assert.deepEqual(blocks.map((block) => block.__devKey), ['c', 'a', 'b']);
+    movePageBlock(blocks, 'c', 'b', 'down');
+    assert.deepEqual(blocks.map((block) => block.__devKey), ['a', 'b', 'c']);
+    assert.equal(movePageBlock(blocks, 'a', 'a', 'down'), false);
 });

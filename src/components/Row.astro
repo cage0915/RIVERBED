@@ -105,34 +105,29 @@ if (finalMB) {
 
 <script>
     import { installPageLifecycle } from "../lib/client-page-lifecycle";
+    import { measureRowItem, rowItemFlex } from "../lib/photo-row-layout";
 
     installPageLifecycle(document, () => {
         const controller = new AbortController();
 
-        document.querySelectorAll('[data-photo-row]').forEach(row => {
-            const items = row.querySelectorAll('.photo-container, :scope > *');
+        document.querySelectorAll<HTMLElement>('[data-photo-row]').forEach(row => {
+            const applyRatios = () => {
+                const items = Array.from(row.children) as HTMLElement[];
+                const measured = items.flatMap(item => {
+                    const metrics = measureRowItem(item);
+                    return metrics ? [{ item, metrics }] : [];
+                });
+                const flex = rowItemFlex(measured.map(({ metrics }) => metrics));
+                measured.forEach(({ item }, index) => {
+                    item.style.flex = flex[index];
+                });
+            };
 
-            items.forEach(item => {
-                const img = item.querySelector('img');
-                if (!img) return;
-
-                const applyRatio = () => {
-                    if (img.naturalWidth && img.naturalHeight) {
-                        const ratio = img.naturalWidth / img.naturalHeight;
-                        // Multiply ratio by 100 to ensure the sum of flex-grow values in the row
-                        // is always >= 1. If sum(flex-grow) < 1, Flexbox won't fill the full width!
-                        // The relative proportions between items remain exactly the same.
-                        (item as HTMLElement).style.flex = `${ratio * 100} 1 0%`;
-                    }
-                };
-
-                if (img.complete) {
-                    applyRatio();
-                } else {
-                    img.addEventListener('load', applyRatio, {
-                        signal: controller.signal,
-                    });
-                }
+            applyRatios();
+            // Images without manifest dimensions only become measurable on load.
+            row.addEventListener('load', applyRatios, {
+                capture: true,
+                signal: controller.signal,
             });
         });
 

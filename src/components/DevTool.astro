@@ -27,7 +27,15 @@
         remValueForInput,
         remValueFromInput,
     } from "../lib/rem-spacing";
-    import { applyDefaultCaptionBoundaryMargin } from "../lib/page-structure";
+    import {
+        applyDefaultCaptionBoundaryMargin,
+        movePageBlock,
+        movePagePhotos,
+        rowCells,
+        type MoveDirection,
+        type RowCell,
+    } from "../lib/page-structure";
+    import { measureRowItem, rowItemFlex } from "../lib/photo-row-layout";
     import { parseRichText } from "../lib/rich-text";
     import {
         sortPhotoImportFiles,
@@ -124,8 +132,11 @@
             let inlineOrderPhotoAction: InlineOrderPhotoAction = null;
             let inlineOrderSelectedPhotoNames = new Set<string>();
             let inlineOrderLastSelectedPhotoName: string | null = null;
-            let inlineOrderMovePhotoName: string | null = null;
-            let inlineOrderMoveBlockKey: string | null = null;
+            // One selection whose level grows on repeated clicks: photo -> column -> block.
+            type InlineOrderMove =
+                | { level: 'photo' | 'column'; photoName: string; blockKey: string }
+                | { level: 'block'; blockKey: string };
+            let inlineOrderMove: InlineOrderMove | null = null;
             let inlineOrderInteractionAbortController: AbortController | null = null;
             let activeMarginControl: HTMLElement | null = null;
             type InlineBlockAction = {
@@ -1398,33 +1409,44 @@
                         outline-offset: -3px;
                         cursor: copy !important;
                     }
-                    .dev-order-photo-move-target {
-                        outline: 2px dashed #86efac !important;
-                        outline-offset: -3px;
-                        cursor: copy !important;
-                    }
-                    .dev-order-block-move-zone {
-                        position: absolute;
-                        top: 50%;
-                        right: 0;
-                        z-index: 90;
-                        display: flex;
-                        width: 2rem;
-                        height: 2rem;
-                        justify-content: center;
-                        transform: translate(50%, -50%);
-                    }
-                    .dev-order-block-controls {
+                    .dev-order-move-selected {
                         position: relative;
                     }
-                    .dev-order-block-move-button.is-selected {
-                        border-color: rgba(59, 130, 246, 0.8);
-                        background: rgba(59, 130, 246, 0.8);
-                        color: white;
+                    /* An overlay instead of an outline: positioned photos inside a
+                       Column or block would otherwise paint over the frame. */
+                    .dev-order-move-frame {
+                        position: absolute;
+                        inset: 0;
+                        z-index: 95;
+                        border: 3px solid #16a34a;
+                        border-radius: 4px;
+                        pointer-events: none;
                     }
-                    .dev-order-block-move-button.is-move-target {
-                        border-color: rgba(134, 239, 172, 0.85);
-                        color: #bbf7d0;
+                    .dev-order-move-badge {
+                        position: absolute;
+                        top: 0.5rem;
+                        left: 0.5rem;
+                        padding: 0.1rem 0.5rem;
+                        border-radius: 999px;
+                        background: #16a34a;
+                        color: white;
+                        font: 600 0.65rem/1.4 sans-serif;
+                        letter-spacing: 0.05em;
+                        pointer-events: none;
+                    }
+                    .dev-order-drop-indicator {
+                        position: absolute;
+                        z-index: 9999;
+                        box-sizing: border-box;
+                        background: rgba(250, 204, 21, 0.28);
+                        pointer-events: none;
+                    }
+                    .dev-order-drop-indicator[data-direction="up"] { border-top: 4px solid #facc15; }
+                    .dev-order-drop-indicator[data-direction="down"] { border-bottom: 4px solid #facc15; }
+                    .dev-order-drop-indicator[data-direction="left"] { border-left: 4px solid #facc15; }
+                    .dev-order-drop-indicator[data-direction="right"] { border-right: 4px solid #facc15; }
+                    .dev-order-can-drop .album-content * {
+                        cursor: copy !important;
                     }
                     .dev-tag-toggle:not(.in-container) {
                         position: fixed;
@@ -3093,13 +3115,25 @@
                     track.className = isCarousel ? 'carousel-track' : isPanorama ? 'photo-panorama-track' : 'photo-row';
                     if (!isCarousel && !isPanorama) track.dataset.photoRow = '';
                     if (isCarousel) track.style.setProperty('--slide-width', `${100 - peekPercent}%`);
-                    (block.photos || []).forEach((photo: any) => {
-                        const photoNode = getPhotoNode(photo.itemKey);
-                        if (photoNode) {
+                    const photos = block.photos || [];
+                    const cells: RowCell[] = isCarousel || isPanorama
+                        ? photos.map((_: any, index: number) => ({ start: index, end: index + 1 }) as RowCell)
+                        : rowCells(photos);
+                    cells.forEach((cell) => {
+                        const parent = cell.column ? document.createElement('div') : track;
+                        if (cell.column) {
+                            parent.className = 'photo-column';
+                            parent.dataset.photoColumn = '';
+                            track.appendChild(parent);
+                        }
+                        photos.slice(cell.start, cell.end).forEach((photo: any) => {
+                            const photoNode = getPhotoNode(photo.itemKey);
+                            if (!photoNode) return;
                             photoNode.style.removeProperty('flex');
                             photoNode.removeAttribute('data-active');
-                            track.appendChild(photoNode);
-                        }
+                            parent.appendChild(photoNode);
+                        });
+                        if (cell.column && !parent.childElementCount) parent.remove();
                     });
                     const panoramaSliceSlides: HTMLElement[] = [];
                     if (panoramaSliceCount > 1 && track.children.length === 1) {
@@ -3248,16 +3282,18 @@
                             }
                         }
                     } else {
-                        Array.from(track.children).forEach((photo) => {
-                            photo.removeAttribute('data-active');
-                            const image = photo.querySelector<HTMLImageElement>('img');
-                            const applyRatio = () => {
-                                if (!image?.naturalWidth || !image.naturalHeight) return;
-                                (photo as HTMLElement).style.flex = `${(image.naturalWidth / image.naturalHeight) * 100} 1 0%`;
-                            };
-                            if (image?.complete) applyRatio();
-                            else image?.addEventListener('load', applyRatio, { once: true });
-                        });
+                        const applyRatios = () => {
+                            const items = Array.from(track.children) as HTMLElement[];
+                            const measured = items.flatMap((item) => {
+                                const metrics = measureRowItem(item);
+                                return metrics ? [{ item, metrics }] : [];
+                            });
+                            const flex = rowItemFlex(measured.map(({ metrics }) => metrics));
+                            measured.forEach(({ item }, index) => { item.style.flex = flex[index]; });
+                        };
+                        // Column gaps are read from computed style, so measure once attached.
+                        requestAnimationFrame(applyRatios);
+                        track.addEventListener('load', applyRatios, { capture: true });
                     }
                     if (caption && captionPosition.includes('bottom')) media.appendChild(createCaption(caption, captionPosition));
                     fragment.appendChild(media);
@@ -4189,15 +4225,13 @@
                 inlineOrderPhotoAction = null;
                 inlineOrderSelectedPhotoNames.clear();
                 inlineOrderLastSelectedPhotoName = null;
-                inlineOrderMovePhotoName = null;
-                inlineOrderMoveBlockKey = null;
+                inlineOrderMove = null;
                 if (activeOrderMode) initInlineOrderEditor();
             };
 
             const cancelInlineOrderMove = () => {
-                if (!inlineOrderMovePhotoName && !inlineOrderMoveBlockKey) return false;
-                inlineOrderMovePhotoName = null;
-                inlineOrderMoveBlockKey = null;
+                if (!inlineOrderMove) return false;
+                inlineOrderMove = null;
                 initInlineOrderEditor();
                 return true;
             };
@@ -4207,8 +4241,7 @@
                     'dev-inline-focused-action',
                     activeTagMode
                         || inlineOrderPhotoAction !== null
-                        || inlineOrderMovePhotoName !== null
-                        || inlineOrderMoveBlockKey !== null,
+                        || inlineOrderMove !== null,
                 );
             };
 
@@ -4217,62 +4250,124 @@
                 inlineOrderPhotoAction = null;
                 inlineOrderSelectedPhotoNames.clear();
                 inlineOrderLastSelectedPhotoName = null;
-                inlineOrderMovePhotoName = null;
-                inlineOrderMoveBlockKey = null;
+                inlineOrderMove = null;
                 setGlobalTagMode(!activeTagMode);
                 initInlineOrderEditor();
             };
 
-            const moveInlineOrderPhoto = async (targetPhotoName: string, insertAfter: boolean) => {
-                const sourcePhotoName = inlineOrderMovePhotoName;
-                const albumSlug = getAlbumSlug();
-                if (!sourcePhotoName || !albumSlug) return;
-                if (sourcePhotoName === targetPhotoName) {
-                    inlineOrderMovePhotoName = null;
-                    initInlineOrderEditor();
-                    return;
-                }
+            type InlineOrderDrop = {
+                direction: MoveDirection;
+                targetBlockKey: string;
+                targetPhotoName?: string;
+                rect: DOMRect;
+            };
+            const inlineOrderMoveLabels = { photo: 'Photo', column: 'Column', block: 'Block' } as const;
 
-                try {
-                    const page = await getDirectPageStructure(albumSlug);
-                    const source = getInlineOrderPhotoPosition(page.draft.blocks, sourcePhotoName);
-                    if (!source) return showToast('❌ Selected photo is no longer available');
-                    const [movedPhoto] = page.draft.blocks[source.blockIndex].photos.splice(source.photoIndex, 1);
-                    if (page.draft.blocks[source.blockIndex].photos.length === 0) {
-                        page.draft.blocks.splice(source.blockIndex, 1);
-                    }
-                    const target = getInlineOrderPhotoPosition(page.draft.blocks, targetPhotoName);
-                    if (!target || !movedPhoto) return showToast('❌ Target photo is no longer available');
-                    page.draft.blocks[target.blockIndex].photos.splice(target.photoIndex + (insertAfter ? 1 : 0), 0, movedPhoto);
-                    inlineOrderMovePhotoName = null;
-                    stageInlineOrderChange(albumSlug, page, '📝 Pending photo move');
-                } catch (error) {
-                    showToast(`❌ ${error instanceof Error ? error.message : 'Failed to move photo'}`);
-                }
+            const inlineOrderBlockKey = (block: HTMLElement) => block.dataset.devBlockKey
+                || `persisted-${Array.from(document.querySelectorAll('.album-content [data-dev-block]')).indexOf(block)}`;
+
+            // Columns only exist inside Rows; a lone photo has no column level.
+            const inlineOrderColumnOf = (wrapper: HTMLElement) => {
+                const column = wrapper.closest<HTMLElement>('.photo-column');
+                return column?.closest<HTMLElement>('[data-dev-block]')?.dataset.devBlock === 'row' ? column : null;
             };
 
-            const moveInlineOrderBlock = async (targetBlockKey: string) => {
-                const sourceBlockKey = inlineOrderMoveBlockKey;
-                const albumSlug = getAlbumSlug();
-                if (!sourceBlockKey || !albumSlug) return;
-                if (sourceBlockKey === targetBlockKey) {
-                    inlineOrderMoveBlockKey = null;
-                    initInlineOrderEditor();
+            const inlineOrderMoveElement = () => {
+                const move = inlineOrderMove;
+                if (!move) return null;
+                const block = Array.from(document.querySelectorAll<HTMLElement>('.album-content [data-dev-block]'))
+                    .find((candidate) => inlineOrderBlockKey(candidate) === move.blockKey);
+                if (!block || move.level === 'block') return block || null;
+                const wrapper = Array.from(block.querySelectorAll<HTMLElement>('.photo-wrapper'))
+                    .find((candidate) => inlineOrderPhotoName(candidate) === move.photoName);
+                if (!wrapper) return null;
+                return move.level === 'photo' ? wrapper : inlineOrderColumnOf(wrapper);
+            };
+
+            const resolveInlineOrderDrop = (event: MouseEvent, block: HTMLElement): InlineOrderDrop | null => {
+                const move = inlineOrderMove;
+                const target = event.target as HTMLElement;
+                if (!move || inlineOrderMoveElement()?.contains(target)) return null;
+                const targetBlockKey = inlineOrderBlockKey(block);
+                if (move.level === 'block') {
+                    const rect = block.getBoundingClientRect();
+                    const direction = event.clientY < rect.top + rect.height / 2 ? 'up' : 'down';
+                    return targetBlockKey === move.blockKey ? null : { direction, targetBlockKey, rect };
+                }
+
+                const wrapper = target.closest<HTMLElement>('.photo-wrapper');
+                const targetPhotoName = wrapper ? inlineOrderPhotoName(wrapper) : '';
+                const isRow = block.dataset.devBlock === 'row';
+                if (!wrapper || !targetPhotoName || (move.level === 'column' && !isRow)) return null;
+                // Diagonals split the photo into four zones; only Rows accept up/down.
+                const zone = wrapper.getBoundingClientRect();
+                const dx = (event.clientX - zone.left) / zone.width - 0.5;
+                const dy = (event.clientY - zone.top) / zone.height - 0.5;
+                const direction: MoveDirection = !isRow || Math.abs(dx) >= Math.abs(dy)
+                    ? dx < 0 ? 'left' : 'right'
+                    : dy < 0 ? 'up' : 'down';
+                // Sideways drops land beside the whole Row cell, so the line spans the Column.
+                const cell = direction === 'left' || direction === 'right'
+                    ? inlineOrderColumnOf(wrapper) || wrapper
+                    : wrapper;
+                return { direction, targetBlockKey, targetPhotoName, rect: cell.getBoundingClientRect() };
+            };
+
+            const showInlineOrderDropIndicator = (drop: InlineOrderDrop | null) => {
+                document.documentElement.classList.toggle('dev-order-can-drop', Boolean(drop));
+                let indicator = document.querySelector<HTMLElement>('.dev-order-drop-indicator');
+                if (!drop) {
+                    indicator?.remove();
                     return;
                 }
+                if (!indicator) {
+                    indicator = document.createElement('div');
+                    indicator.className = 'dev-order-drop-indicator';
+                    document.body.appendChild(indicator);
+                }
+                // Tint the target half and edge it on the side the selection lands.
+                const { rect, direction } = drop;
+                const horizontal = direction === 'left' || direction === 'right';
+                const width = horizontal ? rect.width / 2 : rect.width;
+                const height = horizontal ? rect.height : rect.height / 2;
+                indicator.dataset.direction = direction;
+                indicator.style.left = `${(direction === 'right' ? rect.right - width : rect.left) + window.scrollX}px`;
+                indicator.style.top = `${(direction === 'down' ? rect.bottom - height : rect.top) + window.scrollY}px`;
+                indicator.style.width = `${width}px`;
+                indicator.style.height = `${height}px`;
+            };
+
+            const clearInlineOrderMoveMarks = () => {
+                document.querySelectorAll('.dev-order-move-frame').forEach((frame) => frame.remove());
+                document.querySelectorAll<HTMLElement>('.dev-order-move-selected').forEach((element) => {
+                    element.classList.remove('dev-order-move-selected');
+                });
+                showInlineOrderDropIndicator(null);
+            };
+
+            const moveInlineOrderSelection = async (drop: InlineOrderDrop) => {
+                const move = inlineOrderMove;
+                const albumSlug = getAlbumSlug();
+                if (!move || !albumSlug) return;
 
                 try {
                     const page = await getDirectPageStructure(albumSlug);
-                    const sourceIndex = page.draft.blocks.findIndex((block: any) => block.__devKey === sourceBlockKey);
-                    if (sourceIndex < 0) return showToast('❌ Selected block is no longer available');
-                    const [movedBlock] = page.draft.blocks.splice(sourceIndex, 1);
-                    const targetIndex = page.draft.blocks.findIndex((block: any) => block.__devKey === targetBlockKey);
-                    if (targetIndex < 0 || !movedBlock) return showToast('❌ Target block is no longer available');
-                    page.draft.blocks.splice(targetIndex + 1, 0, movedBlock);
-                    inlineOrderMoveBlockKey = null;
-                    stageInlineOrderChange(albumSlug, page, '📝 Pending block move');
+                    const moved = move.level === 'block'
+                        ? movePageBlock(page.draft.blocks, move.blockKey, drop.targetBlockKey, drop.direction === 'up' ? 'up' : 'down')
+                        : movePagePhotos(
+                            page.draft.blocks,
+                            { level: move.level, photoName: move.photoName },
+                            drop.targetPhotoName || '',
+                            drop.direction,
+                            () => `pending-${crypto.randomUUID()}`,
+                        );
+                    if (!moved) return showToast('❌ Selection can no longer move there');
+                    inlineOrderMove = null;
+                    // The preview clones photo nodes from the live page; drop selection marks first.
+                    clearInlineOrderMoveMarks();
+                    stageInlineOrderChange(albumSlug, page, `📝 Pending ${inlineOrderMoveLabels[move.level].toLowerCase()} move`);
                 } catch (error) {
-                    showToast(`❌ ${error instanceof Error ? error.message : 'Failed to move block'}`);
+                    showToast(`❌ ${error instanceof Error ? error.message : 'Failed to move selection'}`);
                 }
             };
 
@@ -4294,7 +4389,7 @@
                         (block.photos || []).filter((photo: any) =>
                             inlineOrderSelectedPhotoNames.has((photo.itemKey || '').replace(/^.*\//, '')),
                         ),
-                    );
+                    ).map(({ column: _column, ...photo }: any) => photo);
                     const lastSelectedName = inlineOrderLastSelectedPhotoName;
                     const lastSource = lastSelectedName
                         ? getInlineOrderPhotoPosition(page.draft.blocks, lastSelectedName)
@@ -4355,8 +4450,7 @@
                 inlineOrderPhotoAction = action;
                 inlineOrderSelectedPhotoNames.clear();
                 inlineOrderLastSelectedPhotoName = null;
-                inlineOrderMovePhotoName = null;
-                inlineOrderMoveBlockKey = null;
+                inlineOrderMove = null;
                 initInlineOrderEditor();
             };
 
@@ -4364,14 +4458,11 @@
                 inlineOrderInteractionAbortController?.abort();
                 inlineOrderInteractionAbortController = null;
                 document.querySelector<HTMLElement>('[data-dev-inline-order-actions]')?.remove();
-                document.querySelectorAll<HTMLElement>('.dev-order-block-move-zone').forEach((zone) => zone.remove());
-                document.querySelectorAll<HTMLElement>('.dev-order-block-controls').forEach((block) => {
-                    block.classList.remove('dev-order-block-controls');
-                });
+                clearInlineOrderMoveMarks();
                 updateInlineFocusedActionState();
                 if (!activeOrderMode) {
-                    document.querySelectorAll<HTMLElement>('.dev-order-photo-selected, .dev-order-photo-move-target').forEach((photo) => {
-                        photo.classList.remove('dev-order-photo-selected', 'dev-order-photo-move-target');
+                    document.querySelectorAll<HTMLElement>('.dev-order-photo-selected').forEach((photo) => {
+                        photo.classList.remove('dev-order-photo-selected');
                     });
                     return;
                 }
@@ -4445,82 +4536,81 @@
                     }, 50);
                     return;
                 }
-                if (!activeTagMode && !inlineOrderPhotoAction) {
-                    blocks.forEach((block, index) => {
-                        block.classList.add('dev-order-block-controls');
-                        const blockKey = block.dataset.devBlockKey || `persisted-${index}`;
-                        const moveZone = document.createElement('div');
-                        moveZone.className = 'dev-order-block-move-zone';
-                        const moveButton = document.createElement('button');
-                        moveButton.type = 'button';
-                        const selected = inlineOrderMoveBlockKey === blockKey;
-                        if (inlineOrderMoveBlockKey && !selected) {
-                            moveButton.className = 'dev-page-inline-add-button dev-order-block-move-button is-move-target';
-                            moveButton.title = 'Move selected block here';
-                            moveButton.setAttribute('aria-label', moveButton.title);
-                            moveButton.innerHTML = ICONS.arrowRight;
-                        } else {
-                            moveButton.className = `dev-page-inline-add-button dev-order-block-move-button${selected ? ' is-selected' : ''}`;
-                            moveButton.title = selected ? 'Cancel move' : 'Click to move';
-                            moveButton.setAttribute('aria-label', moveButton.title);
-                            moveButton.innerHTML = selected ? ICONS.close : ICONS.drag;
-                        }
-                        moveButton.addEventListener('click', (event) => {
-                            event.stopPropagation();
-                            if (inlineOrderMoveBlockKey && !selected) {
-                                void moveInlineOrderBlock(blockKey);
-                                return;
-                            }
-                            clearActiveInlineBlockAction();
-                            inlineOrderMoveBlockKey = selected ? null : blockKey;
-                            inlineOrderMovePhotoName = null;
-                            initInlineOrderEditor();
-                        });
-                        moveZone.appendChild(moveButton);
-                        block.appendChild(moveZone);
-                    });
-                }
-
                 if (activeTagMode) return;
                 document.querySelectorAll<HTMLElement>('.album-content [data-dev-block] .photo-wrapper').forEach((wrapper) => {
                     const photoName = inlineOrderPhotoName(wrapper);
                     if (!photoName) return;
-                    const selectedForAction = inlineOrderSelectedPhotoNames.has(photoName);
-                    const selectedForMove = inlineOrderMovePhotoName === photoName;
-                    const moveTarget = Boolean(inlineOrderMovePhotoName && !selectedForMove && !inlineOrderPhotoAction);
-                    wrapper.classList.toggle('dev-order-photo-selected', selectedForAction || selectedForMove);
-                    wrapper.classList.toggle('dev-order-photo-move-target', moveTarget);
+                    wrapper.classList.toggle('dev-order-photo-selected', inlineOrderSelectedPhotoNames.has(photoName));
+                    if (!inlineOrderPhotoAction) return;
                     wrapper.addEventListener('click', (event) => {
                         if ((event.target as HTMLElement).closest('.dev-tag-edit-btn, .tag-link')) return;
                         if (activeInlineBlockAction) return;
                         event.preventDefault();
                         event.stopPropagation();
-                        if (inlineOrderPhotoAction) {
-                            if (inlineOrderSelectedPhotoNames.has(photoName)) {
-                                inlineOrderSelectedPhotoNames.delete(photoName);
-                                if (inlineOrderLastSelectedPhotoName === photoName) inlineOrderLastSelectedPhotoName = null;
-                            } else {
-                                inlineOrderSelectedPhotoNames.add(photoName);
-                                inlineOrderLastSelectedPhotoName = photoName;
-                            }
-                            inlineOrderMovePhotoName = null;
-                            initInlineOrderEditor();
-                            return;
+                        if (inlineOrderSelectedPhotoNames.has(photoName)) {
+                            inlineOrderSelectedPhotoNames.delete(photoName);
+                            if (inlineOrderLastSelectedPhotoName === photoName) inlineOrderLastSelectedPhotoName = null;
+                        } else {
+                            inlineOrderSelectedPhotoNames.add(photoName);
+                            inlineOrderLastSelectedPhotoName = photoName;
                         }
-                        if (!inlineOrderMovePhotoName || inlineOrderMovePhotoName === photoName) {
-                            inlineOrderMovePhotoName = inlineOrderMovePhotoName === photoName ? null : photoName;
-                            inlineOrderMoveBlockKey = null;
-                            initInlineOrderEditor();
-                            return;
-                        }
-                        void moveInlineOrderPhoto(photoName, false);
+                        initInlineOrderEditor();
                     }, { capture: true, signal: interactionAbortController.signal });
-                    wrapper.addEventListener('contextmenu', (event) => {
-                        if (!inlineOrderMovePhotoName || inlineOrderPhotoAction) return;
+                });
+                if (inlineOrderPhotoAction) return;
+
+                const selected = inlineOrderMoveElement();
+                if (inlineOrderMove && !selected) inlineOrderMove = null;
+                if (inlineOrderMove && selected) {
+                    selected.classList.add('dev-order-move-selected');
+                    const frame = document.createElement('span');
+                    frame.className = 'dev-order-move-frame';
+                    const badge = document.createElement('span');
+                    badge.className = 'dev-order-move-badge';
+                    badge.textContent = inlineOrderMoveLabels[inlineOrderMove.level];
+                    frame.appendChild(badge);
+                    selected.appendChild(frame);
+                }
+
+                blocks.forEach((block) => {
+                    const { signal } = interactionAbortController;
+                    block.addEventListener('pointermove', (event) => {
+                        showInlineOrderDropIndicator(resolveInlineOrderDrop(event, block));
+                    }, { signal });
+                    block.addEventListener('pointerleave', () => showInlineOrderDropIndicator(null), { signal });
+                    block.addEventListener('click', (event) => {
+                        const target = event.target as HTMLElement;
+                        if (activeInlineBlockAction) return;
+                        if (target.closest('button, input, textarea, .tag-link, .dev-page-inline-add-zone')) return;
+                        const wrapper = target.closest<HTMLElement>('.photo-wrapper');
+                        const photoName = wrapper ? inlineOrderPhotoName(wrapper) : '';
+                        const isText = block.dataset.devBlock === 'text';
+                        if (!inlineOrderMove && !photoName && !isText) return;
                         event.preventDefault();
                         event.stopPropagation();
-                        void moveInlineOrderPhoto(photoName, true);
-                    }, { capture: true, signal: interactionAbortController.signal });
+                        clearActiveInlineBlockAction();
+                        const blockKey = inlineOrderBlockKey(block);
+                        const current = inlineOrderMove;
+
+                        if (!current) {
+                            inlineOrderMove = photoName ? { level: 'photo', photoName, blockKey } : { level: 'block', blockKey };
+                            initInlineOrderEditor();
+                            return;
+                        }
+                        // Clicking inside the selection widens it: photo -> column -> block -> none.
+                        if (inlineOrderMoveElement()?.contains(target)) {
+                            if (current.level === 'photo' && wrapper && inlineOrderColumnOf(wrapper)) {
+                                inlineOrderMove = { ...current, level: 'column' };
+                            } else {
+                                inlineOrderMove = current.level === 'block' ? null : { level: 'block', blockKey };
+                            }
+                            showInlineOrderDropIndicator(null);
+                            initInlineOrderEditor();
+                            return;
+                        }
+                        const drop = resolveInlineOrderDrop(event, block);
+                        if (drop) void moveInlineOrderSelection(drop);
+                    }, { capture: true, signal });
                 });
             }
 
@@ -6524,8 +6614,7 @@
                     inlineOrderPhotoAction = null;
                     inlineOrderSelectedPhotoNames.clear();
                     inlineOrderLastSelectedPhotoName = null;
-                    inlineOrderMovePhotoName = null;
-                    inlineOrderMoveBlockKey = null;
+                    inlineOrderMove = null;
                 }
                 updateEditModeAvailability();
                 initInlineOrderEditor();
