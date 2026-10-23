@@ -225,7 +225,8 @@ test('PhotoPanorama is a standalone block with full-width carousel and joined pr
     assert.match(panorama, /data-view="panorama"[^}]*\.photo-panorama-track:hover :global\(\.tags-overlay\)/);
     assert.match(panorama, /const animations = slides\.map[\s\S]*?translate\([^)]*before\.top - after\.top[\s\S]*?scale\([\s\S]*?transformOrigin: "top left"[\s\S]*?slide\.animate\(keyframes/);
     assert.doesNotMatch(panorama, /scaleX\(/);
-    assert.match(panorama, /const keepBottomEdge = isPanorama[\s\S]*?stage\.getBoundingClientRect\(\)\.bottom - beforeStageRect\.bottom[\s\S]*?window\.scrollBy\(\{ top: drift, behavior: "instant" \}\)/);
+    assert.match(panorama, /const keepBottomEdge = isPanorama[\s\S]*?beforeStageHeight - stage\.getBoundingClientRect\(\)\.height[\s\S]*?beforeScrollY - shrunk[\s\S]*?window\.scrollTo\(\{ top: target, behavior: "instant" \}\)/);
+    assert.doesNotMatch(panorama, /window\.scrollBy/);
     assert.match(panorama, /html:has\(\.photo-panorama-section\[data-view-transitioning\]\)\)\s*\{\s*overflow-anchor: none/);
     assert.match(panorama, /useMobileCarouselReveal[\s\S]*?nextView === "carousel"[\s\S]*?activeIndex > 0[\s\S]*?max-width: 767px/);
     assert.match(panorama, /const keyframes = useMobileCarouselReveal[\s\S]*?opacity: 0[\s\S]*?opacity: 1/);

@@ -303,6 +303,7 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
                     : [];
                 const beforeStageRect = shouldAnimate ? stage.getBoundingClientRect() : null;
                 const beforeStageHeight = beforeStageRect?.height ?? 0;
+                const beforeScrollY = window.scrollY;
 
                 isChangingView = true;
                 toggle.disabled = true;
@@ -365,11 +366,16 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
                     // Panorama → carousel grows down from a fixed top edge; carousel → panorama
                     // shrinks up toward a fixed bottom edge, so scroll along as the stage shrinks.
                     const keepBottomEdge = isPanorama && beforeStageRect !== null;
+                    // The target comes from the stage height alone, not from re-measuring scroll
+                    // position: mobile browsers apply scroll asynchronously, and a measure-and-correct
+                    // loop overshoots there and jitters.
                     const holdBottomEdge = () => {
-                        if (!beforeStageRect) return;
-                        const drift = stage.getBoundingClientRect().bottom - beforeStageRect.bottom;
+                        const shrunk = beforeStageHeight - stage.getBoundingClientRect().height;
+                        const target = beforeScrollY - shrunk;
                         // "instant" bypasses the page-wide scroll-smooth, which would lag a frame behind.
-                        if (Math.abs(drift) > 0.5) window.scrollBy({ top: drift, behavior: "instant" });
+                        if (Math.abs(window.scrollY - target) > 0.5) {
+                            window.scrollTo({ top: target, behavior: "instant" });
+                        }
                     };
                     const followBottomEdge = () => {
                         if (controller.signal.aborted || !section.dataset.viewTransitioning) return;
