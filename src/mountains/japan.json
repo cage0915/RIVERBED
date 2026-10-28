@@ -80,7 +80,7 @@
     "description": ""
   },
   {
-    "name": "五龍岳",
+    "name": "五竜岳",
     "elevation": null,
     "description": ""
   },
@@ -140,10 +140,15 @@
     "description": ""
   },
   {
+    "name": "白馬旭岳",
+    "elevation": null,
+    "description": ""
+  },
+  {
     "name": "白馬岳",
-    "alternateName": "しろうまだけ",
     "elevation": 2932,
     "description": "",
+    "alternateName": "しろうまだけ",
     "coverKey": "yama/2026-hakuba/KCS01420.jpg",
     "location": {
       "latitude": 36.758611,
@@ -154,9 +159,9 @@
   },
   {
     "name": "白馬鑓ヶ岳",
-    "alternateName": "しろうまやりがたけ",
     "elevation": 2903,
     "description": "",
+    "alternateName": "しろうまやりがたけ",
     "coverKey": "yama/2026-hakuba/KCS01471.jpg",
     "location": {
       "latitude": 36.73133,
@@ -166,10 +171,15 @@
     "panorama": true
   },
   {
+    "name": "立山真砂岳",
+    "elevation": null,
+    "description": ""
+  },
+  {
     "name": "有明山",
-    "alternateName": "ありやけやま",
     "elevation": 2268,
     "description": "",
+    "alternateName": "ありやけやま",
     "coverKey": "yama/2026-matsumoto-suwa-azumino/KCS01798.jpg",
     "location": {
       "latitude": 36.391391,
@@ -189,10 +199,15 @@
     "description": ""
   },
   {
+    "name": "妙高山",
+    "elevation": null,
+    "description": ""
+  },
+  {
     "name": "杓子岳",
-    "alternateName": "しゃくしだけ",
     "elevation": 2812,
     "description": "",
+    "alternateName": "しゃくしだけ",
     "coverKey": "yama/2026-hakuba/KCS01478.jpg",
     "location": {
       "latitude": 36.7406,
@@ -223,9 +238,9 @@
   },
   {
     "name": "明神岳",
-    "alternateName": "みょうじんだけ",
     "elevation": 2931,
     "description": "",
+    "alternateName": "みょうじんだけ",
     "coverKey": "yama/2025-omoteginza-d4/KCS08181.jpg",
     "location": {
       "latitude": 36.274697,
@@ -246,9 +261,9 @@
   },
   {
     "name": "乗鞍岳",
-    "alternateName": "のりくらだけ",
     "elevation": 3026,
     "description": "",
+    "alternateName": "のりくらだけ",
     "coverKey": "yama/2026-matsumoto-suwa-azumino/KCS01278.jpg",
     "location": {
       "latitude": 36.10652,
@@ -264,9 +279,9 @@
   },
   {
     "name": "前穂高岳",
-    "alternateName": "まえほだかだけ",
     "elevation": 3090,
     "description": "",
+    "alternateName": "まえほだかだけ",
     "coverKey": "yama/2025-omoteginza-d2/KCS07148.jpg",
     "location": {
       "latitude": 36.28198,
@@ -282,9 +297,9 @@
   },
   {
     "name": "浅間山",
-    "alternateName": "あさまやま",
     "elevation": 2568,
     "description": "",
+    "alternateName": "あさまやま",
     "coverKey": "yama/2025-omoteginza-d2/KCS06817.jpg",
     "location": {
       "latitude": 36.4064,
@@ -295,9 +310,9 @@
   },
   {
     "name": "唐松岳",
-    "alternateName": "からまつだけ",
     "elevation": 2696,
     "description": "",
+    "alternateName": "からまつだけ",
     "coverKey": "yama/2026-hakuba/KCS01424.jpg",
     "location": {
       "latitude": 36.687158,
@@ -313,10 +328,10 @@
   },
   {
     "name": "針ノ木岳",
-    "alternateName": "はりのきだけ",
     "elevation": 2820,
     "description": "",
-    "coverKey": "yama/2025-omoteginza-d2/KCS07142.jpg",
+    "alternateName": "はりのきだけ",
+    "coverKey": "yama/2026-tateyama-tsurugi/KCS05919.jpg",
     "location": {
       "latitude": 36.53801,
       "longitude": 137.684531,
@@ -326,9 +341,9 @@
   },
   {
     "name": "高妻山",
-    "alternateName": "たかづまやま",
     "elevation": 2353,
     "description": "",
+    "alternateName": "たかづまやま",
     "coverKey": "yama/2026-hakuba/KCS01412.jpg",
     "location": {
       "latitude": 36.80009,
@@ -339,9 +354,10 @@
   },
   {
     "name": "剱岳",
-    "alternateName": "つるぎだけ",
     "elevation": 2999,
     "description": "",
+    "alternateName": "つるぎだけ",
+    "coverKey": "yama/2026-tateyama-tsurugi/KCS06076.jpg",
     "location": {
       "latitude": 36.623322,
       "longitude": 137.617119,
@@ -351,9 +367,9 @@
   },
   {
     "name": "常念岳",
-    "alternateName": "じょうねんだけ",
     "elevation": 2857,
     "description": "",
+    "alternateName": "じょうねんだけ",
     "coverKey": "yama/2026-matsumoto-suwa-azumino/KCS01819.jpg",
     "location": {
       "latitude": 36.325496,
@@ -375,9 +391,9 @@
   },
   {
     "name": "野口五郎岳",
-    "alternateName": "のぐちごろうだけ",
     "elevation": 2924,
     "description": "",
+    "alternateName": "のぐちごろうだけ",
     "coverKey": "yama/2025-omoteginza-d1/KCS06507.jpg",
     "location": {
       "latitude": 36.432657,
@@ -387,10 +403,15 @@
     "panorama": true
   },
   {
+    "name": "雪倉岳",
+    "elevation": null,
+    "description": ""
+  },
+  {
     "name": "鹿島槍ヶ岳",
-    "alternateName": "かしまやりがたけ",
     "elevation": 2889,
     "description": "",
+    "alternateName": "かしまやりがたけ",
     "coverKey": "yama/2026-shinano-omachi/KCS01691.jpg",
     "location": {
       "latitude": 36.6244,
@@ -406,9 +427,9 @@
   },
   {
     "name": "奥穂高岳",
-    "alternateName": "おくほたかだけ",
     "elevation": 3190,
     "description": "",
+    "alternateName": "おくほたかだけ",
     "coverKey": "yama/2025-omoteginza-d1/KCS06750.jpg",
     "location": {
       "latitude": 36.289229,
@@ -419,9 +440,9 @@
   },
   {
     "name": "富士山",
-    "alternateName": "ふじさん",
     "elevation": 3776,
     "description": "",
+    "alternateName": "ふじさん",
     "coverKey": "yama/2025-omoteginza-d4/KCS08043.jpg",
     "location": {
       "latitude": 35.360555,
@@ -461,15 +482,20 @@
     "description": ""
   },
   {
+    "name": "飯縄山",
+    "elevation": null,
+    "description": ""
+  },
+  {
     "name": "塩見岳",
     "elevation": null,
     "description": ""
   },
   {
     "name": "爺ヶ岳",
-    "alternateName": "じいがたけ",
     "elevation": 2670,
     "description": "",
+    "alternateName": "じいがたけ",
     "coverKey": "yama/2026-shinano-omachi/KCS01776.jpg",
     "location": {
       "latitude": 36.588292,
@@ -480,9 +506,9 @@
   },
   {
     "name": "槍ヶ岳",
-    "alternateName": "やりがたけ",
     "elevation": 3180,
     "description": "",
+    "alternateName": "やりがたけ",
     "coverKey": "yama/2025-omoteginza-d2/KCS06808.jpg",
     "location": {
       "latitude": 36.34198,
@@ -518,9 +544,9 @@
   },
   {
     "name": "蓮華岳",
-    "alternateName": "れんげだけ",
     "elevation": 2798,
     "description": "",
+    "alternateName": "れんげだけ",
     "coverKey": "yama/2026-shinano-omachi/KCS01696.jpg",
     "location": {
       "latitude": 36.53577,
@@ -541,9 +567,9 @@
   },
   {
     "name": "蝶ヶ岳",
-    "alternateName": "ちょうがたけ",
     "elevation": 2677,
     "description": "",
+    "alternateName": "ちょうがたけ",
     "coverKey": "yama/2025-omoteginza-d1/KCS06223.jpg",
     "location": {
       "latitude": 36.2875,
@@ -554,9 +580,9 @@
   },
   {
     "name": "餓鬼岳",
-    "alternateName": "がきだけ",
     "elevation": 2647,
     "description": "",
+    "alternateName": "がきだけ",
     "coverKey": "yama/2026-shinano-omachi/KCS01684.jpg",
     "location": {
       "latitude": 36.44722,
@@ -567,9 +593,9 @@
   },
   {
     "name": "燕岳",
-    "alternateName": "つばくろだけ",
     "elevation": 2763,
     "description": "",
+    "alternateName": "つばくろだけ",
     "coverKey": "yama/2025-omoteginza-d1/KCS06727.jpg",
     "location": {
       "latitude": 36.406796,
@@ -595,6 +621,11 @@
   },
   {
     "name": "鷲岳",
+    "elevation": null,
+    "description": ""
+  },
+  {
+    "name": "スバリ岳",
     "elevation": null,
     "description": ""
   },

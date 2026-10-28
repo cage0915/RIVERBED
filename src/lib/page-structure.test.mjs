@@ -313,7 +313,7 @@ test('deleting a persisted caption restores its default boundary margin as pendi
     );
     assert.match(
         devTool,
-        /if \(change\.blockMargin && change\.blockMargin !== '0\.5rem'\) props\.blockMargin = change\.blockMargin;\s*else delete props\.blockMargin/,
+        /if \(change\.blockMargin\) props\.blockMargin = change\.blockMargin;\s*else delete props\.blockMargin/,
     );
 });
 
@@ -418,7 +418,7 @@ test('direct block margin control stages changes for the shared save action', ()
         devTool,
         /const fileEffectiveMargin = remValueFromInput\(remValueForInput\(originalBlockMargin \|\| visibleMargin\)\)/,
     );
-    assert.match(devTool, /const expectedEffectiveMargin = originalBlockMargin[\s\S]*?defaultMarginForType\(displayedType\)/);
+    assert.match(devTool, /const expectedEffectiveMargin = originalBlockMargin[\s\S]*?cssDefaultMargin\(\)/);
     assert.match(devTool, /const matchesFile = blockMargin === expectedEffectiveMargin/);
     assert.match(devTool, /if \(matchesFile\) \{\s*if \(pendingMarginEntry\) pendingBlockMarginChanges\.delete\(pendingMarginEntry\[0\]\)/);
     assert.match(devTool, /updateMarginPreview\(matchesFile \? originalBlockMargin : blockMargin\)/);
@@ -717,8 +717,7 @@ test('media block type chooser keeps abbreviated trigger and expands with full l
     assert.match(devTool, /dev-preview-carousel-dots/);
     assert.match(devTool, /image\.naturalWidth \/ image\.naturalHeight/);
     assert.match(devTool, /restoreOriginalLayout\(\)/);
-    assert.match(devTool, /const rowDefaultMargin = isLastAlbumBlock \? '0rem' : \(albumGap \|\| '0\.5rem'\)/);
-    assert.match(devTool, /if \(isCarouselLikeType\(blockType\) \|\| blockType === 'Text'\) return '0\.5rem'/);
+    assert.match(devTool, /const effectiveMargin = blockMargin \|\| cssDefaultMargin\(\)/);
     assert.match(devTool, /if \(isCarouselLikeType\(targetType\)\) \{\s*if \(index > 0\) required\.add\(index - 1\);\s*required\.add\(index\)/);
     assert.match(devTool, /updateBlockTypePreview\(targetMode, matchesFile\);\s*reconcileAutomaticBlockMargins\(\)/);
     assert.match(devTool, /dev-preview-as-panorama/);
@@ -1636,4 +1635,19 @@ test('block moves land above or below the target block', () => {
     movePageBlock(blocks, 'c', 'b', 'down');
     assert.deepEqual(blocks.map((block) => block.__devKey), ['a', 'b', 'c']);
     assert.equal(movePageBlock(blocks, 'a', 'a', 'down'), false);
+});
+
+test('block margins are written only when they differ from the Carousel-aware default', () => {
+    const body = serializePageBody([
+        { type: 'Row', props: { blockMargin: '0.5rem' }, photos: [{ itemKey: 'a.jpg' }] },
+        { type: 'PhotoCarousel', props: { blockMargin: '0.5rem' }, photos: [{ itemKey: 'b.jpg' }] },
+        { type: 'Row', props: { blockMargin: '1.5rem' }, photos: [{ itemKey: 'c.jpg' }] },
+        { type: 'PhotoCarousel', props: { blockMargin: '1.5rem' }, photos: [{ itemKey: 'd.jpg' }] },
+        { type: 'Row', props: { blockMargin: '0.5rem' }, photos: [{ itemKey: 'e.jpg' }] },
+    ]);
+    assert.match(body, /<Row\n  blockMargin="0\.5rem">\n  <Photo itemKey="a\.jpg"/);
+    assert.match(body, /<PhotoCarousel\n  blockMargin="0\.5rem">\n  <Photo itemKey="b\.jpg"/);
+    assert.match(body, /<Row>\n  <Photo itemKey="c\.jpg"/);
+    assert.match(body, /<PhotoCarousel>\n  <Photo itemKey="d\.jpg"/);
+    assert.match(body, /<Row>\n  <Photo itemKey="e\.jpg"/);
 });

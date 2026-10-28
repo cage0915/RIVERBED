@@ -1,0 +1,298 @@
+{
+  "schemaVersion": 1,
+  "title": "長野",
+  "info": "2026.9",
+  "publishedAt": "2026-10-28",
+  "order": 290,
+  "cover": {
+    "photo": {
+      "kind": "local",
+      "filename": "KCS05658.jpg"
+    },
+    "zoom": 1,
+    "offset": {
+      "x": 49.6,
+      "y": 27.1
+    }
+  },
+  "photos": [
+    {
+      "filename": "2026-0919-1110-07.962.jpg",
+      "width": 2000,
+      "height": 2667,
+      "tags": []
+    },
+    {
+      "filename": "2026-0919-1113-49.426.jpg",
+      "width": 2000,
+      "height": 2667,
+      "tags": []
+    },
+    {
+      "filename": "2026-0919-1114-11.320.jpg",
+      "width": 2000,
+      "height": 2667,
+      "tags": []
+    },
+    {
+      "filename": "2026-0919-1513-07.053.jpg",
+      "width": 2000,
+      "height": 2667,
+      "tags": []
+    },
+    {
+      "filename": "2026-0919-1652-05.517.jpg",
+      "width": 2000,
+      "height": 2667,
+      "tags": []
+    },
+    {
+      "filename": "2026-0919-1706-45.383.jpg",
+      "width": 2667,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "2026-0919-1543-57.739.jpg",
+      "width": 2000,
+      "height": 2667,
+      "tags": []
+    },
+    {
+      "filename": "2026-0922-1621-06.508.jpg",
+      "width": 2667,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "2026-0922-1622-08.497.jpg",
+      "width": 2000,
+      "height": 2667,
+      "tags": []
+    },
+    {
+      "filename": "2026-0919-1617-43.972.jpg",
+      "width": 2000,
+      "height": 2667,
+      "tags": []
+    },
+    {
+      "filename": "2026-0922-1305-15.566.jpg",
+      "width": 2000,
+      "height": 2667,
+      "tags": []
+    },
+    {
+      "filename": "2026-0922-1021-54.520.jpg",
+      "width": 2000,
+      "height": 2667,
+      "tags": []
+    },
+    {
+      "filename": "2026-0922-1028-30.880.jpg",
+      "width": 2000,
+      "height": 2664,
+      "tags": []
+    },
+    {
+      "filename": "2026-0923-0637-36.566.jpg",
+      "width": 2000,
+      "height": 2667,
+      "tags": []
+    },
+    {
+      "filename": "2026-0923-0645-43.804.jpg",
+      "width": 2000,
+      "height": 2667,
+      "tags": []
+    },
+    {
+      "filename": "2026-0923-1115-56.742.jpg",
+      "width": 2667,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "2026-0923-1114-33.057.jpg",
+      "width": 2000,
+      "height": 2667,
+      "tags": []
+    },
+    {
+      "filename": "2026-0923-1457-58.019.jpg",
+      "width": 2000,
+      "height": 2667,
+      "tags": []
+    },
+    {
+      "filename": "2026-0923-1354-45.101.jpg",
+      "width": 2667,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "2026-0924-1509-21.011.jpg",
+      "width": 2667,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "2026-0924-1514-28.845.jpg",
+      "width": 2000,
+      "height": 2667,
+      "tags": []
+    },
+    {
+      "filename": "2026-0924-1520-00.689.jpg",
+      "width": 2000,
+      "height": 2667,
+      "tags": []
+    },
+    {
+      "filename": "2026-0924-1521-04.020.jpg",
+      "width": 2000,
+      "height": 2667,
+      "tags": []
+    },
+    {
+      "filename": "2026-0924-1140-07.890.jpg",
+      "width": 2667,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "2026-0924-1142-11.917.jpg",
+      "width": 2000,
+      "height": 2665,
+      "tags": []
+    },
+    {
+      "filename": "2026-0924-1209-51.918.jpg",
+      "width": 2000,
+      "height": 2667,
+      "tags": []
+    },
+    {
+      "filename": "2026-0924-1234-03.980.jpg",
+      "width": 2667,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "2026-0924-1229-10.238.jpg",
+      "width": 2000,
+      "height": 2667,
+      "tags": []
+    },
+    {
+      "filename": "2026-0924-1258-16.658.jpg",
+      "width": 2667,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "2026-0924-1245-22.241.jpg",
+      "width": 2667,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "2026-0924-1306-40.449.jpg",
+      "width": 2000,
+      "height": 2667,
+      "tags": []
+    },
+    {
+      "filename": "KCS05623.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "鹿島槍ヶ岳",
+          "x": 50.14,
+          "y": 43.26
+        },
+        {
+          "name": "五竜岳",
+          "x": 76.01,
+          "y": 43.91
+        },
+        {
+          "name": "爺ヶ岳",
+          "x": 23.12,
+          "y": 45.43
+        }
+      ]
+    },
+    {
+      "filename": "KCS05624.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS05659.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS05655.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "鹿島槍ヶ岳",
+          "x": 52.27,
+          "y": 31.94
+        }
+      ]
+    },
+    {
+      "filename": "KCS05658.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "鹿島槍ヶ岳",
+          "x": 49.86,
+          "y": 28.18
+        }
+      ]
+    },
+    {
+      "filename": "KCS05661.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "鹿島槍ヶ岳",
+          "x": 51.11,
+          "y": 42.13
+        },
+        {
+          "name": "五竜岳",
+          "x": 89.43,
+          "y": 41.55
+        },
+        {
+          "name": "爺ヶ岳",
+          "x": 9.51,
+          "y": 43.72
+        }
+      ]
+    },
+    {
+      "filename": "KCS05665.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "鹿島槍ヶ岳",
+          "x": 50.24,
+          "y": 38.85
+        }
+      ]
+    }
+  ]
+}

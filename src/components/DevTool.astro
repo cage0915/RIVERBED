@@ -2330,7 +2330,7 @@
                             throw new Error('Could not identify a margin block');
                         }
                         const props = { ...(structure.blocks[targetIndex].props || {}) };
-                        if (change.blockMargin && change.blockMargin !== '0.5rem') props.blockMargin = change.blockMargin;
+                        if (change.blockMargin) props.blockMargin = change.blockMargin;
                         else delete props.blockMargin;
                         if (change.sourceType === 'Text') {
                             delete props.mt;
@@ -4805,13 +4805,14 @@
                     // Move selected photo to before/after the clicked position
                     const from = selectedPhoto;
                     selectedPhoto = null;
+                    const previousSpecial = specialBoundaryBlocks();
                     const [moved] = currentBlocks[from.bIdx].photos.splice(from.pIdx, 1);
                     let targetPIdx = insertAfter ? pIdx + 1 : pIdx;
                     if (from.bIdx === bIdx && from.pIdx < targetPIdx) targetPIdx--;
                     currentBlocks[bIdx].photos.splice(targetPIdx, 0, moved);
                     if (currentBlocks[from.bIdx].photos.length === 0) {
                         currentBlocks.splice(from.bIdx, 1);
-                        syncManagedSpecialMargins(currentBlocks.map((_: any, index: number) => index));
+                        syncManagedSpecialMargins(previousSpecial);
                     }
                     renderTree();
                 };
@@ -4820,37 +4821,45 @@
                     if (selectedBlock === null) return;
                     const from = selectedBlock;
                     const collapsedFlags: boolean[] = currentBlocks.map((_: any, index: number) => collapsedBlocks.has(index));
+                    const previousSpecial = specialBoundaryBlocks();
                     const [movedBlock] = currentBlocks.splice(from, 1);
                     const [movedCollapsed] = collapsedFlags.splice(from, 1);
                     const target = from < gapIndex ? gapIndex - 1 : gapIndex;
                     currentBlocks.splice(target, 0, movedBlock);
                     collapsedFlags.splice(target, 0, movedCollapsed);
-                    syncManagedSpecialMargins(currentBlocks.map((_: any, index: number) => index));
+                    syncManagedSpecialMargins(previousSpecial);
                     collapsedBlocks = new Set(collapsedFlags.flatMap((value: boolean, index: number) => value ? [index] : []));
                     selectedBlock = null;
                     renderTree();
                 };
 
-                const syncManagedSpecialMargins = (boundaryIndexes: number[]) => {
-                    const boundaryIsSpecial = (index: number) => {
-                        const block = currentBlocks[index];
-                        const nextBlock = currentBlocks[index + 1];
-                        if (!block) return false;
-                        if (block.type === 'Text' || isCarouselLikeType(block.type)) return true;
-                        if (isCarouselLikeType(nextBlock?.type)) return true;
+                const boundaryIsSpecial = (index: number) => {
+                    const block = currentBlocks[index];
+                    const nextBlock = currentBlocks[index + 1];
+                    if (!block) return false;
+                    if (block.type === 'Text' || isCarouselLikeType(block.type)) return true;
+                    if (isCarouselLikeType(nextBlock?.type)) return true;
 
-                        const captionPosition = String(block.props?.captionPosition || 'center bottom');
-                        if (block.props?.caption && captionPosition.includes('bottom') && nextBlock) return true;
-                        const nextCaptionPosition = String(nextBlock?.props?.captionPosition || 'center bottom');
-                        return Boolean(nextBlock?.props?.caption && nextCaptionPosition.includes('top'));
-                    };
+                    const captionPosition = String(block.props?.captionPosition || 'center bottom');
+                    if (block.props?.caption && captionPosition.includes('bottom') && nextBlock) return true;
+                    const nextCaptionPosition = String(nextBlock?.props?.captionPosition || 'center bottom');
+                    return Boolean(nextBlock?.props?.caption && nextCaptionPosition.includes('top'));
+                };
 
-                    new Set(boundaryIndexes).forEach((index) => {
-                        const block = currentBlocks[index];
-                        if (!block) return;
+                // Snapshot taken before a layout edit, keyed by block object.
+                const specialBoundaryBlocks = () => new Set(
+                    currentBlocks.filter((_: any, index: number) => boundaryIsSpecial(index)),
+                );
+
+                // Only boundaries whose special status changed are touched, so a
+                // margin the user set on an unchanged boundary is preserved.
+                const syncManagedSpecialMargins = (previousSpecial: Set<any>) => {
+                    currentBlocks.forEach((block: any, index: number) => {
+                        const isSpecial = boundaryIsSpecial(index);
+                        if (previousSpecial.has(block) === isSpecial) return;
                         block.props ||= {};
                         const currentMargin = remValueFromInput(block.props.blockMargin || block.props.mb);
-                        if (boundaryIsSpecial(index)) {
+                        if (isSpecial) {
                             if (!currentMargin || currentMargin === '0.5rem') {
                                 block.props.blockMargin = '1.5rem';
                                 delete block.props.mb;
@@ -5067,13 +5076,14 @@
                                 const toIdx = parseInt(evt.to.dataset.blockIdx);
                                 if (fromIdx === toIdx && evt.oldIndex === evt.newIndex) return;
 
+                                const previousSpecial = specialBoundaryBlocks();
                                 const [moved] = currentBlocks[fromIdx].photos.splice(evt.oldIndex, 1);
                                 currentBlocks[toIdx].photos.splice(evt.newIndex, 0, moved);
 
                                 if (currentBlocks[fromIdx].photos.length === 0) {
                                     currentBlocks.splice(fromIdx, 1);
                                 }
-                                syncManagedSpecialMargins(currentBlocks.map((_: any, index: number) => index));
+                                syncManagedSpecialMargins(previousSpecial);
                                 renderTree();
                             }
                         });
@@ -5088,9 +5098,10 @@
                         handle: '.dev-pm-block-header',
                         onEnd: (evt: any) => {
                             if (evt.from !== treeContainer || evt.to !== treeContainer) return;
+                            const previousSpecial = specialBoundaryBlocks();
                             const [moved] = currentBlocks.splice(evt.oldIndex, 1);
                             currentBlocks.splice(evt.newIndex, 0, moved);
-                            syncManagedSpecialMargins(currentBlocks.map((_: any, index: number) => index));
+                            syncManagedSpecialMargins(previousSpecial);
                             updatePageDirtyState();
                         }
                     });
@@ -6825,15 +6836,15 @@
                     const rootFontSize = Number.parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
                     const marginInPixels = Number.parseFloat(getComputedStyle(blockElement).marginBottom);
                     const visibleMargin = `${Math.round(((Number.isFinite(marginInPixels) ? marginInPixels : 0) / rootFontSize) * 1000) / 1000}rem`;
-                    const albumContent = blockElement.closest<HTMLElement>('.album-content');
-                    const albumGap = albumContent
-                        ? getComputedStyle(albumContent).getPropertyValue('--album-block-gap').trim()
-                        : '';
-                    const isLastAlbumBlock = albumContent?.lastElementChild === blockElement;
-                    const rowDefaultMargin = isLastAlbumBlock ? '0rem' : (albumGap || '0.5rem');
-                    const defaultMarginForType = (blockType: MediaBlockType | 'Text') => {
-                        if (isCarouselLikeType(blockType) || blockType === 'Text') return '0.5rem';
-                        return rowDefaultMargin;
+                    // The margin the album CSS gives this block without an inline
+                    // override, e.g. 1.5rem around a Carousel.
+                    const cssDefaultMargin = () => {
+                        const inlineMargin = blockElement.style.getPropertyValue('margin-bottom');
+                        const inlinePriority = blockElement.style.getPropertyPriority('margin-bottom');
+                        blockElement.style.removeProperty('margin-bottom');
+                        const pixels = Number.parseFloat(getComputedStyle(blockElement).marginBottom);
+                        if (inlineMargin) blockElement.style.setProperty('margin-bottom', inlineMargin, inlinePriority);
+                        return `${Math.round(((Number.isFinite(pixels) ? pixels : 0) / rootFontSize) * 1000) / 1000}rem`;
                     };
                     const originalBlockMargin = sourceBlock?.props?.blockMargin
                         || (isTextBlock ? sourceBlock?.props?.mb : '')
@@ -6964,11 +6975,9 @@
                     };
 
                     const updateMarginPreview = (blockMargin: string) => {
-                        const displayedType = pendingBlockTypeChanges.get(typeChangeKey)?.targetType || sourceType;
-                        const effectiveMargin = blockMargin || (isTextBlock
-                            ? defaultMarginForType('Text')
-                            : defaultMarginForType(displayedType));
-                        blockElement.style.setProperty('margin-bottom', effectiveMargin, 'important');
+                        if (blockMargin) blockElement.style.setProperty('margin-bottom', blockMargin, 'important');
+                        else blockElement.style.removeProperty('margin-bottom');
+                        const effectiveMargin = blockMargin || cssDefaultMargin();
                         if (blockMargin) blockElement.dataset.devBlockMargin = blockMargin;
                         else delete blockElement.dataset.devBlockMargin;
                         const hasCurrentMargin = Boolean(blockMargin);
@@ -7009,10 +7018,9 @@
                             marginInput.value = remValueForInput(requestedMargin);
                         }
                         const blockMargin = remValueFromInput(marginInput.value);
-                        const displayedType = pendingBlockTypeChanges.get(typeChangeKey)?.targetType || sourceType;
                         const expectedEffectiveMargin = originalBlockMargin
                             ? fileEffectiveMargin
-                            : remValueFromInput(remValueForInput(defaultMarginForType(displayedType)));
+                            : remValueFromInput(remValueForInput(cssDefaultMargin()));
                         const matchesFile = blockMargin === expectedEffectiveMargin;
                         const pendingMarginEntry = findPendingMarginEntry();
                         const pendingMarginKey = pendingMarginEntry?.[0]
@@ -7532,6 +7540,7 @@
                         if (marginInput.readOnly) openInlineMarginEditor();
                     });
                     marginInput.addEventListener('keydown', (event) => {
+                        if (event.isComposing) return;
                         if (event.key === 'Enter') {
                             event.preventDefault();
                             stageBlockMargin();

@@ -130,20 +130,32 @@ export function applyDefaultCaptionBoundaryMargin(
     return true;
 }
 
+const isCarouselLike = (block?: PageBlock) => block?.type === 'PhotoCarousel' || block?.type === 'PhotoPanorama';
+
+// Mirrors the album CSS: a Carousel or Panorama promotes its own and the
+// preceding block's bottom margin to 1.5rem.
+function defaultBlockMargin(blocks: PageBlock[], index: number) {
+    return isCarouselLike(blocks[index]) || isCarouselLike(blocks[index + 1]) ? '1.5' : '0.5';
+}
+
+// Only a margin that differs from the rendered default is written, so an
+// explicit 0.5rem next to a Carousel survives.
+function blockMarginProp(blocks: PageBlock[], index: number) {
+    const props = blocks[index].props || {};
+    const value = props.blockMargin || props.mb;
+    const margin = remNumber(value);
+    return margin && margin !== defaultBlockMargin(blocks, index) ? `\n  blockMargin="${value}"` : '';
+}
+
 export function serializePageBody(blocks: PageBlock[]) {
     let body = '';
-    for (const block of blocks) {
+    for (const [index, block] of blocks.entries()) {
         const props = block.props || {};
         if (block.type === 'Text') {
             let propsText = '';
             if (props.align && props.align !== 'center') propsText += `\n  align="${props.align}"`;
             if (props.size && props.size !== 'caption') propsText += `\n  size="${props.size}"`;
-            if (remNumber(props.blockMargin) && remNumber(props.blockMargin) !== '0.5') {
-                propsText += `\n  blockMargin="${props.blockMargin}"`;
-            }
-            if (!props.blockMargin && remNumber(props.mb) && remNumber(props.mb) !== '0.5') {
-                propsText += `\n  blockMargin="${props.mb}"`;
-            }
+            propsText += blockMarginProp(blocks, index);
             body += `<Text${propsText}>\n  ${block.text || ''}\n</Text>\n\n`;
             continue;
         }
@@ -151,9 +163,7 @@ export function serializePageBody(blocks: PageBlock[]) {
         let propsText = '';
         if (props.caption) propsText += `\n  caption="${props.caption}"`;
         if (props.captionPosition && props.captionPosition !== 'center bottom') propsText += `\n  captionPosition="${props.captionPosition}"`;
-        if (remNumber(props.blockMargin) && remNumber(props.blockMargin) !== '0.5') {
-            propsText += `\n  blockMargin="${props.blockMargin}"`;
-        }
+        propsText += blockMarginProp(blocks, index);
         const isPanorama = block.type === 'PhotoPanorama';
         if ((block.type === 'PhotoCarousel' || isPanorama) && props.initialSlide) {
             propsText += `\n  initialSlide={${props.initialSlide}}`;
@@ -169,10 +179,6 @@ export function serializePageBody(blocks: PageBlock[]) {
         if (isPanorama && block.photos?.length === 1 && panoramaSlices > 1) {
             propsText += `\n  panoramaSlices={${panoramaSlices}}`;
         }
-        if (!props.blockMargin && remNumber(props.mb) && remNumber(props.mb) !== '0.5') {
-            propsText += `\n  blockMargin="${props.mb}"`;
-        }
-
         body += `<${block.type}${propsText}>\n`;
         const photos = block.photos || [];
         const cells = block.type === 'Row'

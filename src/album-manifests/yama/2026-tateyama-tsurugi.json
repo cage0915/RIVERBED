@@ -1,0 +1,764 @@
+{
+  "schemaVersion": 1,
+  "title": "立山・剱岳",
+  "info": "2026.9",
+  "publishedAt": "2026-10-28",
+  "order": 300,
+  "cover": {
+    "photo": {
+      "kind": "local",
+      "filename": "KCS05912.jpg"
+    },
+    "zoom": 1.15,
+    "offset": {
+      "x": 52.6,
+      "y": 19.9
+    }
+  },
+  "photos": [
+    {
+      "filename": "KCS05691.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "赤牛岳",
+          "x": 23.7,
+          "y": 13.16
+        }
+      ]
+    },
+    {
+      "filename": "KCS05688.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS05704.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "赤牛岳",
+          "x": 46.28,
+          "y": 23.15
+        }
+      ]
+    },
+    {
+      "filename": "KCS05731.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS05719.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS05742.jpg",
+      "width": 2000,
+      "height": 3000,
+      "tags": []
+    },
+    {
+      "filename": "KCS05750.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "鹿島槍ヶ岳",
+          "x": 53.62,
+          "y": 17.21
+        }
+      ]
+    },
+    {
+      "filename": "KCS05755.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "大汝山",
+          "x": 62.5,
+          "y": 30.8
+        },
+        {
+          "name": "雄山",
+          "x": 79.49,
+          "y": 27.1
+        },
+        {
+          "name": "富士ノ折立",
+          "x": 46.96,
+          "y": 33.84
+        },
+        {
+          "name": "立山真砂岳",
+          "x": 19.64,
+          "y": 39.19
+        }
+      ]
+    },
+    {
+      "filename": "KCS05769.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS05771.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS05788.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "大汝山",
+          "x": 59.22,
+          "y": 24.23
+        },
+        {
+          "name": "雄山",
+          "x": 82.77,
+          "y": 20.18
+        },
+        {
+          "name": "富士ノ折立",
+          "x": 39.62,
+          "y": 28.51
+        }
+      ]
+    },
+    {
+      "filename": "KCS05787.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "雄山",
+          "x": 80.36,
+          "y": 5.92
+        },
+        {
+          "name": "富士ノ折立",
+          "x": 23.41,
+          "y": 14.17
+        },
+        {
+          "name": "大汝山",
+          "x": 50.63,
+          "y": 10.04
+        }
+      ]
+    },
+    {
+      "filename": "KCS05791.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS05796.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "大汝山",
+          "x": 49.28,
+          "y": 21.75
+        },
+        {
+          "name": "雄山",
+          "x": 62.02,
+          "y": 19.79
+        },
+        {
+          "name": "富士ノ折立",
+          "x": 37.31,
+          "y": 23.56
+        },
+        {
+          "name": "立山真砂岳",
+          "x": 13.56,
+          "y": 26.24
+        }
+      ]
+    },
+    {
+      "filename": "2026-0925-1041-00.605.jpg",
+      "width": 2667,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "2026-0925-1041-31.589.jpg",
+      "width": 2000,
+      "height": 2667,
+      "tags": []
+    },
+    {
+      "filename": "KCS05800.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "雄山",
+          "x": 17.23,
+          "y": 18.91
+        }
+      ]
+    },
+    {
+      "filename": "KCS05829.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "雄山",
+          "x": 64.91,
+          "y": 2.38
+        }
+      ]
+    },
+    {
+      "filename": "KCS05826.jpg",
+      "width": 3645,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "雄山",
+          "x": 92.33,
+          "y": 4.89
+        },
+        {
+          "name": "立山真砂岳",
+          "x": 36.05,
+          "y": 34.97
+        }
+      ]
+    },
+    {
+      "filename": "KCS05848.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS05866.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS05937.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS05856.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS05888.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "2026-0925-1136-34.844.jpg",
+      "width": 2000,
+      "height": 2667,
+      "tags": []
+    },
+    {
+      "filename": "2026-0925-1200-18.907.jpg",
+      "width": 2000,
+      "height": 2667,
+      "tags": []
+    },
+    {
+      "filename": "2026-0925-1236-25.285.jpg",
+      "width": 2000,
+      "height": 2667,
+      "tags": []
+    },
+    {
+      "filename": "KCS05890.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS05891.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "槍ヶ岳",
+          "x": 51.4,
+          "y": 36.29
+        }
+      ]
+    },
+    {
+      "filename": "KCS05906.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "剱岳",
+          "x": 50.92,
+          "y": 17.32
+        }
+      ]
+    },
+    {
+      "filename": "KCS05912.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "剱岳",
+          "x": 55.36,
+          "y": 10.59
+        }
+      ]
+    },
+    {
+      "filename": "KCS05919.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "針ノ木岳",
+          "x": 51.59,
+          "y": 11.22
+        },
+        {
+          "name": "スバリ岳",
+          "x": 40.69,
+          "y": 13.39
+        }
+      ]
+    },
+    {
+      "filename": "KCS05917.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "針ノ木岳",
+          "x": 50.63,
+          "y": 6.95
+        },
+        {
+          "name": "スバリ岳",
+          "x": 29.39,
+          "y": 10.13
+        }
+      ]
+    },
+    {
+      "filename": "KCS05956.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "針ノ木岳",
+          "x": 52.65,
+          "y": 7.24
+        },
+        {
+          "name": "スバリ岳",
+          "x": 32.96,
+          "y": 5.64
+        }
+      ]
+    },
+    {
+      "filename": "2026-0925-1305-39.077.jpg",
+      "width": 2667,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "2026-0925-1310-40.498.jpg",
+      "width": 2667,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "2026-0925-1305-00.557.jpg",
+      "width": 2667,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "2026-0925-1311-36.759.jpg",
+      "width": 2667,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS05940.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "大汝山",
+          "x": 50.24,
+          "y": 11.86
+        }
+      ]
+    },
+    {
+      "filename": "KCS05949.jpg",
+      "width": 2000,
+      "height": 3000,
+      "tags": []
+    },
+    {
+      "filename": "KCS05972.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS06014.jpg",
+      "width": 5261,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS06004.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS06023.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS06039.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS06055.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS06074.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "雄山",
+          "x": 62.89,
+          "y": 6.87
+        },
+        {
+          "name": "大汝山",
+          "x": 54.49,
+          "y": 6
+        },
+        {
+          "name": "富士ノ折立",
+          "x": 44.45,
+          "y": 5.42
+        },
+        {
+          "name": "立山真砂岳",
+          "x": 36.82,
+          "y": 15.26
+        }
+      ]
+    },
+    {
+      "filename": "2026-0925-1552-40.679.jpg",
+      "width": 2667,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS06083.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "白馬岳",
+          "x": 55.74,
+          "y": 27.42
+        },
+        {
+          "name": "白馬鑓ヶ岳",
+          "x": 87.6,
+          "y": 30.02
+        }
+      ]
+    },
+    {
+      "filename": "KCS06093.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "剱岳",
+          "x": 53.43,
+          "y": 9.66
+        }
+      ]
+    },
+    {
+      "filename": "KCS06089.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "剱岳",
+          "x": 54.49,
+          "y": 5.6
+        }
+      ]
+    },
+    {
+      "filename": "KCS06076.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "剱岳",
+          "x": 52.17,
+          "y": 10.53
+        }
+      ]
+    },
+    {
+      "filename": "KCS06117.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS06105.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS06106.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS06123.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS06134.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS06154.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "剱岳",
+          "x": 52.85,
+          "y": 20.42
+        }
+      ]
+    },
+    {
+      "filename": "KCS06164.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "剱岳",
+          "x": 51.69,
+          "y": 5.7
+        }
+      ]
+    },
+    {
+      "filename": "KCS06167.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "剱岳",
+          "x": 51.4,
+          "y": 7.8
+        }
+      ]
+    },
+    {
+      "filename": "KCS06173.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "剱岳",
+          "x": 52.36,
+          "y": 5.53
+        }
+      ]
+    },
+    {
+      "filename": "KCS06181.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "剱岳",
+          "x": 47.54,
+          "y": 9.85
+        }
+      ]
+    },
+    {
+      "filename": "2026-0925-1641-17.792.jpg",
+      "width": 2667,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "2026-0925-1647-34.512.jpg",
+      "width": 2000,
+      "height": 2667,
+      "tags": []
+    },
+    {
+      "filename": "2026-0925-1652-54.009.jpg",
+      "width": 2667,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS06184.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS06187.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "五竜岳",
+          "x": 52.46,
+          "y": 15.41
+        }
+      ]
+    },
+    {
+      "filename": "KCS06190.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "鹿島槍ヶ岳",
+          "x": 48.7,
+          "y": 18.93
+        }
+      ]
+    },
+    {
+      "filename": "KCS06202.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "2026-0926-0750-36.571.jpg",
+      "width": 2667,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "2026-0926-0739-34.104.jpg",
+      "width": 2000,
+      "height": 2667,
+      "tags": []
+    },
+    {
+      "filename": "2026-0926-0739-47.534.jpg",
+      "width": 2667,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "2026-0926-0740-04.069.jpg",
+      "width": 2000,
+      "height": 2667,
+      "tags": []
+    },
+    {
+      "filename": "KCS06222.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS06226.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS06236.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS06290.jpg",
+      "width": 7114,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS06315.jpg",
+      "width": 7614,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS06296.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS06317.jpg",
+      "width": 3579,
+      "height": 2000,
+      "tags": []
+    }
+  ]
+}
