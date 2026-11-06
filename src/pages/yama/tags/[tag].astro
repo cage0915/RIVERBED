@@ -34,11 +34,7 @@ export async function getStaticPaths() {
     );
 }
 
-const { tag } = Astro.params;
-
-if (!tag) {
-    return Astro.redirect("/404");
-}
+const { tag } = Astro.params as { tag: string };
 
 const decodedTag = decodeURIComponent(tag);
 const mountain = mountainsData.find(

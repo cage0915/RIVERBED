@@ -1,15 +1,9 @@
 import type { APIRoute } from 'astro';
 
 import { updatePhotoCaption } from '../lib/albums/manifest-files';
+import { json } from './_http';
 
 export const POST: APIRoute = async ({ request }) => {
-    if (!import.meta.env.DEV) {
-        return new Response(JSON.stringify({ error: 'Not available in production' }), {
-            status: 403,
-            headers: { 'Content-Type': 'application/json' },
-        });
-    }
-
     let body: {
         action?: 'update' | 'delete';
         albumSlug?: string;
@@ -19,24 +13,15 @@ export const POST: APIRoute = async ({ request }) => {
     try {
         body = await request.json();
     } catch {
-        return new Response(JSON.stringify({ error: 'Invalid JSON' }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return json({ error: 'Invalid JSON' }, 400);
     }
 
     const { action, albumSlug, filename } = body;
     if ((action !== 'update' && action !== 'delete') || !albumSlug || !filename) {
-        return new Response(JSON.stringify({ error: 'Missing required parameters' }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return json({ error: 'Missing required parameters' }, 400);
     }
     if (action === 'update' && typeof body.caption !== 'string') {
-        return new Response(JSON.stringify({ error: 'Caption must be a string' }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return json({ error: 'Caption must be a string' }, 400);
     }
 
     try {
@@ -46,15 +31,9 @@ export const POST: APIRoute = async ({ request }) => {
             filename,
             action === 'update' ? body.caption : undefined,
         );
-        return new Response(JSON.stringify({ success: true }), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return json({ success: true });
     } catch (error) {
-        return new Response(
-            JSON.stringify({ error: error instanceof Error ? error.message : 'Unable to save photo caption' }),
-            { status: 400, headers: { 'Content-Type': 'application/json' } },
-        );
+        return json({ error: error instanceof Error ? error.message : 'Unable to save photo caption' }, 400);
     }
 };
 // Registered only by the local development server.

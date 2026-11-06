@@ -7,21 +7,9 @@ import {
     readMountainRegion,
     writeMountainRegion,
 } from "../lib/mountain-files";
-
-const json = (body: unknown, status = 200) =>
-    new Response(JSON.stringify(body), {
-        status,
-        headers: {
-            "Content-Type": "application/json",
-            "Cache-Control": "no-store",
-        },
-    });
+import { json } from "./_http";
 
 export const POST: APIRoute = async ({ request }) => {
-    if (!import.meta.env.DEV) {
-        return json({ error: "Not available in production" }, 403);
-    }
-
     let body: { mountainName?: string; coverKey?: string };
     try {
         body = await request.json();

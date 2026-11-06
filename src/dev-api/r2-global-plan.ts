@@ -3,14 +3,9 @@ import type { APIRoute } from 'astro';
 import { loadR2SourceIndex } from '../lib/r2-source-files';
 import { getR2AdminClient } from '../lib/r2-admin-client';
 import { classifyRemoteObjects } from '../lib/r2-source-index';
-
-const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), {
-    status,
-    headers: { 'Content-Type': 'application/json' },
-});
+import { json } from './_http';
 
 export const GET: APIRoute = async () => {
-    if (!import.meta.env.DEV) return json({ error: 'Not available in production' }, 403);
     const sourceIndex = loadR2SourceIndex();
     const r2 = await getR2AdminClient();
     if (!r2) {

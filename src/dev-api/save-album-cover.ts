@@ -5,11 +5,7 @@ import {
     AlbumManifestMutationError,
     updateAlbumCover,
 } from '../lib/albums/manifest-files';
-
-const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), {
-    status,
-    headers: { 'Content-Type': 'application/json' },
-});
+import { json } from './_http';
 
 const finiteInRange = (value: unknown, minimum: number, maximum: number): value is number =>
     typeof value === 'number' && Number.isFinite(value) && value >= minimum && value <= maximum;
@@ -17,8 +13,6 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
     typeof value === 'object' && value !== null && !Array.isArray(value);
 
 export const POST: APIRoute = async ({ request }) => {
-    if (!import.meta.env.DEV) return json({ error: 'Not available in production' }, 403);
-
     let input: unknown;
     try {
         input = await request.json();

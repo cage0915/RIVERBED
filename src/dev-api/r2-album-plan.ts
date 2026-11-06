@@ -7,15 +7,10 @@ import { loadR2SourceIndex } from '../lib/r2-source-files';
 import { getR2AdminClient } from '../lib/r2-admin-client';
 import { readAlbumManifestFile } from '../lib/albums/manifest-files';
 import { assertAlbumAssetStorageSafe } from '../lib/albums/album-lifecycle';
+import { json } from './_http';
 
 const IMAGE_PATTERN = /\.(?:jpe?g|png|webp|avif)$/i;
-const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), {
-    status,
-    headers: { 'Content-Type': 'application/json' },
-});
-
 export const GET: APIRoute = async ({ url }) => {
-    if (!import.meta.env.DEV) return json({ error: 'Not available in production' }, 403);
     const albumSlug = (url.searchParams.get('albumSlug') || '').replace(/^\/+|\/+$/g, '');
     if (!/^[a-z0-9-]+\/[a-z0-9-]+$/.test(albumSlug)) return json({ error: 'Invalid albumSlug' }, 400);
 

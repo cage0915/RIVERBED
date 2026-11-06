@@ -5,19 +5,9 @@ import {
     isMountainSourceRegion,
     readMountainRegion,
 } from "../lib/mountain-files";
-
-const jsonError = (error: string, status: number) =>
-    new Response(JSON.stringify({ error }), {
-        status,
-        headers: {
-            "Content-Type": "application/json",
-            "Cache-Control": "no-store",
-        },
-    });
+import { json } from "./_http";
 
 export const POST: APIRoute = async ({ request }) => {
-    if (!import.meta.env.DEV) return jsonError("Not available in production", 403);
-
     let body: {
         region?: unknown;
         name?: unknown;
@@ -27,7 +17,7 @@ export const POST: APIRoute = async ({ request }) => {
     try {
         body = await request.json();
     } catch {
-        return jsonError("Invalid JSON body", 400);
+        return json({ error: "Invalid JSON body" }, 400);
     }
 
     const name = typeof body.name === "string" ? body.name.trim() : "";
@@ -43,13 +33,13 @@ export const POST: APIRoute = async ({ request }) => {
         longitude < -180 ||
         longitude > 180
     ) {
-        return jsonError("Invalid mountain or coordinates", 400);
+        return json({ error: "Invalid mountain or coordinates" }, 400);
     }
 
     try {
         const mountains = await readMountainRegion(body.region);
         if (!mountains.some((mountain) => mountain.name === name)) {
-            return jsonError("Mountain not found", 404);
+            return json({ error: "Mountain not found" }, 404);
         }
         const svg = await generateMountainContourPreview(body.region, name, {
             latitude,
@@ -62,8 +52,8 @@ export const POST: APIRoute = async ({ request }) => {
             },
         });
     } catch (error) {
-        return jsonError(
-            error instanceof Error ? error.message : "Unable to generate contour preview",
+        return json(
+            { error: error instanceof Error ? error.message : "Unable to generate contour preview" },
             400,
         );
     }

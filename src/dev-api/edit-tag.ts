@@ -10,33 +10,21 @@ import {
     writeMountainRegion,
 } from '../lib/mountain-files';
 import type { MountainRegion } from '../lib/mountains';
+import { json } from './_http';
 
 export const POST: APIRoute = async ({ request }) => {
     // Only allow in dev mode
-    if (!import.meta.env.DEV) {
-        return new Response(JSON.stringify({ error: 'Not available in production' }), {
-            status: 403,
-            headers: { 'Content-Type': 'application/json' },
-        });
-    }
-
     let body: { action?: 'update' | 'delete'; sourceAlbumSlug?: string; filename?: string; tagName?: string; x?: number; y?: number; region?: MountainRegion };
     try {
         body = await request.json();
     } catch {
-        return new Response(JSON.stringify({ error: 'Invalid JSON body' }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return json({ error: 'Invalid JSON body' }, 400);
     }
 
     const { action, sourceAlbumSlug, filename, tagName, x, y } = body;
 
     if ((action !== 'update' && action !== 'delete') || !sourceAlbumSlug || !filename || !tagName || x == null || y == null) {
-        return new Response(JSON.stringify({ error: 'Missing required fields' }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return json({ error: 'Missing required fields' }, 400);
     }
 
     const cwd = process.cwd();
@@ -45,22 +33,16 @@ export const POST: APIRoute = async ({ request }) => {
         const manifest = await readAlbumManifestFile(cwd, sourceAlbumSlug);
         const photo = manifest.photos.find((entry) => entry.filename === filename);
         if (!photo) {
-            return new Response(JSON.stringify({ error: 'Photo not found' }), { status: 404, headers: { 'Content-Type': 'application/json' }});
+            return json({ error: 'Photo not found' }, 404);
         }
         currentTags = photo.tags;
     } catch (error) {
-        return new Response(
-            JSON.stringify({ error: error instanceof Error ? error.message : 'Unable to read Album manifest' }),
-            { status: 400, headers: { 'Content-Type': 'application/json' } },
-        );
+        return json({ error: error instanceof Error ? error.message : 'Unable to read Album manifest' }, 400);
     }
     const existingMountain =
         action === 'update' ? await findMountainRegion(tagName) : undefined;
     if (action === 'update' && !existingMountain && !isMountainRegion(body.region)) {
-        return new Response(
-            JSON.stringify({ error: 'Choose a region for the new mountain' }),
-            { status: 400, headers: { 'Content-Type': 'application/json' } },
-        );
+        return json({ error: 'Choose a region for the new mountain' }, 400);
     }
 
     if (action === 'delete') {
@@ -77,10 +59,7 @@ export const POST: APIRoute = async ({ request }) => {
     try {
         await updatePhotoTags(cwd, sourceAlbumSlug, filename, currentTags);
     } catch (error) {
-        return new Response(
-            JSON.stringify({ error: error instanceof Error ? error.message : 'Unable to save photo tags' }),
-            { status: 400, headers: { 'Content-Type': 'application/json' } },
-        );
+        return json({ error: error instanceof Error ? error.message : 'Unable to save photo tags' }, 400);
     }
 
     if (action === 'update' && !existingMountain) {
@@ -90,9 +69,6 @@ export const POST: APIRoute = async ({ request }) => {
         await writeMountainRegion(body.region, mountains);
     }
 
-    return new Response(
-        JSON.stringify({ success: true }),
-        { status: 200, headers: { 'Content-Type': 'application/json' } }
-    );
+    return json({ success: true });
 };
 // Registered only by the local development server.

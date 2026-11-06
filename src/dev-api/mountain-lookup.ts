@@ -5,6 +5,7 @@ import {
     type MountainLookupCandidate,
     type WikidataEntity,
 } from "../lib/wikidata-mountain";
+import { json } from "./_http";
 
 const WIKIDATA_USER_AGENT =
     "RIVERBED-MountainDevTool/1.1 (https://riverbed.cage0915.com)";
@@ -13,12 +14,6 @@ const lookupCache = new Map<
     string,
     { expiresAt: number; candidates: MountainLookupCandidate[] }
 >();
-
-const json = (body: unknown, status = 200) =>
-    new Response(JSON.stringify(body), {
-        status,
-        headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
-    });
 
 const retryDelayMs = (response: Response) => {
     const value = response.headers.get("Retry-After");
@@ -51,8 +46,6 @@ const fetchWikidata = async (url: URL, canRetry = true): Promise<unknown> => {
 };
 
 export const GET: APIRoute = async ({ url }) => {
-    if (!import.meta.env.DEV) return json({ error: "Not available in production" }, 403);
-
     const query = url.searchParams.get("q")?.trim() ?? "";
     if (query.length < 1 || query.length > 120) {
         return json({ error: "Enter a valid mountain name" }, 400);

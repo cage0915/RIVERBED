@@ -16,6 +16,7 @@ import {
     commitTextFiles,
     type TextFileProposal,
 } from "../lib/source-transaction";
+import { json } from "./_http";
 
 type ContextConfig = {
     id: string;
@@ -40,12 +41,6 @@ type ContextRequestBody = {
     region?: MountainSourceRegion;
     mountain?: unknown;
 };
-
-const json = (body: unknown, status = 200) =>
-    new Response(JSON.stringify(body), {
-        status,
-        headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
-    });
 
 const readBody = async (request: Request): Promise<ContextRequestBody | null> => {
     try {
@@ -108,7 +103,6 @@ const getFiles = async () => {
 };
 
 export const POST: APIRoute = async ({ request }) => {
-    if (!import.meta.env.DEV) return json({ error: "Not available in production" }, 403);
     const body = await readBody(request);
     if (!body) return json({ error: "Invalid JSON body" }, 400);
 
@@ -164,7 +158,6 @@ export const POST: APIRoute = async ({ request }) => {
 };
 
 export const PUT: APIRoute = async ({ request }) => {
-    if (!import.meta.env.DEV) return json({ error: "Not available in production" }, 403);
     const body = await readBody(request);
     if (!body) return json({ error: "Invalid JSON body" }, 400);
 
@@ -236,7 +229,6 @@ export const PUT: APIRoute = async ({ request }) => {
 };
 
 export const DELETE: APIRoute = async ({ request }) => {
-    if (!import.meta.env.DEV) return json({ error: "Not available in production" }, 403);
     const body = await readBody(request);
     if (!body) return json({ error: "Invalid JSON body" }, 400);
     const id = body.id?.trim();

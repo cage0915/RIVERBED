@@ -6,15 +6,7 @@ import {
     type MountainViewSettings,
 } from "../lib/mountain-view-settings";
 import type { MountainRegionDefinition } from "../lib/mountains";
-
-const json = (body: unknown, status = 200) =>
-    new Response(JSON.stringify(body), {
-        status,
-        headers: {
-            "Content-Type": "application/json",
-            "Cache-Control": "no-store",
-        },
-    });
+import { json } from "./_http";
 
 const files = async () => {
     const path = await import("node:path");
@@ -69,7 +61,6 @@ const sanitizeRegions = (input: unknown): MountainRegionDefinition[] => {
 };
 
 export const GET: APIRoute = async () => {
-    if (!import.meta.env.DEV) return json({ error: "Not available in production" }, 403);
     const [regions, settings] = await Promise.all([
         readRegions(),
         readViewSettings(),
@@ -78,8 +69,6 @@ export const GET: APIRoute = async () => {
 };
 
 export const PUT: APIRoute = async ({ request }) => {
-    if (!import.meta.env.DEV) return json({ error: "Not available in production" }, 403);
-
     let body: { regions?: unknown; settings?: unknown };
     try {
         body = await request.json();

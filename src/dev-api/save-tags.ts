@@ -16,17 +16,11 @@ import {
     writeMountainRegion,
 } from '../lib/mountain-files';
 import type { MountainRegion } from '../lib/mountains';
+import { json } from './_http';
 
 type Tag = { name: string; x: number; y: number };
 type TagMap = Record<string, Tag[]>;
 export const POST: APIRoute = async ({ request }) => {
-    if (!import.meta.env.DEV) {
-        return new Response(JSON.stringify({ error: 'Not available in production' }), {
-            status: 403,
-            headers: { 'Content-Type': 'application/json' },
-        });
-    }
-
     let body: {
         albumSlug?: string;
         tagsMap?: unknown;
@@ -35,18 +29,12 @@ export const POST: APIRoute = async ({ request }) => {
     try {
         body = await request.json();
     } catch {
-        return new Response(JSON.stringify({ error: 'Invalid JSON body' }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return json({ error: 'Invalid JSON body' }, 400);
     }
 
     const { albumSlug, tagsMap } = body;
     if (!albumSlug) {
-        return new Response(JSON.stringify({ error: 'Missing required fields' }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return json({ error: 'Missing required fields' }, 400);
     }
 
     const cwd = process.cwd();
@@ -61,10 +49,7 @@ export const POST: APIRoute = async ({ request }) => {
                 .map((photo) => [photo.filename, photo.tags]),
         );
     } catch (error) {
-        return new Response(
-            JSON.stringify({ error: error instanceof Error ? error.message : 'Invalid Album tags' }),
-            { status: 400, headers: { 'Content-Type': 'application/json' } },
-        );
+        return json({ error: error instanceof Error ? error.message : 'Invalid Album tags' }, 400);
     }
     const newTagNames = new Set(findNewTagNames(previousTagMap, normalizedTagMap));
 
@@ -79,22 +64,16 @@ export const POST: APIRoute = async ({ request }) => {
             !isMountainRegion(body.newMountainRegions?.[name]),
     );
     if (missingRegions.length > 0) {
-        return new Response(
-            JSON.stringify({
-                error: `Choose a region for: ${missingRegions.join(', ')}`,
-                unknownMountains: missingRegions,
-            }),
-            { status: 400, headers: { 'Content-Type': 'application/json' } },
-        );
+        return json({
+            error: `Choose a region for: ${missingRegions.join(', ')}`,
+            unknownMountains: missingRegions,
+        }, 400);
     }
 
     try {
         await replaceAlbumPhotoTags(cwd, albumSlug, normalizedTagMap);
     } catch (error) {
-        return new Response(
-            JSON.stringify({ error: error instanceof Error ? error.message : 'Unable to save Album tags' }),
-            { status: 400, headers: { 'Content-Type': 'application/json' } },
-        );
+        return json({ error: error instanceof Error ? error.message : 'Unable to save Album tags' }, 400);
     }
 
     const targetRegions = [...new Set(
@@ -116,9 +95,6 @@ export const POST: APIRoute = async ({ request }) => {
         await writeMountainRegion(region, mountains);
     }
 
-    return new Response(JSON.stringify({ success: true }), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-    });
+    return json({ success: true });
 };
 // Registered only by the local development server.

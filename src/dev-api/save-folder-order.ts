@@ -1,17 +1,12 @@
 import type { APIRoute } from 'astro';
 
 import { reorderFolderAlbums } from '../lib/albums/manifest-files';
+import { json } from './_http';
 
-const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), {
-    status,
-    headers: { 'Content-Type': 'application/json' },
-});
 const isRecord = (value: unknown): value is Record<string, unknown> =>
     typeof value === 'object' && value !== null && !Array.isArray(value);
 
 export const POST: APIRoute = async ({ request }) => {
-    if (!import.meta.env.DEV) return json({ error: 'Not available in production' }, 403);
-
     let input: unknown;
     try {
         input = await request.json();

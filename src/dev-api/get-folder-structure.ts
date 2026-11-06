@@ -2,15 +2,9 @@ import type { APIRoute } from 'astro';
 
 import { createFolderStructure } from '../lib/albums/folder-structure';
 import { readAllAlbumManifestFiles } from '../lib/albums/manifest-files';
-
-const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), {
-    status,
-    headers: { 'Content-Type': 'application/json' },
-});
+import { json } from './_http';
 
 export const GET: APIRoute = async ({ url }) => {
-    if (!import.meta.env.DEV) return json({ error: 'Not available in production' }, 403);
-
     const folder = url.searchParams.get('folder');
     if (!folder || !/^[a-z0-9-]+$/.test(folder)) {
         return json({ error: 'Missing folder parameter' }, 400);

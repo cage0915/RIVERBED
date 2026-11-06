@@ -16,15 +16,7 @@ import {
     mountainContourFileExists,
     regenerateMountainContour,
 } from "../lib/mountain-contour-files";
-
-const json = (body: unknown, status = 200) =>
-    new Response(JSON.stringify(body), {
-        status,
-        headers: {
-            "Content-Type": "application/json",
-            "Cache-Control": "no-store",
-        },
-    });
+import { json } from "./_http";
 
 const readJson = async <T>(file: string): Promise<T> => {
     const fs = await import("node:fs/promises");
@@ -32,8 +24,6 @@ const readJson = async <T>(file: string): Promise<T> => {
 };
 
 export const GET: APIRoute = async () => {
-    if (!import.meta.env.DEV) return json({ error: "Not available in production" }, 403);
-
     const path = await import("node:path");
     const contextsFile = path.resolve(process.cwd(), "src/map-contexts.json");
     const [mountains, mapConfig] = await Promise.all([
@@ -59,8 +49,6 @@ type MountainChangeRequest = {
 };
 
 export const POST: APIRoute = async ({ request }) => {
-    if (!import.meta.env.DEV) return json({ error: "Not available in production" }, 403);
-
     let body: MountainChangeRequest & { changes?: MountainChangeRequest[] };
     try {
         body = await request.json();

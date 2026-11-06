@@ -2,14 +2,9 @@ import type { APIRoute } from 'astro';
 import path from 'node:path';
 import trash from 'trash';
 import { AlbumLifecycleConflictError, deleteAlbumSourceFiles } from '../lib/albums/album-lifecycle';
-
-const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), {
-    status,
-    headers: { 'Content-Type': 'application/json' },
-});
+import { json } from './_http';
 
 export const POST: APIRoute = async ({ request }) => {
-    if (!import.meta.env.DEV) return json({ error: 'Not available in production' }, 403);
     try {
         const body = await request.json() as { pagePath?: string };
         const pagePath = String(body.pagePath || '').replace(/^\/+|\/+$/g, '');

@@ -21,13 +21,9 @@ import {
     readAllAlbumManifestFiles,
     withAlbumManifestLocks,
 } from '../lib/albums/manifest-files';
+import { json } from './_http';
 
-const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), {
-    status,
-    headers: { 'Content-Type': 'application/json' },
-});
 export const POST: APIRoute = async ({ request }) => {
-    if (!import.meta.env.DEV) return json({ error: 'Not available in production' }, 403);
     try {
         const form = await request.formData();
         const albumSlug = String(form.get('albumSlug') || '');

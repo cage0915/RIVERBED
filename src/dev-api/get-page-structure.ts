@@ -3,31 +3,26 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { readAlbumManifestFile } from '../lib/albums/manifest-files';
 import { albumPageManagerMetadata, assertAlbumAssetStorageSafe } from '../lib/albums/album-lifecycle';
+import { json } from './_http';
 
 export const GET: APIRoute = async ({ request }) => {
-    if (!import.meta.env.DEV) {
-        return new Response(JSON.stringify({ error: 'Not available in production' }), {
-            status: 403, headers: { 'Content-Type': 'application/json' },
-        });
-    }
-
     const url = new URL(request.url);
     const albumSlug = url.searchParams.get('albumSlug');
 
     if (!albumSlug || !/^[a-z0-9-]+\/[a-z0-9-]+$/.test(albumSlug)) {
-        return new Response(JSON.stringify({ error: 'Missing albumSlug' }), { status: 400 });
+        return json({ error: 'Missing albumSlug' }, 400);
     }
 
     const mdxFile = path.resolve(process.cwd(), 'src/content/albums', `${albumSlug}.mdx`);
     if (!fs.existsSync(mdxFile)) {
-        return new Response(JSON.stringify({ error: 'MDX file not found' }), { status: 404 });
+        return json({ error: 'MDX file not found' }, 404);
     }
 
     let manifest;
     try {
         manifest = await readAlbumManifestFile(process.cwd(), albumSlug);
     } catch (error) {
-        return new Response(JSON.stringify({ error: error instanceof Error ? error.message : 'Manifest not found' }), { status: 404 });
+        return json({ error: error instanceof Error ? error.message : 'Manifest not found' }, 404);
     }
     const content = fs.readFileSync(mdxFile, 'utf-8');
 
@@ -149,13 +144,10 @@ export const GET: APIRoute = async ({ request }) => {
             .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }))
         : [];
 
-    return new Response(JSON.stringify({
+    return json({
         metadata: albumPageManagerMetadata(albumSlug, manifest),
         blocks,
         localPhotos,
-    }), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
     });
 };
 // Registered only by the local development server.

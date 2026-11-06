@@ -4,16 +4,9 @@ import {
     MOUNTAIN_REGION_DEFINITIONS as regions,
 } from '../lib/mountains';
 import { readAllAlbumManifestFiles } from '../lib/albums/manifest-files';
-
+import { json } from './_http';
 
 export const GET: APIRoute = async () => {
-    if (!import.meta.env.DEV) {
-        return new Response(JSON.stringify({ error: 'Not available in production' }), {
-            status: 403,
-            headers: { 'Content-Type': 'application/json' },
-        });
-    }
-
     const manifests = await readAllAlbumManifestFiles(process.cwd());
     const allTags = Object.fromEntries(
         Object.entries(manifests).map(([slug, manifest]) => [
@@ -26,12 +19,6 @@ export const GET: APIRoute = async () => {
         ]),
     );
 
-    return new Response(
-        JSON.stringify({ mountains, regions, allTags }),
-        {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' },
-        }
-    );
+    return json({ mountains, regions, allTags });
 };
 // Registered only by the local development server.
