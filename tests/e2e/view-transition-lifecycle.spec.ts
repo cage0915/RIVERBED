@@ -35,18 +35,16 @@ async function isolateRemotePhotos(page: Page) {
 }
 
 async function openYamaFromHomeWithTouch(page: Page) {
-    // The latest-post card reveals its info on the first tap; folder cards
-    // are marked data-mobile-direct and navigate immediately.
-    const latestPostCard = page.locator(".latest-post-card[data-catalog-card]");
-    await expect(latestPostCard).toBeVisible();
-    await latestPostCard.click();
-    await expect.poll(() => new URL(page.url()).pathname).toBe("/");
-    await expect(latestPostCard).toHaveClass(/show-info/);
-
+    // Touch devices always show card captions, so cards navigate on the first tap.
     const yamaCard = page.locator(
-        '[data-catalog-card][data-mobile-direct]:has(a[href="/yama"])',
+        '.folder-card[data-catalog-card]:has(a[href="/yama"])',
     ).first();
     await expect(yamaCard).toBeVisible();
+    await expect.poll(() =>
+        yamaCard.locator(".album-overlay").evaluate(
+            (overlay) => getComputedStyle(overlay).opacity,
+        ),
+    ).toBe("1");
     await yamaCard.click();
     await expect(page).toHaveURL(/\/yama\/?$/);
     await expect(page.locator("[data-site-navigation]")).toBeVisible();
@@ -93,7 +91,7 @@ test.describe("touch navigation lifecycle", () => {
         await isolateRemotePhotos(page);
     });
 
-    test("catalog keeps first-tap reveal after repeated view transitions", async ({
+    test("catalog cards navigate on first tap after repeated view transitions", async ({
         page,
     }) => {
         await page.goto("/");

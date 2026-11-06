@@ -7,13 +7,9 @@
         const root = document.querySelector<HTMLElement>("[data-catalog-grid]");
         if (!root) return;
 
-        const controller = new AbortController();
         const cards = root.querySelectorAll<HTMLElement>("[data-catalog-card]");
         const intervals: number[] = [];
         const observers: IntersectionObserver[] = [];
-        const closeCards = () => {
-            cards.forEach((card) => card.classList.remove("show-info"));
-        };
 
         cards.forEach((card) => {
             const slides = Array.from(
@@ -73,38 +69,11 @@
                     start();
                 }
             }
-
-            card.addEventListener("click", (event) => {
-                const isMobile = window.matchMedia(
-                    "(max-width: 768px) and (hover: none)",
-                ).matches;
-                if (
-                    !isMobile
-                    || card.hasAttribute("data-mobile-direct")
-                    || card.classList.contains("show-info")
-                ) return;
-
-                event.preventDefault();
-                closeCards();
-                card.classList.add("show-info");
-            }, { signal: controller.signal });
         });
 
-        document.addEventListener("click", (event) => {
-            const target = event.target;
-            const isInsideCurrentCard = target instanceof Node
-                && [...cards].some((card) => card.contains(target));
-
-            if (!isInsideCurrentCard) {
-                closeCards();
-            }
-        }, { signal: controller.signal });
-
         return () => {
-            controller.abort();
             intervals.forEach((interval) => window.clearInterval(interval));
             observers.forEach((observer) => observer.disconnect());
-            closeCards();
         };
     });
 </script>

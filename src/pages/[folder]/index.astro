@@ -160,7 +160,7 @@ const isYama = folder === "yama";
         width: 100%;
         aspect-ratio: 177/100;
         overflow: hidden;
-        background: #1a1a1a;
+        background: #1c1c1c;
     }
 
     .album-cover img {
@@ -173,71 +173,49 @@ const isYama = folder === "yama";
         transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), object-position 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
+    /* Caption sits on a bottom gradient so the photo stays visible behind it. */
     .album-overlay {
         position: absolute;
-        inset: 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 1.5rem;
-        transition: all 0.4s ease;
-        background: rgba(255, 255, 255, 0);
-        opacity: 0;
+        inset: auto 0 0;
+        padding: 2.5rem 1rem 0.85rem;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0));
         z-index: 10;
         pointer-events: none;
+        transition: opacity 0.4s ease;
     }
 
     .album-title {
+        margin: 0;
         font-family: "Noto Sans TC", "Noto Sans JP", sans-serif;
-        font-size: 1.25rem;
+        font-size: 1.05rem;
         font-weight: 400;
         letter-spacing: 0.05em;
-        text-align: center;
-        color: #111827;
-        transform: translateY(10px);
-        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        z-index: 20;
+        color: #fafafa;
+        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
     }
 
     .album-info {
+        margin: 0.2rem 0 0;
         font-family: "PT Sans", "Noto Sans TC", "Noto Sans JP", sans-serif;
-        font-size: 0.875rem;
+        font-size: 0.8rem;
         font-weight: 300;
         letter-spacing: 0.05em;
-        text-align: center;
-        color: #111827;
-        margin-top: 0.5rem;
-        transform: translateY(10px);
-        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        z-index: 20;
+        color: #d4d4d8;
     }
 
-    .album-card.show-info .album-overlay {
-        opacity: 1;
-        background: rgba(255, 255, 255, 0.7);
-    }
-
-    .album-card.show-info .album-title,
-    .album-card.show-info .album-info {
-        opacity: 1;
-        transform: translateY(0);
-    }
-
+    /* Pointer devices reveal the caption on hover; touch devices always show it. */
     @media (hover: hover) {
+        .album-overlay {
+            opacity: 0;
+        }
+
         .album-card:hover .album-cover img {
             transform: scale(calc(var(--zoom) * 1.05));
         }
 
-        .album-card:hover .album-overlay {
+        .album-card:hover .album-overlay,
+        .album-card:focus-within .album-overlay {
             opacity: 1;
-            background: rgba(255, 255, 255, 0.6);
-        }
-
-        .album-card:hover .album-title,
-        .album-card:hover .album-info {
-            opacity: 1;
-            transform: translateY(0);
         }
     }
 </style>

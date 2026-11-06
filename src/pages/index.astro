@@ -78,32 +78,34 @@ const sortedFolders = folderSlugs
             <article class="album-card latest-post-card group" data-catalog-card data-keyboard-navigation-target>
                 <a href={`/${latestAlbum.slug}`} class="album-link">
                     <div class="album-cover latest-post-cover">
-                        <img
-                            src={getThumbnailUrl(latestAlbumCoverKey, 1100)}
-                            srcset={getThumbnailSrcSet(latestAlbumCoverKey)}
-                            sizes="(max-width: 640px) calc(100vw - 2rem), (max-width: 1100px) calc(100vw - 4rem), 1036px"
-                            alt={latestAlbum.title}
-                            loading="eager"
-                            fetchpriority="high"
-                            decoding="async"
-                            class="slide active"
-                            style={`--zoom: ${latestAlbum.cover.zoom}; --ox: ${latestAlbum.cover.offset.x}%; --oy: ${latestAlbum.cover.offset.y}%;`}
-                            onerror={
-                                isDev
-                                    ? `this.onerror=null; this.src='${R2_DOMAIN}/${latestAlbumCoverKey}';`
-                                    : undefined
-                            }
-                        />
-                        <div class="album-overlay">
-                            <div class="latest-post-info">
-                                <p class="latest-post-label">
-                                    Latest · {getFolderTitle(latestAlbumFolder)}
-                                </p>
-                                <h1 class="album-title">{latestAlbum.title}</h1>
-                                {latestAlbum.info && (
-                                    <p class="latest-post-meta">{latestAlbum.info}</p>
-                                )}
-                            </div>
+                        <picture>
+                            <!-- The latest post is hidden on phones; an empty source keeps them from downloading it. -->
+                            <source media="(max-width: 640px)" srcset="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+                            <img
+                                src={getThumbnailUrl(latestAlbumCoverKey, 1100)}
+                                srcset={getThumbnailSrcSet(latestAlbumCoverKey)}
+                                sizes="(max-width: 1100px) calc(100vw - 4rem), 1036px"
+                                alt={latestAlbum.title}
+                                loading="eager"
+                                fetchpriority="high"
+                                decoding="async"
+                                class="slide active"
+                                style={`--zoom: ${latestAlbum.cover.zoom}; --ox: ${latestAlbum.cover.offset.x}%; --oy: ${latestAlbum.cover.offset.y}%;`}
+                                onerror={
+                                    isDev
+                                        ? `this.onerror=null; this.src='${R2_DOMAIN}/${latestAlbumCoverKey}';`
+                                        : undefined
+                                }
+                            />
+                        </picture>
+                        <div class="album-overlay latest-post-overlay">
+                            <p class="latest-post-label">
+                                Latest · {getFolderTitle(latestAlbumFolder)}
+                            </p>
+                            <h1 class="album-title latest-post-title">{latestAlbum.title}</h1>
+                            {latestAlbum.info && (
+                                <p class="latest-post-meta">{latestAlbum.info}</p>
+                            )}
                         </div>
                     </div>
                 </a>
@@ -121,7 +123,6 @@ const sortedFolders = folderSlugs
                         class="album-card folder-card group"
                         data-catalog-card
                         data-keyboard-navigation-target
-                        data-mobile-direct
                         data-covers={folder.covers.length}
                     >
                         <a href={`/${folder.id}`} class="album-link">
@@ -130,7 +131,7 @@ const sortedFolders = folderSlugs
                                     <img
                                         src={i === 0 ? cover.coverUrl : undefined}
                                         srcset={i === 0 ? cover.coverSrcSet : undefined}
-                                        sizes="(max-width: 640px) 9rem, (max-width: 1100px) calc((100vw - 6rem) / 5), 203px"
+                                        sizes="(max-width: 640px) calc(100vw - 2rem), (max-width: 1100px) calc((100vw - 6rem) / 5), 203px"
                                         data-src={i === 0 ? undefined : cover.coverUrl}
                                         data-srcset={i === 0 ? undefined : cover.coverSrcSet}
                                         alt={cover.title}
@@ -145,8 +146,10 @@ const sortedFolders = folderSlugs
                                         }
                                     />
                                 ))}
+                                <div class="album-overlay">
+                                    <h2 class="album-title">{folder.title}</h2>
+                                </div>
                             </div>
-                            <h2 class="folder-title">{folder.title}</h2>
                         </a>
                     </div>
                 ))
@@ -172,8 +175,14 @@ const sortedFolders = folderSlugs
         max-height: calc(100vh - 10rem);
     }
 
-    .latest-post-info {
-        text-align: center;
+    .latest-post-overlay {
+        padding: 4rem 1.5rem 1.25rem;
+    }
+
+    .latest-post-title {
+        margin-top: 0.35rem;
+        font-size: 1.5rem;
+        letter-spacing: 0.08em;
     }
 
     .latest-post-label,
@@ -183,11 +192,11 @@ const sortedFolders = folderSlugs
         font-size: 0.7rem;
         letter-spacing: 0.16em;
         text-transform: uppercase;
-        color: #374151;
+        color: #d4d4d8;
     }
 
     .latest-post-meta {
-        margin-top: 0.65rem;
+        margin-top: 0.35rem;
         letter-spacing: 0.08em;
         text-transform: none;
     }
@@ -207,6 +216,7 @@ const sortedFolders = folderSlugs
         width: 100%;
         aspect-ratio: 177/100;
         overflow: hidden;
+        background: #1c1c1c;
     }
 
     /* All slides stacked on top of each other */
@@ -230,91 +240,39 @@ const sortedFolders = folderSlugs
         opacity: 1;
     }
 
+    /* Home captions stay visible; they sit on a bottom gradient over the photo. */
     .album-overlay {
         position: absolute;
-        inset: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 1.5rem;
-        transition: all 0.4s ease;
-        background: rgba(255, 255, 255, 0);
-        opacity: 0;
+        inset: auto 0 0;
+        padding: 2.5rem 1rem 0.85rem;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0));
         z-index: 10;
         pointer-events: none;
     }
 
     .album-title {
-        font-family: "Noto Sans TC", "Noto Sans JP", sans-serif;
-        font-size: 1.5rem;
-        font-weight: 400;
-        letter-spacing: 0.08em;
-        text-align: center;
-        color: #111827;
-        transform: translateY(10px);
-        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        z-index: 20;
-    }
-
-    .folder-title {
         margin: 0;
-        padding: 0.65rem 0.25rem 0;
         font-family: "Noto Sans TC", "Noto Sans JP", sans-serif;
-        font-size: clamp(0.7rem, 1.25vw, 1rem);
+        font-size: 1.05rem;
         font-weight: 400;
-        letter-spacing: 0.08em;
-        text-align: center;
-        color: #a1a1aa;
-        transition: color 0.25s ease;
-    }
-
-    .album-card.show-info .album-overlay {
-        opacity: 1;
-        background: rgba(255, 255, 255, 0.7);
-    }
-
-    .album-card.show-info .album-title {
-        opacity: 1;
-        transform: translateY(0);
+        letter-spacing: 0.05em;
+        color: #fafafa;
+        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
     }
 
     @media (hover: hover) {
         .album-card:hover .slide.active {
             transform: scale(calc(var(--zoom) * 1.05));
         }
-
-        .album-card:hover .album-overlay {
-            opacity: 1;
-            background: rgba(255, 255, 255, 0.6);
-        }
-
-        .album-card:hover .album-title {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .album-card:hover .folder-title {
-            color: #f4f4f5;
-        }
     }
 
     @media (max-width: 640px) {
-        .latest-post-cover {
-            aspect-ratio: 4 / 3;
+        .latest-post {
+            display: none;
         }
 
         .folders-grid {
-            grid-template-columns: repeat(
-                var(--folder-count, 5),
-                minmax(9rem, 1fr)
-            );
-            overflow-x: auto;
-            padding-bottom: 0.35rem;
-            scrollbar-width: thin;
-        }
-
-        .folder-title {
-            font-size: 0.8rem;
+            grid-template-columns: 1fr;
         }
     }
 </style>

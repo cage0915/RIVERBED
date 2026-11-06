@@ -1254,7 +1254,7 @@ test('Layout delegates explicit content keyboard navigation targets and lifecycl
     );
     assert.match(
         homePage,
-        /class="album-card folder-card group"[\s\S]*data-catalog-card[\s\S]*data-keyboard-navigation-target[\s\S]*data-mobile-direct/,
+        /class="album-card folder-card group"[\s\S]*data-catalog-card[\s\S]*data-keyboard-navigation-target/,
     );
     assert.match(
         folderPage,
@@ -1382,7 +1382,7 @@ test('catalog routes share lifecycle-scoped card interactions', () => {
     );
     assert.match(
         homePage,
-        /<div class="album-cover">[\s\S]*<\/div>\s*<h2 class="folder-title">\{folder\.title\}<\/h2>/,
+        /<div class="album-cover">[\s\S]*<div class="album-overlay">\s*<h2 class="album-title">\{folder\.title\}<\/h2>/,
     );
     assert.match(
         folderPage,
@@ -1390,22 +1390,21 @@ test('catalog routes share lifecycle-scoped card interactions', () => {
     );
     assert.match(interactions.trim(), /^<script>[\s\S]*<\/script>$/);
     assert.match(interactions, /installPageLifecycle/);
-    assert.match(interactions, /new AbortController\(\)/);
     assert.match(interactions, /root\.querySelectorAll[^;]*data-catalog-card/);
     assert.match(interactions, /const INTERVAL_MS = 5000/);
     assert.match(interactions, /window\.setInterval/);
     assert.match(interactions, /clearInterval/);
-    assert.match(interactions, /controller\.abort\(\)/);
-    assert.match(interactions, /classList\.remove\("show-info"\)/);
+    // Captions are always visible on touch devices, so a tap navigates directly.
+    assert.doesNotMatch(interactions, /show-info|preventDefault|data-mobile-direct/);
+    for (const page of [homePage, folderPage]) {
+        assert.doesNotMatch(page, /show-info|data-mobile-direct/);
+    }
+    // Folder cards reveal captions on hover; home captions stay visible.
     assert.match(
-        interactions,
-        /\(max-width: 768px\) and \(hover: none\)[\s\S]*classList\.contains\("show-info"\)[\s\S]*event\.preventDefault\(\)/,
+        folderPage,
+        /@media \(hover: hover\) \{\s*\.album-overlay \{\s*opacity: 0;/,
     );
-    assert.match(interactions, /card\.hasAttribute\("data-mobile-direct"\)/);
-    assert.match(
-        interactions,
-        /card\.contains\(target\)[\s\S]*if \(!isInsideCurrentCard\)/,
-    );
+    assert.doesNotMatch(homePage, /opacity: 0;\s*\}/);
     assert.doesNotMatch(
         interactions,
         /document\.querySelectorAll[^;]*\.album-card/,
