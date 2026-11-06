@@ -1317,10 +1317,13 @@ test('media behavior uses page-scoped lifecycle owners with deterministic cleanu
         /<a[\s\S]*class="pswp-link block"[\s\S]*data-photo-lightbox-link/,
     );
     assert.match(photo, /data-pswp-width=\{width\}[\s\S]*data-pswp-height=\{height\}/);
-    assert.match(photo, /installPageLifecycle/);
-    assert.match(photo, /new AbortController\(\)/);
-    assert.match(photo, /signal: controller\.signal/);
-    assert.doesNotMatch(photo, /astro:after-swap|initPhotoFallbacks\(\);/);
+    // The dev-only fallback lives with the dev tool so Photo emits no script inside rows or tracks.
+    const photoFallback = readProjectFile('src/scripts/dev-tool/photo-fallback.ts');
+    assert.doesNotMatch(photo, /<script/);
+    assert.match(photoFallback, /installPageLifecycle/);
+    assert.match(photoFallback, /new AbortController\(\)/);
+    assert.match(photoFallback, /signal: controller\.signal/);
+    assert.doesNotMatch(photoFallback, /astro:after-swap|initPhotoFallbacks\(\);/);
 
     assert.match(
         row,

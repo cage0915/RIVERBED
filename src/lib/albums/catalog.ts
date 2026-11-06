@@ -26,9 +26,9 @@ async function loadCatalogState(): Promise<CatalogState> {
     const entries = await getCollection("albums");
     const catalog = buildAlbumCatalogFromSources(
         entries.map((entry) => ({
-            slug: entry.slug,
-            mdxPath: `/src/content/albums/${entry.slug}.mdx`,
-            mdxBody: entry.body,
+            slug: entry.id,
+            mdxPath: `/src/content/albums/${entry.id}.mdx`,
+            mdxBody: entry.body ?? "",
         })),
         manifestModules,
     );

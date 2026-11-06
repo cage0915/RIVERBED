@@ -18,19 +18,19 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/mdx": "^3.1.9",
+    "@astrojs/mdx": "^4.3.14",
     "@astrojs/rss": "^4.0.19",
-    "@astrojs/tailwind": "^5.0.0",
+    "@astrojs/tailwind": "^6.0.2",
     "@fontsource/fjalla-one": "^5.2.7",
     "@fontsource/noto-sans-jp": "^5.2.9",
     "@fontsource/noto-sans-tc": "^5.2.9",
     "@fontsource/pt-sans": "^5.2.8",
-    "astro": "^4.0.0",
+    "astro": "^5.18.2",
     "photoswipe": "^5.4.4",
     "tailwindcss": "^3.4.0"
   },
   "devDependencies": {
-    "@astrojs/check": "^0.9.9",
+    "@astrojs/check": "^0.9.12",
     "@aws-sdk/client-s3": "^3.1090.0",
     "@playwright/test": "^1.61.1",
     "@types/node": "^26.1.1",

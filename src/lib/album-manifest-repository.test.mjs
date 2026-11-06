@@ -76,6 +76,7 @@ test("production Album and Tag rendering read manifests through the catalog", ()
     const albumPage = fs.readFileSync(path.join(sourceRoot, "pages/[folder]/[album].astro"), "utf8");
     const photoComponent = fs.readFileSync(path.join(sourceRoot, "components/Photo.astro"), "utf8");
     const albumPhotoComponent = fs.readFileSync(path.join(sourceRoot, "components/AlbumPhoto.astro"), "utf8");
+    const photoFallback = fs.readFileSync(path.join(sourceRoot, "scripts/dev-tool/photo-fallback.ts"), "utf8");
     const tagPage = fs.readFileSync(path.join(sourceRoot, "pages/yama/tags/[tag].astro"), "utf8");
 
     assert.doesNotMatch(albumPage, /albumEntry\.data\.(?:title|info|gap)/);
@@ -89,11 +90,11 @@ test("production Album and Tag rendering read manifests through the catalog", ()
     assert.doesNotMatch(photoComponent, /\bonerror=/);
     assert.match(photoComponent, /data-dev-fallback-url/);
     assert.match(
-        photoComponent,
+        photoFallback,
         /addEventListener\("error", useFallback, \{[\s\S]*once: true,[\s\S]*signal: controller\.signal,[\s\S]*\}\);/,
     );
-    assert.match(photoComponent, /const controller = new AbortController\(\)/);
-    assert.match(photoComponent, /controller\.abort\(\)/);
+    assert.match(photoFallback, /const controller = new AbortController\(\)/);
+    assert.match(photoFallback, /controller\.abort\(\)/);
     assert.match(tagPage, /getTaggedPhotos\(decodedTag\)/);
     assert.match(tagPage, /sourceAlbumSlug/);
     assert.doesNotMatch(tagPage, /getAllPhotosWithTags|utils\/tags/);
@@ -152,7 +153,7 @@ test("repository contains no retired storage or mutable Album frontmatter", () =
 
 test("post-cutover configuration validates manifests before contour preparation", () => {
     const packageJson = JSON.parse(fs.readFileSync(path.join(projectRoot, "package.json"), "utf8"));
-    const contentConfig = fs.readFileSync(path.join(projectRoot, "src/content/config.ts"), "utf8");
+    const contentConfig = fs.readFileSync(path.join(projectRoot, "src/content.config.ts"), "utf8");
     assert.match(contentConfig, /schema:\s*z\.object\(\{\}\)\.strict\(\)/);
     assert.doesNotMatch(contentConfig, /title|coverKey|publishedAt|coverZoom|coverOffset|\border\b|\bgap\b/);
     assert.equal(packageJson.scripts.prebuild, "node --import tsx scripts/validate-album-repository.mjs && node scripts/prepare-contour-assets.mjs prepare");

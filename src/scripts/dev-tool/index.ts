@@ -15,6 +15,7 @@ import { openRegionManager } from "./region-manager";
 import { initFolderCoverEditors } from "./folder-cover";
 import { openFolderManager } from "./folder-manager";
 import { openR2Manager } from "./r2-manager";
+import "./photo-fallback";
 
 type MountainRegion = string;
 type MountainRegionDefinition = { id: string; label: string };
