@@ -130,6 +130,26 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
 
     type PanoramaView = "carousel" | "panorama";
 
+    const VIEW_HINT_STORAGE_KEY = "riverbed:panorama-view-hint-seen";
+    const VIEW_HINT_DURATION_MS = 2600;
+
+    // Storage can be unavailable (private mode, blocked site data); then the hint
+    // simply plays once per page instead of once per visitor.
+    const hasSeenViewHint = () => {
+        try {
+            return localStorage.getItem(VIEW_HINT_STORAGE_KEY) === "true";
+        } catch {
+            return false;
+        }
+    };
+    const markViewHintSeen = () => {
+        try {
+            localStorage.setItem(VIEW_HINT_STORAGE_KEY, "true");
+        } catch {
+            // The hint just may play again on a later visit.
+        }
+    };
+
     installPageLifecycle(document, () => {
         const controller = new AbortController();
         const initializedSections: HTMLElement[] = [];
@@ -432,6 +452,7 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
             });
 
             toggle.addEventListener("click", () => {
+                markViewHintSeen();
                 void setView(currentView() === "carousel" ? "panorama" : "carousel");
             }, { signal: controller.signal });
 
@@ -486,8 +507,40 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
             void setView(section.dataset.initialView === "panorama" ? "panorama" : "carousel", false, false);
         });
 
+        // The first Panorama a visitor scrolls to pulses its view toggle once, so
+        // they notice the block can switch views.
+        let hintObserver: IntersectionObserver | undefined;
+        let hintTimer: number | undefined;
+        if (
+            initializedSections.length > 0
+            && !hasSeenViewHint()
+            && "IntersectionObserver" in window
+        ) {
+            hintObserver = new IntersectionObserver((entries) => {
+                const entry = entries.find((candidate) => candidate.isIntersecting);
+                if (!entry || hasSeenViewHint()) return;
+                const section = entry.target.closest<HTMLElement>("[data-photo-panorama]");
+                if (!section || section.dataset.viewTransitioning) return;
+
+                hintObserver?.disconnect();
+                markViewHintSeen();
+                section.dataset.viewHint = "true";
+                hintTimer = window.setTimeout(() => {
+                    delete section.dataset.viewHint;
+                    hintTimer = undefined;
+                }, VIEW_HINT_DURATION_MS);
+            }, { threshold: 1, rootMargin: "0px 0px -15% 0px" });
+            // Watch the toggles themselves: a tall Panorama may never be mostly on screen.
+            initializedSections.forEach((section) => {
+                const toggle = section.querySelector(".photo-panorama-view-toggle");
+                if (toggle) hintObserver?.observe(toggle);
+            });
+        }
+
         return () => {
             controller.abort();
+            hintObserver?.disconnect();
+            if (hintTimer !== undefined) window.clearTimeout(hintTimer);
             resizeObservers.forEach((observer) => observer.disconnect());
             viewAnimations.forEach((animation) => animation.cancel());
             frameIds.forEach((id) => cancelAnimationFrame(id));
@@ -501,6 +554,7 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
                 });
                 section.querySelector(".photo-panorama-single-source")?.classList.remove("photo-panorama-single-source");
                 delete section.dataset.singlePhotoSliced;
+                delete section.dataset.viewHint;
                 delete section.dataset.photoPanoramaReady;
             });
         };
@@ -686,6 +740,57 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
         transform: scale(0.75);
     }
 
+    /*
+     * One-time hint: two rings spread from the toggle while its icon briefly
+     * previews the other view, then everything settles back.
+     */
+    .photo-panorama-section[data-view-hint] .photo-panorama-view-toggle {
+        color: rgba(255, 255, 255, 0.95);
+        border-color: rgba(255, 255, 255, 0.5);
+        animation: photo-panorama-hint-ring 1.2s ease-out 2;
+    }
+
+    .photo-panorama-section[data-view="carousel"][data-view-hint] .photo-panorama-view-icon--carousel,
+    .photo-panorama-section[data-view="panorama"][data-view-hint] .photo-panorama-view-icon--panorama {
+        animation: photo-panorama-hint-current 2.4s ease-in-out;
+    }
+
+    .photo-panorama-section[data-view="carousel"][data-view-hint] .photo-panorama-view-icon--panorama,
+    .photo-panorama-section[data-view="panorama"][data-view-hint] .photo-panorama-view-icon--carousel {
+        animation: photo-panorama-hint-other 2.4s ease-in-out;
+    }
+
+    @keyframes photo-panorama-hint-ring {
+        from {
+            box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.45);
+        }
+        to {
+            box-shadow: 0 0 0 0.75rem rgba(255, 255, 255, 0);
+        }
+    }
+
+    @keyframes photo-panorama-hint-current {
+        0%, 25%, 75%, 100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+        40%, 60% {
+            opacity: 0;
+            transform: scale(0.75);
+        }
+    }
+
+    @keyframes photo-panorama-hint-other {
+        0%, 25%, 75%, 100% {
+            opacity: 0;
+            transform: scale(0.75);
+        }
+        40%, 60% {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
     .photo-panorama-view-label {
         position: absolute;
         width: 1px;
@@ -830,6 +935,12 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
     }
 
     @media (prefers-reduced-motion: reduce) {
+        /* Without motion the hint is just the brightened toggle. */
+        .photo-panorama-section[data-view-hint] .photo-panorama-view-toggle,
+        .photo-panorama-section[data-view-hint] .photo-panorama-view-icon {
+            animation: none;
+        }
+
         .photo-panorama-section :global(.photo-panorama-dot),
         .photo-panorama-view-toggle,
         .photo-panorama-view-icon,
