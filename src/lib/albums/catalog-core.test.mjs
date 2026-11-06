@@ -10,7 +10,7 @@ function manifest({
     cover = { kind: "local", filename: photos[0].filename },
 }) {
     return {
-        schemaVersion: 1,
+        schemaVersion: 2,
         title,
         order,
         cover: {
@@ -23,11 +23,10 @@ function manifest({
 }
 
 function record(slug, albumManifest, filenames) {
+    albumManifest.blocks = filenames.map((filename) => ({ type: "Row", photos: [filename] }));
     return {
         slug,
-        manifestPath: `src/content/albums/${slug}.album.json`,
-        mdxPath: `src/content/albums/${slug}.mdx`,
-        mdxBody: filenames.map((filename) => `<Photo itemKey="${filename}" />`).join("\n"),
+        manifestPath: `src/album-manifests/${slug}.json`,
         manifest: albumManifest,
     };
 }
@@ -73,7 +72,7 @@ test("normalizes local photos and sorts Albums by order then slug", () => {
     assert.equal(catalog.getAlbum("yama/first").cover.assetKey, "yama/first/A.jpg");
 });
 
-test("projects tags only from MDX content in stable Album and content order", () => {
+test("projects tags only from block content in stable Album and content order", () => {
     const taggedA = { name: "白馬岳", x: 10, y: 20 };
     const taggedB = { name: "白馬岳", x: 30, y: 40 };
     const catalog = createAlbumCatalog([
@@ -164,8 +163,8 @@ test("resolves external covers only to tracked manifest inventory", () => {
             code: "external-cover-source-missing",
             message: "External cover asset \"yama/source/not-tracked.jpg\" is not tracked by any Album manifest inventory",
             albumSlug: "k/missing",
-            sourcePath: "src/content/albums/k/missing.album.json",
-            manifestPath: "src/content/albums/k/missing.album.json",
+            sourcePath: "src/album-manifests/k/missing.json",
+            manifestPath: "src/album-manifests/k/missing.json",
             fieldPath: "cover.photo.assetKey",
         }],
     );
@@ -186,8 +185,8 @@ test("rejects a same-Album photo encoded as an external cover", () => {
         code: "external-cover-source-same-album",
         message: "External cover asset \"yama/self-reference/A.jpg\" belongs to the consumer Album; use a local cover reference",
         albumSlug: "yama/self-reference",
-        sourcePath: "src/content/albums/yama/self-reference.album.json",
-        manifestPath: "src/content/albums/yama/self-reference.album.json",
+        sourcePath: "src/album-manifests/yama/self-reference.json",
+        manifestPath: "src/album-manifests/yama/self-reference.json",
         fieldPath: "cover.photo.assetKey",
     }]);
 });
@@ -212,7 +211,7 @@ test("reports inventory, duplicate order, and duplicate slug diagnostics", () =>
     ]);
 
     assert.deepEqual(catalog.diagnostics.map(({ code }) => code), [
-        "manifest-photo-not-in-mdx",
+        "manifest-photo-not-in-blocks",
         "duplicate-album-slug",
         "duplicate-album-order",
     ]);
@@ -223,9 +222,9 @@ test("reports inventory, duplicate order, and duplicate slug diagnostics", () =>
     ]);
     const orderDiagnostic = catalog.diagnostics.find(({ code }) => code === "duplicate-album-order");
     const slugDiagnostic = catalog.diagnostics.find(({ code }) => code === "duplicate-album-slug");
-    assert.equal(orderDiagnostic.sourcePath, "src/content/albums/yama/other.album.json");
+    assert.equal(orderDiagnostic.sourcePath, "src/album-manifests/yama/other.json");
     assert.equal(orderDiagnostic.fieldPath, "order");
-    assert.equal(slugDiagnostic.sourcePath, "src/content/albums/yama/duplicate.album.json");
+    assert.equal(slugDiagnostic.sourcePath, "src/album-manifests/yama/duplicate.json");
     assert.equal(slugDiagnostic.fieldPath, "slug");
 });
 
@@ -243,8 +242,8 @@ test("reports and skips an invalid Album slug", () => {
         code: "invalid-album-slug",
         message: "Invalid album slug: not-a-slug",
         albumSlug: "not-a-slug",
-        sourcePath: "src/content/albums/not-a-slug.album.json",
-        manifestPath: "src/content/albums/not-a-slug.album.json",
+        sourcePath: "src/album-manifests/not-a-slug.json",
+        manifestPath: "src/album-manifests/not-a-slug.json",
         fieldPath: "slug",
     }]);
 });
@@ -264,6 +263,7 @@ test("does not alias caller input or mutable query results", () => {
     inputManifest.cover.photo.filename = "mutated-cover.jpg";
     inputManifest.cover.offset.x = 0;
     inputManifest.photos[0].filename = "mutated-photo.jpg";
+    inputManifest.blocks[0].photos[0] = "mutated-block-photo.jpg";
     tag.name = "mutated input tag";
 
     assert.equal(catalog.getAlbum("yama/snapshot").title, "Snapshot");
@@ -278,6 +278,7 @@ test("does not alias caller input or mutable query results", () => {
     albumResult.cover.offset.y = 0;
     albumResult.photos[0].tags[0].name = "mutated result tag";
     albumResult.photos.push(albumResult.photos[0]);
+    albumResult.blocks[0].photos.push("mutated-result-block.jpg");
 
     const albumsResult = catalog.getAlbums();
     albumsResult[0].photos[0].caption = "Mutated list result";
@@ -293,6 +294,7 @@ test("does not alias caller input or mutable query results", () => {
         offset: { x: 50, y: 50 },
         assetKey: "yama/snapshot/A.jpg",
     });
+    assert.deepEqual(freshAlbum.blocks, [{ type: "Row", photos: ["A.jpg"] }]);
     assert.equal(freshAlbum.photos.length, 1);
     assert.equal(freshAlbum.photos[0].filename, "A.jpg");
     assert.equal(freshAlbum.photos[0].caption, "Original");
@@ -307,7 +309,7 @@ test("does not alias caller input or mutable query results", () => {
         }), ["A.jpg"]),
     ]);
     diagnosticCatalog.diagnostics[0].code = "mutated-diagnostic";
-    assert.equal(diagnosticCatalog.diagnostics[0].code, "manifest-photo-not-in-mdx");
+    assert.equal(diagnosticCatalog.diagnostics[0].code, "manifest-photo-not-in-blocks");
 });
 
 test("produces identical winners, Albums, and diagnostics for record permutations", () => {
@@ -316,16 +318,14 @@ test("produces identical winners, Albums, and diagnostics for record permutation
         order: 10,
         photos: [{ filename: "A.jpg" }, { filename: "unused-A.jpg" }],
     }), ["A.jpg"]);
-    canonicalDuplicate.manifestPath = "src/content/albums/yama/a-duplicate.album.json";
-    canonicalDuplicate.mdxPath = "src/content/albums/yama/a-duplicate.mdx";
+    canonicalDuplicate.manifestPath = "src/album-manifests/yama/a-duplicate.json";
 
     const losingDuplicate = record("yama/duplicate-order", manifest({
         title: "Losing duplicate",
         order: 30,
         photos: [{ filename: "Z.jpg" }],
     }), ["Z.jpg"]);
-    losingDuplicate.manifestPath = "src/content/albums/yama/z-duplicate.album.json";
-    losingDuplicate.mdxPath = "src/content/albums/yama/z-duplicate.mdx";
+    losingDuplicate.manifestPath = "src/album-manifests/yama/z-duplicate.json";
 
     const orderCollision = record("yama/order-collision", manifest({
         title: "Order collision",
@@ -343,7 +343,7 @@ test("produces identical winners, Albums, and diagnostics for record permutation
     assert.deepEqual(forward.diagnostics.map(({ code }) => code).sort(), [
         "duplicate-album-order",
         "duplicate-album-slug",
-        "manifest-photo-not-in-mdx",
-        "manifest-photo-not-in-mdx",
+        "manifest-photo-not-in-blocks",
+        "manifest-photo-not-in-blocks",
     ]);
 });

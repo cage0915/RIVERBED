@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "title": "２０１９",
   "order": 90,
   "cover": {
@@ -13,6 +13,170 @@
       "y": 50
     }
   },
+  "blocks": [
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "中華民國自由地區 臺灣省政府"
+    },
+    {
+      "type": "Row",
+      "blockMargin": "2rem",
+      "photos": [
+        "001.jpg",
+        "002.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "武陵農場"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "003.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "004.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "005.jpg",
+        "006.jpg",
+        "007.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "008.jpg",
+        "009.jpg",
+        "010.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "011.jpg",
+        "012.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "55mm・f2.8・Micro",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "013.jpg",
+        "014.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "101大樓.中央百世大樓",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "015.jpg",
+        "016.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "017.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "大塊噫氣其名為風。",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "018.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "019.jpg",
+        "020.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "2rem",
+      "photos": [
+        "021.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "美濃"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "022.jpg",
+        "023.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "024.jpg",
+        "025.jpg",
+        "026.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "027.jpg",
+        "028.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "日久他鄉是故鄉",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "029.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "北接山高送涼風",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "030.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "左營高鐵新兵集合",
+      "captionPosition": "left bottom",
+      "photos": [
+        "031.jpg"
+      ]
+    }
+  ],
   "photos": [
     {
       "filename": "001.jpg",

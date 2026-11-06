@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "title": "２０１７",
   "order": 20,
   "cover": {
@@ -13,6 +13,52 @@
       "y": 50
     }
   },
+  "blocks": [
+    {
+      "type": "Row",
+      "caption": "鄉下的綠色分很多種：香蕉綠、鳳梨綠、水稻綠、竹林綠。",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "01.JPG"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "02.JPG"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "遠方的慈濟醫院是許多人對大林的第一印象。",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "03.JPG"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "04.JPG"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "母校大林國中，不曉得操場是不是也改鋪成現在常見的PU了。",
+      "captionPosition": "center top",
+      "photos": [
+        "05.JPG",
+        "06.JPG"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "07.JPG"
+      ]
+    }
+  ],
   "photos": [
     {
       "filename": "01.JPG",

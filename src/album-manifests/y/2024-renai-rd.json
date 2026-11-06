@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "title": "仁愛路",
   "info": "2024.1",
   "order": 200,
@@ -14,6 +14,57 @@
       "y": 50
     }
   },
+  "blocks": [
+    {
+      "type": "Row",
+      "photos": [
+        "001.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "002.jpg",
+        "003.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "004.jpg",
+        "005.jpg",
+        "006.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "007.jpg",
+        "008.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "009.jpg",
+        "010.jpg",
+        "011.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "012.jpg",
+        "013.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "014.jpg"
+      ]
+    }
+  ],
   "photos": [
     {
       "filename": "001.jpg",

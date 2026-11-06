@@ -13,7 +13,7 @@ import {
 import { loadR2SourceIndex } from './r2-source-files.ts';
 
 const manifest = (overrides = {}) => ({
-    schemaVersion: 1,
+    schemaVersion: 2,
     title: 'Album',
     order: 10,
     cover: {
@@ -21,6 +21,7 @@ const manifest = (overrides = {}) => ({
         zoom: 1,
         offset: { x: 50, y: 50 },
     },
+    blocks: [{ type: 'Row', photos: ['001.jpg'] }],
     photos: [
         { filename: 'cover.jpg', tags: [] },
         { filename: '001.jpg', tags: [] },
@@ -77,7 +78,7 @@ test('remote audit separates directory markers from deletable orphans', () => {
     const index = buildR2SourceIndex([{
         key: 'yama/album/used.jpg',
         kind: 'album-photo',
-        source: 'src/content/albums/yama/album.mdx',
+        source: 'src/album-manifests/yama/album.json',
     }]);
     const result = classifyRemoteObjects([
         { key: 'yama/' },
@@ -91,17 +92,14 @@ test('remote audit separates directory markers from deletable orphans', () => {
     assert.deepEqual(result.trash.map((object) => object.key), ['_trash/2026-07-19/yama/album/old.jpg']);
 });
 
-test('filesystem source index ignores legacy MDX frontmatter and content references', async () => {
+test('filesystem source index reads local photos from manifest inventory', async () => {
     const root = await mkdtemp(path.join(tmpdir(), 'riverbed-r2-index-'));
     await mkdir(path.join(root, 'src/album-manifests/yama'), { recursive: true });
-    await mkdir(path.join(root, 'src/content/albums/yama'), { recursive: true });
     await writeFile(path.join(root, 'src/album-manifests/yama/album.json'), JSON.stringify(manifest()), 'utf8');
-    await writeFile(path.join(root, 'src/content/albums/yama/album.mdx'), `---\ncoverKey: "rogue.jpg"\n---\n<Photo itemKey="rogue.jpg" />`, 'utf8');
 
     const index = loadR2SourceIndex(root);
     assert.equal(index.has('yama/album/cover.jpg'), true);
     assert.equal(index.has('yama/album/001.jpg'), true);
-    assert.equal(index.has('yama/album/rogue.jpg'), false);
 });
 
 test('filesystem source index rejects an external cover that does not resolve to tracked inventory', async () => {

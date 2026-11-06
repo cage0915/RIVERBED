@@ -3,9 +3,11 @@ import test from "node:test";
 
 import { validateAlbumInventory } from "./validation.ts";
 
-function manifest(filenames, cover = { kind: "local", filename: filenames[0] }) {
+const MANIFEST_PATH = "src/album-manifests/yama/walk.json";
+
+function manifest(filenames, blocks, cover = { kind: "local", filename: filenames[0] }) {
     return {
-        schemaVersion: 1,
+        schemaVersion: 2,
         title: "Walk",
         order: 1,
         cover: {
@@ -13,77 +15,54 @@ function manifest(filenames, cover = { kind: "local", filename: filenames[0] }) 
             zoom: 1,
             offset: { x: 50, y: 50 },
         },
+        blocks,
         photos: filenames.map((filename) => ({ filename, tags: [] })),
     };
 }
 
-function validate({ filenames, mdxBody, cover }) {
+const row = (...photos) => ({ type: "Row", photos });
+
+function validate({ filenames, blocks, cover }) {
     return validateAlbumInventory({
         albumSlug: "yama/walk",
-        manifestPath: "src/content/albums/yama/walk.album.json",
-        manifest: manifest(filenames, cover),
-        mdxPath: "src/content/albums/yama/walk.mdx",
-        mdxBody,
+        manifestPath: MANIFEST_PATH,
+        manifest: manifest(filenames, blocks, cover),
     });
 }
 
-test("turns MDX Photo syntax errors into a stable diagnostic", () => {
+test("reports a photo placed by more than one block", () => {
     const diagnostics = validate({
         filenames: ["A.jpg"],
-        mdxBody: `<Photo itemKey={key} />`,
+        blocks: [row("A.jpg"), { type: "PhotoCarousel", photos: ["A.jpg"] }],
     });
 
-    assert.equal(diagnostics.length, 1);
-    assert.deepEqual(
-        {
-            code: diagnostics[0].code,
-            albumSlug: diagnostics[0].albumSlug,
-            sourcePath: diagnostics[0].sourcePath,
-            manifestPath: diagnostics[0].manifestPath,
-            fieldPath: diagnostics[0].fieldPath,
-        },
-        {
-            code: "mdx-photo-syntax",
-            albumSlug: "yama/walk",
-            sourcePath: "src/content/albums/yama/walk.mdx",
-            manifestPath: "src/content/albums/yama/walk.album.json",
-            fieldPath: "Photo@0",
-        },
-    );
-    assert.match(diagnostics[0].message, /static quoted string/i);
-});
-
-test("reports duplicate MDX Photo references", () => {
-    const diagnostics = validate({
-        filenames: ["A.jpg"],
-        mdxBody: `<Photo itemKey="A.jpg" />\n<Photo itemKey='A.jpg' />`,
-    });
-
-    assert.deepEqual(diagnostics.map(({ code }) => code), ["duplicate-mdx-photo"]);
-    assert.equal(diagnostics[0].sourcePath, "src/content/albums/yama/walk.mdx");
-    assert.match(diagnostics[0].fieldPath, /^Photo@\d+$/);
+    assert.deepEqual(diagnostics.map(({ code }) => code), ["duplicate-block-photo"]);
+    assert.equal(diagnostics[0].sourcePath, MANIFEST_PATH);
+    assert.equal(diagnostics[0].fieldPath, "blocks");
     assert.match(diagnostics[0].message, /A\.jpg/);
 });
 
-test("reports an MDX Photo missing from the manifest", () => {
+test("reports a block photo missing from the manifest", () => {
     const diagnostics = validate({
         filenames: ["A.jpg"],
-        mdxBody: `<Photo itemKey="A.jpg" />\n<Photo itemKey="B.jpg" />`,
+        blocks: [row("A.jpg", { column: ["B.jpg", "A2.jpg"] })],
     });
 
-    assert.deepEqual(diagnostics.map(({ code }) => code), ["mdx-photo-missing-from-manifest"]);
-    assert.equal(diagnostics[0].sourcePath, "src/content/albums/yama/walk.mdx");
+    assert.deepEqual(diagnostics.map(({ code }) => code), [
+        "block-photo-missing-from-manifest",
+        "block-photo-missing-from-manifest",
+    ]);
     assert.match(diagnostics[0].message, /B\.jpg.*manifest/i);
 });
 
 test("reports manifest-only photos that are not the selected local cover", () => {
     const diagnostics = validate({
         filenames: ["A.jpg", "unused.jpg"],
-        mdxBody: `<Photo itemKey="A.jpg" />`,
+        blocks: [row("A.jpg")],
     });
 
-    assert.deepEqual(diagnostics.map(({ code }) => code), ["manifest-photo-not-in-mdx"]);
-    assert.equal(diagnostics[0].sourcePath, "src/content/albums/yama/walk.album.json");
+    assert.deepEqual(diagnostics.map(({ code }) => code), ["manifest-photo-not-in-blocks"]);
+    assert.equal(diagnostics[0].sourcePath, MANIFEST_PATH);
     assert.equal(diagnostics[0].fieldPath, "photos[1].filename");
 });
 
@@ -91,7 +70,7 @@ test("allows exactly the selected local cover to be manifest-only", () => {
     const diagnostics = validate({
         filenames: ["cover.jpg", "A.jpg"],
         cover: { kind: "local", filename: "cover.jpg" },
-        mdxBody: `<Photo itemKey="A.jpg" />`,
+        blocks: [row("A.jpg")],
     });
 
     assert.deepEqual(diagnostics, []);
@@ -101,30 +80,32 @@ test("an external cover does not excuse unused local inventory", () => {
     const diagnostics = validate({
         filenames: ["A.jpg", "unused.jpg"],
         cover: { kind: "external", assetKey: "yama/other/cover.jpg" },
-        mdxBody: `<Photo itemKey="A.jpg" />`,
+        blocks: [row("A.jpg")],
     });
 
-    assert.deepEqual(diagnostics.map(({ code }) => code), ["manifest-photo-not-in-mdx"]);
+    assert.deepEqual(diagnostics.map(({ code }) => code), ["manifest-photo-not-in-blocks"]);
     assert.match(diagnostics[0].message, /unused\.jpg/);
 });
 
-test("reports when manifest content order differs from MDX order", () => {
+test("reports when manifest content order differs from block order", () => {
     const diagnostics = validate({
         filenames: ["B.jpg", "A.jpg"],
         cover: { kind: "local", filename: "B.jpg" },
-        mdxBody: `<Photo itemKey="A.jpg" />\n<Photo itemKey="B.jpg" />`,
+        blocks: [row("A.jpg"), row("B.jpg")],
     });
 
     assert.deepEqual(diagnostics.map(({ code }) => code), ["manifest-photo-order-mismatch"]);
-    assert.equal(diagnostics[0].sourcePath, "src/content/albums/yama/walk.album.json");
     assert.equal(diagnostics[0].fieldPath, "photos");
     assert.match(diagnostics[0].message, /A\.jpg.*B\.jpg/);
 });
 
-test("returns no diagnostics for matching MDX and manifest inventory", () => {
+test("returns no diagnostics for matching blocks and manifest inventory", () => {
     const diagnostics = validate({
-        filenames: ["A.jpg", "B.jpg"],
-        mdxBody: `<Row>\n<Photo itemKey="A.jpg" />\n<Photo itemKey='B.jpg' />\n</Row>`,
+        filenames: ["A.jpg", "B.jpg", "C.jpg"],
+        blocks: [
+            { type: "Text", text: "Morning" },
+            row("A.jpg", { column: ["B.jpg", "C.jpg"] }),
+        ],
     });
 
     assert.deepEqual(diagnostics, []);

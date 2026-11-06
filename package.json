@@ -18,7 +18,6 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/mdx": "^7.0.8",
     "@astrojs/rss": "^4.0.19",
     "@fontsource/fjalla-one": "^5.2.7",
     "@fontsource/noto-sans-jp": "^5.2.9",

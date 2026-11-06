@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "title": "白馬三山",
   "info": "2026.9",
   "publishedAt": "2026-10-28",
@@ -15,6 +15,559 @@
       "y": 0
     }
   },
+  "blocks": [
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "D1 栂池 - 白馬山荘"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS05005.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "3rem",
+      "photos": [
+        "2026-0920-0747-35.861.jpg",
+        "2026-0920-0749-25.377.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "白馬大池",
+      "blockMargin": "1rem",
+      "photos": [
+        "2026-0920-1151-55.572.jpg",
+        {
+          "column": [
+            "2026-0920-1130-47.636.jpg",
+            "2026-0920-1153-06.873.jpg"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "3rem",
+      "photos": [
+        "KCS05121.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "2026-0920-1122-31.277.jpg",
+        "2026-0920-1126-58.851.jpg",
+        "2026-0920-1328-23.783.jpg",
+        "2026-0920-1046-28.308.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "2026-0920-1038-27.475.jpg",
+        "2026-0920-1329-18.030.jpg",
+        "2026-0920-1525-02.119.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "3rem",
+      "photos": [
+        "2026-0920-1209-48.983.jpg",
+        "2026-0920-1210-08.044.jpg",
+        "2026-0920-1244-01.359.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "3rem",
+      "photos": [
+        "2026-0920-1217-50.160.jpg",
+        {
+          "column": [
+            "2026-0920-1222-22.264.jpg",
+            "2026-0920-1257-51.367.jpg"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS05143.jpg",
+        {
+          "column": [
+            "KCS05166.jpg",
+            "KCS05192.jpg"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "2026-0920-1336-14.191.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "3rem",
+      "photos": [
+        "2026-0920-1542-59.762.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "白馬山荘",
+      "captionPosition": "center top",
+      "photos": [
+        "2026-0920-1812-01.228.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        {
+          "column": [
+            "2026-0920-1702-20.483.jpg",
+            "2026-0920-1709-06.423.jpg"
+          ]
+        },
+        "2026-0920-1659-23.321.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "5rem",
+      "photos": [
+        "2026-0920-1746-27.874.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "D2 白馬山荘-白馬鑓温泉"
+    },
+    {
+      "type": "Row",
+      "caption": "白馬山荘 |\n日本第一座營業小屋。1905年第一代負責人松沢貞逸取得山頂下方測量用的臨時石屋的使用權，改造後於隔年開業。目前最多能收容800人（巔峰時期可達1200人），是日本規模最大的山屋。立山的室堂、木曽御岳和富士山雖然自江戶時代就有小屋存在，但其作為宗教參拜用途，並不是以登山客為服務對象的山屋。我們在山上時天氣時好時壞，沒機會看到山屋的全貌。",
+      "captionPosition": "left bottom",
+      "blockMargin": "3rem",
+      "photos": [
+        "2026-0921-0722-40.179.jpg",
+        "2026-0921-0727-01.214.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "2026-0921-0823-56.555.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        {
+          "column": [
+            "2026-0921-0912-10.829.jpg",
+            "2026-0921-0836-25.429.jpg"
+          ]
+        },
+        "2026-0921-0910-18.213.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "3rem",
+      "photos": [
+        "2026-0921-0924-11.043.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "caption": "白馬鑓ヶ岳山頂。走到這裡雲霧開始有散開的跡象。",
+      "blockMargin": "3rem",
+      "photos": [
+        "KCS05304.jpg",
+        "KCS05308.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        {
+          "column": [
+            "2026-0921-0827-32.970.jpg",
+            "2026-0921-1153-01.933.jpg"
+          ]
+        },
+        "2026-0921-1159-30.378.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "2026-0921-0908-08.733.jpg",
+        "2026-0921-1143-44.507.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "2026-0921-1246-44.285.jpg",
+        "2026-0921-1141-06.240.jpg",
+        "2026-0921-1142-52.382.jpg",
+        "2026-0921-1142-17.062.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "2026-0921-1214-04.557.jpg",
+        "2026-0921-1227-44.824.jpg",
+        "2026-0921-0926-09.229.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "2026-0921-1140-37.367.jpg",
+        "2026-0921-1140-47.897.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "2026-0921-1200-54.137.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "2026-0921-1232-25.136.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "2026-0921-1248-15.535.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "2026-0921-1250-09.451.jpg",
+        "2026-0921-1257-57.647.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "0.5rem",
+      "photos": [
+        "2026-0921-1315-14.368.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "blockMargin": "3rem",
+      "initialSlide": 1,
+      "photos": [
+        "KCS05320.jpg",
+        "KCS05353.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "在白馬鑓ヶ岳山頂時就有預感雲霧會散掉，所以在山屋吃完點心後（烏龍麵和山菜炒飯）決定輕裝爬回稜線看看。",
+      "captionPosition": "left bottom",
+      "blockMargin": "1rem",
+      "photos": [
+        "KCS05338.jpg",
+        "KCS05352.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS05365.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "大概花了80分鐘回到稜線岔路處，這時才第一次看到白馬鑓本體。「鑓」讀音與意思都和「槍」一樣，只是一個是和製漢字一個是中國傳進來的寫法。從這個角度看不出來，但從山下白馬村看過來確實稍可理解為何稱作白馬鑓ヶ岳。",
+      "captionPosition": "left top",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS05402.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "如願看到剱岳。從這個方向看過去呈現三角形。",
+      "captionPosition": "left top",
+      "photos": [
+        "KCS05414.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS05425.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS05429.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "用peak finder和google earth確認了很久還是不太確定，但應該是槍ヶ岳。",
+      "captionPosition": "left bottom",
+      "blockMargin": "5rem",
+      "photos": [
+        "KCS05441.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "text": "D3 白馬鑓温泉 - 猿倉"
+    },
+    {
+      "type": "PhotoCarousel",
+      "caption": "前一天回到山屋後決定隔天如果天氣晴朗，就再上稜線一次。三點多醒來時看預報是陰天，原本要睡回去，想想還是到山屋外做最後確認，出去一看滿天星斗，回頭拿裝備馬上出發，在日出前成功上到稜線上。",
+      "captionPosition": "left top",
+      "blockMargin": "1rem",
+      "photos": [
+        "KCS05482.jpg",
+        "KCS05495.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "0.5rem",
+      "photos": [
+        "KCS05494.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "blockMargin": "1rem",
+      "initialSlide": 1,
+      "photos": [
+        "KCS05507.jpg",
+        "KCS05506.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "blockMargin": "3rem",
+      "initialSlide": 1,
+      "photos": [
+        "KCS05523.jpg",
+        "KCS05524.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "光線灑在坡面上，讓我想起在雪山南壁坡面上看到的景色。",
+      "captionPosition": "left bottom",
+      "blockMargin": "1rem",
+      "photos": [
+        "KCS05504.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS05529.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "天狗山荘 |\n遠方是八ヶ岳山脈和南阿爾卑斯山脈。",
+      "captionPosition": "left bottom",
+      "blockMargin": "3rem",
+      "photos": [
+        "KCS05535.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS05538.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS05540.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS05539.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS05543.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "3rem",
+      "photos": [
+        "KCS05547.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "caption": "三天後的目的地。",
+      "blockMargin": "1rem",
+      "initialSlide": 2,
+      "photos": [
+        "KCS05552.jpg",
+        "KCS05563.jpg",
+        "KCS05553.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "3rem",
+      "photos": [
+        "KCS05556.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS05566.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS05578.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS05572.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS05583.jpg",
+        "KCS05589.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS05577.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "3rem",
+      "photos": [
+        "KCS05587.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "白馬鑓温泉 |\n此地冬季降雪量大，10月營業結束時會將山屋解體，待隔年6月再重新組裝。附近的白馬尻小屋同樣需要拆除過冬，不同處在於白馬尻小屋因為地勢平緩，可以利用直升機吊來除雪機將積雪吹除，白馬鑓温泉小屋因為坡度關係，只能等積雪自己融化。兩間山屋都需要十人以上、兩週的工時來完成重新組裝。",
+      "captionPosition": "left bottom",
+      "blockMargin": "3rem",
+      "photos": [
+        "2026-0922-0724-10.231.jpg",
+        "2026-0922-0725-40.878.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "2026-0922-0729-31.706.jpg",
+        "2026-0922-0730-48.797.jpg",
+        "2026-0922-0750-19.717.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "3rem",
+      "photos": [
+        "2026-0922-0751-07.062.jpg",
+        "2026-0922-0806-25.276.jpg",
+        "2026-0922-0807-58.820.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "2026-0922-0735-18.766.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "2026-0922-0742-40.210.jpg",
+        {
+          "column": [
+            "2026-0922-0749-01.662.jpg",
+            "2026-0922-0749-51.660.jpg"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "2026-0922-0752-45.066.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "3rem",
+      "photos": [
+        "2026-0922-0754-22.673.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "2026-0922-0832-09.932.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS05595.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS05603.jpg"
+      ]
+    }
+  ],
   "photos": [
     {
       "filename": "KCS05005.jpg",

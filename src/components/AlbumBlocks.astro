@@ -1,0 +1,77 @@
+---
+import Photo from "./Photo.astro";
+import Row from "./Row.astro";
+import Column from "./Column.astro";
+import PhotoCarousel from "./PhotoCarousel.astro";
+import PhotoPanorama from "./PhotoPanorama.astro";
+import Text from "./Text.astro";
+import { albumBlockPhotos } from "../lib/albums/blocks";
+import type { NormalizedAlbum } from "../lib/albums/types";
+
+interface Props {
+    album: NormalizedAlbum;
+}
+
+const { album } = Astro.props;
+const photos = new Map(album.photos.map((photo) => [photo.filename, photo]));
+const priorityFilename = albumBlockPhotos(album.blocks)[0];
+
+// The catalog guarantees every block photo is in the manifest inventory.
+const photoProps = (filename: string) => {
+    const photo = photos.get(filename);
+    if (photo === undefined) throw new Error(`Block photo ${filename} is not registered in ${album.slug}`);
+    return {
+        assetKey: photo.assetKey,
+        width: photo.width,
+        height: photo.height,
+        caption: photo.caption,
+        tags: photo.tags,
+        priority: filename === priorityFilename,
+    };
+};
+---
+
+{album.blocks.map((block) => {
+    switch (block.type) {
+        case "Text":
+            return (
+                <Text align={block.align} size={block.size} blockMargin={block.blockMargin}>
+                    <p>{block.text}</p>
+                </Text>
+            );
+        case "Row":
+            return (
+                <Row caption={block.caption} captionPosition={block.captionPosition} blockMargin={block.blockMargin}>
+                    {block.photos.map((item) => typeof item === "string"
+                        ? <Photo {...photoProps(item)} />
+                        : <Column>{item.column.map((filename) => <Photo {...photoProps(filename)} />)}</Column>
+                    )}
+                </Row>
+            );
+        case "PhotoCarousel":
+            return (
+                <PhotoCarousel
+                    caption={block.caption}
+                    captionPosition={block.captionPosition}
+                    blockMargin={block.blockMargin}
+                    initialSlide={block.initialSlide}
+                    peekPercent={block.peekPercent}
+                >
+                    {block.photos.map((filename) => <Photo {...photoProps(filename)} />)}
+                </PhotoCarousel>
+            );
+        case "PhotoPanorama":
+            return (
+                <PhotoPanorama
+                    caption={block.caption}
+                    captionPosition={block.captionPosition}
+                    blockMargin={block.blockMargin}
+                    initialSlide={block.initialSlide}
+                    initialView={block.initialView}
+                    panoramaSlices={block.panoramaSlices}
+                >
+                    {block.photos.map((filename) => <Photo {...photoProps(filename)} />)}
+                </PhotoPanorama>
+            );
+    }
+})}

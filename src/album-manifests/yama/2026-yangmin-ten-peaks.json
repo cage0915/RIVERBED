@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "title": "陽明山十連峰",
   "info": "2026.1",
   "order": 210,
@@ -14,6 +14,171 @@
       "y": 40
     }
   },
+  "blocks": [
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00911.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00923.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00943.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00937.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00965.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS00964.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "blockMargin": "1.5rem",
+      "initialSlide": 1,
+      "photos": [
+        "KCS00972.jpg",
+        "KCS00981.jpg",
+        "KCS00976.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00991.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS00978.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "@ 大屯山南峰",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS01005.jpg",
+        "KCS01008.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "caption": "@ 大屯山西峰",
+      "blockMargin": "1.5rem",
+      "initialSlide": 2,
+      "photos": [
+        "KCS01015.jpg",
+        "KCS01010.jpg",
+        "KCS01011.jpg",
+        "KCS01022.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS01067.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS01048.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS01065.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS01060.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS01071.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "淡江大橋",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS01062.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00950.jpg",
+        "KCS01090.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00891.jpg",
+        "KCS00956.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS01084.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "向天池",
+      "captionPosition": "center top",
+      "photos": [
+        "KCS01092.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS01093.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS01101.jpg"
+      ]
+    }
+  ],
   "photos": [
     {
       "filename": "KCS00911.jpg",

@@ -25,13 +25,6 @@ export function validateImageFilename(value: unknown) {
     return filename;
 }
 
-function createAlbumLayoutMdx(filenames: string[]) {
-    const photos = filenames.map(validateImageFilename);
-    if (photos.length === 0) throw new Error('Select at least one photo');
-    if (new Set(photos).size !== photos.length) throw new Error('Duplicate photo filenames are not allowed');
-    const rows = photos.map((filename) => `<Row>\n  <Photo itemKey="${filename}" />\n</Row>`);
-    return `---\n---\n\n${rows.join('\n\n')}\n`;
-}
 
 type AlbumImportOptions = {
     albumSlug: string;
@@ -42,7 +35,7 @@ type AlbumImportOptions = {
     order: number;
 };
 
-/** Build and cross-validate the two source files created for a new Album. */
+/** Build and validate the manifest created for a new Album: one Row per photo. */
 export function createAlbumImport({
     albumSlug,
     title,
@@ -52,10 +45,11 @@ export function createAlbumImport({
     order,
 }: AlbumImportOptions) {
     const date = publishedAt || new Date().toISOString().slice(0, 10);
-    const mdx = createAlbumLayoutMdx(filenames);
     const photos = filenames.map(validateImageFilename);
+    if (photos.length === 0) throw new Error('Select at least one photo');
+    if (new Set(photos).size !== photos.length) throw new Error('Duplicate photo filenames are not allowed');
     const manifest = parseAlbumManifest({
-        schemaVersion: 1,
+        schemaVersion: 2,
         title: String(title || '').trim(),
         publishedAt: date,
         order,
@@ -64,6 +58,7 @@ export function createAlbumImport({
             zoom: 1,
             offset: { x: 50, y: 50 },
         },
+        blocks: photos.map((filename) => ({ type: 'Row', photos: [filename] })),
         photos: photos.map((filename) => ({
             filename,
             ...(photoDimensions[filename] || {}),
@@ -74,11 +69,9 @@ export function createAlbumImport({
         albumSlug,
         manifestPath: `src/album-manifests/${albumSlug}.json`,
         manifest,
-        mdxPath: `src/content/albums/${albumSlug}.mdx`,
-        mdxBody: mdx,
     });
     if (diagnostics.length > 0) {
         throw new Error(`Invalid Album import proposal: ${diagnostics.map(({ code }) => code).join(', ')}`);
     }
-    return { mdx, manifest };
+    return { manifest };
 }

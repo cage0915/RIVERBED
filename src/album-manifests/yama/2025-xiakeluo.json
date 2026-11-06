@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "title": "霞喀羅",
   "info": "2025.11",
   "order": 160,
@@ -14,6 +14,105 @@
       "y": 50
     }
   },
+  "blocks": [
+    {
+      "type": "Row",
+      "photos": [
+        "KCS09966.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS09975.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS09981.jpg",
+        "KCS09988.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS09985.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS09970.jpg",
+        "KCS00001.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00049.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00017.jpg",
+        "KCS00023.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00011.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "initialSlide": 1,
+      "photos": [
+        "KCS00029.jpg",
+        "KCS00042.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "photos": [
+        "KCS00058.jpg",
+        "KCS00066.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00060.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00053.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00067.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00073.jpg",
+        "KCS00072.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00075.jpg"
+      ]
+    }
+  ],
   "photos": [
     {
       "filename": "KCS09966.jpg",

@@ -1,9 +1,14 @@
 import { normalizeAssetKey, validateAlbumSlug, validateLocalPhotoFilename } from "./keys.ts";
 import type {
+    AlbumBlock,
     AlbumManifest,
     ExternalCoverPhoto,
     LocalCoverPhoto,
+    PhotoCarouselBlock,
+    PhotoPanoramaBlock,
     PhotoTag,
+    RowBlock,
+    TextBlock,
 } from "./types.ts";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -49,6 +54,26 @@ function optionalPositiveInteger(value: unknown, field: string): number | undefi
         throw new Error(`${field} must be a positive integer`);
     }
     return number;
+}
+
+function optionalIntegerInRange(
+    value: unknown,
+    field: string,
+    min: number,
+    max: number,
+): number | undefined {
+    if (value === undefined) return undefined;
+    const number = requireFiniteNumber(value, field);
+    if (!Number.isInteger(number) || number < min || number > max) {
+        throw new Error(`${field} must be an integer from ${min} to ${max}`);
+    }
+    return number;
+}
+
+function optionalEnum<T extends string>(value: unknown, allowed: readonly T[], field: string): T | undefined {
+    if (value === undefined) return undefined;
+    if (!allowed.includes(value as T)) throw new Error(`${field} must be one of: ${allowed.join(", ")}`);
+    return value as T;
 }
 
 function requireCoordinate(value: unknown, field: string): number {
@@ -102,16 +127,94 @@ function parseCoverPhoto(value: unknown): LocalCoverPhoto | ExternalCoverPhoto {
     throw new Error("cover photo has an unsupported kind");
 }
 
+function parseBlockPhoto(value: unknown, field: string): string {
+    try {
+        return validateLocalPhotoFilename(requireString(value, field));
+    } catch (error) {
+        throw new Error(`${field}: ${error instanceof Error ? error.message : String(error)}`);
+    }
+}
+
+function parseBlockPhotos(value: unknown, field: string): string[] {
+    if (!Array.isArray(value) || value.length === 0) throw new Error(`${field} must be a non-empty array`);
+    return value.map((filename, index) => parseBlockPhoto(filename, `${field}[${index}]`));
+}
+
+/** Undefined optional fields are dropped so serialized blocks stay minimal. */
+function compact<T extends AlbumBlock>(value: T): T {
+    return Object.fromEntries(Object.entries(value).filter(([, entry]) => entry !== undefined)) as T;
+}
+
+const MEDIA_BLOCK_FIELDS = ["type", "caption", "captionPosition", "blockMargin", "photos"];
+
+function parseBlock(value: unknown, index: number): AlbumBlock {
+    const field = `block ${index}`;
+    const block = requireRecord(value, field);
+    const media = {
+        caption: optionalString(block.caption, `${field} caption`),
+        captionPosition: optionalString(block.captionPosition, `${field} captionPosition`),
+        blockMargin: optionalString(block.blockMargin, `${field} blockMargin`),
+    };
+    switch (block.type) {
+        case "Text":
+            rejectUnknownFields(block, ["type", "align", "size", "blockMargin", "text"], field);
+            return compact<TextBlock>({
+                type: "Text",
+                align: optionalEnum(block.align, ["left", "center", "right"] as const, `${field} align`),
+                size: optionalEnum(block.size, ["caption", "title"] as const, `${field} size`),
+                blockMargin: media.blockMargin,
+                text: requireString(block.text, `${field} text`),
+            });
+        case "Row": {
+            rejectUnknownFields(block, MEDIA_BLOCK_FIELDS, field);
+            if (!Array.isArray(block.photos) || block.photos.length === 0) {
+                throw new Error(`${field} photos must be a non-empty array`);
+            }
+            const photos = block.photos.map((item, itemIndex) => {
+                const itemField = `${field} photos[${itemIndex}]`;
+                if (typeof item === "string") return parseBlockPhoto(item, itemField);
+                const column = requireRecord(item, itemField);
+                rejectUnknownFields(column, ["column"], itemField);
+                const members = parseBlockPhotos(column.column, `${itemField} column`);
+                if (members.length < 2) throw new Error(`${itemField} column must hold at least two photos`);
+                return { column: members };
+            });
+            return compact<RowBlock>({ type: "Row", ...media, photos });
+        }
+        case "PhotoCarousel":
+            rejectUnknownFields(block, [...MEDIA_BLOCK_FIELDS, "initialSlide", "peekPercent"], field);
+            return compact<PhotoCarouselBlock>({
+                type: "PhotoCarousel",
+                ...media,
+                initialSlide: optionalIntegerInRange(block.initialSlide, `${field} initialSlide`, 0, Number.MAX_SAFE_INTEGER),
+                peekPercent: optionalIntegerInRange(block.peekPercent, `${field} peekPercent`, 0, 90),
+                photos: parseBlockPhotos(block.photos, `${field} photos`),
+            });
+        case "PhotoPanorama":
+            rejectUnknownFields(block, [...MEDIA_BLOCK_FIELDS, "initialSlide", "initialView", "panoramaSlices"], field);
+            return compact<PhotoPanoramaBlock>({
+                type: "PhotoPanorama",
+                ...media,
+                initialSlide: optionalIntegerInRange(block.initialSlide, `${field} initialSlide`, 0, Number.MAX_SAFE_INTEGER),
+                initialView: optionalEnum(block.initialView, ["carousel", "panorama"] as const, `${field} initialView`),
+                panoramaSlices: optionalIntegerInRange(block.panoramaSlices, `${field} panoramaSlices`, 1, 24),
+                photos: parseBlockPhotos(block.photos, `${field} photos`),
+            });
+        default:
+            throw new Error(`${field} has an unsupported type`);
+    }
+}
+
 export function parseAlbumManifest(input: unknown, albumSlug: string): AlbumManifest {
     validateAlbumSlug(albumSlug);
     const manifest = requireRecord(input, "album manifest");
     rejectUnknownFields(
         manifest,
-        ["schemaVersion", "title", "info", "publishedAt", "order", "gap", "cover", "photos"],
+        ["schemaVersion", "title", "info", "publishedAt", "order", "gap", "cover", "blocks", "photos"],
         "album manifest",
     );
 
-    if (manifest.schemaVersion !== 1) {
+    if (manifest.schemaVersion !== 2) {
         throw new Error("album manifest has an unsupported schemaVersion");
     }
     const title = requireString(manifest.title, "title");
@@ -136,6 +239,9 @@ export function parseAlbumManifest(input: unknown, albumSlug: string): AlbumMani
         x: requireCoordinate(offsetInput.x, "cover offset x"),
         y: requireCoordinate(offsetInput.y, "cover offset y"),
     };
+
+    if (!Array.isArray(manifest.blocks)) throw new Error("blocks must be an array");
+    const blocks = manifest.blocks.map(parseBlock);
 
     if (!Array.isArray(manifest.photos)) throw new Error("photos must be an array");
     const filenames = new Set<string>();
@@ -172,13 +278,14 @@ export function parseAlbumManifest(input: unknown, albumSlug: string): AlbumMani
     }
 
     return {
-        schemaVersion: 1,
+        schemaVersion: 2,
         title,
         info: optionalString(manifest.info, "info"),
         publishedAt,
         order,
         gap: optionalString(manifest.gap, "gap"),
         cover: { photo: coverPhoto, zoom, offset },
+        blocks,
         photos,
     };
 }

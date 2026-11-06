@@ -31,7 +31,7 @@ function filesBelow(root, relativeRoot, predicate = () => true) {
 
 function manifest(overrides = {}) {
     return {
-        schemaVersion: 1,
+        schemaVersion: 2,
         title: "Album",
         order: 10,
         cover: {
@@ -39,6 +39,7 @@ function manifest(overrides = {}) {
             zoom: 1,
             offset: { x: 50, y: 50 },
         },
+        blocks: [{ type: "Row", photos: ["content.jpg"] }],
         photos: [
             { filename: "content.jpg", tags: [] },
             { filename: "cover.jpg", tags: [] },
@@ -47,11 +48,9 @@ function manifest(overrides = {}) {
     };
 }
 
-function createCutoverRepository() {
+function createRepository() {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), "album-manifest-repository-"));
-    write(root, "src/content/albums/yama/source.mdx", `---\n---\n\n<Photo itemKey="content.jpg" />\n`);
     write(root, "src/album-manifests/yama/source.json", JSON.stringify(manifest({ title: "Source" })));
-    write(root, "src/content/albums/yama/consumer.mdx", `---\n---\n\n<Photo itemKey="own.jpg" />\n`);
     write(root, "src/album-manifests/yama/consumer.json", JSON.stringify(manifest({
         title: "Consumer",
         order: 20,
@@ -60,6 +59,7 @@ function createCutoverRepository() {
             zoom: 1.2,
             offset: { x: 40, y: 60 },
         },
+        blocks: [{ type: "Row", photos: ["own.jpg"] }],
         photos: [{ filename: "own.jpg", tags: [] }],
     })));
     return root;
@@ -74,16 +74,16 @@ function diagnosticLocations(diagnostics) {
 test("production Album and Tag rendering read manifests through the catalog", () => {
     const sourceRoot = path.join(projectRoot, "src");
     const albumPage = fs.readFileSync(path.join(sourceRoot, "pages/[folder]/[album].astro"), "utf8");
+    const albumBlocks = fs.readFileSync(path.join(sourceRoot, "components/AlbumBlocks.astro"), "utf8");
     const photoComponent = fs.readFileSync(path.join(sourceRoot, "components/Photo.astro"), "utf8");
-    const albumPhotoComponent = fs.readFileSync(path.join(sourceRoot, "components/AlbumPhoto.astro"), "utf8");
     const photoFallback = fs.readFileSync(path.join(sourceRoot, "scripts/dev-tool/photo-fallback.ts"), "utf8");
     const tagPage = fs.readFileSync(path.join(sourceRoot, "pages/yama/tags/[tag].astro"), "utf8");
 
-    assert.doesNotMatch(albumPage, /albumEntry\.data\.(?:title|info|gap)/);
+    assert.doesNotMatch(albumPage, /astro:content|albumEntry/);
     for (const field of ["title", "info", "gap"]) assert.match(albumPage, new RegExp(`albumRecord\\.${field}`));
-    assert.match(albumPage, /AlbumPhoto/);
+    assert.match(albumPage, /<AlbumBlocks album=\{albumRecord\} \/>/);
     assert.doesNotMatch(photoComponent, /album-tags|import\.meta\.glob|Astro\.url\.pathname/);
-    assert.match(albumPhotoComponent, /caption=\{photo\.caption\}/);
+    assert.match(albumBlocks, /caption: photo\.caption/);
     assert.match(photoComponent, /photo-caption--photo/);
     assert.match(photoComponent, /<RichText text=\{caption\}/);
     assert.match(tagPage, /caption=\{photo\.caption\}/);
@@ -101,7 +101,7 @@ test("production Album and Tag rendering read manifests through the catalog", ()
     assert.equal(fs.existsSync(path.join(sourceRoot, "utils/tags.ts")), false);
 });
 
-test("production repository pairs every minimal MDX source with a valid manifest", () => {
+test("production repository holds only valid Album manifests", () => {
     const result = validateAlbumRepository(projectRoot);
     assert.ok(result.albumCount > 0);
     assert.equal(result.validCount, result.albumCount);
@@ -117,6 +117,7 @@ test("production repository pairs every minimal MDX source with a valid manifest
     const catalogPath = path.join(projectRoot, "src/lib/albums/catalog.ts");
     const catalogSource = fs.readFileSync(catalogPath, "utf8");
     assert.match(catalogSource, /import\.meta\.glob\(\s*["']\/src\/album-manifests\/\*\*\/\*\.json["']/);
+    assert.doesNotMatch(catalogSource, /astro:content|getCollection/);
     for (const api of ["getAlbumCatalog", "getAlbumSummaries", "getAlbumBySlug", "getTaggedPhotos"]) {
         assert.match(catalogSource, new RegExp(`export\\s+(?:async\\s+)?function\\s+${api}\\b`));
     }
@@ -139,121 +140,67 @@ test("production readers use the manifest catalog instead of frontmatter or orde
     );
 });
 
-test("repository contains no retired storage or mutable Album frontmatter", () => {
-    assert.deepEqual([
-        ...filesBelow(projectRoot, "src/album-tags", (entry) => entry.endsWith(".json")),
-        ...filesBelow(projectRoot, "src/content/albums", (entry) => path.basename(entry) === "_order.json"),
-    ], []);
-    const forbidden = /^(?:title|coverKey|coverZoom|coverOffset|publishedAt|info|order|gap):/m;
-    for (const mdxPath of filesBelow(projectRoot, "src/content/albums", (entry) => entry.endsWith(".mdx"))) {
-        const frontmatter = /^---\r?\n([\s\S]*?)\r?\n---/.exec(fs.readFileSync(mdxPath, "utf8"))?.[1] ?? "";
-        assert.doesNotMatch(frontmatter, forbidden, path.relative(projectRoot, mdxPath));
-    }
+test("repository contains no retired Album storage", () => {
+    assert.deepEqual(filesBelow(projectRoot, "src/album-tags", (entry) => entry.endsWith(".json")), []);
+    assert.equal(fs.existsSync(path.join(projectRoot, "src/content")), false);
+    assert.equal(fs.existsSync(path.join(projectRoot, "src/content.config.ts")), false);
 });
 
-test("post-cutover configuration validates manifests before contour preparation", () => {
+test("Album build configuration validates manifests and carries no MDX pipeline", () => {
     const packageJson = JSON.parse(fs.readFileSync(path.join(projectRoot, "package.json"), "utf8"));
-    const contentConfig = fs.readFileSync(path.join(projectRoot, "src/content.config.ts"), "utf8");
-    assert.match(contentConfig, /schema:\s*z\.object\(\{\}\)\.strict\(\)/);
-    assert.doesNotMatch(contentConfig, /title|coverKey|publishedAt|coverZoom|coverOffset|\border\b|\bgap\b/);
+    const astroConfig = fs.readFileSync(path.join(projectRoot, "astro.config.mjs"), "utf8");
+    assert.doesNotMatch(astroConfig, /@astrojs\/mdx|mdx\(\)/);
+    assert.equal(packageJson.dependencies["@astrojs/mdx"], undefined);
     assert.equal(packageJson.scripts.prebuild, "node --import tsx scripts/validate-album-repository.mjs && node scripts/prepare-contour-assets.mjs prepare");
     assert.equal(packageJson.scripts["albums:validate"], "node --import tsx scripts/validate-album-repository.mjs");
     assert.match(packageJson.devDependencies.tsx, /^\^/);
 });
 
-test("post-cutover validator accepts paired minimal sources", () => {
-    assert.deepEqual(validateAlbumRepository(createCutoverRepository()), {
+test("validator accepts valid manifests", () => {
+    assert.deepEqual(validateAlbumRepository(createRepository()), {
         albumCount: 2,
         validCount: 2,
         diagnostics: [],
     });
 });
 
-test("post-cutover validator accumulates missing, orphan, and independent source failures", () => {
-    const root = createCutoverRepository();
-    const consumerMdx = path.join(root, "src/content/albums/yama/consumer.mdx");
+test("validator accumulates independent manifest failures", () => {
+    const root = createRepository();
     const consumerManifest = path.join(root, "src/album-manifests/yama/consumer.json");
-    const orphanManifest = path.join(root, "src/album-manifests/yama/orphan.json");
-    fs.unlinkSync(consumerManifest);
-    fs.writeFileSync(consumerMdx, `---\n---\n\n<Photo itemKey={dynamic} />\n`);
-    fs.writeFileSync(orphanManifest, "{}");
+    const brokenManifest = path.join(root, "src/album-manifests/yama/broken.json");
+    const consumer = JSON.parse(fs.readFileSync(consumerManifest, "utf8"));
+    consumer.blocks.push({ type: "PhotoCarousel", photos: ["missing.jpg"] });
+    fs.writeFileSync(consumerManifest, JSON.stringify(consumer));
+    fs.writeFileSync(brokenManifest, "{");
 
     const result = validateAlbumRepository(root);
-    assert.deepEqual({ albumCount: result.albumCount, validCount: result.validCount }, { albumCount: 2, validCount: 1 });
+    assert.deepEqual({ albumCount: result.albumCount, validCount: result.validCount }, { albumCount: 3, validCount: 1 });
     assert.deepEqual(diagnosticLocations(result.diagnostics), [
         {
-            code: "missing-album-manifest",
+            code: "invalid-album-manifest",
+            albumSlug: "yama/broken",
+            sourcePath: brokenManifest,
+            manifestPath: brokenManifest,
+            fieldPath: "manifest",
+        },
+        {
+            code: "block-photo-missing-from-manifest",
             albumSlug: "yama/consumer",
             sourcePath: consumerManifest,
             manifestPath: consumerManifest,
-            fieldPath: "manifest",
-        },
-        {
-            code: "mdx-photo-syntax",
-            albumSlug: "yama/consumer",
-            sourcePath: consumerMdx,
-            manifestPath: consumerManifest,
-            fieldPath: "Photo@1",
-        },
-        {
-            code: "invalid-album-manifest",
-            albumSlug: "yama/orphan",
-            sourcePath: orphanManifest,
-            manifestPath: orphanManifest,
-            fieldPath: "manifest",
-        },
-        {
-            code: "orphan-album-manifest",
-            albumSlug: "yama/orphan",
-            sourcePath: orphanManifest,
-            manifestPath: orphanManifest,
-            fieldPath: "slug",
+            fieldPath: "blocks",
         },
     ]);
 });
 
-test("post-cutover validator attributes invalid MDX and manifests independently", () => {
-    const invalidMdxRoot = createCutoverRepository();
-    const invalidMdxPath = path.join(invalidMdxRoot, "src/content/albums/yama/consumer.mdx");
-    const pairedManifestPath = path.join(invalidMdxRoot, "src/album-manifests/yama/consumer.json");
-    fs.writeFileSync(invalidMdxPath, `---\ntitle: "retired"\n---\n\n<Photo itemKey="own.jpg" />\n`);
-    assert.deepEqual(diagnosticLocations(validateAlbumRepository(invalidMdxRoot).diagnostics), [{
-        code: "invalid-album-mdx",
-        albumSlug: "yama/consumer",
-        sourcePath: invalidMdxPath,
-        manifestPath: pairedManifestPath,
-        fieldPath: "frontmatter",
-    }]);
-
-    const invalidManifestRoot = createCutoverRepository();
-    const validMdxPath = path.join(invalidManifestRoot, "src/content/albums/yama/consumer.mdx");
-    const invalidManifestPath = path.join(invalidManifestRoot, "src/album-manifests/yama/consumer.json");
-    fs.writeFileSync(invalidManifestPath, "{");
-    assert.deepEqual(diagnosticLocations(validateAlbumRepository(invalidManifestRoot).diagnostics), [{
-        code: "invalid-album-manifest",
-        albumSlug: "yama/consumer",
-        sourcePath: invalidManifestPath,
-        manifestPath: invalidManifestPath,
-        fieldPath: "manifest",
-    }]);
-    assert.match(fs.readFileSync(validMdxPath, "utf8"), /^---\n---\n/);
-});
-
-test("post-cutover validator deterministically attributes both retired storage forms", () => {
-    const root = createCutoverRepository();
+test("validator deterministically attributes both retired storage forms", () => {
+    const root = createRepository();
     const tagsPath = path.join(root, "src/album-tags/yama/source.json");
-    const orderPath = path.join(root, "src/content/albums/yama/_order.json");
+    const mdxPath = path.join(root, "src/content/albums/yama/source.mdx");
     write(root, "src/album-tags/yama/source.json", "{}");
-    write(root, "src/content/albums/yama/_order.json", "[]");
+    write(root, "src/content/albums/yama/source.mdx", "---\n---\n");
     const result = validateAlbumRepository(root);
     assert.deepEqual(diagnosticLocations(result.diagnostics), [
-        {
-            code: "retired-album-order-file",
-            albumSlug: "yama/*",
-            sourcePath: orderPath,
-            manifestPath: path.join(root, "src/album-manifests/yama"),
-            fieldPath: "order",
-        },
         {
             code: "retired-album-tag-sidecar",
             albumSlug: "yama/source",
@@ -261,12 +208,19 @@ test("post-cutover validator deterministically attributes both retired storage f
             manifestPath: path.join(root, "src/album-manifests/yama/source.json"),
             fieldPath: "tags",
         },
+        {
+            code: "retired-album-mdx",
+            albumSlug: "yama/source",
+            sourcePath: mdxPath,
+            manifestPath: path.join(root, "src/album-manifests/yama/source.json"),
+            fieldPath: "blocks",
+        },
     ]);
     assert.deepEqual(validateAlbumRepository(root), result);
 });
 
-test("post-cutover validator runs catalog diagnostics alongside retired-storage diagnostics", () => {
-    const root = createCutoverRepository();
+test("validator runs catalog diagnostics alongside retired-storage diagnostics", () => {
+    const root = createRepository();
     const tagsPath = path.join(root, "src/album-tags/yama/consumer.json");
     const sourceManifest = path.join(root, "src/album-manifests/yama/source.json");
     const consumerManifest = path.join(root, "src/album-manifests/yama/consumer.json");
@@ -292,27 +246,12 @@ test("post-cutover validator runs catalog diagnostics alongside retired-storage 
     ]);
 });
 
-test("manifest-global checks remain safe when paired MDX is invalid", () => {
-    const root = createCutoverRepository();
-    const sourceMdx = path.join(root, "src/content/albums/yama/source.mdx");
-    const consumerManifest = path.join(root, "src/album-manifests/yama/consumer.json");
-    fs.writeFileSync(sourceMdx, "missing frontmatter");
-    const consumer = JSON.parse(fs.readFileSync(consumerManifest, "utf8"));
-    consumer.order = 10;
-    fs.writeFileSync(consumerManifest, JSON.stringify(consumer));
-    const diagnostics = validateAlbumRepository(root).diagnostics;
-    assert.equal(diagnostics.some(({ code }) => code === "duplicate-album-order"), true);
-    assert.equal(diagnostics.some(({ code }) => code === "external-cover-source-missing"), false);
-});
-
-test("repository validator rejects missing and empty required roots through the CLI", () => {
+test("repository validator rejects a missing or empty manifest root through the CLI", () => {
     const missingRoot = fs.mkdtempSync(path.join(os.tmpdir(), "album-roots-missing-"));
     assert.deepEqual(validateAlbumRepository(missingRoot).diagnostics.map(({ code }) => code), [
         "missing-album-manifest-root",
-        "missing-album-mdx-root",
     ]);
     const emptyRoot = fs.mkdtempSync(path.join(os.tmpdir(), "album-roots-empty-"));
-    fs.mkdirSync(path.join(emptyRoot, "src/content/albums"), { recursive: true });
     fs.mkdirSync(path.join(emptyRoot, "src/album-manifests"), { recursive: true });
     const errors = [];
     assert.equal(runValidationCli({ projectRoot: emptyRoot, stdout: () => {}, stderr: (message) => errors.push(message) }), 1);
@@ -321,13 +260,12 @@ test("repository validator rejects missing and empty required roots through the 
 
 test("repository validator rejects source symlinks without following them", () => {
     for (const item of [
-        { relativePath: "src/content/albums/yama/linked.mdx", kind: "file" },
         { relativePath: "src/album-manifests/yama/linked.json", kind: "file" },
-        { relativePath: "src/content/albums/linked", kind: "directory" },
+        { relativePath: "src/album-manifests/linked", kind: "directory" },
     ]) {
-        const root = createCutoverRepository();
+        const root = createRepository();
         const outside = fs.mkdtempSync(path.join(os.tmpdir(), "album-source-outside-"));
-        const target = item.kind === "directory" ? outside : path.join(outside, "outside.mdx");
+        const target = item.kind === "directory" ? outside : path.join(outside, "outside.json");
         if (item.kind === "file") fs.writeFileSync(target, "outside");
         const linkPath = path.join(root, item.relativePath);
         fs.mkdirSync(path.dirname(linkPath), { recursive: true });
@@ -348,19 +286,17 @@ test("repository validator rejects source symlinks without following them", () =
     }
 });
 
-test("repository validator rejects invalid derived slugs without pairing noise", () => {
-    const root = createCutoverRepository();
-    write(root, "src/content/albums/yama/nested/album.mdx", "---\n---\n");
+test("repository validator rejects invalid derived slugs", () => {
+    const root = createRepository();
     write(root, "src/album-manifests/yama/nested/album.json", "{}");
-    write(root, "src/content/albums/yama/Bad.mdx", "---\n---\n");
     write(root, "src/album-manifests/yama/Bad.json", "{}");
     const diagnostics = validateAlbumRepository(root).diagnostics;
-    assert.equal(diagnostics.filter(({ code }) => code === "invalid-album-slug").length, 4);
-    assert.equal(diagnostics.some(({ code }) => ["missing-album-manifest", "orphan-album-manifest"].includes(code)), false);
+    assert.equal(diagnostics.filter(({ code }) => code === "invalid-album-slug").length, 2);
+    assert.equal(diagnostics.some(({ code }) => code === "invalid-album-manifest"), false);
 });
 
 test("repository validator rejects symlinks in optional retired tag storage", () => {
-    const rootSymlinkProject = createCutoverRepository();
+    const rootSymlinkProject = createRepository();
     const rootOutside = fs.mkdtempSync(path.join(os.tmpdir(), "retired-tags-root-outside-"));
     fs.writeFileSync(path.join(rootOutside, "outside.json"), "{}");
     fs.symlinkSync(rootOutside, path.join(rootSymlinkProject, "src/album-tags"), "dir");
@@ -368,7 +304,7 @@ test("repository validator rejects symlinks in optional retired tag storage", ()
         "unsafe-retired-storage",
     ]);
 
-    const root = createCutoverRepository();
+    const root = createRepository();
     const outside = fs.mkdtempSync(path.join(os.tmpdir(), "retired-tags-outside-"));
     const outsideFile = path.join(outside, "outside.json");
     fs.writeFileSync(outsideFile, "{}");

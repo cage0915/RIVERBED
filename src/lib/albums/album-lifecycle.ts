@@ -14,9 +14,9 @@ import path from 'node:path';
 
 import { normalizeAssetKey, validateAlbumSlug, validateLocalPhotoFilename } from './keys.ts';
 import { parseAlbumManifest } from './manifest-schema.ts';
-import { extractMdxPhotos } from './mdx-photos.ts';
+import { albumBlockPhotos, renameAlbumBlockPhotos } from './blocks.ts';
 import { validateAlbumInventory } from './validation.ts';
-import type { AlbumManifest } from './types.ts';
+import type { AlbumBlock, AlbumManifest } from './types.ts';
 import { readAlbumManifestFile, readAllAlbumManifestFiles, withAlbumManifestLocks } from './manifest-files.ts';
 
 export class AlbumAssetConflictError extends Error {
@@ -86,29 +86,11 @@ export async function withR2SourceAlbumLocks<T>(
     return withAlbumManifestLocks(projectRoot, sourceSlugs, operation);
 }
 
-function replaceMdxPhotoFilenames(mdx: string, renameMap: Map<string, string>): string {
-    // Offsets come from the project-scoped extractor, so code examples and comments stay untouched.
-    const references = extractMdxPhotos(mdx);
-    let result = mdx;
-    for (const reference of [...references].sort((a, b) => b.offset - a.offset)) {
-        const replacement = renameMap.get(reference.filename);
-        if (replacement === undefined) continue;
-        const tag = reference.context.replace(
-            /(\bitemKey\s*=\s*)(["'])([^"']+)(\2)/,
-            (_attribute, prefix, quote, _filename, closingQuote) =>
-                `${prefix}${quote}${replacement}${closingQuote}`,
-        );
-        result = `${result.slice(0, reference.offset)}${tag}${result.slice(reference.offset + reference.context.length)}`;
-    }
-    return result;
-}
-
 export function buildPhotoRenameProposal(input: {
     albumSlug: string;
-    mdx: string;
     manifests: Record<string, AlbumManifest>;
     renameMap: Map<string, string>;
-}): { mdx: string; manifests: Record<string, AlbumManifest> } {
+}): { manifests: Record<string, AlbumManifest> } {
     const albumSlug = validateAlbumSlug(input.albumSlug);
     const source = input.manifests[albumSlug];
     if (!source) throw new Error(`Album manifest not found: ${albumSlug}`);
@@ -127,7 +109,6 @@ export function buildPhotoRenameProposal(input: {
         throw new Error('Photo rename would create duplicate manifest filenames');
     }
 
-    const mdx = replaceMdxPhotoFilenames(input.mdx, renameMap);
     const manifests = Object.fromEntries(Object.entries(input.manifests).map(([slug, manifest]) => {
         let proposed: AlbumManifest = manifest;
         if (slug === albumSlug) {
@@ -142,6 +123,7 @@ export function buildPhotoRenameProposal(input: {
                         },
                     }
                     : manifest.cover,
+                blocks: renameAlbumBlockPhotos(manifest.blocks, (filename) => renameMap.get(filename) ?? filename),
                 photos: manifest.photos.map((photo) => ({
                     ...photo,
                     filename: renameMap.get(photo.filename) ?? photo.filename,
@@ -170,13 +152,11 @@ export function buildPhotoRenameProposal(input: {
         albumSlug,
         manifestPath: `src/album-manifests/${albumSlug}.json`,
         manifest: manifests[albumSlug],
-        mdxPath: `src/content/albums/${albumSlug}.mdx`,
-        mdxBody: mdx,
     });
     if (diagnostics.length > 0) {
         throw new Error(`Invalid photo rename proposal: ${diagnostics.map(({ code }) => code).join(', ')}`);
     }
-    return { mdx, manifests };
+    return { manifests };
 }
 
 type RenameItem = {
@@ -524,8 +504,6 @@ export async function executeAlbumPhotoRename(
     return withAlbumManifestLocks(projectRoot, lockSlugs, async () => {
         const manifests = await readAllAlbumManifestFiles(projectRoot);
         const r2Directory = path.resolve(projectRoot, 'r2', albumSlug);
-        const mdxPath = path.resolve(projectRoot, 'src/content/albums', `${albumSlug}.mdx`);
-        const mdx = await readFile(mdxPath, 'utf8');
         const items = await buildSequentialRenamePlan(r2Directory, albumSlug, orderedKeys);
         const blocking = items.filter(({ status }) => ['missing', 'conflict', 'duplicate'].includes(status));
         if (blocking.length > 0) throw new AlbumRenamePlanError(items);
@@ -534,17 +512,14 @@ export async function executeAlbumPhotoRename(
             .map(({ oldName, newName }) => [oldName, newName]));
         if (renameMap.size === 0) return { items, renamed: {} };
 
-        const proposal = buildPhotoRenameProposal({ albumSlug, mdx, manifests, renameMap });
+        const proposal = buildPhotoRenameProposal({ albumSlug, manifests, renameMap });
         const changedSlugs = Object.keys(manifests).filter((slug) =>
             JSON.stringify(proposal.manifests[slug]) !== JSON.stringify(manifests[slug])
         );
-        const sourceProposals: SourceProposal[] = [
-            { target: mdxPath, content: proposal.mdx },
-            ...changedSlugs.map((slug) => ({
-                target: path.resolve(projectRoot, 'src/album-manifests', `${slug}.json`),
-                content: `${JSON.stringify(proposal.manifests[slug], null, 2)}\n`,
-            })),
-        ];
+        const sourceProposals: SourceProposal[] = changedSlugs.map((slug) => ({
+            target: path.resolve(projectRoot, 'src/album-manifests', `${slug}.json`),
+            content: `${JSON.stringify(proposal.manifests[slug], null, 2)}\n`,
+        }));
 
         const applyR2Plan = operations.applyR2Plan ?? ((directory, plan) =>
             applyLocalR2RenamePlan(directory, plan, operations.renameR2Path));
@@ -632,7 +607,7 @@ async function createSourceFilesAtomically(
 export async function commitAlbumImportSources(
     projectRoot: string,
     albumSlugInput: string,
-    proposal: { mdx: string; manifest: AlbumManifest },
+    proposal: { manifest: AlbumManifest },
     assets: Array<{ name: string; bytes: Uint8Array }> = [],
     operations: { writeAsset?: typeof writeFile; sourceFiles?: SourceFileOperations } = {},
 ): Promise<{ copied: string[]; skipped: string[] }> {
@@ -642,8 +617,6 @@ export async function commitAlbumImportSources(
         albumSlug,
         manifestPath: `src/album-manifests/${albumSlug}.json`,
         manifest,
-        mdxPath: `src/content/albums/${albumSlug}.mdx`,
-        mdxBody: proposal.mdx,
     });
     if (diagnostics.length > 0) {
         throw new Error(`Invalid Album import proposal: ${diagnostics.map(({ code }) => code).join(', ')}`);
@@ -660,8 +633,6 @@ export async function commitAlbumImportSources(
             albumSlug,
             manifestPath: `src/album-manifests/${albumSlug}.json`,
             manifest: finalManifest,
-            mdxPath: `src/content/albums/${albumSlug}.mdx`,
-            mdxBody: proposal.mdx,
         });
         if (finalDiagnostics.length > 0) {
             throw new Error(`Invalid Album import proposal: ${finalDiagnostics.map(({ code }) => code).join(', ')}`);
@@ -673,10 +644,6 @@ export async function commitAlbumImportSources(
                 {
                     target: path.resolve(projectRoot, 'src/album-manifests', `${albumSlug}.json`),
                     content: `${JSON.stringify(finalManifest, null, 2)}\n`,
-                },
-                {
-                    target: path.resolve(projectRoot, 'src/content/albums', `${albumSlug}.mdx`),
-                    content: proposal.mdx,
                 },
             ], operations.sourceFiles);
         } catch (error) {
@@ -798,9 +765,6 @@ export async function commitAlbumAssets(
     const albumSlug = validateAlbumSlug(albumSlugInput);
     return withAlbumManifestLocks(projectRoot, [albumSlug], async () => {
         await readAlbumManifestFile(projectRoot, albumSlug);
-        const mdxPath = path.resolve(projectRoot, 'src/content/albums', `${albumSlug}.mdx`);
-        await assertSafeWorkspacePath(projectRoot, mdxPath, 'Album MDX source');
-        if (!await pathExists(mdxPath)) throw new Error(`Album source does not exist: ${albumSlug}`);
         return commitAlbumAssetsWithinLock(projectRoot, albumSlug, assets);
     });
 }
@@ -861,7 +825,6 @@ export async function deleteAlbumSourceFiles(
             throw new AlbumLifecycleConflictError(blockingKey, consumers);
         }
         const candidates = [
-            path.resolve(projectRoot, 'src/content/albums', `${albumSlug}.mdx`),
             path.resolve(projectRoot, 'src/album-manifests', `${albumSlug}.json`),
         ];
         const existing: string[] = [];
@@ -923,7 +886,7 @@ export async function deleteAlbumSourceFiles(
 export function buildAlbumPageProposal(input: {
     albumSlug: string;
     manifest: AlbumManifest;
-    mdx: string;
+    blocks: AlbumBlock[];
     importedFilenames: string[];
     importedPhotoDimensions?: Record<string, { width: number; height: number }>;
     metadata?: Pick<AlbumManifest, 'title' | 'info' | 'gap'>;
@@ -932,8 +895,7 @@ export function buildAlbumPageProposal(input: {
     const current = parseAlbumManifest(input.manifest, albumSlug);
     const imported = new Set(input.importedFilenames.map(validateLocalPhotoFilename));
     const existingByFilename = new Map(current.photos.map((photo) => [photo.filename, photo]));
-    const references = extractMdxPhotos(input.mdx);
-    const contentFilenames = references.map(({ filename }) => filename);
+    const contentFilenames = albumBlockPhotos(input.blocks);
     for (const filename of contentFilenames) {
         if (!existingByFilename.has(filename) && !imported.has(filename)) {
             throw new Error(`Photo is not tracked or imported: ${filename}`);
@@ -957,14 +919,13 @@ export function buildAlbumPageProposal(input: {
     const proposed = parseAlbumManifest({
         ...current,
         ...(input.metadata ?? {}),
+        blocks: input.blocks,
         photos,
     }, albumSlug);
     const diagnostics = validateAlbumInventory({
         albumSlug,
         manifestPath: `src/album-manifests/${albumSlug}.json`,
         manifest: proposed,
-        mdxPath: `src/content/albums/${albumSlug}.mdx`,
-        mdxBody: input.mdx,
     });
     if (diagnostics.length > 0) {
         throw new Error(`Invalid Page Manager proposal: ${diagnostics.map(({ code }) => code).join(', ')}`);

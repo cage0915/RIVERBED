@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "title": "卑南溪・光復溪",
   "info": "2022.3",
   "order": 10,
@@ -14,6 +14,82 @@
       "y": 50
     }
   },
+  "blocks": [
+    {
+      "type": "Row",
+      "caption": "半屏山",
+      "captionPosition": "left top",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "000885290009.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "鸞山",
+      "captionPosition": "left top",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "000885290020.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "卑南溪",
+      "captionPosition": "left top",
+      "photos": [
+        "000885290014.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "利吉惡地",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "000885290023.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "000885290024.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "000885290027.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "太巴塱",
+      "captionPosition": "left top",
+      "photos": [
+        "000885290033.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "000885290034.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "000885290035.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "000885290036.jpg"
+      ]
+    }
+  ],
   "photos": [
     {
       "filename": "000885290009.jpg",

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "title": "Hitchhike",
   "info": "2016",
   "order": 40,
@@ -14,6 +14,351 @@
       "y": 50
     }
   },
+  "blocks": [
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "三地門.萬巒"
+    },
+    {
+      "type": "Row",
+      "caption": "沿山公路/屏185（右）| 大叔說，沿山公路管轄分屬山地鄉和平地鄉，對山地鄉來說是主要道路但對平地鄉來說不是，所以沿途道路有平整也有不平整。",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "001.jpg",
+        "002.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "枋寮.鵝鑾鼻.恆春"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "003.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "枋寮漁港",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "004.jpg",
+        "005.jpg",
+        "006.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "007.jpg",
+        "008.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "009.jpg",
+        "010.jpg",
+        "011.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "012.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "2rem",
+      "photos": [
+        "013.jpg",
+        "014.jpg",
+        "015.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "知本"
+    },
+    {
+      "type": "Row",
+      "blockMargin": "2rem",
+      "photos": [
+        "016.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "蘭嶼"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "017.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "椰油長老教會",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "018.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "019.jpg",
+        "020.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "021.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "022.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "023.jpg",
+        "024.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "025.jpg",
+        "026.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "027.jpg",
+        "028.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "029.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "030.jpg",
+        "031.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "蘭嶼機場.蘭嶼燈塔",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "032.jpg",
+        "033.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "034.jpg",
+        "035.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "036.jpg",
+        "037.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "038.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "羊肉.芋田.魚乾",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "039.jpg",
+        "040.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "041.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "042.jpg",
+        "043.jpg",
+        "044.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "蘭嶼儲存場.龍門港",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "045.jpg",
+        "046.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "047.jpg",
+        "048.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "049.jpg",
+        "050.jpg",
+        "051.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "2rem",
+      "photos": [
+        "052.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "中橫.太魯閣"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "053.jpg",
+        "054.jpg",
+        "055.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "056.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "合歡山隧道 | 走到另一端等了二十分鐘等不到車，又摸黑走回來。",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "057.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "合歡山"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "058.jpg",
+        "059.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "2rem",
+      "photos": [
+        "060.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "埔里.魚池.峨眉"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "061.jpg",
+        "062.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "063.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "064.jpg",
+        "065.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "066.jpg",
+        "067.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "樟腦寮（右）| 試圖表演鋸樟木但電鋸發不動",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "068.jpg",
+        "069.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "070.jpg",
+        "071.jpg"
+      ]
+    }
+  ],
   "photos": [
     {
       "filename": "001.jpg",

@@ -6,7 +6,7 @@ import { parseAlbumManifest } from "./manifest-schema.ts";
 
 function validManifest(overrides = {}) {
     return {
-        schemaVersion: 1,
+        schemaVersion: 2,
         title: "A morning walk",
         info: "Along the river",
         publishedAt: "2026-07-22",
@@ -17,6 +17,12 @@ function validManifest(overrides = {}) {
             zoom: 1.5,
             offset: { x: 25, y: 75 },
         },
+        blocks: [
+            { type: "Text", size: "title", text: "Dawn" },
+            { type: "Row", caption: "Pair", photos: ["cover.jpg", { column: ["a.jpg", "b.jpg"] }] },
+            { type: "PhotoCarousel", initialSlide: 1, photos: ["c.jpg", "d.jpg"] },
+            { type: "PhotoPanorama", panoramaSlices: 3, photos: ["second.webp"] },
+        ],
         photos: [
             {
                 filename: "cover.jpg",
@@ -197,7 +203,7 @@ test("rejects malformed external asset keys and album slugs", () => {
 
 test("rejects unsupported versions, empty titles, and malformed cover unions", () => {
     const invalidCases = [
-        validManifest({ schemaVersion: 2 }),
+        validManifest({ schemaVersion: 1 }),
         validManifest({ title: "   " }),
         validManifest({ cover: { ...validManifest().cover, photo: { kind: "local", assetKey: "taiwan/walk/a.jpg" } } }),
         validManifest({ cover: { ...validManifest().cover, photo: { kind: "external", filename: "cover.jpg" } } }),
@@ -216,6 +222,8 @@ test("rejects unknown keys at every persisted manifest object boundary", () => {
         ["cover offset", (manifest) => { manifest.cover.offset.unexpected = true; }],
         ["photo 0", (manifest) => { manifest.photos[0].unexpected = true; }],
         ["tag 0", (manifest) => { manifest.photos[0].tags[0].unexpected = true; }],
+        ["block 0", (manifest) => { manifest.blocks[0].unexpected = true; }],
+        ["block 1 photos\\[1\\]", (manifest) => { manifest.blocks[1].photos[1].unexpected = true; }],
     ];
 
     for (const [boundary, mutate] of cases) {
@@ -226,4 +234,35 @@ test("rejects unknown keys at every persisted manifest object boundary", () => {
             new RegExp(`${boundary}.*unknown field`, "i"),
         );
     }
+});
+
+test("parses every block type and preserves page order", () => {
+    const manifest = parseAlbumManifest(validManifest(), "taiwan/morning-walk");
+
+    assert.deepEqual(manifest.blocks.map(({ type }) => type), ["Text", "Row", "PhotoCarousel", "PhotoPanorama"]);
+    assert.deepEqual(manifest.blocks[1].photos, ["cover.jpg", { column: ["a.jpg", "b.jpg"] }]);
+});
+
+test("rejects malformed blocks", () => {
+    const invalidBlocks = [
+        { type: "Gallery", photos: ["a.jpg"] },
+        { type: "Text" },
+        { type: "Text", align: "justify", text: "x" },
+        { type: "Row", photos: [] },
+        { type: "Row", photos: ["nested/a.jpg"] },
+        { type: "Row", photos: [{ column: ["a.jpg"] }] },
+        { type: "PhotoCarousel", photos: ["a.jpg"], peekPercent: 95 },
+        { type: "PhotoCarousel", photos: [{ column: ["a.jpg", "b.jpg"] }] },
+        { type: "PhotoPanorama", photos: ["a.jpg"], panoramaSlices: 0 },
+        { type: "PhotoPanorama", photos: ["a.jpg"], initialView: "grid" },
+    ];
+
+    for (const block of invalidBlocks) {
+        assert.throws(
+            () => parseAlbumManifest(validManifest({ blocks: [block] }), "taiwan/morning-walk"),
+            /block 0/,
+            JSON.stringify(block),
+        );
+    }
+    assert.throws(() => parseAlbumManifest(validManifest({ blocks: undefined }), "taiwan/morning-walk"), /blocks/);
 });

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "title": "北插天山",
   "info": "2025.11",
   "order": 170,
@@ -14,6 +14,107 @@
       "y": 50
     }
   },
+  "blocks": [
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00128.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "photos": [
+        "KCS00133.jpg",
+        "KCS00132.jpg",
+        "KCS00139.jpg",
+        "KCS00140.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "photos": [
+        "KCS00144.jpg",
+        "KCS00147.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00148.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "photos": [
+        "KCS00154.jpg",
+        "KCS00152.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00173.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00184.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00191.jpg",
+        "KCS00201.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00208.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "photos": [
+        "KCS00210.jpg",
+        "KCS00211.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "photos": [
+        "KCS00217.jpg",
+        "KCS00216.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00231.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00233.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00237.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "photos": [
+        "KCS00244.jpg",
+        "KCS00243.jpg"
+      ]
+    }
+  ],
   "photos": [
     {
       "filename": "KCS00128.jpg",

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "title": "２０２４",
   "order": 60,
   "cover": {
@@ -13,6 +13,41 @@
       "y": 50
     }
   },
+  "blocks": [
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00491.jpg",
+        "KCS00509.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS04912.jpg",
+        "KCS04914.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "2rem",
+      "photos": [
+        "KCS04918.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS04939.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS04962.jpg"
+      ]
+    }
+  ],
   "photos": [
     {
       "filename": "KCS00491.jpg",

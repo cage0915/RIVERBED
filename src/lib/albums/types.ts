@@ -16,8 +16,43 @@ export type ExternalCoverPhoto = {
     assetKey: string;
 };
 
+type BlockSpacing = { blockMargin?: string };
+type BlockCaption = { caption?: string; captionPosition?: string };
+
+export type TextBlock = BlockSpacing & {
+    type: "Text";
+    align?: "left" | "center" | "right";
+    size?: "caption" | "title";
+    text: string;
+};
+
+/** A Row item is one photo, or a Column of photos stacked at a shared width. */
+export type RowItem = string | { column: string[] };
+
+export type RowBlock = BlockSpacing & BlockCaption & {
+    type: "Row";
+    photos: RowItem[];
+};
+
+export type PhotoCarouselBlock = BlockSpacing & BlockCaption & {
+    type: "PhotoCarousel";
+    initialSlide?: number;
+    peekPercent?: number;
+    photos: string[];
+};
+
+export type PhotoPanoramaBlock = BlockSpacing & BlockCaption & {
+    type: "PhotoPanorama";
+    initialSlide?: number;
+    initialView?: "carousel" | "panorama";
+    panoramaSlices?: number;
+    photos: string[];
+};
+
+export type AlbumBlock = TextBlock | RowBlock | PhotoCarouselBlock | PhotoPanoramaBlock;
+
 export type AlbumManifest = {
-    schemaVersion: 1;
+    schemaVersion: 2;
     title: string;
     info?: string;
     publishedAt?: string;
@@ -28,6 +63,7 @@ export type AlbumManifest = {
         zoom: number;
         offset: { x: number; y: number };
     };
+    blocks: AlbumBlock[];
     photos: Array<{
         filename: string;
         width?: number;

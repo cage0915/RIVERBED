@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "title": "觀霧望聖稜線",
   "info": "2025.9",
   "order": 150,
@@ -14,6 +14,82 @@
       "y": 100
     }
   },
+  "blocks": [
+    {
+      "type": "Row",
+      "photos": [
+        "KCS08600.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS08604.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "冠羽畫眉（Yuhina brunneiceps）. 黃胸藪眉（Liocichla steerii）",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS08605.jpg",
+        "KCS08612.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS08634.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS08639.jpg",
+        "KCS08653.jpg",
+        "KCS08661.jpg"
+      ]
+    },
+    {
+      "type": "PhotoPanorama",
+      "blockMargin": "1.5rem",
+      "initialView": "panorama",
+      "panoramaSlices": 2,
+      "photos": [
+        "KCS08667.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS08664.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS08662.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS08683.jpg"
+      ]
+    },
+    {
+      "type": "PhotoPanorama",
+      "blockMargin": "1.5rem",
+      "initialView": "panorama",
+      "panoramaSlices": 2,
+      "photos": [
+        "KCS08677.jpg"
+      ]
+    }
+  ],
   "photos": [
     {
       "filename": "KCS08600.jpg",

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "title": "阿里山望玉山",
   "info": "2024.2",
   "order": 20,
@@ -14,6 +14,77 @@
       "y": 50
     }
   },
+  "blocks": [
+    {
+      "type": "Row",
+      "caption": "祝山望向玉山 | 身為嘉義人，二十八年來第一次到阿里山，也是第一次見到玉山。",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS00797.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "captionPosition": "center top",
+      "photos": [
+        "KCS00743.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00741.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00815.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00534.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "0.5rem",
+      "photos": [
+        "KCS00675.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS00753.jpg",
+        "KCS00754.jpg",
+        "KCS00756.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00561.jpg",
+        "KCS00789.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00569.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00871.jpg"
+      ]
+    }
+  ],
   "photos": [
     {
       "filename": "KCS00797.jpg",

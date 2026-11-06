@@ -19,7 +19,7 @@ test('image filenames are basenames with supported extensions', () => {
     assert.throws(() => validateImageFilename('notes.txt'));
 });
 
-test('createAlbumImport proposes matching MDX and manifest inventory', () => {
+test('createAlbumImport places each photo in its own Row', () => {
     const proposal = createAlbumImport({
         albumSlug: 'yama/new-album',
         title: 'New Album',
@@ -36,11 +36,13 @@ test('createAlbumImport proposes matching MDX and manifest inventory', () => {
         { filename: '002.jpg', caption: undefined, tags: [] },
         { filename: '001.jpg', caption: undefined, tags: [] },
     ]);
-    assert.match(proposal.mdx, /<Photo itemKey="002\.jpg" \/>/);
-    assert.doesNotMatch(proposal.mdx, /^(?:title|publishedAt|coverKey|coverZoom|coverOffset):/m);
+    assert.deepEqual(proposal.manifest.blocks, [
+        { type: 'Row', photos: ['002.jpg'] },
+        { type: 'Row', photos: ['001.jpg'] },
+    ]);
 });
 
-test('createAlbumImport validates both proposals before returning either', () => {
+test('createAlbumImport validates the manifest before returning it', () => {
     assert.throws(() => createAlbumImport({
         albumSlug: 'yama/new-album',
         title: 'New Album',

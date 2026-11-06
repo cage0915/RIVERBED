@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "title": "Hitchhike",
   "info": "2015",
   "order": 20,
@@ -14,6 +14,114 @@
       "y": 50
     }
   },
+  "blocks": [
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "花蓮"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "001.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "002.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "003.jpg",
+        "004.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "005.jpg",
+        "006.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "007.jpg",
+        "008.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "009.jpg",
+        "010.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "花東縱谷.六十石山",
+      "photos": [
+        "011.jpg",
+        "012.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "南橫"
+    },
+    {
+      "type": "Row",
+      "caption": "初來橋.卑南溪",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "013.jpg",
+        "014.jpg",
+        "015.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "016.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "2rem",
+      "photos": [
+        "017.jpg",
+        "018.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "三仙台"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "019.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "020.jpg",
+        "021.jpg"
+      ]
+    }
+  ],
   "photos": [
     {
       "filename": "001.jpg",

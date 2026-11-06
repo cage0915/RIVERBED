@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "title": "２０２０",
   "order": 40,
   "cover": {
@@ -13,6 +13,144 @@
       "y": 50
     }
   },
+  "blocks": [
+    {
+      "type": "Row",
+      "photos": [
+        "01.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "新興戲院\n大林過去因為有兩座軍營駐紮和一座糖廠營業，全盛時期鎮上有四家戲院。飛彈營裁撤及糖廠停止製糖後大林繁華不再，戲院因此逐一關閉。不像萬國戲院近年被修復保留，新興戲院在閒置多年後終於還是遭到拆除。",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "02.jpg",
+        "03.jpg",
+        "04.jpg",
+        "05.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "鹿堀溝",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "06.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "07.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "09.jpg",
+        "10.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "準備做成堆肥的牛糞",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "11.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "12.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "13.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "三疊溪",
+      "captionPosition": "center top",
+      "photos": [
+        "14.jpg",
+        "15.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "16.jpg",
+        "17.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "24.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "18.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "19.jpg",
+        "20.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "21.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "蘆筍田",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "22.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "23.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "25.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "冬季水圳水源不足時需要抽取地下水來灌溉。有些是在自家田地上鑿井，有些則是多個農戶共用一口水井，並利用水圳系統將井水導引至自家田地。",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "26.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "27.jpg"
+      ]
+    }
+  ],
   "photos": [
     {
       "filename": "01.jpg",

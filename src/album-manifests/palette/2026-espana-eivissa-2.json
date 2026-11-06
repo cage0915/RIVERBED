@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "title": "Eivissa",
   "info": "2026.4",
   "order": 30,
@@ -14,6 +14,233 @@
       "y": 45
     }
   },
+  "blocks": [
+    {
+      "type": "PhotoCarousel",
+      "photos": [
+        "KCS02574.jpg",
+        "KCS02584.jpg",
+        "KCS02592.jpg",
+        "KCS02593.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS02603.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS02638.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "2rem",
+      "photos": [
+        "KCS02662.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "Formentera"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "2026-0410-0913-37.045.jpg",
+        "2026-0410-0921-06.600.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS02670.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS02694.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "Ibiza wall lizard",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS02697.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS02701.jpg",
+        "KCS02705.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "2026-0410-1353-17.222.jpg",
+        "KCS02703.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS02708.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS02716.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "2026-0410-1126-18.732.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS02723.jpg",
+        "2026-0410-1120-12.724.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "2026-0410-1350-40.498.jpg",
+        "2026-0410-1349-00.754.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "2026-0410-1554-46.390.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "2026-0410-1538-58.353.jpg",
+        "2026-0410-1541-40.497.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS02734.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS02778.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS02783.jpg",
+        "KCS02824.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "2026-0410-1959-26.626.jpg",
+        "2026-0411-1557-35.868.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "炸青龍椒 Pimientos de Padrón / 加利西亞章魚 Polbo á feira / Zorza",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "2026-0410-2033-49.214.jpg",
+        "2026-0410-2037-03.788.jpg",
+        "2026-0410-2041-41.891.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "Porras / Churros",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "2026-0411-0959-42.199.jpg",
+        "2026-0411-1001-03.690.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "2026-0411-1447-00.466.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "Paella",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "2026-0411-1447-23.565.jpg",
+        "2026-0411-1448-16.683.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "2026-0411-1338-27.716.jpg",
+        "2026-0411-1352-17.971.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "2rem",
+      "photos": [
+        "2026-0410-1855-15.971.jpg",
+        "2026-0410-1905-47.265.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "Taiwan"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS02830.jpg",
+        "KCS02832.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS02838.jpg",
+        "KCS02837.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS02842.jpg"
+      ]
+    }
+  ],
   "photos": [
     {
       "filename": "KCS02574.jpg",

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "title": "信濃大町",
   "info": "2026.2",
   "order": 240,
@@ -14,6 +14,101 @@
       "y": 30
     }
   },
+  "blocks": [
+    {
+      "type": "Row",
+      "photos": [
+        "KCS01682.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS01684.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "blockMargin": "1.5rem",
+      "initialSlide": 1,
+      "photos": [
+        "KCS01687.jpg",
+        "KCS01693.jpg",
+        "KCS01688.jpg",
+        "KCS01691.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS01689.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "blockMargin": "1.5rem",
+      "initialSlide": 1,
+      "photos": [
+        "KCS01694.jpg",
+        "KCS01695.jpg",
+        "KCS01696.jpg"
+      ]
+    },
+    {
+      "type": "PhotoPanorama",
+      "blockMargin": "1.5rem",
+      "panoramaSlices": 2,
+      "photos": [
+        "KCS01709-全景.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "blockMargin": "1.5rem",
+      "initialSlide": 1,
+      "photos": [
+        "KCS01699.jpg",
+        "KCS01710.jpg",
+        "KCS01742.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS01745.jpg",
+        "KCS01746.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "caption": "↓ 中綱湖",
+      "captionPosition": "center top",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS01765.jpg",
+        "KCS01772.jpg",
+        "KCS01762.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS01774.jpg",
+        "KCS01776.jpg",
+        "KCS01783.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS01781.jpg"
+      ]
+    }
+  ],
   "photos": [
     {
       "filename": "KCS01682.jpg",

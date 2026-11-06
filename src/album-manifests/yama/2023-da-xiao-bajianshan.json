@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "title": "尖霸尖山",
   "info": "2023.6",
   "order": 10,
@@ -14,6 +14,92 @@
       "y": 50
     }
   },
+  "blocks": [
+    {
+      "type": "Row",
+      "caption": "馬達拉溪 | 這趟行程沒有申請離大霸更近的九九山莊，而是住在山腳的馬達拉溪山屋。雖然距離較遠，但可以輕裝來回陡上路段，而且水源也充足。",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "01.jpg",
+        "02.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "03.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "04.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "05.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "photos": [
+        "06.jpg",
+        "07.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "08.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "09.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "0.5rem",
+      "photos": [
+        "11.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "人生的初百岳。比起大小霸，更讚嘆的是穆特勒布山的紋理。",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "10.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "12.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "13.jpg",
+        "14.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "15.jpg",
+        "16.jpg",
+        "17.jpg"
+      ]
+    }
+  ],
   "photos": [
     {
       "filename": "01.jpg",

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "title": "大劍山",
   "info": "2024.7",
   "order": 50,
@@ -14,6 +14,264 @@
       "y": 50
     }
   },
+  "blocks": [
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "text": "Day 1"
+    },
+    {
+      "type": "Row",
+      "caption": "福壽山農場 | 天亮後對面的俗氣音樂聲就沒有停過，如果是為了驅趕獼猴效果應該是很不錯。",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS01151.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS01185.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS01612.jpg",
+        "KCS01182.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "森林防火巷是為了防止野火擴散，防止火災擴散是為了水土保持，水土保持是為了減緩下游德基水庫的淤積。\n對登山來說最直接的感受是沒有遮蔽極其曝曬。",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS01229.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS01232.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "在午後雷雨前抵達油婆蘭山屋並搭好帳篷。",
+      "captionPosition": "left top",
+      "photos": [
+        "KCS01257.jpg",
+        "KCS01261.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "福壽山農場 | 從平視走到可以俯瞰的高度。油婆蘭山展望極佳，隔著大甲溪谷可以展望對面的中央山脈北段。",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS01287.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS01314.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS01353.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "中央尖山與南湖大山",
+      "captionPosition": "left top",
+      "photos": [
+        "KCS01400.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS01368.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS01370.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "往北則可以展望雪山山脈。",
+      "captionPosition": "left top",
+      "photos": [
+        "KCS01431.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "雪山南壁 | 年初從志佳陽上雪山最後就是走碎石坡登頂，可能是角度關係，視覺上比當時還要更陡（但當時體感上也夠陡了。）",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS01399.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS01399-2.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "captionPosition": "center top",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS01320.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "油婆蘭草原 | 不確定是不是因為東北季風的關係，樹木都集中在背風面的西側。",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS01481.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "油婆蘭山屋",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS01473.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS01490.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS01492.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS01495.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "Day 2"
+    },
+    {
+      "type": "PhotoCarousel",
+      "caption": "@ 大劍山",
+      "captionPosition": "center top",
+      "photos": [
+        "KCS01504.jpg",
+        "KCS01537.jpg",
+        "KCS01541.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS01512.jpg",
+        "KCS01530.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "大劍山頂看見的玉山 | 距離剛好100公里，感謝科技讓我在這個距離還能有這樣的視野。不過鏡頭焦段再長或鍍膜再好，仍難以抹除大氣中懸浮粒子散射的干擾，終究還是希望有機會能更近地了解這座山。",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS01535.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS01540.jpg",
+        "KCS01544.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS01548.jpg",
+        "KCS01559.jpg",
+        "KCS01564.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS01549.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS01572.jpg",
+        "KCS01546.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "喜歡這樣的紋理和光線。",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS01581.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS01599.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "前一天抵達營地時已是陰天，直到下山前，才真正注意到大劍山的恢宏壯闊。與大劍山相對的是劍山，其名源自山形近似日本的劍岳。從大雪山遊樂區及東卯山一帶望去，劍山確實頗有寶劍的神韻；至於大劍山，到目前為止，我還沒找到一個看起來像寶劍的角度。當然這絲毫無損大劍山本身的氣勢，只是凡夫如我的一點鑽牛角尖（的樂趣）罷了。",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS01587.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "踏訪佳陽山和劍山的路途道阻且長。這次上山不懂分配體力，腿力都all in在上山路段。在營地和夥伴一致決定應該適度看輕自己，第二天造訪大劍山後就快樂下山。",
+      "captionPosition": "left bottom",
+      "photos": [
+        "KCS01596.jpg"
+      ]
+    }
+  ],
   "photos": [
     {
       "filename": "KCS01151.jpg",

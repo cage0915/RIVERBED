@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "title": "２０２２",
   "order": 140,
   "cover": {
@@ -13,6 +13,296 @@
       "y": 50
     }
   },
+  "blocks": [
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "溪州"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "001.jpg",
+        "002.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "003.jpg",
+        "004.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "2rem",
+      "photos": [
+        "005.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "宜蘭"
+    },
+    {
+      "type": "Row",
+      "caption": "velvia 100。沒注意到是正片，曝光爆了一堆，但曝光對的時候真的讚，尤其是海水。",
+      "captionPosition": "left top",
+      "photos": [
+        "007.jpg",
+        "008.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "009.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "2rem",
+      "photos": [
+        "010.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "花蓮"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "011.jpg",
+        "012.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "花蓮雷達",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "013.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "崇德海灘",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "014.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "015.jpg",
+        "016.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "清水斷崖",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "017.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "台中.桃園.雙北"
+    },
+    {
+      "type": "Row",
+      "caption": "南屯雷達",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "018.jpg",
+        "019.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "石門水庫",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "020.jpg",
+        "021.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "樹林雷達",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "022.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "十分瀑布",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "023.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "2rem",
+      "photos": [
+        "006.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "屏東"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "024.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "2rem",
+      "photos": [
+        "025.jpg",
+        "026.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "龜山島"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "027.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "028.jpg",
+        "029.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "030.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "2rem",
+      "photos": [
+        "031.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "恆春.滿州"
+    },
+    {
+      "type": "Row",
+      "blockMargin": "2rem",
+      "photos": [
+        "032.jpg",
+        "033.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "火炎山"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "034.jpg",
+        "035.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "鯉魚潭鋸齒堰",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "036.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "東石白水湖壽島",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "037.jpg",
+        "038.jpg",
+        "039.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "040.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "永和",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "041.jpg",
+        "042.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "043.jpg",
+        "044.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "淡水河",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "045.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "046.jpg"
+      ]
+    }
+  ],
   "photos": [
     {
       "filename": "001.jpg",

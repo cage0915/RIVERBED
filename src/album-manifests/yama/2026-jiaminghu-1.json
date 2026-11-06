@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "title": "嘉明湖-1",
   "info": "2026.7 南橫.向陽山",
   "publishedAt": "2026-07-12",
@@ -15,6 +15,386 @@
       "y": 60
     }
   },
+  "blocks": [
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "南橫.新武呂溪"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "2026-0703-0804-10.035.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS03575.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "2026-0703-0841-54.077.jpg",
+        "2026-0703-0848-37.919.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "霧鹿峽谷",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "2026-0703-0853-09.166.jpg",
+        "KCS03590.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "霧鹿.利稻",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS03595.jpg",
+        "KCS03601.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "紅嘴黑鵯 / Qaipis",
+      "blockMargin": "2rem",
+      "photos": [
+        "KCS03630.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "嘉明湖步道"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS03703.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS03728.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS03747.jpg",
+        "KCS03798.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS03754.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "photos": [
+        "KCS03762.jpg",
+        "KCS03774.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS03770.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS03777.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "caption": "向陽崩壁",
+      "photos": [
+        "KCS03784.jpg",
+        "KCS03790.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "photos": [
+        "KCS03785.jpg",
+        "KCS03809.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "嘉明湖山屋",
+      "photos": [
+        "2026-0703-1518-34.004.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "向陽山日出"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS04394.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS04396.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS04410.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "photos": [
+        "KCS04423.jpg",
+        "KCS04424.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS04422.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS04425.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS04429.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "photos": [
+        "KCS04432.jpg",
+        "KCS04428.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "photos": [
+        "KCS04449.jpg",
+        "KCS04452.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS04443.jpg",
+        "KCS04465.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS04470.jpg",
+        "KCS04484.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "2rem",
+      "photos": [
+        "KCS04479.jpg",
+        "KCS04476.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "向陽崩壁"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS04487.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "photos": [
+        "KCS04515.jpg",
+        "KCS04525.jpg",
+        "KCS04526.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS04508.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS04509.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS04489.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS04548.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS04522.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "2rem",
+      "photos": [
+        "KCS04562.jpg",
+        "KCS04559.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "南橫.關山大斷崖"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS04589.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS04615.jpg",
+        "KCS04641.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS04594.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "caption": "向陽大崩壁",
+      "captionPosition": "center top",
+      "photos": [
+        "KCS04624.jpg",
+        "KCS04629.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS04631.jpg",
+        "KCS04644.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS04633.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "關山大斷崖",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS04665.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "initialSlide": 1,
+      "photos": [
+        "KCS04670.jpg",
+        "KCS04657.jpg",
+        "KCS04679.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "2rem",
+      "photos": [
+        "KCS04695.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "海岸山脈"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS04715.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS04716.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS04710.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS04717.jpg"
+      ]
+    }
+  ],
   "photos": [
     {
       "filename": "2026-0703-0804-10.035.jpg",

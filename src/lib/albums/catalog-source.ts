@@ -4,19 +4,11 @@ import { parseAlbumManifest } from "./manifest-schema.ts";
 import type { NormalizedAlbum } from "./types.ts";
 import type { AlbumDiagnostic } from "./validation.ts";
 
-export type AlbumContentSource = {
-    slug: string;
-    mdxPath: string;
-    mdxBody: string;
-};
-
 export type JsonModule = { default: unknown };
 
-export type AlbumSummary = Omit<NormalizedAlbum, "photos">;
+export type AlbumSummary = Omit<NormalizedAlbum, "blocks" | "photos">;
 
-function manifestPathForSlug(slug: string): string {
-    return `/src/album-manifests/${slug}.json`;
-}
+const MANIFEST_PATH = /^\/src\/album-manifests\/(.+)\.json$/;
 
 function errorMessage(error: unknown): string {
     return error instanceof Error ? error.message : String(error);
@@ -44,31 +36,14 @@ function diagnosticLocation(diagnostic: AlbumDiagnostic): string {
     return parts.join(" ");
 }
 
-export function buildAlbumCatalogFromSources(
-    entries: AlbumContentSource[],
+export function buildAlbumCatalogFromManifests(
     manifestModules: Record<string, JsonModule>,
 ): AlbumCatalog {
-    const expectedManifestPaths = new Set<string>();
-    const records: AlbumSourceRecord[] = entries.map((entry) => {
-        const manifestPath = manifestPathForSlug(entry.slug);
-        expectedManifestPaths.add(manifestPath);
-        const manifestModule = manifestModules[manifestPath];
-        if (manifestModule === undefined) {
-            throw new Error(`Missing Album manifest for ${entry.slug}: ${manifestPath}`);
-        }
-        return {
-            ...entry,
-            manifestPath,
-            manifest: parseManifest(manifestModule, entry.slug, manifestPath),
-        };
+    const records: AlbumSourceRecord[] = Object.entries(manifestModules).map(([manifestPath, module]) => {
+        const slug = MANIFEST_PATH.exec(manifestPath)?.[1];
+        if (slug === undefined) throw new Error(`Unexpected Album manifest path: ${manifestPath}`);
+        return { slug, manifestPath, manifest: parseManifest(module, slug, manifestPath) };
     });
-
-    const orphanManifestPaths = Object.keys(manifestModules)
-        .filter((manifestPath) => !expectedManifestPaths.has(manifestPath))
-        .sort();
-    if (orphanManifestPaths.length > 0) {
-        throw new Error(`Album manifests without paired MDX: ${orphanManifestPaths.join(", ")}`);
-    }
 
     const catalog = createAlbumCatalog(records);
     if (catalog.diagnostics.length > 0) {
@@ -95,7 +70,7 @@ export function createAlbumSummaryReader(
     catalog: Pick<AlbumCatalog, "getAlbums">,
 ): () => AlbumSummary[] {
     const snapshot = catalog.getAlbums().map((album) => {
-        const { photos: _photos, ...summary } = album;
+        const { blocks: _blocks, photos: _photos, ...summary } = album;
         return cloneSummary(summary);
     });
     return () => snapshot.map(cloneSummary);

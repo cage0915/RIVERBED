@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "title": "濁水溪",
   "info": "2024.10",
   "order": 50,
@@ -14,6 +14,112 @@
       "y": 50
     }
   },
+  "blocks": [
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "溪州"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS03631.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS03636.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS03640.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "2rem",
+      "photos": [
+        "KCS03643.jpg",
+        "KCS03651.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "莿仔埤圳",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS03657.jpg",
+        "KCS03666.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "八堡圳引水路",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS03668.jpg",
+        "KCS03669.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "水里"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS03673.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS03677.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "@龍神橋",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS03681.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "信義"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS03694.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS03696.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "@和社溪.愛玉橋",
+      "photos": [
+        "KCS03699.jpg"
+      ]
+    }
+  ],
   "photos": [
     {
       "filename": "KCS03631.jpg",

@@ -5,7 +5,7 @@ import sharp from 'sharp';
 import trash from 'trash';
 
 import { validateImageFilename } from '../lib/album-import';
-import { createLayoutOnlyPageContent, referencedLocalNames } from '../lib/page-structure';
+import { pageBlocksToAlbumBlocks, referencedLocalNames } from '../lib/page-structure';
 import {
     AlbumAssetConflictError,
     AlbumLifecycleConflictError,
@@ -49,8 +49,7 @@ export const POST: APIRoute = async ({ request }) => {
         const projectRoot = process.cwd();
         const albumDirectory = path.resolve(projectRoot, 'r2', albumSlug);
         const allowedRoot = path.resolve(projectRoot, 'r2') + path.sep;
-        const mdxPath = path.resolve(projectRoot, 'src/content/albums', `${albumSlug}.mdx`);
-        if (!albumDirectory.startsWith(allowedRoot) || !fs.existsSync(mdxPath)) return json({ error: 'Page does not exist' }, 404);
+        if (!albumDirectory.startsWith(allowedRoot)) return json({ error: 'Page does not exist' }, 404);
         await assertAlbumAssetStorageSafe(projectRoot, albumSlug);
 
         const files = form.getAll('photos').filter((entry): entry is File => typeof entry !== 'string');
@@ -103,7 +102,6 @@ export const POST: APIRoute = async ({ request }) => {
                 return json({ error: `${currentManifest.cover.photo.filename} is still selected as the local cover` }, 409);
             }
 
-            const newContent = createLayoutOnlyPageContent(blocks);
             const metadata = {
                 title: pageMetadata.title,
                 info: pageMetadata.info?.trim() ? pageMetadata.info : undefined,
@@ -112,7 +110,7 @@ export const POST: APIRoute = async ({ request }) => {
             const proposedManifest = buildAlbumPageProposal({
                 albumSlug,
                 manifest: currentManifest,
-                mdx: newContent,
+                blocks: pageBlocksToAlbumBlocks(blocks),
                 importedFilenames: names,
                 importedPhotoDimensions,
                 metadata,
@@ -123,7 +121,6 @@ export const POST: APIRoute = async ({ request }) => {
                 albumSlug,
                 assets: payloads,
                 sourceProposals: [
-                    { target: mdxPath, content: newContent },
                     {
                         target: path.resolve(projectRoot, 'src/album-manifests', `${albumSlug}.json`),
                         content: `${JSON.stringify(proposedManifest, null, 2)}\n`,

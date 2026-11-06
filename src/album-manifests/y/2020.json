@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "title": "２０２０",
   "order": 100,
   "cover": {
@@ -13,6 +13,140 @@
       "y": 50
     }
   },
+  "blocks": [
+    {
+      "type": "Row",
+      "caption": "2020.1.21 | 千の風になって。",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "001.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "2rem",
+      "photos": [
+        "002.jpg",
+        "003.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "004.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "2020.6.17",
+      "captionPosition": "center top",
+      "photos": [
+        "005.jpg",
+        "006.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "007.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "008.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "009.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "2020.6.21 日全食",
+      "captionPosition": "center top",
+      "blockMargin": "2rem",
+      "photos": [
+        "010.jpg",
+        "011.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "012.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "2020.8.21",
+      "captionPosition": "center top",
+      "photos": [
+        "013.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "2rem",
+      "photos": [
+        "014.jpg",
+        "015.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "016.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "017.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "018.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "019.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "020.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "土木研究大樓8F | 當你望向深淵，深淵也...不對，這個視角代表你就在深淵。",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "021.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "022.jpg",
+        "023.jpg",
+        "024.jpg"
+      ]
+    }
+  ],
   "photos": [
     {
       "filename": "001.jpg",

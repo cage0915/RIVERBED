@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "title": "嘉明湖-2",
   "info": "2026.7 三叉山",
   "publishedAt": "2026-07-12",
@@ -15,6 +15,399 @@
       "y": 40
     }
   },
+  "blocks": [
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "三叉山日落"
+    },
+    {
+      "type": "PhotoCarousel",
+      "initialSlide": 1,
+      "photos": [
+        "KCS03825.jpg",
+        "KCS03826.jpg",
+        "KCS03832.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS03830.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS03843.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS03872.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS03880.jpg",
+        "KCS03897.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS03890.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS03889.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "initialSlide": 1,
+      "photos": [
+        "KCS03892.jpg",
+        "KCS03901.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS03905.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS03909.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS03916.jpg",
+        "KCS03917.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS03914.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS03920.jpg",
+        "KCS03931.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "2rem",
+      "photos": [
+        "KCS03932.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "三叉山日出"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS03942.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS03981.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS03987.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "photos": [
+        "KCS03965.jpg",
+        "KCS03983.jpg",
+        "KCS04011.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "photos": [
+        "KCS03986.jpg",
+        "KCS04012.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "photos": [
+        "KCS03961.jpg",
+        "KCS03977.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "photos": [
+        "KCS03978.jpg",
+        "KCS04016.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "photos": [
+        "KCS03974.jpg",
+        "KCS03998.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "blockMargin": "2rem",
+      "photos": [
+        "KCS03992.jpg",
+        "KCS04010.jpg",
+        "KCS04008.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "拉庫音溪方向"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "2026-0704-1157-07.118.jpg",
+        "KCS04031.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS04038.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "photos": [
+        "KCS04050.jpg",
+        "KCS04092.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "initialSlide": 1,
+      "photos": [
+        "KCS04071.jpg",
+        "KCS04085.jpg",
+        "KCS04106.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS04076.jpg",
+        "KCS04044.jpg",
+        "KCS04159.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS04145.jpg",
+        "KCS04186.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "photos": [
+        "KCS04116.jpg",
+        "KCS04119.jpg",
+        "KCS04120.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "photos": [
+        "KCS04151.jpg",
+        "KCS04163.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS04178.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS04166.jpg",
+        "KCS04165.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS04183.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS04192.jpg",
+        "KCS04205.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS04214.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "photos": [
+        "KCS04239.jpg",
+        "KCS04231.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS04237.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "photos": [
+        "KCS04255.jpg",
+        "KCS04256.jpg",
+        "KCS04257.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS04235.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "photos": [
+        "KCS04259.jpg",
+        "KCS04251.jpg",
+        "KCS04254.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS04273.jpg",
+        "KCS04288.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "2rem",
+      "photos": [
+        "KCS04277.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "向陽山方向"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS04312.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS04314.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS04321.jpg",
+        "KCS04322.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS04332.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS04340.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS04342.jpg",
+        "KCS04346.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS04319.jpg",
+        "KCS04363.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS04366.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS04370.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS04374.jpg"
+      ]
+    }
+  ],
   "photos": [
     {
       "filename": "KCS03825.jpg",

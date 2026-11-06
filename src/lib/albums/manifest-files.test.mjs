@@ -24,7 +24,7 @@ const albumSlug = "yama/sample-album";
 
 function manifest(overrides = {}) {
     return {
-        schemaVersion: 1,
+        schemaVersion: 2,
         title: "Sample",
         order: 10,
         cover: {
@@ -32,6 +32,7 @@ function manifest(overrides = {}) {
             zoom: 1,
             offset: { x: 50, y: 50 },
         },
+        blocks: [{ type: "Row", caption: "Block caption", photos: ["view.jpg"] }],
         photos: [
             { filename: "cover.jpg", tags: [] },
             { filename: "view.jpg", tags: [] },
@@ -212,19 +213,15 @@ test("save-tags pipeline rejects invalid and unknown empty keys without clearing
     assert.deepEqual(await readdir(path.dirname(project.file)), ["sample-album.json"]);
 });
 
-test("updatePhotoCaption writes photo captions and deletion leaves MDX-owned block captions alone", async () => {
+test("updatePhotoCaption writes photo captions and deletion leaves block captions alone", async () => {
     const project = await tempProject();
     await writeFile(project.file, JSON.stringify(manifest()), "utf8");
-    const mdxFile = path.join(project.root, "src", "content", "albums", "yama", "sample-album.mdx");
-    await mkdir(path.dirname(mdxFile), { recursive: true });
-    const mdx = '<Row caption="Block caption"><Photo itemKey="view.jpg" /></Row>\n';
-    await writeFile(mdxFile, mdx, "utf8");
 
     await updatePhotoCaption(project.root, albumSlug, "view.jpg", "Photo caption");
     assert.equal((await readAlbumManifestFile(project.root, albumSlug)).photos[1].caption, "Photo caption");
     await updatePhotoCaption(project.root, albumSlug, "view.jpg", "   ");
     assert.equal((await readAlbumManifestFile(project.root, albumSlug)).photos[1].caption, undefined);
-    assert.equal(await readFile(mdxFile, "utf8"), mdx);
+    assert.deepEqual((await readAlbumManifestFile(project.root, albumSlug)).blocks, manifest().blocks);
 });
 
 test("concurrent caption and tag mutations serialize per manifest without losing either update", async () => {

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "title": "大小霸",
   "info": "2025.12",
   "order": 180,
@@ -14,6 +14,322 @@
       "y": 0
     }
   },
+  "blocks": [
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "D1 大鹿林道"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00250.jpg",
+        "KCS00259.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00287.jpg",
+        "KCS00264.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS00281.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "D2 大.小霸尖山"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00306.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00309.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00323.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00330.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00327.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00337.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS00336.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00308.jpg",
+        "KCS00347.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "2rem",
+      "photos": [
+        "KCS00472.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "photos": [
+        "KCS00349.jpg",
+        "KCS00354.jpg",
+        "KCS00429.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00415.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00448.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00402.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS00417.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "photos": [
+        "KCS00418.jpg",
+        "KCS00437.jpg",
+        "KCS00424.jpg",
+        "KCS00451.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS00441.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "photos": [
+        "KCS00463.jpg",
+        "KCS00458.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00432.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00456.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00444.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00474.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00478.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS00479.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS00484.jpg",
+        "KCS00485.jpg",
+        "KCS00519.jpg",
+        "KCS00486.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "樂山雷達站",
+      "captionPosition": "left top",
+      "photos": [
+        "KCS00504.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS00508.jpg",
+        "KCS00511.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "二號圈谷",
+      "captionPosition": "left top",
+      "photos": [
+        "KCS00517.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00521.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00550.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00530.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00558.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00540.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00543.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00549.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00541.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00538.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00542.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS00551.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "D3 觀霧"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00572.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS00586.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "photos": [
+        "KCS00585.jpg",
+        "KCS00588.jpg",
+        "KCS00594.jpg"
+      ]
+    }
+  ],
   "photos": [
     {
       "filename": "KCS00250.jpg",

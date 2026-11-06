@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "title": "２０１６",
   "order": 30,
   "cover": {
@@ -13,6 +13,221 @@
       "y": 50
     }
   },
+  "blocks": [
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "元旦"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "001.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "002.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "003.jpg",
+        "004.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "005.jpg",
+        "006.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "大尖山，2016寒流",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "007.jpg",
+        "008.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "2rem",
+      "photos": [
+        "009.jpg",
+        "010.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "東北角"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "011.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "012.jpg",
+        "013.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "三貂角燈塔",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "014.jpg",
+        "015.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "台南"
+    },
+    {
+      "type": "Row",
+      "blockMargin": "2rem",
+      "photos": [
+        "016.jpg",
+        "017.jpg",
+        "018.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "高雄"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "019.jpg",
+        "020.jpg",
+        "021.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "022.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "旗後燈塔",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "023.jpg",
+        "024.jpg",
+        "025.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "白沙岬燈塔",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "026.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "景美看守所",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "027.jpg",
+        "028.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "長興淨水場",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "029.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "台大農場"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "030.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "031.jpg",
+        "032.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "2rem",
+      "photos": [
+        "033.jpg",
+        "034.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "太平山.翠峰湖"
+    },
+    {
+      "type": "Row",
+      "caption": "山上很涼，需要輪流騎機車才不會睡著。",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "035.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "036.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "037.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "038.jpg"
+      ]
+    }
+  ],
   "photos": [
     {
       "filename": "001.jpg",

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "title": "東卯山望劍山",
   "info": "2026.1",
   "order": 190,
@@ -14,6 +14,52 @@
       "y": 40
     }
   },
+  "blocks": [
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00600.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "photos": [
+        "KCS00631.jpg",
+        "KCS00601.jpg",
+        "KCS00633.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00618.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00627.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00629.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00635.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00638.jpg"
+      ]
+    }
+  ],
   "photos": [
     {
       "filename": "KCS00600.jpg",

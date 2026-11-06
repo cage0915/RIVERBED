@@ -1,5 +1,5 @@
 import { validateAlbumSlug } from "./keys.ts";
-import { extractMdxPhotos } from "./mdx-photos.ts";
+import { albumBlockPhotos } from "./blocks.ts";
 import type {
     AlbumManifest,
     AlbumSlug,
@@ -13,8 +13,6 @@ import type { AlbumDiagnostic } from "./validation.ts";
 export type AlbumSourceRecord = {
     slug: string;
     manifestPath: string;
-    mdxPath: string;
-    mdxBody: string;
     manifest: AlbumManifest;
 };
 
@@ -43,8 +41,6 @@ function compareText(left: string, right: string): number {
 function compareSourceRecords(left: AlbumSourceRecord, right: AlbumSourceRecord): number {
     return compareText(left.slug, right.slug) ||
         compareText(left.manifestPath, right.manifestPath) ||
-        compareText(left.mdxPath, right.mdxPath) ||
-        compareText(left.mdxBody, right.mdxBody) ||
         compareText(JSON.stringify(left.manifest), JSON.stringify(right.manifest));
 }
 
@@ -83,6 +79,7 @@ function cloneAlbum(album: NormalizedAlbum): NormalizedAlbum {
             photo: { ...album.cover.photo },
             offset: { ...album.cover.offset },
         },
+        blocks: structuredClone(album.blocks),
         photos: album.photos.map(cloneResolvedPhoto),
     };
 }
@@ -131,8 +128,6 @@ export function createAlbumCatalog(records: AlbumSourceRecord[]): AlbumCatalog {
             albumSlug: slug,
             manifestPath: record.manifestPath,
             manifest: record.manifest,
-            mdxPath: record.mdxPath,
-            mdxBody: record.mdxBody,
         }));
 
         const [folder, albumId] = slug.split("/") as [string, string];
@@ -151,19 +146,8 @@ export function createAlbumCatalog(records: AlbumSourceRecord[]): AlbumCatalog {
             orderOwner.set(orderKey, record);
         }
 
-        const contentFilenames: string[] = [];
-        try {
-            const seen = new Set<string>();
-            for (const reference of extractMdxPhotos(record.mdxBody)) {
-                if (!seen.has(reference.filename)) {
-                    contentFilenames.push(reference.filename);
-                    seen.add(reference.filename);
-                }
-            }
-        } catch {
-            // validateAlbumInventory already reports the MDX syntax diagnostic.
-        }
-        const contentFilenameSet = new Set(contentFilenames);
+        const contentFilenameSet = new Set(albumBlockPhotos(record.manifest.blocks));
+        const contentFilenames = [...contentFilenameSet];
         const photos: ResolvedAlbumPhoto[] = record.manifest.photos.map((photo) => ({
             sourceAlbumSlug: slug,
             sourceAlbumTitle: record.manifest.title,
@@ -200,6 +184,7 @@ export function createAlbumCatalog(records: AlbumSourceRecord[]): AlbumCatalog {
                 offset: { ...record.manifest.cover.offset },
                 assetKey: coverAssetKey,
             },
+            blocks: structuredClone(record.manifest.blocks),
             photos,
         };
         indexedBySlug.set(slug, { album, contentPhotos });

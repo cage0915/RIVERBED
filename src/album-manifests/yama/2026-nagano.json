@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "title": "長野",
   "info": "2026.9",
   "publishedAt": "2026-10-28",
@@ -15,6 +15,199 @@
       "y": 27.1
     }
   },
+  "blocks": [
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "長野"
+    },
+    {
+      "type": "Row",
+      "blockMargin": "5rem",
+      "photos": [
+        "2026-0919-1110-07.962.jpg",
+        {
+          "column": [
+            "2026-0919-1113-49.426.jpg",
+            "2026-0919-1114-11.320.jpg"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "白馬"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        {
+          "column": [
+            "2026-0919-1513-07.053.jpg",
+            "2026-0919-1652-05.517.jpg"
+          ]
+        },
+        "2026-0919-1706-45.383.jpg",
+        "2026-0919-1543-57.739.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        {
+          "column": [
+            "2026-0922-1621-06.508.jpg",
+            "2026-0922-1622-08.497.jpg"
+          ]
+        },
+        "2026-0919-1617-43.972.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "5rem",
+      "photos": [
+        "2026-0922-1305-15.566.jpg",
+        {
+          "column": [
+            "2026-0922-1021-54.520.jpg",
+            "2026-0922-1028-30.880.jpg"
+          ]
+        },
+        {
+          "column": [
+            "2026-0923-0637-36.566.jpg",
+            "2026-0923-0645-43.804.jpg"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "信濃大町"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "2026-0923-1115-56.742.jpg",
+        "2026-0923-1114-33.057.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "2026-0923-1457-58.019.jpg",
+        "2026-0923-1354-45.101.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "2026-0924-1509-21.011.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "3rem",
+      "photos": [
+        "2026-0924-1514-28.845.jpg",
+        {
+          "column": [
+            "2026-0924-1520-00.689.jpg",
+            "2026-0924-1521-04.020.jpg"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "安曇野"
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "2026-0924-1140-07.890.jpg",
+        "2026-0924-1142-11.917.jpg",
+        "2026-0924-1209-51.918.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "再訪大王わさび農場。",
+      "captionPosition": "center top",
+      "photos": [
+        "2026-0924-1234-03.980.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "2026-0924-1229-10.238.jpg",
+        "2026-0924-1258-16.658.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "3rem",
+      "photos": [
+        "2026-0924-1245-22.241.jpg",
+        "2026-0924-1306-40.449.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "小川村"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS05623.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "blockMargin": "1rem",
+      "photos": [
+        "KCS05624.jpg",
+        "KCS05659.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "blockMargin": "1rem",
+      "photos": [
+        "KCS05655.jpg",
+        "KCS05658.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS05661.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS05665.jpg"
+      ]
+    }
+  ],
   "photos": [
     {
       "filename": "2026-0919-1110-07.962.jpg",

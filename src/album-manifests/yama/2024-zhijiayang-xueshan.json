@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "title": "志佳陽上雪山",
   "info": "2024.3",
   "order": 30,
@@ -14,6 +14,227 @@
       "y": 50
     }
   },
+  "blocks": [
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "Day 2"
+    },
+    {
+      "type": "Row",
+      "caption": "瓢簞山屋 4:25 | 原本計畫睡賽良久營地，到營地後決定繼續推到瓢簞山屋，一來還有時間，再往前推的話隔天可以多睡一些，二來路上只遇到另外四個人，瓢簞山屋應該沒睡滿，三來開始下雨了。到山屋後發現已經有兩團大哥大姐，幸好床位剛好夠我們睡，還喝了很辣的薑茶。",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS01028.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "在此行前從未看過中央尖山，看到的第一眼不需要peak finder，直覺告訴我這就是中央尖山。完全被煞到，期待有一天能從那裡望向雪山。",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS01062.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS01085.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "雪山山莊舊址營地 | 前方溪谷為第三日上雪山路徑。",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS01260.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "雪山南峰 | 風很大腳很抖。",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS01308.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "Day 3"
+    },
+    {
+      "type": "Row",
+      "caption": "雪山主峰南壁碎石坡 |\n凌晨從雪山山莊舊址出發，沿著雪山南壁溪溝陡上。溪溝多是大石頭加上前幾天都有雨，並不是很好走，如果是反方向下山應該會good good see。離開溪溝接上南壁的碎石坡後就是單純的心肺和肌耐力考驗。雖然沒能在日出前抵達山頂，但第一道陽光照在碎石坡上時心中只有感動與慶幸。",
+      "captionPosition": "left top",
+      "photos": [
+        "KCS01403.jpg",
+        "KCS01449.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS01460.jpg",
+        "KCS01484.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS01486.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS01490.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS01557.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS01493.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS01500.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS01556.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "雪山主峰 |\n出發前幾天都還有降雪，當時一直在評估是否要取消行程。還好天公賞臉，出發前預報顯示天氣好轉，到山頂時雪也還沒融，是南國子民第一次在台灣高山摸到雪。",
+      "captionPosition": "left top",
+      "photos": [
+        "KCS01522.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS01546.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS01562.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS01598.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS01613.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS01618.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "在圈谷遺失了一頂岩盔。當時為了將太陽眼鏡收起來暫時將岩盔脫下放在旁邊。也是南國子民沒滑過雪沒料到雪地的摩擦力如此小。沒有很快，但你就是知道追不上了。",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS01624.jpg",
+        "KCS01631.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS01633.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "圈谷底",
+      "captionPosition": "left top",
+      "photos": [
+        "KCS01649.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS01654.jpg",
+        "KCS01657.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS01656.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "黑森林",
+      "captionPosition": "left top",
+      "photos": [
+        "KCS01666.jpg",
+        "KCS01674.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS01669.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "三六九山莊草坡",
+      "captionPosition": "left top",
+      "photos": [
+        "KCS01709.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "品田山的褶皺",
+      "captionPosition": "left bottom",
+      "photos": [
+        "KCS01724.jpg"
+      ]
+    }
+  ],
   "photos": [
     {
       "filename": "KCS01028.jpg",

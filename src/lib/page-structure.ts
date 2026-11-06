@@ -1,3 +1,5 @@
+import type { AlbumBlock } from './albums/types';
+
 type PagePhoto = { itemKey?: string; column?: string };
 
 type PageBlock = {
@@ -26,6 +28,11 @@ export function rowCells(photos: PagePhoto[] = []): RowCell[] {
 }
 
 const photoName = (photo: PagePhoto) => (photo.itemKey || '').replace(/^.*\//, '');
+const photoKey = (photo: PagePhoto) => photo.itemKey || '';
+
+/** Undefined optional fields are dropped so stored blocks stay minimal. */
+const compact = <T extends object>(value: T): T =>
+    Object.fromEntries(Object.entries(value).filter(([, entry]) => entry !== undefined)) as T;
 
 function findPhoto(blocks: PageBlock[], name: string) {
     for (let blockIndex = 0; blockIndex < blocks.length; blockIndex += 1) {
@@ -138,69 +145,98 @@ function defaultBlockMargin(blocks: PageBlock[], index: number) {
     return isCarouselLike(blocks[index]) || isCarouselLike(blocks[index + 1]) ? '1.5' : '0.5';
 }
 
-// Only a margin that differs from the rendered default is written, so an
+// Only a margin that differs from the rendered default is stored, so an
 // explicit 0.5rem next to a Carousel survives.
 function blockMarginProp(blocks: PageBlock[], index: number) {
     const props = blocks[index].props || {};
     const value = props.blockMargin || props.mb;
     const margin = remNumber(value);
-    return margin && margin !== defaultBlockMargin(blocks, index) ? `\n  blockMargin="${value}"` : '';
+    return margin && margin !== defaultBlockMargin(blocks, index) ? String(value) : undefined;
 }
 
-export function serializePageBody(blocks: PageBlock[]) {
-    let body = '';
-    for (const [index, block] of blocks.entries()) {
+const positiveInteger = (value: unknown, max: number) =>
+    Math.min(max, Math.max(0, Math.trunc(Number(value) || 0)));
+
+/** Converts the Page Manager draft into stored blocks, dropping default-valued props. */
+export function pageBlocksToAlbumBlocks(blocks: PageBlock[]): AlbumBlock[] {
+    // A media block emptied by the editor has nothing to render.
+    const kept = blocks.filter((block) => block.type === 'Text' || (block.photos || []).length > 0);
+    return kept.map((block, index): AlbumBlock => {
         const props = block.props || {};
+        const blockMargin = blockMarginProp(kept, index);
         if (block.type === 'Text') {
-            let propsText = '';
-            if (props.align && props.align !== 'center') propsText += `\n  align="${props.align}"`;
-            if (props.size && props.size !== 'caption') propsText += `\n  size="${props.size}"`;
-            propsText += blockMarginProp(blocks, index);
-            body += `<Text${propsText}>\n  ${block.text || ''}\n</Text>\n\n`;
-            continue;
+            return compact({
+                type: 'Text',
+                align: props.align && props.align !== 'center' ? props.align : undefined,
+                size: props.size && props.size !== 'caption' ? props.size : undefined,
+                blockMargin,
+                text: block.text || '',
+            });
         }
 
-        let propsText = '';
-        if (props.caption) propsText += `\n  caption="${props.caption}"`;
-        if (props.captionPosition && props.captionPosition !== 'center bottom') propsText += `\n  captionPosition="${props.captionPosition}"`;
-        propsText += blockMarginProp(blocks, index);
-        const isPanorama = block.type === 'PhotoPanorama';
-        if ((block.type === 'PhotoCarousel' || isPanorama) && props.initialSlide) {
-            propsText += `\n  initialSlide={${props.initialSlide}}`;
-        }
-        const peekPercent = Math.min(90, Math.max(0, Math.trunc(Number(props.peekPercent) || 0)));
-        if (block.type === 'PhotoCarousel' && peekPercent > 0) {
-            propsText += `\n  peekPercent={${peekPercent}}`;
-        }
-        if (isPanorama && props.initialView === 'panorama') {
-            propsText += `\n  initialView="panorama"`;
-        }
-        const panoramaSlices = Math.min(24, Math.max(1, Math.trunc(Number(props.panoramaSlices) || 1)));
-        if (isPanorama && block.photos?.length === 1 && panoramaSlices > 1) {
-            propsText += `\n  panoramaSlices={${panoramaSlices}}`;
-        }
-        body += `<${block.type}${propsText}>\n`;
         const photos = block.photos || [];
-        const cells = block.type === 'Row'
-            ? rowCells(photos)
-            : photos.map((_, index) => ({ start: index, end: index + 1 }) as RowCell);
-        for (const cell of cells) {
-            const members = photos.slice(cell.start, cell.end);
-            if (!cell.column) {
-                body += `  <Photo itemKey="${members[0].itemKey}" />\n`;
-                continue;
-            }
-            body += '  <Column>\n';
-            for (const photo of members) body += `    <Photo itemKey="${photo.itemKey}" />\n`;
-            body += '  </Column>\n';
+        const media = {
+            caption: props.caption || undefined,
+            captionPosition: props.captionPosition && props.captionPosition !== 'center bottom'
+                ? props.captionPosition
+                : undefined,
+            blockMargin,
+        };
+        if (block.type === 'Row') {
+            return compact({
+                type: 'Row',
+                ...media,
+                photos: rowCells(photos).map((cell) => cell.column
+                    ? { column: photos.slice(cell.start, cell.end).map(photoKey) }
+                    : photoKey(photos[cell.start])),
+            });
         }
-        body += `</${block.type}>\n\n`;
-    }
-    return body.trim();
+        if (block.type === 'PhotoCarousel') {
+            return compact({
+                type: 'PhotoCarousel',
+                ...media,
+                initialSlide: positiveInteger(props.initialSlide, Number.MAX_SAFE_INTEGER) || undefined,
+                peekPercent: positiveInteger(props.peekPercent, 90) || undefined,
+                photos: photos.map(photoKey),
+            });
+        }
+        if (block.type === 'PhotoPanorama') {
+            const panoramaSlices = Math.max(1, positiveInteger(props.panoramaSlices, 24));
+            return compact({
+                type: 'PhotoPanorama',
+                ...media,
+                initialSlide: positiveInteger(props.initialSlide, Number.MAX_SAFE_INTEGER) || undefined,
+                initialView: props.initialView === 'panorama' ? 'panorama' : undefined,
+                panoramaSlices: photos.length === 1 && panoramaSlices > 1 ? panoramaSlices : undefined,
+                photos: photos.map(photoKey),
+            });
+        }
+        throw new Error(`Unsupported page block type: ${block.type}`);
+    });
 }
 
-export function createLayoutOnlyPageContent(blocks: PageBlock[]) {
-    return `---\n---\n\n${serializePageBody(blocks)}\n`;
+/** Converts stored blocks into the Page Manager draft; Row Columns get fresh column ids. */
+export function albumBlocksToPageBlocks(blocks: AlbumBlock[]): PageBlock[] {
+    let columnCount = 0;
+    return blocks.map((block) => {
+        if (block.type === 'Text') {
+            const { type, text, ...props } = block;
+            return { type, props, text, photos: [] };
+        }
+        const { type, photos, ...props } = block;
+        if (block.type !== 'Row') {
+            return { type, props, photos: block.photos.map((itemKey) => ({ itemKey })) };
+        }
+        return {
+            type,
+            props,
+            photos: block.photos.flatMap((item) => {
+                if (typeof item === 'string') return [{ itemKey: item }];
+                const column = `column-${columnCount++}`;
+                return item.column.map((itemKey) => ({ itemKey, column }));
+            }),
+        };
+    });
 }
 
 export function referencedLocalNames(blocks: PageBlock[]) {

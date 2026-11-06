@@ -1,8 +1,6 @@
-import { getCollection } from "astro:content";
-
 import type { AlbumCatalog } from "./catalog-core.ts";
 import {
-    buildAlbumCatalogFromSources,
+    buildAlbumCatalogFromManifests,
     createAlbumSummaryReader,
 } from "./catalog-source.ts";
 import type { AlbumSummary, JsonModule } from "./catalog-source.ts";
@@ -23,15 +21,7 @@ type CatalogState = {
 let catalogStatePromise: Promise<CatalogState> | undefined;
 
 async function loadCatalogState(): Promise<CatalogState> {
-    const entries = await getCollection("albums");
-    const catalog = buildAlbumCatalogFromSources(
-        entries.map((entry) => ({
-            slug: entry.id,
-            mdxPath: `/src/content/albums/${entry.id}.mdx`,
-            mdxBody: entry.body ?? "",
-        })),
-        manifestModules,
-    );
+    const catalog = buildAlbumCatalogFromManifests(manifestModules);
     return { catalog, readSummaries: createAlbumSummaryReader(catalog) };
 }
 

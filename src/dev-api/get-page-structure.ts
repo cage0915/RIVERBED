@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { readAlbumManifestFile } from '../lib/albums/manifest-files';
 import { albumPageManagerMetadata, assertAlbumAssetStorageSafe } from '../lib/albums/album-lifecycle';
+import { albumBlocksToPageBlocks } from '../lib/page-structure';
 import { json } from './_http';
 
 export const GET: APIRoute = async ({ request }) => {
@@ -13,124 +14,13 @@ export const GET: APIRoute = async ({ request }) => {
         return json({ error: 'Missing albumSlug' }, 400);
     }
 
-    const mdxFile = path.resolve(process.cwd(), 'src/content/albums', `${albumSlug}.mdx`);
-    if (!fs.existsSync(mdxFile)) {
-        return json({ error: 'MDX file not found' }, 404);
-    }
-
     let manifest;
     try {
         manifest = await readAlbumManifestFile(process.cwd(), albumSlug);
     } catch (error) {
         return json({ error: error instanceof Error ? error.message : 'Manifest not found' }, 404);
     }
-    const content = fs.readFileSync(mdxFile, 'utf-8');
-
-    // Simple parser for MDX blocks
-    // 1. Extract Frontmatter
-    const fmMatch = content.match(/^---\r?\n[\s\S]*?^---[ \t]*(?:\r?\n|$)/m);
-    const body = fmMatch ? content.slice(fmMatch[0].length).trim() : content;
-
-    // 2. Extract Blocks
-    // Regex to match the supported album layout blocks.
-    const blockRegex = /<(Row|PhotoCarousel|PhotoPanorama|Text)\b([^>]*?)>([\s\S]*?)<\/\1>/g;
-    const blocks: any[] = [];
-    let columnCount = 0;
-    let match;
-
-    while ((match = blockRegex.exec(body)) !== null) {
-        let type = match[1];
-        const propsStr = match[2];
-        const innerContent = match[3];
-
-        // Handle Text blocks separately
-        if (type === 'Text') {
-            const props: any = {};
-            const alignMatch = propsStr.match(/align="([^"]*)"/);
-            if (alignMatch) props.align = alignMatch[1];
-            const sizeMatch = propsStr.match(/size="([^"]*)"/);
-            if (sizeMatch) props.size = sizeMatch[1];
-            const mtMatch = propsStr.match(/mt="([^"]*)"/);
-            if (mtMatch) props.mt = mtMatch[1];
-            const mbMatch = propsStr.match(/mb="([^"]*)"/);
-            if (mbMatch) props.mb = mbMatch[1];
-            const blockMarginMatch = propsStr.match(/blockMargin="([^"]*)"/);
-            if (blockMarginMatch) props.blockMargin = blockMarginMatch[1];
-            blocks.push({ type: 'Text', props, text: innerContent.trim(), photos: [] });
-            continue;
-        }
-
-        // Parse media block props.
-        const props: any = {};
-        const captionMatch = propsStr.match(/caption="([^"]*)"/);
-        if (captionMatch) props.caption = captionMatch[1];
-
-        const posMatch = propsStr.match(/captionPosition="([^"]*)"/);
-        if (posMatch) props.captionPosition = posMatch[1];
-
-        const paddingMatch = propsStr.match(/padding="([^"]*)"/);
-        if (paddingMatch) props.padding = paddingMatch[1];
-
-        const mbMatch = propsStr.match(/mb="([^"]*)"/);
-        if (mbMatch) props.mb = mbMatch[1];
-
-        const mtMatch = propsStr.match(/mt="([^"]*)"/);
-        if (mtMatch) props.mt = mtMatch[1];
-
-        const blockMarginMatch = propsStr.match(/blockMargin="([^"]*)"/);
-        if (blockMarginMatch) props.blockMargin = blockMarginMatch[1];
-
-        const captionMarginMatch = propsStr.match(/captionMargin="([^"]*)"/);
-        if (captionMarginMatch) props.captionMargin = captionMarginMatch[1];
-
-        const initialSlideMatch = propsStr.match(/initialSlide=\{(\d+)\}/);
-        if (initialSlideMatch) props.initialSlide = parseInt(initialSlideMatch[1]);
-
-        // Legacy syntax: <PhotoCarousel enablePanorama> is read as a PhotoPanorama block.
-        if (type === 'PhotoCarousel' && /\benablePanorama(?:=\{true\})?(?=\s|$)/.test(propsStr)) {
-            type = 'PhotoPanorama';
-        }
-
-        if (type === 'PhotoCarousel') {
-            const peekPercentMatch = propsStr.match(/peekPercent=\{(\d+)\}/);
-            if (peekPercentMatch) {
-                props.peekPercent = Math.min(90, Math.max(0, parseInt(peekPercentMatch[1])));
-            }
-        }
-
-        if (type === 'PhotoPanorama') {
-            const initialViewMatch = propsStr.match(/initialView="(carousel|panorama)"/);
-            if (initialViewMatch) props.initialView = initialViewMatch[1];
-
-            const panoramaSlicesMatch = propsStr.match(/panoramaSlices=\{(\d+)\}/);
-            if (panoramaSlicesMatch) {
-                props.panoramaSlices = Math.min(24, Math.max(1, parseInt(panoramaSlicesMatch[1])));
-            }
-        }
-
-        // Parse Photos inside Block. Photos inside a Row's <Column> share a column id.
-        const photoRegex = /<Photo\s+([^>]*?)\/>|<(\/?)Column\b[^>]*>/g;
-        const photos: any[] = [];
-        let column: string | undefined;
-        let pMatch;
-        while ((pMatch = photoRegex.exec(innerContent)) !== null) {
-            if (pMatch[1] === undefined) {
-                column = pMatch[2] || type !== 'Row' ? undefined : `column-${columnCount++}`;
-                continue;
-            }
-            const pPropsStr = pMatch[1];
-            const itemKeyMatch = pPropsStr.match(/itemKey="([^"]*)"/);
-            if (itemKeyMatch) {
-                photos.push(column ? { itemKey: itemKeyMatch[1], column } : { itemKey: itemKeyMatch[1] });
-            }
-        }
-
-        blocks.push({
-            type,
-            props,
-            photos
-        });
-    }
+    const blocks = albumBlocksToPageBlocks(manifest.blocks);
 
     const localDirectory = path.resolve(process.cwd(), 'r2', albumSlug);
     await assertAlbumAssetStorageSafe(process.cwd(), albumSlug);

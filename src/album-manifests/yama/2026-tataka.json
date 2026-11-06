@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "title": "塔塔加三山",
   "info": "2026.1",
   "order": 200,
@@ -14,6 +14,167 @@
       "y": 50
     }
   },
+  "blocks": [
+    {
+      "type": "PhotoCarousel",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS00671.jpg",
+        "KCS00670.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS00696.jpg",
+        "KCS00693.jpg",
+        "KCS00695.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "鹿林天文台",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS00697.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS00712.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS00715.jpg",
+        "KCS00716.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS00720.jpg",
+        "KCS00735.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00729.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00736.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00737.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00761.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00743.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS00749.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS00772.jpg",
+        "KCS00771.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00746.jpg",
+        "KCS00780.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS00776.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "阿里山公路",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS00784.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00849.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00789.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "栗背林鴝（Tarsiger johnstoniae）",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS00707.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00818.jpg",
+        "KCS00831.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00862.jpg",
+        "KCS00724.jpg",
+        "KCS00872.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS00879.jpg"
+      ]
+    }
+  ],
   "photos": [
     {
       "filename": "KCS00671.jpg",

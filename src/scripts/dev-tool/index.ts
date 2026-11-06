@@ -557,7 +557,7 @@ const savePendingChanges = async () => {
     updateSaveButtonState(true);
     const tagsSaved = await savePendingTagChanges(albumSlug);
     if (tagsSaved && hasPendingBlockChanges) {
-        // The dev server can apply an MDX update before the response returns.
+        // The dev server can reload on the manifest update before the response returns.
         sessionStorage.setItem('dev-caption-save-scroll-y', String(window.scrollY));
     }
     const blocksSaved = tagsSaved && await savePendingPageChanges(albumSlug);

@@ -2,13 +2,13 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
-    buildAlbumCatalogFromSources,
+    buildAlbumCatalogFromManifests,
     createAlbumSummaryReader,
 } from "./catalog-source.ts";
 
 function validManifest(overrides = {}) {
     return {
-        schemaVersion: 1,
+        schemaVersion: 2,
         title: "Source",
         order: 10,
         cover: {
@@ -16,22 +16,29 @@ function validManifest(overrides = {}) {
             zoom: 1,
             offset: { x: 50, y: 50 },
         },
+        blocks: [{ type: "Row", photos: ["A.jpg"] }],
         photos: [{ filename: "A.jpg" }],
         ...overrides,
     };
 }
 
+test("derives Album slugs from manifest module paths", () => {
+    const catalog = buildAlbumCatalogFromManifests({
+        "/src/album-manifests/yama/source.json": { default: validManifest() },
+    });
+
+    assert.deepEqual(catalog.getAlbums().map(({ slug }) => slug), ["yama/source"]);
+    assert.deepEqual(catalog.getAlbum("yama/source").blocks, [{ type: "Row", photos: ["A.jpg"] }]);
+    assert.throws(
+        () => buildAlbumCatalogFromManifests({ "/elsewhere/source.json": { default: validManifest() } }),
+        /Unexpected Album manifest path: \/elsewhere\/source\.json/,
+    );
+});
+
 test("manifest parse failures name the exact manifest path and preserve their cause", () => {
     const manifestPath = "/src/album-manifests/yama/source.json";
     assert.throws(
-        () => buildAlbumCatalogFromSources(
-            [{
-                slug: "yama/source",
-                mdxPath: "/src/content/albums/yama/source.mdx",
-                mdxBody: '<Photo itemKey="A.jpg" />',
-            }],
-            { [manifestPath]: { default: validManifest({ title: "" }) } },
-        ),
+        () => buildAlbumCatalogFromManifests({ [manifestPath]: { default: validManifest({ title: "" }) } }),
         (error) => {
             assert.match(error.message, new RegExp(manifestPath));
             assert.match(error.message, /title must not be empty/);
@@ -43,24 +50,18 @@ test("manifest parse failures name the exact manifest path and preserve their ca
 });
 
 test("catalog validation failures include their code, actionable source path, and field", () => {
-    const mdxPath = "/src/content/albums/yama/source.mdx";
     assert.throws(
-        () => buildAlbumCatalogFromSources(
-            [{
-                slug: "yama/source",
-                mdxPath,
-                mdxBody: '<Photo itemKey="missing.jpg" />',
-            }],
-            {
-                "/src/album-manifests/yama/source.json": {
-                    default: validManifest(),
-                },
+        () => buildAlbumCatalogFromManifests({
+            "/src/album-manifests/yama/source.json": {
+                default: validManifest({
+                    blocks: [{ type: "Row", photos: ["A.jpg", "missing.jpg"] }],
+                }),
             },
-        ),
+        }),
         (error) => {
             assert.match(
                 error.message,
-                /\[mdx-photo-missing-from-manifest\] yama\/source sourcePath=\/src\/content\/albums\/yama\/source\.mdx manifestPath=\/src\/album-manifests\/yama\/source\.json fieldPath=Photo@0:/,
+                /\[block-photo-missing-from-manifest\] yama\/source sourcePath=\/src\/album-manifests\/yama\/source\.json manifestPath=\/src\/album-manifests\/yama\/source\.json fieldPath=blocks:/,
             );
             return true;
         },
@@ -78,6 +79,7 @@ test("summary reader snapshots full albums once and returns defensive cover clon
             ...validManifest().cover,
             assetKey: "yama/source/A.jpg",
         },
+        blocks: [{ type: "Row", photos: ["A.jpg"] }],
         photos: [{
             sourceAlbumSlug: "yama/source",
             sourceAlbumTitle: "Source",
@@ -99,6 +101,7 @@ test("summary reader snapshots full albums once and returns defensive cover clon
     const second = readSummaries();
     assert.equal(calls, 1);
     assert.ok(!("photos" in first[0]));
+    assert.ok(!("blocks" in first[0]));
     assert.notEqual(first[0], second[0]);
     assert.notEqual(first[0].cover, second[0].cover);
     assert.notEqual(first[0].cover.photo, second[0].cover.photo);

@@ -3,12 +3,12 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import test from 'node:test';
 
 import {
+    albumBlocksToPageBlocks,
     applyDefaultCaptionBoundaryMargin,
-    createLayoutOnlyPageContent,
     movePageBlock,
     movePagePhotos,
+    pageBlocksToAlbumBlocks,
     rowCells,
-    serializePageBody,
     referencedLocalNames,
 } from './page-structure.ts';
 
@@ -80,15 +80,11 @@ test('referenced local names include only page photos', () => {
     assert.deepEqual([...names], ['one.jpg', 'two.jpg']);
 });
 
-test('layout-only Page Manager serialization never writes Album metadata to MDX', () => {
-    const content = createLayoutOnlyPageContent([
-        { type: 'Row', photos: [{ itemKey: 'new.jpg' }] },
-    ]);
-    assert.equal(content, '---\n---\n\n<Row>\n  <Photo itemKey="new.jpg" />\n</Row>\n');
-    assert.doesNotMatch(
-        content,
-        /^(?:title|info|coverKey|coverZoom|coverOffset|gap|order|publishedAt):/m,
-    );
+test('Page Manager blocks store only layout, without editor-only fields', () => {
+    assert.deepEqual(pageBlocksToAlbumBlocks([
+        { type: 'Row', __devKey: 'k1', props: {}, photos: [{ itemKey: 'new.jpg' }] },
+        { type: 'Row', props: {}, photos: [] },
+    ]), [{ type: 'Row', photos: ['new.jpg'] }]);
 });
 
 test('caption spacing initializes the adjacent block bottom margin without replacing custom spacing', () => {
@@ -123,47 +119,46 @@ test('caption spacing initializes the adjacent block bottom margin without repla
     assert.equal(applyDefaultCaptionBoundaryMargin(bottomBlocks, 2), false);
 });
 
-test('Page Manager serialization retires captionMargin', () => {
-    const content = createLayoutOnlyPageContent([
+test('Page Manager blocks retire captionMargin', () => {
+    assert.deepEqual(pageBlocksToAlbumBlocks([
         {
             type: 'Row',
             props: { caption: 'Caption', captionMargin: '3rem', blockMargin: '1.5rem' },
             photos: [{ itemKey: 'one.jpg' }],
         },
-    ]);
-    assert.doesNotMatch(content, /captionMargin/);
-    assert.match(content, /blockMargin="1\.5rem"/);
+    ]), [{ type: 'Row', caption: 'Caption', blockMargin: '1.5rem', photos: ['one.jpg'] }]);
 });
 
 test('caption serialization and pending preview preserve manual line breaks', () => {
-    const content = createLayoutOnlyPageContent([
+    const [block] = pageBlocksToAlbumBlocks([
         {
             type: 'Row',
-            props: { caption: 'First line\nSecond line' },
+            props: { caption: 'First line\nSecond line "quoted"' },
             photos: [{ itemKey: 'one.jpg' }],
         },
     ]);
     const devTool = readDevToolSource();
 
-    assert.match(content, /caption="First line\nSecond line"/);
+    assert.equal(block.caption, 'First line\nSecond line "quoted"');
     assert.match(devTool, /\.dev-caption-live-preview\s*\{\s*white-space: pre-line;/);
     assert.match(devTool, /preview\.classList\.add\('dev-caption-live-preview'\);\s*preview\.textContent = caption/);
     assert.match(devTool, /stageInlineCaption\(textInput\.value\.trim\(\)\)/);
 });
 
-test('Text serialization uses one bottom block margin and retires legacy Text margins', () => {
-    const content = createLayoutOnlyPageContent([
+test('Text blocks use one bottom block margin and retire legacy Text margins', () => {
+    assert.deepEqual(pageBlocksToAlbumBlocks([
         { type: 'Text', props: { align: 'left', size: 'title', mt: '2rem', mb: '1.5rem' }, text: 'Section' },
+        { type: 'Text', props: { align: 'center', size: 'caption' }, text: 'Plain' },
         { type: 'Row', props: { blockMargin: '0.5rem' }, photos: [{ itemKey: 'one.jpg' }] },
+    ]), [
+        { type: 'Text', align: 'left', size: 'title', blockMargin: '1.5rem', text: 'Section' },
+        { type: 'Text', text: 'Plain' },
+        { type: 'Row', photos: ['one.jpg'] },
     ]);
-
-    assert.match(content, /<Text\s+align="left"\s+size="title"\s+blockMargin="1\.5rem">/);
-    assert.doesNotMatch(content, /\smt=|\smb=/);
-    assert.doesNotMatch(content, /blockMargin="0\.5rem"/);
 });
 
-test('PhotoPanorama serialization preserves its configured initial view and slide', () => {
-    const content = createLayoutOnlyPageContent([{
+test('PhotoPanorama blocks preserve their configured initial view and slide', () => {
+    assert.deepEqual(pageBlocksToAlbumBlocks([{
         type: 'PhotoPanorama',
         props: { initialView: 'panorama', initialSlide: 2 },
         photos: [
@@ -171,39 +166,32 @@ test('PhotoPanorama serialization preserves its configured initial view and slid
             { itemKey: 'two.jpg' },
             { itemKey: 'three.jpg' },
         ],
+    }]), [{
+        type: 'PhotoPanorama',
+        initialSlide: 2,
+        initialView: 'panorama',
+        photos: ['one.jpg', 'two.jpg', 'three.jpg'],
     }]);
-
-    assert.match(content, /<PhotoPanorama\s+initialSlide=\{2\}\s+initialView="panorama">/);
-    assert.match(content, /<Photo itemKey="three\.jpg" \/>/);
-    assert.match(content, /<\/PhotoPanorama>/);
-    assert.doesNotMatch(content, /<PhotoCarousel|enablePanorama/);
 });
 
-test('PhotoCarousel serialization drops panorama-only props', () => {
-    const content = createLayoutOnlyPageContent([{
+test('PhotoCarousel blocks drop panorama-only props', () => {
+    assert.deepEqual(pageBlocksToAlbumBlocks([{
         type: 'PhotoCarousel',
         props: { initialView: 'panorama', panoramaSlices: 3, initialSlide: 1 },
         photos: [{ itemKey: 'one.jpg' }, { itemKey: 'two.jpg' }],
-    }]);
-
-    assert.match(content, /<PhotoCarousel\s+initialSlide=\{1\}>/);
-    assert.doesNotMatch(content, /initialView|panoramaSlices|enablePanorama/);
+    }]), [{ type: 'PhotoCarousel', initialSlide: 1, photos: ['one.jpg', 'two.jpg'] }]);
 });
 
-test('single-photo panorama serializes a bounded display-only slice count', () => {
-    const single = createLayoutOnlyPageContent([{
-        type: 'PhotoPanorama',
-        props: { panoramaSlices: 3 },
-        photos: [{ itemKey: 'one.jpg' }],
-    }]);
-    const multiple = createLayoutOnlyPageContent([{
-        type: 'PhotoPanorama',
-        props: { panoramaSlices: 3 },
-        photos: [{ itemKey: 'one.jpg' }, { itemKey: 'two.jpg' }],
-    }]);
+test('single-photo panorama stores a bounded display-only slice count', () => {
+    const [single, bounded, multiple] = pageBlocksToAlbumBlocks([
+        { type: 'PhotoPanorama', props: { panoramaSlices: 3 }, photos: [{ itemKey: 'one.jpg' }] },
+        { type: 'PhotoPanorama', props: { panoramaSlices: 40 }, photos: [{ itemKey: 'two.jpg' }] },
+        { type: 'PhotoPanorama', props: { panoramaSlices: 3 }, photos: [{ itemKey: 'three.jpg' }, { itemKey: 'four.jpg' }] },
+    ]);
 
-    assert.match(single, /<PhotoPanorama\s+panoramaSlices=\{3\}>/);
-    assert.doesNotMatch(multiple, /panoramaSlices/);
+    assert.equal(single.panoramaSlices, 3);
+    assert.equal(bounded.panoramaSlices, 24);
+    assert.equal('panoramaSlices' in multiple, false);
 });
 
 test('PhotoPanorama is a standalone block with full-width carousel and joined proportional views', () => {
@@ -214,8 +202,10 @@ test('PhotoPanorama is a standalone block with full-width carousel and joined pr
     const devTool = readDevToolSource();
 
     assert.doesNotMatch(carousel, /enablePanorama|PhotoPanorama|panoramaSlices/);
-    assert.match(albumPage, /import PhotoPanorama from "\.\.\/\.\.\/components\/PhotoPanorama\.astro"/);
-    assert.match(albumPage, /components=\{\{ Row, Column, Photo: AlbumPhoto, Text, PhotoCarousel, PhotoPanorama \}\}/);
+    const albumBlocks = readProjectFile('src/components/AlbumBlocks.astro');
+    assert.match(albumPage, /<AlbumBlocks album=\{albumRecord\} \/>/);
+    assert.match(albumBlocks, /import PhotoPanorama from "\.\/PhotoPanorama\.astro"/);
+    assert.match(albumBlocks, /case "PhotoPanorama":[\s\S]*?<PhotoPanorama/);
     assert.match(panorama, /initialView\?: PanoramaView/);
     assert.match(panorama, /data-initial-view=\{view\}/);
     assert.match(panorama, /data-panorama-slices=\{displaySlices\}/);
@@ -261,10 +251,7 @@ test('PhotoPanorama is a standalone block with full-width carousel and joined pr
     assert.match(panorama, /data-single-photo-sliced[^}]*photo-panorama-single-source\)\s*\{\s*display: none/);
     assert.match(panorama, /\.photo-panorama-controls\s*\{\s*position: relative;\s*z-index: 3/);
     assert.match(panorama, /data-view="panorama"\] \.photo-panorama-dots\s*\{\s*display: none/);
-    assert.match(getStructure, /Row\|PhotoCarousel\|PhotoPanorama\|Text/);
-    assert.match(getStructure, /type === 'PhotoCarousel' && \/\\benablePanorama[\s\S]*?type = 'PhotoPanorama'/);
-    assert.match(getStructure, /panoramaSlices=\\\{\(\\d\+\)\\\}/);
-    assert.match(getStructure, /initialView="\(carousel\|panorama\)"/);
+    assert.match(getStructure, /albumBlocksToPageBlocks\(manifest\.blocks\)/);
     assert.match(devTool, /label: 'Panorama', value: 'PhotoPanorama'/);
     assert.doesNotMatch(devTool, /enablePanorama|targetPanorama|sourcePanorama/);
     assert.doesNotMatch(devTool, /photo-panorama-initial-view/);
@@ -333,7 +320,7 @@ test('Page Manager route and UI use structured manifest metadata without frontma
     assert.match(getStructure, /readAlbumManifestFile/);
     assert.match(getStructure, /metadata/);
     assert.doesNotMatch(getStructure, /frontmatter\s*[,}]/);
-    assert.match(saveManager, /createLayoutOnlyPageContent/);
+    assert.match(saveManager, /pageBlocksToAlbumBlocks/);
     assert.match(saveManager, /withAlbumManifestLocks[\s\S]*commitAlbumPageSourcesWithinLock/);
     assert.doesNotMatch(saveManager, /if \(fs\.existsSync\(target\)\) continue/);
     assert.doesNotMatch(saveManager, /draft\.frontmatter|frontmatterString/);
@@ -440,7 +427,6 @@ test('direct block margin control stages changes for the shared save action', ()
 test('Page Manager delegates all Text settings to the direct Text toolbar', () => {
     const devTool = readDevToolSource();
     const text = readProjectFile('src/components/Text.astro');
-    const getStructure = readProjectFile('src/dev-api/get-page-structure.ts');
 
     assert.doesNotMatch(devTool, /dev-pm-margin-control|text-block-mt|text-block-mb|text-block-content|text-block-align|text-block-size/);
     assert.match(devTool, /dev-btn-text[\s\S]*?title="Edit Text"[\s\S]*?\$\{ICONS\.quote\}/);
@@ -450,7 +436,6 @@ test('Page Manager delegates all Text settings to the direct Text toolbar', () =
     assert.match(text, /data-dev-block=\{isDev \? "text" : undefined\}/);
     assert.match(text, /margin-bottom: \$\{finalBlockMargin\}/);
     assert.doesNotMatch(text, /margin-top:/);
-    assert.match(getStructure, /blockMarginMatch[\s\S]*?props\.blockMargin/);
 });
 
 test('Page Manager delegates caption editing to the direct block toolbar', () => {
@@ -626,19 +611,21 @@ test('carousel defaults to full-width slides with arrows and an adjustable peek'
     assert.match(devTool, /className = `carousel-arrow carousel-arrow--\$\{direction\}`/);
 });
 
-test('carousel peek percent serializes only when set on a carousel', () => {
+test('carousel peek percent is stored only when set on a carousel', () => {
     const photos = [{ itemKey: 'one.jpg' }, { itemKey: 'two.jpg' }];
-    const peek = createLayoutOnlyPageContent([{ type: 'PhotoCarousel', props: { peekPercent: 20, initialSlide: 1 }, photos }]);
-    const none = createLayoutOnlyPageContent([{ type: 'PhotoCarousel', props: { peekPercent: 0 }, photos }]);
-    const clamped = createLayoutOnlyPageContent([{ type: 'PhotoCarousel', props: { peekPercent: 150 }, photos }]);
-    const panorama = createLayoutOnlyPageContent([{ type: 'PhotoPanorama', props: { peekPercent: 20 }, photos }]);
-    const getStructure = readProjectFile('src/dev-api/get-page-structure.ts');
+    const [peek, none, clamped, panorama] = pageBlocksToAlbumBlocks([
+        { type: 'PhotoCarousel', props: { peekPercent: 20, initialSlide: 1 }, photos },
+        { type: 'PhotoCarousel', props: { peekPercent: 0 }, photos },
+        { type: 'PhotoCarousel', props: { peekPercent: 150 }, photos },
+        { type: 'PhotoPanorama', props: { peekPercent: 20 }, photos },
+    ]);
 
-    assert.match(peek, /<PhotoCarousel\s+initialSlide=\{1\}\s+peekPercent=\{20\}>/);
-    assert.doesNotMatch(none, /peekPercent/);
-    assert.match(clamped, /peekPercent=\{90\}/);
-    assert.doesNotMatch(panorama, /peekPercent/);
-    assert.match(getStructure, /peekPercent=\\\{\(\\d\+\)\\\}/);
+    assert.equal(peek.initialSlide, 1);
+    assert.equal(peek.peekPercent, 20);
+    assert.equal('peekPercent' in none, false);
+    assert.equal(clamped.peekPercent, 90);
+    assert.equal('peekPercent' in panorama, false);
+    assert.equal(albumBlocksToPageBlocks([peek])[0].props.peekPercent, 20);
 });
 
 test('mobile album media is full bleed while captions keep the content gutter', () => {
@@ -1577,25 +1564,28 @@ test('row cells group consecutive column members and dissolve singletons', () =>
     ]), [{ start: 0, end: 2, column: 'x' }, { start: 2, end: 3 }, { start: 3, end: 4 }]);
 });
 
-test('serialized rows wrap column cells and leave other blocks flat', () => {
-    const body = serializePageBody([
+test('stored rows nest column cells and leave other blocks flat', () => {
+    const blocks = pageBlocksToAlbumBlocks([
         row(['a', 'b'], 'c'),
         { type: 'PhotoCarousel', props: {}, photos: [{ itemKey: 'd', column: 'x' }, { itemKey: 'e', column: 'x' }] },
     ]);
-    assert.equal(body, [
-        '<Row>',
-        '  <Column>',
-        '    <Photo itemKey="a" />',
-        '    <Photo itemKey="b" />',
-        '  </Column>',
-        '  <Photo itemKey="c" />',
-        '</Row>',
-        '',
-        '<PhotoCarousel>',
-        '  <Photo itemKey="d" />',
-        '  <Photo itemKey="e" />',
-        '</PhotoCarousel>',
-    ].join('\n'));
+    assert.deepEqual(blocks, [
+        { type: 'Row', photos: [{ column: ['a', 'b'] }, 'c'] },
+        { type: 'PhotoCarousel', photos: ['d', 'e'] },
+    ]);
+});
+
+test('stored blocks round-trip through the Page Manager draft', () => {
+    const stored = [
+        { type: 'Text', align: 'left', size: 'title', text: 'Section' },
+        { type: 'Row', caption: 'Pair', captionPosition: 'left top', photos: [{ column: ['a', 'b'] }, 'c', { column: ['d', 'e'] }] },
+        { type: 'PhotoCarousel', blockMargin: '0.5rem', initialSlide: 1, photos: ['f', 'g'] },
+        { type: 'PhotoPanorama', initialView: 'panorama', panoramaSlices: 2, photos: ['h'] },
+    ];
+    const draft = albumBlocksToPageBlocks(stored);
+
+    assert.deepEqual(layout(draft.slice(1, 2)), ['[a b] c [d e]']);
+    assert.deepEqual(pageBlocksToAlbumBlocks(draft), stored);
 });
 
 test('photo moves join rows sideways and columns vertically', () => {
@@ -1651,17 +1641,13 @@ test('block moves land above or below the target block', () => {
     assert.equal(movePageBlock(blocks, 'a', 'a', 'down'), false);
 });
 
-test('block margins are written only when they differ from the Carousel-aware default', () => {
-    const body = serializePageBody([
+test('block margins are stored only when they differ from the Carousel-aware default', () => {
+    const blocks = pageBlocksToAlbumBlocks([
         { type: 'Row', props: { blockMargin: '0.5rem' }, photos: [{ itemKey: 'a.jpg' }] },
         { type: 'PhotoCarousel', props: { blockMargin: '0.5rem' }, photos: [{ itemKey: 'b.jpg' }] },
         { type: 'Row', props: { blockMargin: '1.5rem' }, photos: [{ itemKey: 'c.jpg' }] },
         { type: 'PhotoCarousel', props: { blockMargin: '1.5rem' }, photos: [{ itemKey: 'd.jpg' }] },
         { type: 'Row', props: { blockMargin: '0.5rem' }, photos: [{ itemKey: 'e.jpg' }] },
     ]);
-    assert.match(body, /<Row\n  blockMargin="0\.5rem">\n  <Photo itemKey="a\.jpg"/);
-    assert.match(body, /<PhotoCarousel\n  blockMargin="0\.5rem">\n  <Photo itemKey="b\.jpg"/);
-    assert.match(body, /<Row>\n  <Photo itemKey="c\.jpg"/);
-    assert.match(body, /<PhotoCarousel>\n  <Photo itemKey="d\.jpg"/);
-    assert.match(body, /<Row>\n  <Photo itemKey="e\.jpg"/);
+    assert.deepEqual(blocks.map(({ blockMargin }) => blockMargin), ['0.5rem', '0.5rem', undefined, undefined, undefined]);
 });

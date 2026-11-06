@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "title": "２０１９",
   "order": 30,
   "cover": {
@@ -13,6 +13,34 @@
       "y": 50
     }
   },
+  "blocks": [
+    {
+      "type": "Row",
+      "photos": [
+        "01.JPG"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "02.JPG"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "03.JPG",
+        "06.JPG"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "05.JPG"
+      ]
+    }
+  ],
   "photos": [
     {
       "filename": "01.JPG",

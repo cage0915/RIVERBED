@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "title": "花蓮台東",
   "info": "2025.8",
   "order": 230,
@@ -14,6 +14,263 @@
       "y": 50
     }
   },
+  "blocks": [
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "東台灣"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "001.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "caption": "蘭陽溪",
+      "photos": [
+        "002.jpg",
+        "003.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "烏石鼻",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "004.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "清水大山. 台泥和平礦場",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "005.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "蘇花公路",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "006.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "木瓜溪. 花蓮市區",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "007.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "馬鞍溪. 萬里溪. 壽豐溪",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "008.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "長濱",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "009.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "成功. 三仙台",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "010.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "011.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "台東市區",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "012.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "鹿野"
+    },
+    {
+      "type": "Row",
+      "caption": "鹿鳴吊橋. 鹿野溪 (北絲鬮溪)",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "013.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "014.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "015.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "016.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "2rem",
+      "photos": [
+        "017.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "六十石山"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "018.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "019.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "020.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "021.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "022.jpg",
+        "023.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "024.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "photos": [
+        "025.jpg",
+        "026.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "027.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "photos": [
+        "028.jpg",
+        "029.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "030.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "031.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "032.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "033.jpg",
+        "034.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "photos": [
+        "035.jpg",
+        "036.jpg",
+        "037.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "photos": [
+        "038.jpg",
+        "039.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "台東機場",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "040.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "041.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "042.jpg"
+      ]
+    }
+  ],
   "photos": [
     {
       "filename": "001.jpg",

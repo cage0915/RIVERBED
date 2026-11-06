@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "title": "２０１７",
   "order": 50,
   "cover": {
@@ -13,6 +13,256 @@
       "y": 50
     }
   },
+  "blocks": [
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "基隆"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "001.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "2rem",
+      "photos": [
+        "002.jpg",
+        "003.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "台南"
+    },
+    {
+      "type": "Row",
+      "blockMargin": "2rem",
+      "photos": [
+        "004.jpg",
+        "005.jpg",
+        "006.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "西螺.北港"
+    },
+    {
+      "type": "Row",
+      "caption": "論口音差異：ian-tshiâng/ian-tshiân/kuàn-tshiâng。",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "007.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "紅媠，烏大範。",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "008.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "2rem",
+      "photos": [
+        "009.jpg",
+        "010.jpg",
+        "011.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "北海岸"
+    },
+    {
+      "type": "Row",
+      "caption": "到不了鼻頭角燈塔的鼻頭角，太陽很烈但風很涼。",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "012.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "013.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "燭台雙嶼 | 深深的海深深的藍。",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "014.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "富貴角燈塔",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "015.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "屏東"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "016.jpg",
+        "017.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "這個時間點橋下的人應該比前方聚落的人還要多。",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "018.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "019.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "屏東二峰圳 / 伏流水 | ft. 哪裡都能烤肉的台灣人",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "020.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "大潮州地下水補注湖",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "021.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "力力溪 伏流水集水廊道",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "022.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "023.jpg",
+        "024.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "五溝水",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "025.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "曾文水庫"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "026.jpg",
+        "027.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "028.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "029.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "2rem",
+      "photos": [
+        "030.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "台北.基隆"
+    },
+    {
+      "type": "Row",
+      "caption": "耶穌遇到期末報告的樣子。",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "031.jpg",
+        "032.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "灰階留下的彩色夕陽。",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "033.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "034.jpg"
+      ]
+    }
+  ],
   "photos": [
     {
       "filename": "001.jpg",

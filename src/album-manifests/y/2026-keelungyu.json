@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "title": "基隆嶼",
   "info": "2026.6",
   "order": 250,
@@ -14,6 +14,149 @@
       "y": 10
     }
   },
+  "blocks": [
+    {
+      "type": "Row",
+      "photos": [
+        "KCS03353.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS03384.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS03361.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS03368.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS03386.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS03370.jpg",
+        "KCS03380.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "2rem",
+      "photos": [
+        "KCS03392.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "photos": [
+        "KCS03397.jpg",
+        "KCS03406.jpg",
+        "KCS03409.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "九份",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS03420.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "基隆港",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS03431.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "2026-0530-1542-37.312.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "基隆嶼燈塔",
+      "photos": [
+        "2026-0530-1523-00.123.jpg",
+        "2026-0530-1523-53.146.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "photos": [
+        "KCS03445.jpg",
+        "KCS03441.jpg",
+        "KCS03447.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS03455.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS03462.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS03464.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS03475.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS03479.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "photos": [
+        "KCS03506.jpg",
+        "KCS03505.jpg",
+        "KCS03508.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS03495.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS03513.jpg"
+      ]
+    }
+  ],
   "photos": [
     {
       "filename": "KCS03353.jpg",

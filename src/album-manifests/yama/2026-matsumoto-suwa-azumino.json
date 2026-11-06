@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "title": "松本・諏訪・安曇野",
   "info": "2026.2",
   "order": 220,
@@ -14,6 +14,103 @@
       "y": 60
     }
   },
+  "blocks": [
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "松本"
+    },
+    {
+      "type": "PhotoCarousel",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS01278.jpg",
+        "KCS01266.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS01309.jpg",
+        "KCS01286.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "諏訪"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS01582.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS01586.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS01588.jpg",
+        "KCS01595.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS01592.jpg",
+        "KCS01596.jpg",
+        "KCS01602.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "安曇野"
+    },
+    {
+      "type": "PhotoCarousel",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS01786.jpg",
+        "KCS01789.jpg",
+        "KCS01788.jpg",
+        "KCS01798.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS01809.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS01825.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS01819.jpg"
+      ]
+    }
+  ],
   "photos": [
     {
       "filename": "KCS01278.jpg",

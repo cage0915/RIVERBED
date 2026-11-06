@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "title": "２０１５",
   "info": "",
   "order": 10,
@@ -14,6 +14,82 @@
       "y": 50
     }
   },
+  "blocks": [
+    {
+      "type": "Row",
+      "photos": [
+        "001.jpg",
+        "002.jpg",
+        "003.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "004.jpg",
+        "005.jpg",
+        "006.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "007.jpg",
+        "008.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "009.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "010.jpg",
+        "011.jpg",
+        "012.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "013.jpg",
+        "014.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "015.jpg",
+        "016.jpg",
+        "017.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "018.jpg",
+        "019.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "020.jpg",
+        "021.jpg",
+        "022.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "024.jpg",
+        "023.jpg"
+      ]
+    }
+  ],
   "photos": [
     {
       "filename": "001.jpg",

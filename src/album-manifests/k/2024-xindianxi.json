@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "title": "新店溪",
   "info": "2024.7, 2024.9",
   "order": 40,
@@ -14,6 +14,74 @@
       "y": 50
     }
   },
+  "blocks": [
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "2024.7"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS01648.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS01647.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS01654.jpg",
+        "KCS01657.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "2rem",
+      "photos": [
+        "KCS01653.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "2024.9"
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS03550.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS03556.jpg",
+        "KCS03567.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS03587.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS03609.jpg",
+        "KCS03617.jpg"
+      ]
+    }
+  ],
   "photos": [
     {
       "filename": "KCS01648.jpg",

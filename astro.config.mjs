@@ -1,5 +1,4 @@
 import { defineConfig } from 'astro/config';
-import mdx from '@astrojs/mdx';
 import tailwindcss from '@tailwindcss/vite';
 import sirv from 'sirv';
 import devApiRoutes from './src/integrations/dev-api-routes.mjs';
@@ -8,7 +7,7 @@ import devApiRoutes from './src/integrations/dev-api-routes.mjs';
 export default defineConfig({
     site: 'https://riverbed.cage0915.com',
     output: 'static',
-    integrations: [mdx(), devApiRoutes()],
+    integrations: [devApiRoutes()],
     vite: {
         plugins: [
             tailwindcss(),
