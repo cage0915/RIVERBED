@@ -1143,7 +1143,7 @@ test('Layout delegates footer and development tool rendering boundaries', () => 
     );
     assert.match(
         siteFooter,
-        /currentPath === ["']\/["'][\s\S]*<footer class="pb-8">[\s\S]*href="\/rss\.xml"/,
+        /currentPath === ["']\/["'][\s\S]*<footer class="hidden pb-8 sm:block">[\s\S]*<RssLink \/>/,
     );
     assert.doesNotMatch(siteFooter, /rel="alternate"/);
 });
@@ -1177,6 +1177,10 @@ test('Layout delegates navigation rendering and lifecycle ownership', () => {
     assert.match(siteNavigation, /data-site-navigation/);
     assert.match(siteNavigation, /data-site-menu-toggle/);
     assert.match(siteNavigation, /data-site-mobile-menu/);
+    assert.match(
+        siteNavigation,
+        /data-site-mobile-menu[\s\S]*<RssLink class="ml-4 shrink-0" \/>[\s\S]*<\/nav>/,
+    );
     assert.match(siteNavigation, /installPageLifecycle/);
     assert.match(siteNavigation, /new AbortController\(\)/);
     assert.match(

@@ -1,4 +1,5 @@
 ---
+import RssLink from "./RssLink.astro";
 import { getAlbumSummaries } from "../lib/albums/catalog";
 import { getFolderTitle, getFolderOrder, FOLDER_METADATA } from "../lib/constants";
 
@@ -148,6 +149,7 @@ const currentPath = Astro.url.pathname;
 					})
 				}
 			</div>
+			<RssLink class="ml-4 shrink-0" />
 		</div>
 	</div>
 </nav>
