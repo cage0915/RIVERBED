@@ -921,11 +921,14 @@ test('pending layout rendering restores breadcrumb anchors', () => {
     const albumPage = readProjectFile('src/pages/[folder]/[album].astro');
 
     assert.match(devTool, /albumContent\.replaceChildren\(fragment\);\s*document\.dispatchEvent\(new CustomEvent\('album:content-replaced'\)\);/);
-    assert.match(albumPage, /let breadcrumbObserver = initAlbumBreadcrumbs\(\);/);
+    assert.match(albumPage, /let cleanupBreadcrumbs = initAlbumBreadcrumbs\(\);/);
     assert.match(
         albumPage,
-        /document\.addEventListener\("album:content-replaced", \(\) => \{\s*breadcrumbObserver\?\.disconnect\(\);\s*breadcrumbObserver = initAlbumBreadcrumbs\(\);/,
+        /document\.addEventListener\("album:content-replaced", \(\) => \{\s*cleanupBreadcrumbs\?\.\(\);\s*cleanupBreadcrumbs = initAlbumBreadcrumbs\(\);/,
     );
+    // The active link must carry the exact value its CSS selector matches.
+    assert.match(albumPage, /link\.setAttribute\("data-active", String\(isActive\)\)/);
+    assert.match(albumPage, /\.album-breadcrumb-link\[data-active="true"\]/);
 });
 
 test('a newly added Text block immediately opens its editor', () => {

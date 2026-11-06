@@ -198,7 +198,7 @@ const titleSections = extractTitleSections(albumRecord.blocks);
                         <a
                             href={`#${section.id}`}
                             data-album-breadcrumb={section.id}
-                            class="album-breadcrumb-link text-xs uppercase tracking-[0.18em] text-zinc-600 transition-colors duration-200 hover:text-zinc-200"
+                            class="album-breadcrumb-link text-xs uppercase tracking-[0.18em] text-zinc-500 transition-colors duration-200 hover:text-zinc-200"
                         >
                             {section.label}
                         </a>
@@ -323,8 +323,24 @@ const titleSections = extractTitleSections(albumRecord.blocks);
         line-height: 1.6;
     }
 
+    .album-breadcrumb-link {
+        position: relative;
+    }
+
     .album-breadcrumb-link[data-active="true"] {
         color: rgba(255, 255, 255, 0.9);
+    }
+
+    /* A short dash marks the section currently on screen. */
+    .album-breadcrumb-link[data-active="true"]::before {
+        content: "";
+        position: absolute;
+        /* Centre on the first line so wrapped labels keep the dash at their start. */
+        top: 0.5lh;
+        left: -0.9rem;
+        width: 0.5rem;
+        height: 1px;
+        background: currentColor;
     }
 
     .album-grid-toggle[data-active="true"] > div {
@@ -594,32 +610,44 @@ const titleSections = extractTitleSections(albumRecord.blocks);
         const updateActiveBreadcrumb = (activeId: string) => {
             breadcrumbLinks.forEach((link) => {
                 const isActive = link.getAttribute("data-album-breadcrumb") === activeId;
-                link.toggleAttribute("data-active", isActive);
-                link.setAttribute("aria-current", isActive ? "true" : "false");
+                link.setAttribute("data-active", String(isActive));
+                if (isActive) link.setAttribute("aria-current", "location");
+                else link.removeAttribute("aria-current");
             });
         };
 
-        const breadcrumbObserver = new IntersectionObserver(
-            (entries) => {
-                const visibleEntry = entries
-                    .filter((entry) => entry.isIntersecting)
-                    .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-
-                if (visibleEntry?.target instanceof HTMLElement) {
-                    updateActiveBreadcrumb(visibleEntry.target.id);
-                }
-            },
-            {
-                rootMargin: "-20% 0px -60% 0px",
-                threshold: [0.2, 0.6, 1],
+        // The current section is the last title scrolled past the upper third of
+        // the viewport; at the page bottom it is the last title on screen, so a
+        // short final section still gets selected.
+        const syncActiveBreadcrumb = () => {
+            const isAtBottom = window.scrollY + window.innerHeight
+                >= document.documentElement.scrollHeight - 2;
+            const activationLine = isAtBottom ? window.innerHeight : window.innerHeight * 0.3;
+            let activeId = titleNodes[0].id;
+            for (const node of titleNodes) {
+                if (node.getBoundingClientRect().top > activationLine) break;
+                activeId = node.id;
             }
-        );
+            updateActiveBreadcrumb(activeId);
+        };
 
-        titleNodes.forEach((node) => breadcrumbObserver?.observe(node));
-        if (titleNodes[0] instanceof HTMLElement) {
-            updateActiveBreadcrumb(titleNodes[0].id);
-        }
-        return breadcrumbObserver;
+        const controller = new AbortController();
+        let frame = 0;
+        const scheduleSync = () => {
+            if (frame) return;
+            frame = window.requestAnimationFrame(() => {
+                frame = 0;
+                syncActiveBreadcrumb();
+            });
+        };
+        window.addEventListener("scroll", scheduleSync, { passive: true, signal: controller.signal });
+        window.addEventListener("resize", scheduleSync, { signal: controller.signal });
+        syncActiveBreadcrumb();
+
+        return () => {
+            controller.abort();
+            window.cancelAnimationFrame(frame);
+        };
     };
 
     const syncAlbumTagToggle = () => {
@@ -962,10 +990,10 @@ const titleSections = extractTitleSections(albumRecord.blocks);
 
         const controller = new AbortController();
         areAllTagsVisible = false;
-        let breadcrumbObserver = initAlbumBreadcrumbs();
+        let cleanupBreadcrumbs = initAlbumBreadcrumbs();
         document.addEventListener("album:content-replaced", () => {
-            breadcrumbObserver?.disconnect();
-            breadcrumbObserver = initAlbumBreadcrumbs();
+            cleanupBreadcrumbs?.();
+            cleanupBreadcrumbs = initAlbumBreadcrumbs();
         }, { signal: controller.signal });
         initAlbumTagToggle(controller.signal);
         const cleanupPhotoGrid = initAlbumPhotoGrid(controller.signal);
@@ -979,7 +1007,7 @@ const titleSections = extractTitleSections(albumRecord.blocks);
 
         return () => {
             controller.abort();
-            breadcrumbObserver?.disconnect();
+            cleanupBreadcrumbs?.();
             cleanupPhotoGrid?.();
             cleanupTagPan?.();
             areAllTagsVisible = false;
