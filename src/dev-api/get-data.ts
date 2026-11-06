@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro';
 import {
     allMountains as mountains,
     MOUNTAIN_REGION_DEFINITIONS as regions,
-} from '../lib/mountains';
+} from '../lib/mountains/catalog';
 import { readAllAlbumManifestFiles } from '../lib/albums/manifest-files';
 import { json } from './_http';
 

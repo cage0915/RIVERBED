@@ -4,8 +4,8 @@ import MountainTagGrid from "../../../components/MountainTagGrid.astro";
 import {
     allMountains,
     MOUNTAIN_REGION_DEFINITIONS,
-} from "../../../lib/mountains";
-import { sanitizeMountainViewSettings } from "../../../lib/mountain-view-settings";
+} from "../../../lib/mountains/catalog";
+import { sanitizeMountainViewSettings } from "../../../lib/mountains/view-settings";
 import mountainViewSettingsData from "../../../mountain-view-settings.json";
 
 const mountainViewSettings = sanitizeMountainViewSettings(mountainViewSettingsData);

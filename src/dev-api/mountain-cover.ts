@@ -1,12 +1,12 @@
 import type { APIRoute } from "astro";
 
-import { parseMountainCoverKey } from "../lib/mountain-schema";
+import { parseMountainCoverKey } from "../lib/mountains/schema";
 import { readAlbumManifestFile } from "../lib/albums/manifest-files";
 import {
     findMountainRegion,
     readMountainRegion,
     writeMountainRegion,
-} from "../lib/mountain-files";
+} from "../lib/mountains/files";
 import { json } from "./_http";
 
 export const POST: APIRoute = async ({ request }) => {

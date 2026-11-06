@@ -5,7 +5,7 @@ import {
     createAlbumImport,
     validateAlbumSegment,
     validateImageFilename,
-} from './album-import.js';
+} from './album-import.ts';
 
 test('album path segments reject traversal and unsafe names', () => {
     assert.equal(validateAlbumSegment('2026-new-page'), '2026-new-page');

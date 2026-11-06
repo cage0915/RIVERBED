@@ -381,7 +381,7 @@ test("repository validator rejects symlinks in optional retired tag storage", ()
 
 test("retired Album frontmatter writers and compatibility route stay absent", () => {
     const pageStructure = fs.readFileSync(path.join(projectRoot, "src/lib/page-structure.ts"), "utf8");
-    const albumImport = fs.readFileSync(path.join(projectRoot, "src/lib/album-import.js"), "utf8");
+    const albumImport = fs.readFileSync(path.join(projectRoot, "src/lib/album-import.ts"), "utf8");
     const routes = fs.readFileSync(path.join(projectRoot, "src/integrations/dev-api-routes.mjs"), "utf8");
     assert.doesNotMatch(pageStructure, /createPageContent|frontmatter/);
     assert.doesNotMatch(albumImport, /createAlbumMdx|coverKey:/);

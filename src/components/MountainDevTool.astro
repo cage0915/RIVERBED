@@ -940,8 +940,8 @@
 </style>
 
 <script>
-    import type { Mountain } from "../lib/mountain-schema";
-    import type { MountainWithRegion } from "../lib/mountains";
+    import type { Mountain } from "../lib/mountains/schema";
+    import type { MountainWithRegion } from "../lib/mountains/catalog";
     import {
         boundsToViewBox,
         constrainMapViewBox,
@@ -950,11 +950,11 @@
         zoomMapViewBoxAt,
         type MapBounds,
         type SvgViewBox,
-    } from "../lib/mountain-map";
-    import { buildPeakFinderEmbedUrl } from "../lib/mountain-panorama";
-    import { getMountainContourAssetUrl } from "../lib/mountain-contours";
-    import { parseDirectionalCoordinates } from "../lib/mountain-coordinates";
-    import type { MountainLookupCandidate } from "../lib/wikidata-mountain";
+    } from "../lib/mountains/map";
+    import { buildPeakFinderEmbedUrl } from "../lib/mountains/panorama";
+    import { getMountainContourAssetUrl } from "../lib/mountains/contours";
+    import { parseDirectionalCoordinates } from "../lib/mountains/coordinates";
+    import type { MountainLookupCandidate } from "../lib/mountains/wikidata";
     import { installPageLifecycle } from "../lib/client-page-lifecycle";
 
     type ContextConfig = {

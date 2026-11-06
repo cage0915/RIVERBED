@@ -1,4 +1,24 @@
-export function settleCoverSave(persisted, response, imageSrc = persisted.imageSrc) {
+export type CoverState = {
+    albumSlug: string;
+    coverKey: string;
+    zoom: number;
+    x: number;
+    y: number;
+};
+
+export type PersistedCover = { state: CoverState; imageSrc: string };
+
+export type CoverSaveResponse = {
+    coverKey: string;
+    coverZoom: number;
+    coverOffset: { x: number; y: number };
+};
+
+export function settleCoverSave(
+    persisted: PersistedCover,
+    response: CoverSaveResponse | null,
+    imageSrc = persisted.imageSrc,
+): PersistedCover {
     if (!response) return {
         state: { ...persisted.state },
         imageSrc: persisted.imageSrc,
@@ -16,8 +36,8 @@ export function settleCoverSave(persisted, response, imageSrc = persisted.imageS
 }
 
 export function createCoverSaveQueue() {
-    const queues = new WeakMap();
-    return function enqueue(card, operation) {
+    const queues = new WeakMap<object, Promise<void>>();
+    return function enqueue<T>(card: object, operation: () => T | Promise<T>): Promise<T> {
         const previous = queues.get(card) ?? Promise.resolve();
         const result = previous.catch(() => undefined).then(operation);
         const tail = result.then(() => undefined, () => undefined);
@@ -28,7 +48,12 @@ export function createCoverSaveQueue() {
     };
 }
 
-export function isCoverDraftCurrent(currentState, currentImageSrc, draftState, draftImageSrc) {
+export function isCoverDraftCurrent(
+    currentState: CoverState,
+    currentImageSrc: string,
+    draftState: CoverState,
+    draftImageSrc: string,
+) {
     return currentImageSrc === draftImageSrc &&
         currentState.albumSlug === draftState.albumSlug &&
         currentState.coverKey === draftState.coverKey &&

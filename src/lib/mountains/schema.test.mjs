@@ -5,7 +5,7 @@ import {
     parseMountain,
     parseMountainArray,
     parseMountainCoverKey,
-} from "./mountain-schema.ts";
+} from "./schema.ts";
 
 const contexts = new Set(["tw-mainland"]);
 

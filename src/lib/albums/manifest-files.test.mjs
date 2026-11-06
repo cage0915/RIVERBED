@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 
-import { parseTagMapInput } from "../dev-tag-state.js";
+import { parseTagMapInput } from "../dev-tag-state.ts";
 
 import {
     AlbumManifestMutationError,

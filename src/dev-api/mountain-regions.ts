@@ -1,11 +1,11 @@
 import type { APIRoute } from "astro";
 
-import { readMountainRegion } from "../lib/mountain-files";
+import { readMountainRegion } from "../lib/mountains/files";
 import {
     sanitizeMountainViewSettings,
     type MountainViewSettings,
-} from "../lib/mountain-view-settings";
-import type { MountainRegionDefinition } from "../lib/mountains";
+} from "../lib/mountains/view-settings";
+import type { MountainRegionDefinition } from "../lib/mountains/catalog";
 import { json } from "./_http";
 
 const files = async () => {

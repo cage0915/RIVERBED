@@ -4,7 +4,7 @@ import {
     parseWikidataMountainEntity,
     type MountainLookupCandidate,
     type WikidataEntity,
-} from "../lib/wikidata-mountain";
+} from "../lib/mountains/wikidata";
 import { json } from "./_http";
 
 const WIKIDATA_USER_AGENT =

@@ -1,4 +1,4 @@
-import type { MountainWithRegion } from "./mountains.ts";
+import type { MountainWithRegion } from "./catalog.ts";
 
 export function getMountainContextReferences(
     mountains: readonly MountainWithRegion[],

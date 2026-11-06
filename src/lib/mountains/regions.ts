@@ -1,4 +1,4 @@
-import regionData from "../mountain-regions.json" with { type: "json" };
+import regionData from "../../mountain-regions.json" with { type: "json" };
 
 export type MountainRegionDefinition = {
     id: string;

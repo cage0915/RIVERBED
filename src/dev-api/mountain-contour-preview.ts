@@ -1,10 +1,10 @@
 import type { APIRoute } from "astro";
 
-import { generateMountainContourPreview } from "../lib/mountain-contour-files";
+import { generateMountainContourPreview } from "../lib/mountains/contour-files";
 import {
     isMountainSourceRegion,
     readMountainRegion,
-} from "../lib/mountain-files";
+} from "../lib/mountains/files";
 import { json } from "./_http";
 
 export const POST: APIRoute = async ({ request }) => {

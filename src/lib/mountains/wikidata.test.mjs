@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { parseWikidataMountainEntity } from "./wikidata-mountain.ts";
+import { parseWikidataMountainEntity } from "./wikidata.ts";
 
 test("Wikidata mountain entities expose preferred labels, coordinates and metres", () => {
     assert.deepEqual(

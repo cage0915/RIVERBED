@@ -4,7 +4,7 @@ import test from "node:test";
 import {
   getMountainContourAssetName,
   getMountainContourAssetUrl,
-} from "./mountain-contours.ts";
+} from "./contours.ts";
 
 test("contour asset names are stable and filesystem safe", () => {
   assert.equal(getMountainContourAssetName("玉山"), "玉山");

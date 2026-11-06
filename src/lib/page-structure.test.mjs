@@ -57,7 +57,7 @@ test('mountain navigation uses the static yama tag route hierarchy', () => {
 test('DevTool classifies static mountain tag routes separately from albums', () => {
     const devTool = readProjectFile('src/components/DevTool.astro');
 
-    assert.match(devTool, /isMountainTagIndex[\s\S]*isMountainTagPage[\s\S]*from ["']\.\.\/lib\/dev-route-state\.js["']/);
+    assert.match(devTool, /isMountainTagIndex[\s\S]*isMountainTagPage[\s\S]*from ["']\.\.\/lib\/dev-route-state["']/);
     assert.match(devTool, /isMountainTagPage\(window\.location\.pathname\)/);
     assert.match(devTool, /!isMountainTagIndex\(window\.location\.pathname\)/);
     assert.doesNotMatch(devTool, /new URLSearchParams\(window\.location\.search\)\.get\('view'\) === 'tags'/);
@@ -1059,18 +1059,18 @@ test('cover and folder-order APIs persist only through Album manifests', () => {
 });
 
 test('Mountain data uses one canonical schema and validated read boundaries', () => {
-    const mountains = readProjectFile('src/lib/mountains.ts');
-    const files = readProjectFile('src/lib/mountain-files.ts');
+    const mountains = readProjectFile('src/lib/mountains/catalog.ts');
+    const files = readProjectFile('src/lib/mountains/files.ts');
     const profile = readProjectFile('src/components/MountainProfile.astro');
     const tagPage = readProjectFile('src/pages/yama/tags/[tag].astro');
 
     assert.match(mountains, /parseMountainRegionSource/);
     assert.match(files, /parseMountainRegionSource/);
-    assert.doesNotMatch(mountains, /mountain-editor|EditableMountain/);
-    assert.doesNotMatch(files, /mountain-editor|EditableMountain/);
+    assert.doesNotMatch(mountains, /\.\/editor|EditableMountain/);
+    assert.doesNotMatch(files, /\.\/editor|EditableMountain/);
     assert.match(
         profile,
-        /import type \{ Mountain \} from ["']\.\.\/lib\/mountain-schema/,
+        /import type \{ Mountain \} from ["']\.\.\/lib\/mountains\/schema/,
     );
     assert.doesNotMatch(profile, /export type Mountain(?:Location)?\b/);
     assert.doesNotMatch(tagPage, /mountainsData as Mountain\[\]/);

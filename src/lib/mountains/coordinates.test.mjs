@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { parseDirectionalCoordinates } from "./mountain-coordinates.ts";
+import { parseDirectionalCoordinates } from "./coordinates.ts";
 
 test("parses north/east coordinates copied with degree symbols", () => {
     assert.deepEqual(parseDirectionalCoordinates("24.36170°N, 121.43899°E"), {

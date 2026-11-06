@@ -25,7 +25,7 @@ import {
     replaceSourceFilesAtomically,
     withR2SourceAlbumLocks,
 } from './album-lifecycle.ts';
-import { createAlbumImport } from '../album-import.js';
+import { createAlbumImport } from '../album-import.ts';
 import { createLayoutOnlyPageContent } from '../page-structure.ts';
 import { readAlbumManifestFile, updateAlbumCover, withAlbumManifestLocks } from './manifest-files.ts';
 

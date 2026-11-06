@@ -1,4 +1,4 @@
-import mapConfig from "../map-contexts.json" with { type: "json" };
+import mapConfig from "../../map-contexts.json" with { type: "json" };
 
 export const MAP_WORLD_SIZE = 10_000;
 export const MAX_MERCATOR_LATITUDE = 85.05112878;

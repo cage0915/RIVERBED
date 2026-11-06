@@ -1,4 +1,4 @@
-import { isValidMapBounds, type MapBounds } from "./mountain-map.ts";
+import { isValidMapBounds, type MapBounds } from "./map.ts";
 
 export type MountainLocation = {
     latitude: number;

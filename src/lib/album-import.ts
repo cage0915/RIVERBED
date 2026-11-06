@@ -1,10 +1,10 @@
-const ALBUM_SEGMENT_PATTERN = /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/;
-const IMAGE_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.webp', '.avif']);
-
 import { parseAlbumManifest } from './albums/manifest-schema.ts';
 import { validateAlbumInventory } from './albums/validation.ts';
 
-export function validateAlbumSegment(value, label = 'Album slug') {
+const ALBUM_SEGMENT_PATTERN = /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/;
+const IMAGE_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.webp', '.avif']);
+
+export function validateAlbumSegment(value: unknown, label = 'Album slug') {
     const segment = String(value || '').trim();
     if (!ALBUM_SEGMENT_PATTERN.test(segment)) {
         throw new Error(`${label} must contain only lowercase letters, numbers, and single hyphens`);
@@ -12,7 +12,7 @@ export function validateAlbumSegment(value, label = 'Album slug') {
     return segment;
 }
 
-export function validateImageFilename(value) {
+export function validateImageFilename(value: unknown) {
     const filename = String(value || '').trim();
     if (!filename || filename === '.' || filename === '..' || filename.includes('/') || filename.includes('\\')) {
         throw new Error(`Invalid image filename: ${filename || '(empty)'}`);
@@ -25,7 +25,7 @@ export function validateImageFilename(value) {
     return filename;
 }
 
-function createAlbumLayoutMdx(filenames) {
+function createAlbumLayoutMdx(filenames: string[]) {
     const photos = filenames.map(validateImageFilename);
     if (photos.length === 0) throw new Error('Select at least one photo');
     if (new Set(photos).size !== photos.length) throw new Error('Duplicate photo filenames are not allowed');
@@ -33,10 +33,16 @@ function createAlbumLayoutMdx(filenames) {
     return `---\n---\n\n${rows.join('\n\n')}\n`;
 }
 
-/**
- * Build and cross-validate the two source files created for a new Album.
- * @param {{ albumSlug: string, title: string, filenames: string[], photoDimensions?: Record<string, { width: number, height: number }>, publishedAt?: string, order: number }} options
- */
+type AlbumImportOptions = {
+    albumSlug: string;
+    title: string;
+    filenames: string[];
+    photoDimensions?: Record<string, { width: number; height: number }>;
+    publishedAt?: string;
+    order: number;
+};
+
+/** Build and cross-validate the two source files created for a new Album. */
 export function createAlbumImport({
     albumSlug,
     title,
@@ -44,7 +50,7 @@ export function createAlbumImport({
     photoDimensions = {},
     publishedAt,
     order,
-}) {
+}: AlbumImportOptions) {
     const date = publishedAt || new Date().toISOString().slice(0, 10);
     const mdx = createAlbumLayoutMdx(filenames);
     const photos = filenames.map(validateImageFilename);

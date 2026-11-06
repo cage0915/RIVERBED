@@ -12,7 +12,7 @@ import {
     projectCoordinates,
     viewBoxToBounds,
     zoomMapViewBoxAt,
-} from "./mountain-map.ts";
+} from "./map.ts";
 
 test("Web Mercator projects the origin to the centre of the world", () => {
     const point = projectCoordinates(0, 0);
@@ -69,7 +69,7 @@ test("geographic bounds survive a viewBox round trip", () => {
 test("map sources only reference features present in their SVG", () => {
     for (const context of Object.values(MAP_CONTEXTS)) {
         const source = MAP_SOURCES[context.source];
-        const svgPath = new URL(`../../public${source.asset}`, import.meta.url);
+        const svgPath = new URL(`../../../public${source.asset}`, import.meta.url);
         const svg = fs.readFileSync(svgPath, "utf8");
 
         for (const featureId of source.featureIds) {

@@ -1,9 +1,9 @@
-import { isValidMapBounds } from "./mountain-map.ts";
+import { isValidMapBounds } from "./map.ts";
 import {
     parseMountain,
     parseMountainCoverKey,
     type Mountain,
-} from "./mountain-schema.ts";
+} from "./schema.ts";
 
 const optionalNumber = (
     value: unknown,

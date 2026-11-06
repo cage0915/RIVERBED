@@ -4,7 +4,7 @@ import test from 'node:test';
 import {
     isMountainTagIndex,
     isMountainTagPage,
-} from './dev-route-state.js';
+} from './dev-route-state.ts';
 
 test('mountain tag index is not an album or tag detail page', () => {
     assert.equal(isMountainTagIndex('/yama/tags'), true);

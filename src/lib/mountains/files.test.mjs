@@ -14,7 +14,7 @@ import test from "node:test";
 import {
     readMountainRegion,
     writeMountainRegion,
-} from "./mountain-files.ts";
+} from "./files.ts";
 
 async function project(t) {
     const root = await mkdtemp(path.join(os.tmpdir(), "mountain-files-"));

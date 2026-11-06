@@ -8,7 +8,7 @@ import {
     normalizeTagMap,
     mergeMountainEntries,
     parseTagMapInput,
-} from './dev-tag-state.js';
+} from './dev-tag-state.ts';
 
 test('findNewTagNames ignores legacy names already present in the album', () => {
     const previous = {

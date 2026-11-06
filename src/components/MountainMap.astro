@@ -7,7 +7,7 @@ import {
     projectCoordinates,
     type MapBounds,
     type MapContextId,
-} from "../lib/mountain-map";
+} from "../lib/mountains/map";
 
 interface Props {
     latitude: number;
@@ -167,11 +167,12 @@ const interactionHelpId = `${contextId}-map-help`;
 </style>
 
 <script>
+    import { installPageLifecycle } from "../lib/client-page-lifecycle";
     import {
         constrainMapViewBox,
         zoomMapViewBoxAt,
         type SvgViewBox,
-    } from "../lib/mountain-map";
+    } from "../lib/mountains/map";
 
     const parseViewBox = (value: string | undefined): SvgViewBox | null => {
         if (!value) return null;
@@ -396,6 +397,5 @@ const interactionHelpId = `${contextId}-map-help`;
         });
     }
 
-    initMountainMaps();
-    document.addEventListener("astro:page-load", initMountainMaps);
+    installPageLifecycle(document, initMountainMaps);
 </script>

@@ -1,34 +1,34 @@
-import { MAP_CONTEXTS } from "./mountain-map.ts";
+import { MAP_CONTEXTS } from "./map.ts";
 import {
     MOUNTAIN_REGION_DEFINITIONS,
     type MountainSourceRegion,
-} from "./mountain-regions.ts";
-import type { Mountain } from "./mountain-schema.ts";
-import { parseMountainRegionSource } from "./mountain-source.ts";
+} from "./regions.ts";
+import type { Mountain } from "./schema.ts";
+import { parseMountainRegionSource } from "./source.ts";
 
 export {
     MOUNTAIN_REGION_DEFINITIONS,
     MOUNTAIN_REGION_LABELS,
     MOUNTAIN_REGIONS,
-} from "./mountain-regions.ts";
+} from "./regions.ts";
 export type {
     MountainRegion,
     MountainRegionDefinition,
     MountainSourceRegion,
-} from "./mountain-regions.ts";
+} from "./regions.ts";
 
 export type MountainWithRegion = Mountain & {
     region: MountainSourceRegion;
 };
 
-const mountainFiles = import.meta.glob("../mountains/*.json", {
+const mountainFiles = import.meta.glob("../../mountains/*.json", {
     eager: true,
 }) as Record<string, { default?: unknown } | unknown>;
 const contextIds = new Set(Object.keys(MAP_CONTEXTS));
 
 export const mountainsByRegion = Object.fromEntries(
     MOUNTAIN_REGION_DEFINITIONS.map((region) => {
-        const sourcePath = `../mountains/${region.id}.json`;
+        const sourcePath = `../../mountains/${region.id}.json`;
         const module = mountainFiles[sourcePath];
         if (module === undefined) {
             throw new Error(`Missing Mountain source ${sourcePath}`);

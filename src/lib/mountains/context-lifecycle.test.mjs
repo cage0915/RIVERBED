@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { getMountainContextReferences } from "./mountain-context-lifecycle.ts";
+import { getMountainContextReferences } from "./context-lifecycle.ts";
 
 test("finds Mountains that prevent a referenced context from being deleted", () => {
     const mountains = [

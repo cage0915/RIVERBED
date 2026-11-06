@@ -1,5 +1,5 @@
-import { getMountainContourAssetName } from "./mountain-contours";
-import type { MountainSourceRegion } from "./mountains";
+import { getMountainContourAssetName } from "./contours";
+import type { MountainSourceRegion } from "./catalog";
 
 const DEFAULT_TAIWAN_DEM_PATH =
     "/private/tmp/riverbed-taiwan-dem/不分幅_全台及澎湖DEM/dem_20m.tif";

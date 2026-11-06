@@ -1,12 +1,12 @@
 ---
 import MountainMap from "./MountainMap.astro";
-import { buildPeakFinderEmbedUrl } from "../lib/mountain-panorama";
-import { getMountainContourAssetUrl } from "../lib/mountain-contours";
+import { buildPeakFinderEmbedUrl } from "../lib/mountains/panorama";
+import { getMountainContourAssetUrl } from "../lib/mountains/contours";
 import {
     MAP_CONTEXTS,
     type MapBounds,
     type MapContextId,
-} from "../lib/mountain-map";
+} from "../lib/mountains/map";
 
 interface Props {
     latitude: number;
@@ -323,6 +323,8 @@ const contourSource = contourRegion === "taiwan"
 </style>
 
 <script>
+    import { installPageLifecycle } from "../lib/client-page-lifecycle";
+
     type ViewerMode = "location" | "panorama" | "contour";
 
     function initMountainViewers() {
@@ -395,6 +397,5 @@ const contourSource = contourRegion === "taiwan"
             });
     }
 
-    initMountainViewers();
-    document.addEventListener("astro:page-load", initMountainViewers);
+    installPageLifecycle(document, initMountainViewers);
 </script>

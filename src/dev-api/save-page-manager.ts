@@ -4,7 +4,7 @@ import path from 'node:path';
 import sharp from 'sharp';
 import trash from 'trash';
 
-import { validateImageFilename } from '../lib/album-import.js';
+import { validateImageFilename } from '../lib/album-import';
 import { createLayoutOnlyPageContent, referencedLocalNames } from '../lib/page-structure';
 import {
     AlbumAssetConflictError,

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { parseMountainRegionSource } from "./mountain-source.ts";
+import { parseMountainRegionSource } from "./source.ts";
 
 const contexts = new Set(["tw-mainland"]);
 

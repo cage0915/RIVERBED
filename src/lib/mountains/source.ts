@@ -1,7 +1,7 @@
 import {
     parseMountainArray,
     type Mountain,
-} from "./mountain-schema.ts";
+} from "./schema.ts";
 
 export function parseMountainRegionSource(
     input: unknown,

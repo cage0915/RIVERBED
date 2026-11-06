@@ -4,7 +4,7 @@ import {
     collectTagNames,
     findNewTagNames,
     parseTagMapInput,
-} from '../lib/dev-tag-state.js';
+} from '../lib/dev-tag-state';
 import {
     readAlbumManifestFile,
     replaceAlbumPhotoTags,
@@ -14,8 +14,8 @@ import {
     readAllMountainRegions,
     readMountainRegion,
     writeMountainRegion,
-} from '../lib/mountain-files';
-import type { MountainRegion } from '../lib/mountains';
+} from '../lib/mountains/files';
+import type { MountainRegion } from '../lib/mountains/catalog';
 import { json } from './_http';
 
 type Tag = { name: string; x: number; y: number };

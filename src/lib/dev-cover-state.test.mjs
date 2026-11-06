@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { createCoverSaveQueue, isCoverDraftCurrent, settleCoverSave } from "./dev-cover-state.js";
+import { createCoverSaveQueue, isCoverDraftCurrent, settleCoverSave } from "./dev-cover-state.ts";
 
 const persisted = {
     state: { albumSlug: "yama/a", coverKey: "yama/a/old.jpg", zoom: 1, x: 50, y: 40 },

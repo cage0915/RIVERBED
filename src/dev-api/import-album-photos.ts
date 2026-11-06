@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
 
-import { createAlbumImport, validateAlbumSegment, validateImageFilename } from '../lib/album-import.js';
+import { createAlbumImport, validateAlbumSegment, validateImageFilename } from '../lib/album-import';
 import {
     AlbumAssetConflictError,
     AlbumSourceRollbackIncompleteError,

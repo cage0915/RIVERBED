@@ -1,15 +1,15 @@
-import type { Mountain } from "./mountain-schema.ts";
-import { parseMountainRegionSource } from "./mountain-source.ts";
+import type { Mountain } from "./schema.ts";
+import { parseMountainRegionSource } from "./source.ts";
 import {
     commitTextFiles,
     type TextFileProposal,
-} from "./source-transaction.ts";
+} from "../source-transaction.ts";
 import {
     MOUNTAIN_REGIONS,
     type MountainRegion,
     type MountainSourceRegion,
-} from "./mountain-regions.ts";
-import type { MountainWithRegion } from "./mountains.ts";
+} from "./regions.ts";
+import type { MountainWithRegion } from "./catalog.ts";
 
 export const isMountainRegion = (value: unknown): value is MountainRegion =>
     typeof value === "string" &&

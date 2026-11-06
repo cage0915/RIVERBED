@@ -4,7 +4,7 @@ import test from "node:test";
 import {
     DEFAULT_MOUNTAIN_VIEW_SETTINGS,
     sanitizeMountainViewSettings,
-} from "./mountain-view-settings.ts";
+} from "./view-settings.ts";
 
 test("mountain tags view defaults to five columns", () => {
     assert.deepEqual(DEFAULT_MOUNTAIN_VIEW_SETTINGS, { tagColumns: 5 });

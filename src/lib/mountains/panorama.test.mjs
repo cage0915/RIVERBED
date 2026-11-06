@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { buildPeakFinderEmbedUrl } from "./mountain-panorama.ts";
+import { buildPeakFinderEmbedUrl } from "./panorama.ts";
 
 test("PeakFinder URLs use the mountain elevation", () => {
     const url = new URL(

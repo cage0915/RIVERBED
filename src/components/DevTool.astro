@@ -8,20 +8,20 @@
         collectTagNames,
         deleteTag as removeTagFromMap,
         normalizeTagMap,
-    } from "../lib/dev-tag-state.js";
+    } from "../lib/dev-tag-state";
     import {
         DEFAULT_MOUNTAIN_VIEW_SETTINGS,
         type MountainViewSettings,
-    } from "../lib/mountain-view-settings";
+    } from "../lib/mountains/view-settings";
     import {
         isMountainTagIndex,
         isMountainTagPage,
-    } from "../lib/dev-route-state.js";
+    } from "../lib/dev-route-state";
     import {
         createCoverSaveQueue,
         isCoverDraftCurrent,
         settleCoverSave,
-    } from "../lib/dev-cover-state.js";
+    } from "../lib/dev-cover-state";
     import { installPageLifecycle } from "../lib/client-page-lifecycle";
     import {
         remValueForInput,

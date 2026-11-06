@@ -5,7 +5,7 @@ import {
     DEFAULT_MOUNTAIN_TAG_SORT,
     nextMountainTagSort,
     sortMountainTags,
-} from "./mountain-tag-sort.ts";
+} from "./tag-sort.ts";
 
 const mountains = [
     { name: "南湖大山", elevation: 3742, latitude: 24.361 },

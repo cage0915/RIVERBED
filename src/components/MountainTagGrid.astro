@@ -3,9 +3,9 @@ import { getThumbnailUrl, R2_DOMAIN } from "../lib/constants";
 import {
     DEFAULT_MOUNTAIN_TAG_SORT,
     sortMountainTags,
-} from "../lib/mountain-tag-sort";
-import { DEFAULT_MOUNTAIN_VIEW_SETTINGS } from "../lib/mountain-view-settings";
-import { getMountainContourAssetUrl } from "../lib/mountain-contours";
+} from "../lib/mountains/tag-sort";
+import { DEFAULT_MOUNTAIN_VIEW_SETTINGS } from "../lib/mountains/view-settings";
+import { getMountainContourAssetUrl } from "../lib/mountains/contours";
 
 interface MountainTagCard {
     name: string;
@@ -152,7 +152,7 @@ const sortedGroups = groups.map((group) => ({
         sortMountainTags,
         type MountainTagSort,
         type MountainTagSortKey,
-    } from "../lib/mountain-tag-sort";
+    } from "../lib/mountains/tag-sort";
     import { installPageLifecycle } from "../lib/client-page-lifecycle";
 
     installPageLifecycle(document, () => {

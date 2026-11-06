@@ -1,17 +1,17 @@
 import type { APIRoute } from "astro";
 
-import { sanitizeMountainEntry } from "../lib/mountain-editor";
-import { getMountainContextReferences } from "../lib/mountain-context-lifecycle";
-import { isValidMapBounds, type MapBounds } from "../lib/mountain-map";
-import type { Mountain } from "../lib/mountain-schema";
+import { sanitizeMountainEntry } from "../lib/mountains/editor";
+import { getMountainContextReferences } from "../lib/mountains/context-lifecycle";
+import { isValidMapBounds, type MapBounds } from "../lib/mountains/map";
+import type { Mountain } from "../lib/mountains/schema";
 import {
     createAllMountainRegionProposals,
     createMountainRegionProposal,
     isMountainSourceRegion,
     readAllMountainRegions,
     readMountainRegion,
-} from "../lib/mountain-files";
-import type { MountainSourceRegion } from "../lib/mountains";
+} from "../lib/mountains/files";
+import type { MountainSourceRegion } from "../lib/mountains/catalog";
 import {
     commitTextFiles,
     type TextFileProposal,

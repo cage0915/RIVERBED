@@ -2,8 +2,8 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import test from "node:test";
 
-import { sanitizeMountainEntry } from "./mountain-editor.ts";
-import { parseMountain } from "./mountain-schema.ts";
+import { sanitizeMountainEntry } from "./editor.ts";
+import { parseMountain } from "./schema.ts";
 
 const contexts = new Set(["tw-dabajian"]);
 
@@ -182,9 +182,9 @@ test("mountain editor output satisfies the canonical stored schema", () => {
     assert.deepEqual(parseMountain(result, contexts), result);
 });
 
-test("mountain editor delegates the stored contract to mountain-schema", () => {
+test("mountain editor delegates the stored contract to the mountain schema", () => {
     const source = fs.readFileSync(
-        new URL("./mountain-editor.ts", import.meta.url),
+        new URL("./editor.ts", import.meta.url),
         "utf8",
     );
     assert.match(source, /parseMountain/);

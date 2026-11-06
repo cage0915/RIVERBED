@@ -1,25 +1,16 @@
-/**
- * @typedef {{ name: string; x: number; y: number }} Tag
- * @typedef {{ name: string; elevation: number | null; description: string }} MountainEntry
- * @typedef {Record<string, Tag[]>} TagMap
- */
-
 import { validateLocalPhotoFilename } from './albums/keys.ts';
+
+export type Tag = { name: string; x: number; y: number };
+export type MountainEntry = { name: string; elevation: number | null; description: string };
+export type TagMap = Record<string, Tag[]>;
 
 const TAG_EPSILON = 0.1;
 
-/**
- * @param {number} value
- */
-function roundCoord(value) {
+function roundCoord(value: number) {
     return Math.round(value * 100) / 100;
 }
 
-/**
- * @param {Tag} tag
- * @returns {Tag}
- */
-function normalizeTag(tag) {
+function normalizeTag(tag: Tag): Tag {
     return {
         name: tag.name,
         x: roundCoord(tag.x),
@@ -27,11 +18,7 @@ function normalizeTag(tag) {
     };
 }
 
-/**
- * @param {Tag} left
- * @param {Tag} right
- */
-function isSameTag(left, right) {
+function isSameTag(left: Tag, right: Tag) {
     return (
         left.name === right.name
         && Math.abs(left.x - right.x) < TAG_EPSILON
@@ -39,11 +26,7 @@ function isSameTag(left, right) {
     );
 }
 
-/**
- * @param {TagMap} tagMap
- * @returns {TagMap}
- */
-function cloneTagMap(tagMap) {
+function cloneTagMap(tagMap: TagMap): TagMap {
     return Object.fromEntries(
         Object.entries(tagMap).map(([photoKey, tags]) => [
             photoKey,
@@ -52,14 +35,12 @@ function cloneTagMap(tagMap) {
     );
 }
 
-/**
- * @param {TagMap} tagMap
- * @param {string} photoKey
- * @param {Tag} nextTag
- * @param {Tag} [previousTag]
- * @returns {TagMap}
- */
-export function addOrUpdateTag(tagMap, photoKey, nextTag, previousTag = undefined) {
+export function addOrUpdateTag(
+    tagMap: TagMap,
+    photoKey: string,
+    nextTag: Tag,
+    previousTag?: Tag,
+): TagMap {
     const nextMap = cloneTagMap(tagMap);
     const normalizedNext = normalizeTag(nextTag);
     const currentTags = nextMap[photoKey] || [];
@@ -71,24 +52,14 @@ export function addOrUpdateTag(tagMap, photoKey, nextTag, previousTag = undefine
     return normalizeTagMap(nextMap);
 }
 
-/**
- * @param {TagMap} tagMap
- * @param {string} photoKey
- * @param {Tag} tagToDelete
- * @returns {TagMap}
- */
-export function deleteTag(tagMap, photoKey, tagToDelete) {
+export function deleteTag(tagMap: TagMap, photoKey: string, tagToDelete: Tag): TagMap {
     const nextMap = cloneTagMap(tagMap);
     const currentTags = nextMap[photoKey] || [];
     nextMap[photoKey] = currentTags.filter((tag) => !isSameTag(tag, tagToDelete));
     return normalizeTagMap(nextMap);
 }
 
-/**
- * @param {TagMap} tagMap
- * @returns {TagMap}
- */
-export function normalizeTagMap(tagMap) {
+export function normalizeTagMap(tagMap: TagMap): TagMap {
     return Object.fromEntries(
         Object.entries(tagMap)
             .map(([photoKey, tags]) => [
@@ -99,12 +70,8 @@ export function normalizeTagMap(tagMap) {
     );
 }
 
-/**
- * Validate untrusted request data before normalizing it as a tag map.
- * @param {unknown} input
- * @returns {TagMap}
- */
-export function parseTagMapInput(input) {
+/** Validate untrusted request data before normalizing it as a tag map. */
+export function parseTagMapInput(input: unknown): TagMap {
     if (
         typeof input !== 'object'
         || input === null
@@ -114,8 +81,7 @@ export function parseTagMapInput(input) {
         throw new Error('Invalid tagsMap');
     }
 
-    /** @type {TagMap} */
-    const normalized = {};
+    const normalized: TagMap = {};
     for (const [filename, tags] of Object.entries(input)) {
         validateLocalPhotoFilename(filename);
         if (!Array.isArray(tags)) throw new Error('Invalid tagsMap');
@@ -143,14 +109,9 @@ export function parseTagMapInput(input) {
     return normalized;
 }
 
-/**
- * @param {MountainEntry[]} mountains
- * @param {string[]} tagNames
- * @returns {MountainEntry[]}
- */
-export function mergeMountainEntries(mountains, tagNames) {
+export function mergeMountainEntries(mountains: MountainEntry[], tagNames: string[]): MountainEntry[] {
     const seenNames = new Set(mountains.map((mountain) => mountain.name));
-    const additions = [];
+    const additions: MountainEntry[] = [];
 
     for (const tagName of tagNames) {
         if (!seenNames.has(tagName)) {
@@ -162,20 +123,11 @@ export function mergeMountainEntries(mountains, tagNames) {
     return [...mountains, ...additions].sort((left, right) => left.name.localeCompare(right.name, 'zh-Hant'));
 }
 
-/**
- * @param {TagMap} tagMap
- * @returns {string[]}
- */
-export function collectTagNames(tagMap) {
+export function collectTagNames(tagMap: TagMap): string[] {
     return [...new Set(Object.values(tagMap).flat().map((tag) => tag.name))];
 }
 
-/**
- * @param {TagMap} previousTagMap
- * @param {TagMap} nextTagMap
- * @returns {string[]}
- */
-export function findNewTagNames(previousTagMap, nextTagMap) {
+export function findNewTagNames(previousTagMap: TagMap, nextTagMap: TagMap): string[] {
     const previousNames = new Set(collectTagNames(previousTagMap));
     return collectTagNames(nextTagMap).filter((name) => !previousNames.has(name));
 }

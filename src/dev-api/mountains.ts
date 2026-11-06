@@ -1,21 +1,21 @@
 import type { APIRoute } from "astro";
 
-import { sanitizeMountainEntry } from "../lib/mountain-editor";
+import { sanitizeMountainEntry } from "../lib/mountains/editor";
 import {
     isMountainSourceRegion,
     readAllMountainRegions,
     readMountainRegion,
     writeMountainRegion,
-} from "../lib/mountain-files";
+} from "../lib/mountains/files";
 import {
     MOUNTAIN_REGION_DEFINITIONS,
     type MountainSourceRegion,
-} from "../lib/mountains";
-import { MAP_SOURCES } from "../lib/mountain-map";
+} from "../lib/mountains/catalog";
+import { MAP_SOURCES } from "../lib/mountains/map";
 import {
     mountainContourFileExists,
     regenerateMountainContour,
-} from "../lib/mountain-contour-files";
+} from "../lib/mountains/contour-files";
 import { json } from "./_http";
 
 const readJson = async <T>(file: string): Promise<T> => {
