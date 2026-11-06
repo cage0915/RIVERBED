@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import test from 'node:test';
 
 import {
@@ -13,6 +13,15 @@ import {
 } from './page-structure.ts';
 
 const readProjectFile = (path) => readFileSync(new URL(`../../${path}`, import.meta.url), 'utf8');
+// DevTool.astro holds the editor styles; its client code lives in src/scripts/dev-tool/.
+const readDevToolSource = () => {
+    const modules = readdirSync(new URL('../scripts/dev-tool/', import.meta.url))
+        .filter((name) => name.endsWith('.ts'))
+        .sort((a, b) => (a === 'index.ts' ? -1 : b === 'index.ts' ? 1 : a.localeCompare(b)));
+    return ['src/components/DevTool.astro', ...modules.map((name) => `src/scripts/dev-tool/${name}`)]
+        .map(readProjectFile)
+        .join('\n');
+};
 
 test('production configuration builds static pages without a Workers runtime', () => {
     const astroConfig = readProjectFile('astro.config.mjs');
@@ -34,7 +43,7 @@ test('mountain navigation uses the static yama tag route hierarchy', () => {
     const mountainGrid = readProjectFile('src/components/MountainTagGrid.astro');
     const folderPage = readProjectFile('src/pages/[folder]/index.astro');
     const photo = readProjectFile('src/components/Photo.astro');
-    const devTool = readProjectFile('src/components/DevTool.astro');
+    const devTool = readDevToolSource();
     const mountainDevTool = readProjectFile('src/components/MountainDevTool.astro');
     const siteDevTools = readProjectFile('src/components/SiteDevTools.astro');
 
@@ -55,9 +64,9 @@ test('mountain navigation uses the static yama tag route hierarchy', () => {
 });
 
 test('DevTool classifies static mountain tag routes separately from albums', () => {
-    const devTool = readProjectFile('src/components/DevTool.astro');
+    const devTool = readDevToolSource();
 
-    assert.match(devTool, /isMountainTagIndex[\s\S]*isMountainTagPage[\s\S]*from ["']\.\.\/lib\/dev-route-state["']/);
+    assert.match(devTool, /isMountainTagIndex[\s\S]*isMountainTagPage[\s\S]*from ["'](?:\.\.\/)+lib\/dev-route-state["']/);
     assert.match(devTool, /isMountainTagPage\(window\.location\.pathname\)/);
     assert.match(devTool, /!isMountainTagIndex\(window\.location\.pathname\)/);
     assert.doesNotMatch(devTool, /new URLSearchParams\(window\.location\.search\)\.get\('view'\) === 'tags'/);
@@ -134,7 +143,7 @@ test('caption serialization and pending preview preserve manual line breaks', ()
             photos: [{ itemKey: 'one.jpg' }],
         },
     ]);
-    const devTool = readProjectFile('src/components/DevTool.astro');
+    const devTool = readDevToolSource();
 
     assert.match(content, /caption="First line\nSecond line"/);
     assert.match(devTool, /\.dev-caption-live-preview\s*\{\s*white-space: pre-line;/);
@@ -202,7 +211,7 @@ test('PhotoPanorama is a standalone block with full-width carousel and joined pr
     const panorama = readProjectFile('src/components/PhotoPanorama.astro');
     const albumPage = readProjectFile('src/pages/[folder]/[album].astro');
     const getStructure = readProjectFile('src/dev-api/get-page-structure.ts');
-    const devTool = readProjectFile('src/components/DevTool.astro');
+    const devTool = readDevToolSource();
 
     assert.doesNotMatch(carousel, /enablePanorama|PhotoPanorama|panoramaSlices/);
     assert.match(albumPage, /import PhotoPanorama from "\.\.\/\.\.\/components\/PhotoPanorama\.astro"/);
@@ -274,7 +283,7 @@ test('PhotoPanorama is a standalone block with full-width carousel and joined pr
 });
 
 test('caption spacing is applied when direct block changes are saved', () => {
-    const devTool = readProjectFile('src/components/DevTool.astro');
+    const devTool = readDevToolSource();
 
     assert.match(
         devTool,
@@ -283,7 +292,7 @@ test('caption spacing is applied when direct block changes are saved', () => {
 });
 
 test('new pending captions immediately stage their 1.5rem boundary margin', () => {
-    const devTool = readProjectFile('src/components/DevTool.astro');
+    const devTool = readDevToolSource();
 
     assert.match(devTool, /automaticSpacingKey\?: string/);
     assert.match(
@@ -301,7 +310,7 @@ test('new pending captions immediately stage their 1.5rem boundary margin', () =
 });
 
 test('deleting a persisted caption restores its default boundary margin as pending', () => {
-    const devTool = readProjectFile('src/components/DevTool.astro');
+    const devTool = readDevToolSource();
 
     assert.match(
         devTool,
@@ -320,7 +329,7 @@ test('deleting a persisted caption restores its default boundary margin as pendi
 test('Page Manager route and UI use structured manifest metadata without frontmatter writeback', () => {
     const getStructure = readProjectFile('src/dev-api/get-page-structure.ts');
     const saveManager = readProjectFile('src/dev-api/save-page-manager.ts');
-    const devTool = readProjectFile('src/components/DevTool.astro');
+    const devTool = readDevToolSource();
     assert.match(getStructure, /readAlbumManifestFile/);
     assert.match(getStructure, /metadata/);
     assert.doesNotMatch(getStructure, /frontmatter\s*[,}]/);
@@ -335,7 +344,7 @@ test('Page Manager route and UI use structured manifest metadata without frontma
 
 test('album metadata editing is an Edit blocks control below the album info', () => {
     const albumPage = readProjectFile('src/pages/[folder]/[album].astro');
-    const devTool = readProjectFile('src/components/DevTool.astro');
+    const devTool = readDevToolSource();
 
     assert.match(albumPage, /data-album-heading[\s\S]*?data-album-title/);
     assert.match(devTool, /function initAlbumMetadataEditor\(\)/);
@@ -354,9 +363,9 @@ test('album metadata editing is an Edit blocks control below the album info', ()
 });
 
 test('Page Manager photo thumbnails fall back from missing local assets to R2', () => {
-    const devTool = readProjectFile('src/components/DevTool.astro');
+    const devTool = readDevToolSource();
 
-    assert.match(devTool, /import \{ R2_DOMAIN \} from ["']\.\.\/lib\/constants["']/);
+    assert.match(devTool, /import \{ R2_DOMAIN \} from ["'](?:\.\.\/)+lib\/constants["']/);
     assert.match(
         devTool,
         /src="\/r2\/\$\{encodedKey\}" data-pm-fallback-url="\$\{R2_DOMAIN\}\/\$\{encodedKey\}"/,
@@ -369,7 +378,7 @@ test('Page Manager photo thumbnails fall back from missing local assets to R2', 
 });
 
 test('Add Page and Add Photos can sort candidates by filename or time in either direction', () => {
-    const devTool = readProjectFile('src/components/DevTool.astro');
+    const devTool = readDevToolSource();
 
     assert.match(devTool, /data-import-sort-name/);
     assert.match(devTool, /data-import-sort-time/);
@@ -383,7 +392,7 @@ test('Add Page and Add Photos can sort candidates by filename or time in either 
 });
 
 test('Add Page and Add Photos support modifier-based multi-selection', () => {
-    const devTool = readProjectFile('src/components/DevTool.astro');
+    const devTool = readDevToolSource();
 
     assert.match(devTool, /Click: select · Ctrl\/⌘: toggle · Shift: range/);
     assert.match(devTool, /aria-multiselectable="true"/);
@@ -395,7 +404,7 @@ test('Add Page and Add Photos support modifier-based multi-selection', () => {
 });
 
 test('Album R2 trash actions preserve the dry-run ETag', () => {
-    const devTool = readProjectFile('src/components/DevTool.astro');
+    const devTool = readDevToolSource();
 
     assert.match(
         devTool,
@@ -404,7 +413,7 @@ test('Album R2 trash actions preserve the dry-run ETag', () => {
 });
 
 test('direct block margin control stages changes for the shared save action', () => {
-    const devTool = readProjectFile('src/components/DevTool.astro');
+    const devTool = readDevToolSource();
 
     assert.match(
         devTool,
@@ -429,7 +438,7 @@ test('direct block margin control stages changes for the shared save action', ()
 });
 
 test('Page Manager delegates all Text settings to the direct Text toolbar', () => {
-    const devTool = readProjectFile('src/components/DevTool.astro');
+    const devTool = readDevToolSource();
     const text = readProjectFile('src/components/Text.astro');
     const getStructure = readProjectFile('src/dev-api/get-page-structure.ts');
 
@@ -445,14 +454,14 @@ test('Page Manager delegates all Text settings to the direct Text toolbar', () =
 });
 
 test('Page Manager delegates caption editing to the direct block toolbar', () => {
-    const devTool = readProjectFile('src/components/DevTool.astro');
+    const devTool = readDevToolSource();
 
     assert.doesNotMatch(devTool, /block-caption-toggle|dev-pm-caption-editor|tree-caption-preview/);
     assert.match(devTool, /dev-inline-caption-editor/);
 });
 
 test('development block controls reveal on hover and place edit controls beside the add control', () => {
-    const devTool = readProjectFile('src/components/DevTool.astro');
+    const devTool = readDevToolSource();
 
     assert.match(
         devTool,
@@ -489,7 +498,7 @@ test('development block controls reveal on hover and place edit controls beside 
 });
 
 test('tag editing is a global toggle and inline page editors are mutually exclusive', () => {
-    const devTool = readProjectFile('src/components/DevTool.astro');
+    const devTool = readDevToolSource();
 
     assert.match(devTool, /tagButton\.id = 'dev-tag-toggle'/);
     assert.match(devTool, /actions\.append\(\s*tagButton,\s*managerButton,/);
@@ -508,7 +517,7 @@ test('tag editing is a global toggle and inline page editors are mutually exclus
 });
 
 test('album utility controls expose one Edit blocks entry point and R2 sync outside Page Manager', () => {
-    const devTool = readProjectFile('src/components/DevTool.astro');
+    const devTool = readDevToolSource();
 
     assert.doesNotMatch(devTool, /dev-pm-r2-sync|dev-pm-expand-all|ICONS\.expandAll|ICONS\.collapseAll/);
     assert.match(devTool, /gearBtn\.id = primaryButtonId/);
@@ -527,7 +536,7 @@ test('album utility controls expose one Edit blocks entry point and R2 sync outs
 });
 
 test('media block add menus can add photos to their own block through the shared pending structure', () => {
-    const devTool = readProjectFile('src/components/DevTool.astro');
+    const devTool = readDevToolSource();
 
     assert.match(devTool, /const stageDirectBlockPhotos = async \(blockKey: string, fallbackIndex: number, files: File\[\]\)/);
     assert.match(devTool, /targetBlock\.photos\.push\(\.\.\.files\.map\(\(file\) => \(\{ itemKey: file\.name \}\)\)\)/);
@@ -538,7 +547,7 @@ test('media block add menus can add photos to their own block through the shared
 });
 
 test('block action menu confirms photo deletion and carousel initial-photo selection inline', () => {
-    const devTool = readProjectFile('src/components/DevTool.astro');
+    const devTool = readDevToolSource();
 
     assert.match(devTool, /moreButton\.className = 'dev-page-inline-more-button'/);
     assert.match(devTool, /moreButton\.innerHTML = ICONS\.dots/);
@@ -562,7 +571,7 @@ test('block action menu confirms photo deletion and carousel initial-photo selec
 });
 
 test('pending captions share the component presentation used by persisted captions', () => {
-    const devTool = readProjectFile('src/components/DevTool.astro');
+    const devTool = readDevToolSource();
     const row = readProjectFile('src/components/Row.astro');
     const carousel = readProjectFile('src/components/PhotoCarousel.astro');
 
@@ -572,13 +581,14 @@ test('pending captions share the component presentation used by persisted captio
     assert.doesNotMatch(devTool, /\.dev-caption-generated-preview\s*\{[\s\S]*?color:/);
     assert.doesNotMatch(devTool, /\.dev-page-structure-preview > \.photo-caption\s*\{[\s\S]*?color:/);
     assert.doesNotMatch(devTool, /\.dev-block-overlay > \.photo-caption\s*\{\s*color:/);
-    assert.match(devTool, /let style = document\.getElementById\('dev-tool-styles'\)[\s\S]*?if \(!style\)[\s\S]*?style\.textContent = `/);
-    assert.doesNotMatch(devTool, /if \(document\.getElementById\('dev-tool-styles'\)\) return/);
+    // Editor styles are a static global stylesheet, so Vite HMR keeps them current.
+    assert.match(readProjectFile('src/components/DevTool.astro'), /<style is:global>/);
+    assert.doesNotMatch(devTool, /dev-tool-styles|style\.textContent = `/);
 });
 
 test('carousel edge slides use scrollable spacers so every active photo shares one centre', () => {
     const carousel = readProjectFile('src/components/PhotoCarousel.astro');
-    const devTool = readProjectFile('src/components/DevTool.astro');
+    const devTool = readDevToolSource();
 
     assert.match(carousel, /--carousel-edge:\s*calc\(\(100% - var\(--slide-width, 100%\)\) \/ 2\)/);
     assert.match(carousel, /\.carousel-track::before,[\s\S]*?\.carousel-track::after[\s\S]*?flex:\s*0 0 var\(--carousel-edge\)/);
@@ -593,7 +603,7 @@ test('carousel edge slides use scrollable spacers so every active photo shares o
 
 test('carousel defaults to full-width slides with arrows and an adjustable peek', () => {
     const carousel = readProjectFile('src/components/PhotoCarousel.astro');
-    const devTool = readProjectFile('src/components/DevTool.astro');
+    const devTool = readDevToolSource();
 
     assert.match(carousel, /gap = "0\.5rem"/);
     assert.match(carousel, /peekPercent = 0/);
@@ -633,7 +643,7 @@ test('carousel peek percent serializes only when set on a carousel', () => {
 
 test('mobile album media is full bleed while captions keep the content gutter', () => {
     const albumPage = readProjectFile('src/pages/[folder]/[album].astro');
-    const devTool = readProjectFile('src/components/DevTool.astro');
+    const devTool = readDevToolSource();
     const layout = readProjectFile('src/layouts/Layout.astro');
 
     assert.match(albumPage, /@media \(max-width: 767px\)[\s\S]*?--album-mobile-gutter:\s*1rem/);
@@ -673,7 +683,7 @@ test('mobile album media is full bleed while captions keep the content gutter', 
 
 test('tagged photos reveal tags without a grey image overlay on hover or touch', () => {
     const photo = readProjectFile('src/components/Photo.astro');
-    const devTool = readProjectFile('src/components/DevTool.astro');
+    const devTool = readDevToolSource();
 
     assert.match(photo, /\.photo-wrapper:hover \.tags-overlay\s*\{\s*opacity:\s*1/);
     assert.match(photo, /\.photo-wrapper\.show-info \.tags-overlay\s*\{\s*opacity:\s*1/);
@@ -696,7 +706,7 @@ test('tagged photos reveal tags without a grey image overlay on hover or touch',
 });
 
 test('media block type chooser keeps abbreviated trigger and expands with full lowercase labels', () => {
-    const devTool = readProjectFile('src/components/DevTool.astro');
+    const devTool = readDevToolSource();
 
     assert.match(
         devTool,
@@ -744,7 +754,7 @@ test('media block type chooser keeps abbreviated trigger and expands with full l
 });
 
 test('Page Manager leaves block creation and destructive actions to inline controls', () => {
-    const devTool = readProjectFile('src/components/DevTool.astro');
+    const devTool = readDevToolSource();
 
     assert.doesNotMatch(devTool, /block-add-photos|block-delete|initial-slide-btn|block-toggle/);
     assert.doesNotMatch(devTool, /dev-pm-native-photo-picker|openInlineBlockMenu|insertBlockAt/);
@@ -753,7 +763,7 @@ test('Page Manager leaves block creation and destructive actions to inline contr
 });
 
 test('pending layout and tag controls share the Edit blocks save state', () => {
-    const devTool = readProjectFile('src/components/DevTool.astro');
+    const devTool = readDevToolSource();
 
     assert.match(
         devTool,
@@ -776,7 +786,7 @@ test('pending layout and tag controls share the Edit blocks save state', () => {
 });
 
 test('pending inline edits warn before full loads and Astro page transitions', () => {
-    const devTool = readProjectFile('src/components/DevTool.astro');
+    const devTool = readDevToolSource();
 
     assert.match(
         devTool,
@@ -794,7 +804,7 @@ test('pending inline edits warn before full loads and Astro page transitions', (
 });
 
 test('Page Manager and inline block controls share one pending layout draft', () => {
-    const devTool = readProjectFile('src/components/DevTool.astro');
+    const devTool = readDevToolSource();
 
     assert.match(devTool, /type PendingPageStructureChange = \{[\s\S]*?draft: PageStructureDraft;[\s\S]*?imports: File\[\]/);
     assert.match(devTool, /pendingLayoutChange !== null/);
@@ -808,7 +818,7 @@ test('Page Manager and inline block controls share one pending layout draft', ()
 });
 
 test('layout mode keeps block controls and order controls in one editing session', () => {
-    const devTool = readProjectFile('src/components/DevTool.astro');
+    const devTool = readDevToolSource();
 
     assert.match(devTool, /type AlbumEditMode = 'blocks' \| 'tags';/);
     assert.match(devTool, /const canStartEditMode = \(_target: AlbumEditMode\) => !pendingSaveInProgress;/);
@@ -826,7 +836,7 @@ test('layout mode keeps block controls and order controls in one editing session
 });
 
 test('inline order mode exposes manager, leveled moves, and cross-block photo grouping', () => {
-    const devTool = readProjectFile('src/components/DevTool.astro');
+    const devTool = readDevToolSource();
 
     assert.match(devTool, /const orderButton = document\.getElementById\('dev-save-btn'\);/);
     assert.match(devTool, /setOrderEditMode\(true\);/);
@@ -871,7 +881,7 @@ test('inline order mode exposes manager, leveled moves, and cross-block photo gr
 });
 
 test('inline editor provides F1 tag, F2 merge, and F3 split shortcuts', () => {
-    const devTool = readProjectFile('src/components/DevTool.astro');
+    const devTool = readDevToolSource();
 
     assert.match(devTool, /target\?\.closest\('dialog, input, textarea, select, \[role="textbox"\]'\)/);
     assert.match(devTool, /activeBlockEditMode[\s\S]*?activeOrderMode[\s\S]*?!isEditingText/);
@@ -881,7 +891,7 @@ test('inline editor provides F1 tag, F2 merge, and F3 split shortcuts', () => {
 });
 
 test('copied tags paste directly on right click and Escape clears the copy state', () => {
-    const devTool = readProjectFile('src/components/DevTool.astro');
+    const devTool = readDevToolSource();
 
     assert.match(devTool, /let copiedTagName: string \| null = null;/);
     assert.match(devTool, /const setCopiedTagName = \(name: string \| null\) =>/);
@@ -895,7 +905,7 @@ test('copied tags paste directly on right click and Escape clears the copy state
 });
 
 test('page-level add controls expose every block gap and insert at the selected gap', () => {
-    const devTool = readProjectFile('src/components/DevTool.astro');
+    const devTool = readDevToolSource();
 
     assert.match(devTool, /\.dev-page-inline-add-zone--before/);
     assert.match(devTool, /\.dev-page-inline-add-menu\s*\{[\s\S]*?position: fixed;/);
@@ -907,7 +917,7 @@ test('page-level add controls expose every block gap and insert at the selected 
 });
 
 test('pending Text presentation follows its block identity after structure reordering', () => {
-    const devTool = readProjectFile('src/components/DevTool.astro');
+    const devTool = readDevToolSource();
 
     assert.match(devTool, /block\.__devKey \|\|= `persisted-\$\{index\}`/);
     assert.match(devTool, /text\.dataset\.devBlockKey = block\.__devKey/);
@@ -918,7 +928,7 @@ test('pending Text presentation follows its block identity after structure reord
 });
 
 test('pending layout rendering restores breadcrumb anchors', () => {
-    const devTool = readProjectFile('src/components/DevTool.astro');
+    const devTool = readDevToolSource();
     const albumPage = readProjectFile('src/pages/[folder]/[album].astro');
 
     assert.match(devTool, /albumContent\.replaceChildren\(fragment\);\s*document\.dispatchEvent\(new CustomEvent\('album:content-replaced'\)\);/);
@@ -930,7 +940,7 @@ test('pending layout rendering restores breadcrumb anchors', () => {
 });
 
 test('a newly added Text block immediately opens its editor', () => {
-    const devTool = readProjectFile('src/components/DevTool.astro');
+    const devTool = readDevToolSource();
 
     assert.match(devTool, /let pendingTextBlockEditorKey: string \| null = null;/);
     assert.match(devTool, /if \(type === 'Text'\) pendingTextBlockEditorKey = newBlock\.__devKey;/);
@@ -941,7 +951,7 @@ test('a newly added Text block immediately opens its editor', () => {
 });
 
 test('persistent toolbar controls match the resting appearance of hovered empty controls', () => {
-    const devTool = readProjectFile('src/components/DevTool.astro');
+    const devTool = readDevToolSource();
 
     assert.match(
         devTool,
@@ -956,7 +966,7 @@ test('persistent toolbar controls match the resting appearance of hovered empty 
 });
 
 test('direct caption editor uses a fixed four-line field with aligned controls', () => {
-    const devTool = readProjectFile('src/components/DevTool.astro');
+    const devTool = readDevToolSource();
 
     assert.match(
         devTool,
@@ -967,7 +977,7 @@ test('direct caption editor uses a fixed four-line field with aligned controls',
 });
 
 test('block captions and Text content open their direct editors on double click', () => {
-    const devTool = readProjectFile('src/components/DevTool.astro');
+    const devTool = readDevToolSource();
 
     assert.match(devTool, /blockElement\.addEventListener\('dblclick', \(event\) =>/);
     assert.match(
@@ -981,7 +991,7 @@ test('block captions and Text content open their direct editors on double click'
 });
 
 test('all remaining spacing inputs use unitless rem values', () => {
-    const devTool = readProjectFile('src/components/DevTool.astro');
+    const devTool = readDevToolSource();
 
     for (const className of ['dev-inline-margin-input']) {
         assert.match(
@@ -1034,7 +1044,7 @@ test('cover and folder-order APIs persist only through Album manifests', () => {
     const saveCover = readProjectFile('src/dev-api/save-album-cover.ts');
     const saveOrder = readProjectFile('src/dev-api/save-folder-order.ts');
     const getFolder = readProjectFile('src/dev-api/get-folder-structure.ts');
-    const devTool = readProjectFile('src/components/DevTool.astro');
+    const devTool = readDevToolSource();
     const folderPage = readProjectFile('src/pages/[folder]/index.astro');
 
     assert.match(saveCover, /updateAlbumCover/);
@@ -1446,6 +1456,7 @@ test("covered client scripts do not retain after-swap initializers", () => {
         "src/pages/yama/tags/[tag].astro",
         "src/components/MountainTagGrid.astro",
         "src/components/DevTool.astro",
+        "src/scripts/dev-tool/index.ts",
         "src/components/MountainDevTool.astro",
         "src/components/Photo.astro",
         "src/components/Row.astro",
