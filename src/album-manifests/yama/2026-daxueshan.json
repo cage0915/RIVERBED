@@ -42,14 +42,12 @@
     },
     {
       "type": "Row",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS02907.jpg"
       ]
     },
     {
       "type": "PhotoCarousel",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS02963.jpg",
         "KCS02975.jpg"
@@ -63,14 +61,12 @@
     },
     {
       "type": "Row",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS02968.jpg"
       ]
     },
     {
       "type": "PhotoCarousel",
-      "blockMargin": "1.5rem",
       "initialSlide": 1,
       "photos": [
         "KCS02971.jpg",
@@ -87,7 +83,6 @@
     },
     {
       "type": "PhotoCarousel",
-      "blockMargin": "1.5rem",
       "initialSlide": 1,
       "photos": [
         "KCS03004.jpg",
@@ -96,7 +91,6 @@
     },
     {
       "type": "PhotoCarousel",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS03002.jpg",
         "KCS02988.jpg",
@@ -112,7 +106,6 @@
     },
     {
       "type": "PhotoCarousel",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS02980.jpg",
         "KCS02985.jpg",
@@ -157,7 +150,6 @@
     },
     {
       "type": "Row",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS03070.jpg"
       ]
@@ -165,7 +157,6 @@
     {
       "type": "PhotoCarousel",
       "caption": "白面鼯鼠",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS03094.jpg",
         "KCS03099.jpg",
@@ -180,14 +171,12 @@
     },
     {
       "type": "Row",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS03149.jpg"
       ]
     },
     {
       "type": "PhotoCarousel",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS03212.jpg",
         "KCS03214.jpg"

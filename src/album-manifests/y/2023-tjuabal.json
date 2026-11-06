@@ -94,7 +94,6 @@
     },
     {
       "type": "PhotoCarousel",
-      "blockMargin": "1.5rem",
       "photos": [
         "011.jpg",
         "012.jpg"

@@ -24,7 +24,6 @@
     },
     {
       "type": "PhotoCarousel",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS01278.jpg",
         "KCS01266.jpg"
@@ -32,7 +31,6 @@
     },
     {
       "type": "PhotoCarousel",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS01309.jpg",
         "KCS01286.jpg"
@@ -53,14 +51,12 @@
     },
     {
       "type": "Row",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS01586.jpg"
       ]
     },
     {
       "type": "PhotoCarousel",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS01588.jpg",
         "KCS01595.jpg"
@@ -68,7 +64,6 @@
     },
     {
       "type": "PhotoCarousel",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS01592.jpg",
         "KCS01596.jpg",
@@ -84,7 +79,6 @@
     },
     {
       "type": "PhotoCarousel",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS01786.jpg",
         "KCS01789.jpg",

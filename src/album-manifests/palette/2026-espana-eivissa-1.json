@@ -248,7 +248,6 @@
       "type": "Row",
       "caption": "神話奧德賽中誘惑水手的海妖棲息處。",
       "captionPosition": "left bottom",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS02452.jpg"
       ]
@@ -270,7 +269,6 @@
     },
     {
       "type": "Row",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS02467.jpg",
         "KCS02475.jpg"
@@ -278,7 +276,6 @@
     },
     {
       "type": "PhotoCarousel",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS02517.jpg",
         "KCS02545.jpg",

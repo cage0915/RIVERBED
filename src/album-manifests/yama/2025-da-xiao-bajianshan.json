@@ -135,7 +135,6 @@
     },
     {
       "type": "Row",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS00417.jpg"
       ]
@@ -151,7 +150,6 @@
     },
     {
       "type": "Row",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS00441.jpg"
       ]
@@ -195,14 +193,12 @@
     },
     {
       "type": "Row",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS00479.jpg"
       ]
     },
     {
       "type": "PhotoCarousel",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS00484.jpg",
         "KCS00485.jpg",
@@ -316,7 +312,6 @@
     },
     {
       "type": "Row",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS00586.jpg"
       ]

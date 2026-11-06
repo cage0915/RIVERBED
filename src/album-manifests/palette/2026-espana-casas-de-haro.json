@@ -46,7 +46,6 @@
     },
     {
       "type": "Row",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS01934.jpg"
       ]
@@ -165,7 +164,6 @@
     },
     {
       "type": "Row",
-      "blockMargin": "1.5rem",
       "photos": [
         "2026-0404-1033-29.625.jpg"
       ]
@@ -206,7 +204,6 @@
       "type": "Row",
       "caption": "圈養兔子的空間",
       "captionPosition": "left bottom",
-      "blockMargin": "1.5rem",
       "photos": [
         "2026-0404-1924-51.968.jpg"
       ]
@@ -215,7 +212,6 @@
       "type": "PhotoCarousel",
       "caption": "Casas de Haro一帶會使用綿羊奶來做起司。",
       "captionPosition": "left bottom",
-      "blockMargin": "1.5rem",
       "initialSlide": 1,
       "photos": [
         "KCS02182.jpg",
@@ -226,7 +222,6 @@
       "type": "PhotoCarousel",
       "caption": "橄欖樹，最後一張是某年寒冬大雪tio拍下的。",
       "captionPosition": "left bottom",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS02038.jpg",
         "KCS02082.jpg",

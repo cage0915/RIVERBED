@@ -43,7 +43,6 @@
       "type": "PhotoCarousel",
       "caption": "雪山圈谷 | 這趟最期待的就是裝著雪的碗公。",
       "captionPosition": "left bottom",
-      "blockMargin": "1.5rem",
       "initialSlide": 1,
       "photos": [
         "KCS02471.jpg",
@@ -60,7 +59,6 @@
       "type": "Row",
       "caption": "鋸山連峰",
       "captionPosition": "left bottom",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS02473.jpg"
       ]
@@ -108,7 +106,6 @@
     },
     {
       "type": "Row",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS02588.jpg"
       ]

@@ -58,7 +58,6 @@
     },
     {
       "type": "PhotoCarousel",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS00753.jpg",
         "KCS00754.jpg",

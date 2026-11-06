@@ -64,7 +64,6 @@
     },
     {
       "type": "Row",
-      "blockMargin": "0.5rem",
       "photos": [
         "11.jpg"
       ]

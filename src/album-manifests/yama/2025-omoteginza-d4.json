@@ -17,7 +17,6 @@
   "blocks": [
     {
       "type": "PhotoCarousel",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS08043.jpg",
         "KCS08044.jpg",
@@ -28,14 +27,12 @@
       "type": "Row",
       "caption": "槍沢 | 從槍岳下到上高地的距離約22公里，距離雖然長但坡度明顯比合戰尾根和緩，也因此下山路上遇到的老人家明顯比前三天高。",
       "captionPosition": "left bottom",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS08049.jpg"
       ]
     },
     {
       "type": "PhotoCarousel",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS08051.jpg",
         "KCS08053.jpg",
@@ -45,14 +42,12 @@
     },
     {
       "type": "Row",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS08062.jpg"
       ]
     },
     {
       "type": "PhotoCarousel",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS08070.jpg",
         "KCS08080.jpg"
@@ -60,7 +55,6 @@
     },
     {
       "type": "PhotoCarousel",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS08085.jpg",
         "KCS08084.jpg"
@@ -74,7 +68,6 @@
     },
     {
       "type": "Row",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS08104.jpg",
         "KCS08105.jpg",
@@ -84,7 +77,6 @@
     {
       "type": "PhotoCarousel",
       "caption": "梓川",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS08117.jpg",
         "KCS08132.jpg",
@@ -93,7 +85,6 @@
     },
     {
       "type": "PhotoCarousel",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS08149.jpg",
         "KCS08153.jpg",
@@ -110,7 +101,6 @@
     },
     {
       "type": "Row",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS08169.jpg"
       ]
@@ -118,7 +108,6 @@
     {
       "type": "PhotoCarousel",
       "caption": "明神池",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS08181.jpg",
         "KCS08178.jpg"
@@ -127,7 +116,6 @@
     {
       "type": "PhotoCarousel",
       "caption": "岳沢. 梓川",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS08186.jpg",
         "KCS08193.jpg"

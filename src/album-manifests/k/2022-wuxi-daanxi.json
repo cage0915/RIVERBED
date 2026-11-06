@@ -46,14 +46,12 @@
       "type": "Row",
       "caption": "大安溪",
       "captionPosition": "left top",
-      "blockMargin": "1.5rem",
       "photos": [
         "000166010017.jpg"
       ]
     },
     {
       "type": "PhotoCarousel",
-      "blockMargin": "1.5rem",
       "photos": [
         "000166010021.jpg",
         "000166010023.jpg",

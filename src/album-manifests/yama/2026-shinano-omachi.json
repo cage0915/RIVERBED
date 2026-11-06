@@ -23,14 +23,12 @@
     },
     {
       "type": "Row",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS01684.jpg"
       ]
     },
     {
       "type": "PhotoCarousel",
-      "blockMargin": "1.5rem",
       "initialSlide": 1,
       "photos": [
         "KCS01687.jpg",
@@ -41,14 +39,12 @@
     },
     {
       "type": "Row",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS01689.jpg"
       ]
     },
     {
       "type": "PhotoCarousel",
-      "blockMargin": "1.5rem",
       "initialSlide": 1,
       "photos": [
         "KCS01694.jpg",
@@ -58,7 +54,6 @@
     },
     {
       "type": "PhotoPanorama",
-      "blockMargin": "1.5rem",
       "panoramaSlices": 2,
       "photos": [
         "KCS01709-全景.jpg"
@@ -66,7 +61,6 @@
     },
     {
       "type": "PhotoCarousel",
-      "blockMargin": "1.5rem",
       "initialSlide": 1,
       "photos": [
         "KCS01699.jpg",
@@ -76,7 +70,6 @@
     },
     {
       "type": "PhotoCarousel",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS01745.jpg",
         "KCS01746.jpg"
@@ -86,7 +79,6 @@
       "type": "PhotoCarousel",
       "caption": "↓ 中綱湖",
       "captionPosition": "center top",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS01765.jpg",
         "KCS01772.jpg",
@@ -95,7 +87,6 @@
     },
     {
       "type": "PhotoCarousel",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS01774.jpg",
         "KCS01776.jpg",

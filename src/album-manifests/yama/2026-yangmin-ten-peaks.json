@@ -47,14 +47,12 @@
     },
     {
       "type": "Row",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS00964.jpg"
       ]
     },
     {
       "type": "PhotoCarousel",
-      "blockMargin": "1.5rem",
       "initialSlide": 1,
       "photos": [
         "KCS00972.jpg",
@@ -78,7 +76,6 @@
     {
       "type": "Row",
       "caption": "@ 大屯山南峰",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS01005.jpg",
         "KCS01008.jpg"
@@ -87,7 +84,6 @@
     {
       "type": "PhotoCarousel",
       "caption": "@ 大屯山西峰",
-      "blockMargin": "1.5rem",
       "initialSlide": 2,
       "photos": [
         "KCS01015.jpg",

@@ -96,7 +96,6 @@
     },
     {
       "type": "Row",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS03754.jpg"
       ]
@@ -116,7 +115,6 @@
     },
     {
       "type": "Row",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS03777.jpg"
       ]
@@ -164,7 +162,6 @@
     },
     {
       "type": "Row",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS04410.jpg"
       ]
@@ -190,7 +187,6 @@
     },
     {
       "type": "Row",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS04429.jpg"
       ]
@@ -312,7 +308,6 @@
     },
     {
       "type": "Row",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS04594.jpg"
       ]
@@ -342,7 +337,6 @@
     {
       "type": "Row",
       "caption": "關山大斷崖",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS04665.jpg"
       ]

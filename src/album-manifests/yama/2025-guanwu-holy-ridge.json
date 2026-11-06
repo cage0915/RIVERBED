@@ -45,7 +45,6 @@
     },
     {
       "type": "Row",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS08639.jpg",
         "KCS08653.jpg",
@@ -54,7 +53,6 @@
     },
     {
       "type": "PhotoPanorama",
-      "blockMargin": "1.5rem",
       "initialView": "panorama",
       "panoramaSlices": 2,
       "photos": [
@@ -75,7 +73,6 @@
     },
     {
       "type": "Row",
-      "blockMargin": "1.5rem",
       "photos": [
         "KCS08683.jpg"
       ]
