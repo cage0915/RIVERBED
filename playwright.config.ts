@@ -11,7 +11,8 @@ export default defineConfig({
         trace: "retain-on-failure",
     },
     webServer: {
-        command: "npm run preview -- --host 127.0.0.1 --port 4322",
+        // --ignore-lock keeps a one-off foreground server even when Astro detects an AI agent.
+        command: "npm run preview -- --host 127.0.0.1 --port 4322 --ignore-lock",
         url: "http://127.0.0.1:4322",
         reuseExistingServer: false,
     },
