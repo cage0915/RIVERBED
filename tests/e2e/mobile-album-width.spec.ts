@@ -132,10 +132,11 @@ for (const width of [393, 430]) {
             await page.setViewportSize({ width: 1024, height: 852 });
             await expect(track).toHaveCSS('column-gap', '8px');
             await expect(row).not.toHaveAttribute('data-mobile-row-pan');
+            // peekPercent defaults to 0, so desktop slides span the full track.
             await expect.poll(() => track.evaluate(el => {
                 const slide = el.firstElementChild as HTMLElement;
                 return Math.round(slide.offsetWidth / el.clientWidth * 100);
-            })).toBe(80);
+            })).toBe(100);
         });
     });
 }

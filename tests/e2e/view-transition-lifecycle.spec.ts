@@ -35,15 +35,18 @@ async function isolateRemotePhotos(page: Page) {
 }
 
 async function openYamaFromHomeWithTouch(page: Page) {
-    const yamaCard = page.locator(
-        '[data-catalog-card]:has(a[href="/yama"])',
-    ).first();
-
-    await expect(yamaCard).toBeVisible();
-    await yamaCard.click();
+    // The latest-post card reveals its info on the first tap; folder cards
+    // are marked data-mobile-direct and navigate immediately.
+    const latestPostCard = page.locator(".latest-post-card[data-catalog-card]");
+    await expect(latestPostCard).toBeVisible();
+    await latestPostCard.click();
     await expect.poll(() => new URL(page.url()).pathname).toBe("/");
-    await expect(yamaCard).toHaveClass(/show-info/);
+    await expect(latestPostCard).toHaveClass(/show-info/);
 
+    const yamaCard = page.locator(
+        '[data-catalog-card][data-mobile-direct]:has(a[href="/yama"])',
+    ).first();
+    await expect(yamaCard).toBeVisible();
     await yamaCard.click();
     await expect(page).toHaveURL(/\/yama\/?$/);
     await expect(page.locator("[data-site-navigation]")).toBeVisible();
