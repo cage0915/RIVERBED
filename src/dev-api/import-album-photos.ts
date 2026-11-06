@@ -30,7 +30,7 @@ export const POST: APIRoute = async ({ request }) => {
         const projectRoot = process.cwd();
         const albumDir = path.resolve(projectRoot, 'r2', folder, album);
         const allowedAlbumRoot = path.resolve(projectRoot, 'r2', folder) + path.sep;
-        const manifestPath = path.resolve(projectRoot, 'src/album-manifests', folder, `${album}.json`);
+        const manifestPath = path.resolve(projectRoot, 'src/albums', folder, `${album}.json`);
         if (!albumDir.startsWith(allowedAlbumRoot)) return json({ error: 'Invalid target path' }, 400);
         if (createPage && fs.existsSync(manifestPath)) return json({ error: 'Page already exists' }, 409);
         if (!createPage && !fs.existsSync(manifestPath)) return json({ error: 'Page does not exist' }, 404);

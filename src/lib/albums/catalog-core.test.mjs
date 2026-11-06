@@ -26,7 +26,7 @@ function record(slug, albumManifest, filenames) {
     albumManifest.blocks = filenames.map((filename) => ({ type: "Row", photos: [filename] }));
     return {
         slug,
-        manifestPath: `src/album-manifests/${slug}.json`,
+        manifestPath: `src/albums/${slug}.json`,
         manifest: albumManifest,
     };
 }
@@ -163,8 +163,8 @@ test("resolves external covers only to tracked manifest inventory", () => {
             code: "external-cover-source-missing",
             message: "External cover asset \"yama/source/not-tracked.jpg\" is not tracked by any Album manifest inventory",
             albumSlug: "k/missing",
-            sourcePath: "src/album-manifests/k/missing.json",
-            manifestPath: "src/album-manifests/k/missing.json",
+            sourcePath: "src/albums/k/missing.json",
+            manifestPath: "src/albums/k/missing.json",
             fieldPath: "cover.photo.assetKey",
         }],
     );
@@ -185,8 +185,8 @@ test("rejects a same-Album photo encoded as an external cover", () => {
         code: "external-cover-source-same-album",
         message: "External cover asset \"yama/self-reference/A.jpg\" belongs to the consumer Album; use a local cover reference",
         albumSlug: "yama/self-reference",
-        sourcePath: "src/album-manifests/yama/self-reference.json",
-        manifestPath: "src/album-manifests/yama/self-reference.json",
+        sourcePath: "src/albums/yama/self-reference.json",
+        manifestPath: "src/albums/yama/self-reference.json",
         fieldPath: "cover.photo.assetKey",
     }]);
 });
@@ -222,9 +222,9 @@ test("reports inventory, duplicate order, and duplicate slug diagnostics", () =>
     ]);
     const orderDiagnostic = catalog.diagnostics.find(({ code }) => code === "duplicate-album-order");
     const slugDiagnostic = catalog.diagnostics.find(({ code }) => code === "duplicate-album-slug");
-    assert.equal(orderDiagnostic.sourcePath, "src/album-manifests/yama/other.json");
+    assert.equal(orderDiagnostic.sourcePath, "src/albums/yama/other.json");
     assert.equal(orderDiagnostic.fieldPath, "order");
-    assert.equal(slugDiagnostic.sourcePath, "src/album-manifests/yama/duplicate.json");
+    assert.equal(slugDiagnostic.sourcePath, "src/albums/yama/duplicate.json");
     assert.equal(slugDiagnostic.fieldPath, "slug");
 });
 
@@ -242,8 +242,8 @@ test("reports and skips an invalid Album slug", () => {
         code: "invalid-album-slug",
         message: "Invalid album slug: not-a-slug",
         albumSlug: "not-a-slug",
-        sourcePath: "src/album-manifests/not-a-slug.json",
-        manifestPath: "src/album-manifests/not-a-slug.json",
+        sourcePath: "src/albums/not-a-slug.json",
+        manifestPath: "src/albums/not-a-slug.json",
         fieldPath: "slug",
     }]);
 });
@@ -318,14 +318,14 @@ test("produces identical winners, Albums, and diagnostics for record permutation
         order: 10,
         photos: [{ filename: "A.jpg" }, { filename: "unused-A.jpg" }],
     }), ["A.jpg"]);
-    canonicalDuplicate.manifestPath = "src/album-manifests/yama/a-duplicate.json";
+    canonicalDuplicate.manifestPath = "src/albums/yama/a-duplicate.json";
 
     const losingDuplicate = record("yama/duplicate-order", manifest({
         title: "Losing duplicate",
         order: 30,
         photos: [{ filename: "Z.jpg" }],
     }), ["Z.jpg"]);
-    losingDuplicate.manifestPath = "src/album-manifests/yama/z-duplicate.json";
+    losingDuplicate.manifestPath = "src/albums/yama/z-duplicate.json";
 
     const orderCollision = record("yama/order-collision", manifest({
         title: "Order collision",

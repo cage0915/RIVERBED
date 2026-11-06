@@ -8,7 +8,7 @@ export type JsonModule = { default: unknown };
 
 export type AlbumSummary = Omit<NormalizedAlbum, "blocks" | "photos">;
 
-const MANIFEST_PATH = /^\/src\/album-manifests\/(.+)\.json$/;
+const MANIFEST_PATH = /^\/src\/albums\/(.+)\.json$/;
 
 function errorMessage(error: unknown): string {
     return error instanceof Error ? error.message : String(error);

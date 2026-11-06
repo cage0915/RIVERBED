@@ -82,13 +82,13 @@ async function resolveManifestLocation(
     const slug = validateAlbumSlug(albumSlug);
     const projectRootReal = await realpath(path.resolve(projectRoot));
     const sourceRoot = path.join(projectRootReal, "src");
-    const manifestRoot = path.join(sourceRoot, "album-manifests");
+    const manifestRoot = path.join(sourceRoot, "albums");
     const [folderName] = slug.split("/");
     const folder = path.join(manifestRoot, folderName);
     const target = path.join(manifestRoot, `${slug}.json`);
 
     await assertExistingPathIsSafe(projectRootReal, sourceRoot, "src");
-    await assertExistingPathIsSafe(projectRootReal, manifestRoot, "src/album-manifests");
+    await assertExistingPathIsSafe(projectRootReal, manifestRoot, "src/albums");
     await assertExistingPathIsSafe(projectRootReal, folder, `${folderName}`);
     await assertExistingPathIsSafe(projectRootReal, target, `${slug}.json`);
     return { slug, manifestRoot, folder, target };
@@ -115,9 +115,9 @@ export async function readAllAlbumManifestFiles(
     projectRoot: string,
 ): Promise<Record<string, AlbumManifest>> {
     const projectRootReal = await realpath(path.resolve(projectRoot));
-    const root = path.join(projectRootReal, "src", "album-manifests");
+    const root = path.join(projectRootReal, "src", "albums");
     await assertExistingPathIsSafe(projectRootReal, path.join(projectRootReal, "src"), "src");
-    await assertExistingPathIsSafe(projectRootReal, root, "src/album-manifests");
+    await assertExistingPathIsSafe(projectRootReal, root, "src/albums");
     const rootEntries = await readdir(root, { withFileTypes: true });
     const rootSymlink = rootEntries.find((entry) => entry.isSymbolicLink());
     if (rootSymlink) {

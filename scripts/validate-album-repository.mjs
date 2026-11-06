@@ -97,7 +97,7 @@ function issue(code, albumSlug, sourcePath, manifestPath, fieldPath, message) {
 }
 
 export function validateAlbumRepository(projectRoot = process.cwd()) {
-    const manifestsRoot = path.join(projectRoot, "src/album-manifests");
+    const manifestsRoot = path.join(projectRoot, "src/albums");
     const retiredRoots = [
         {
             root: path.join(projectRoot, "src/album-tags"),

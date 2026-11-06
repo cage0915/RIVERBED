@@ -16,7 +16,7 @@ export function resolveAlbumAssetKey(albumSlug: string, filename: string) {
 }
 
 export function collectAlbumReferences(albumSlug: string, manifest: AlbumManifest): R2SourceReference[] {
-    const source = `src/album-manifests/${albumSlug}.json`;
+    const source = `src/albums/${albumSlug}.json`;
     const references: R2SourceReference[] = manifest.photos.map(({ filename }) => ({
         key: resolveAlbumAssetKey(albumSlug, filename),
         kind: 'album-photo' as const,

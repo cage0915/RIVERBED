@@ -122,7 +122,7 @@ export const POST: APIRoute = async ({ request }) => {
                 assets: payloads,
                 sourceProposals: [
                     {
-                        target: path.resolve(projectRoot, 'src/album-manifests', `${albumSlug}.json`),
+                        target: path.resolve(projectRoot, 'src/albums', `${albumSlug}.json`),
                         content: `${JSON.stringify(proposedManifest, null, 2)}\n`,
                     },
                 ],

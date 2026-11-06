@@ -24,7 +24,7 @@ function validManifest(overrides = {}) {
 
 test("derives Album slugs from manifest module paths", () => {
     const catalog = buildAlbumCatalogFromManifests({
-        "/src/album-manifests/yama/source.json": { default: validManifest() },
+        "/src/albums/yama/source.json": { default: validManifest() },
     });
 
     assert.deepEqual(catalog.getAlbums().map(({ slug }) => slug), ["yama/source"]);
@@ -36,7 +36,7 @@ test("derives Album slugs from manifest module paths", () => {
 });
 
 test("manifest parse failures name the exact manifest path and preserve their cause", () => {
-    const manifestPath = "/src/album-manifests/yama/source.json";
+    const manifestPath = "/src/albums/yama/source.json";
     assert.throws(
         () => buildAlbumCatalogFromManifests({ [manifestPath]: { default: validManifest({ title: "" }) } }),
         (error) => {
@@ -52,7 +52,7 @@ test("manifest parse failures name the exact manifest path and preserve their ca
 test("catalog validation failures include their code, actionable source path, and field", () => {
     assert.throws(
         () => buildAlbumCatalogFromManifests({
-            "/src/album-manifests/yama/source.json": {
+            "/src/albums/yama/source.json": {
                 default: validManifest({
                     blocks: [{ type: "Row", photos: ["A.jpg", "missing.jpg"] }],
                 }),
@@ -61,7 +61,7 @@ test("catalog validation failures include their code, actionable source path, an
         (error) => {
             assert.match(
                 error.message,
-                /\[block-photo-missing-from-manifest\] yama\/source sourcePath=\/src\/album-manifests\/yama\/source\.json manifestPath=\/src\/album-manifests\/yama\/source\.json fieldPath=blocks:/,
+                /\[block-photo-missing-from-manifest\] yama\/source sourcePath=\/src\/albums\/yama\/source\.json manifestPath=\/src\/albums\/yama\/source\.json fieldPath=blocks:/,
             );
             return true;
         },

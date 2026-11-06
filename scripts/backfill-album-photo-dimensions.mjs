@@ -4,7 +4,7 @@ import path from "node:path";
 import sharp from "sharp";
 
 const projectRoot = process.cwd();
-const manifestRoot = path.join(projectRoot, "src", "album-manifests");
+const manifestRoot = path.join(projectRoot, "src", "albums");
 const localPhotoRoot = path.join(projectRoot, "r2");
 const remotePhotoRoot = "https://photos.cage0915.com";
 

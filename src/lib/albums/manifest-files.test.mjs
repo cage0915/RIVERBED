@@ -43,7 +43,7 @@ function manifest(overrides = {}) {
 
 async function tempProject() {
     const root = await mkdtemp(path.join(tmpdir(), "riverbed-manifests-"));
-    const directory = path.join(root, "src", "album-manifests", "yama");
+    const directory = path.join(root, "src", "albums", "yama");
     await mkdir(directory, { recursive: true });
     return {
         root,
@@ -70,7 +70,7 @@ test("manifest file helpers read schema-valid files below an explicit project ro
 test("readAllAlbumManifestFiles returns slug-keyed manifests in stable order", async () => {
     const project = await tempProject();
     await writeFile(project.file, JSON.stringify(manifest()), "utf8");
-    const otherDirectory = path.join(project.root, "src", "album-manifests", "k");
+    const otherDirectory = path.join(project.root, "src", "albums", "k");
     await mkdir(otherDirectory, { recursive: true });
     await writeFile(
         path.join(otherDirectory, "another.json"),
@@ -111,7 +111,7 @@ test("writeAlbumManifestFile does not replace the existing file when validation 
 test("manifest writes reject symlinked storage components without escaping the project", async () => {
     const root = await mkdtemp(path.join(tmpdir(), "riverbed-symlink-root-"));
     const external = await mkdtemp(path.join(tmpdir(), "riverbed-symlink-external-"));
-    const manifestsRoot = path.join(root, "src", "album-manifests");
+    const manifestsRoot = path.join(root, "src", "albums");
     await mkdir(manifestsRoot, { recursive: true });
     await symlink(external, path.join(manifestsRoot, "yama"));
 
@@ -247,7 +247,7 @@ test("concurrent caption and tag mutations serialize per manifest without losing
     const tagMutation = updatePhotoTags(project.root, albumSlug, "view.jpg", [
         { name: "Concurrent tag", x: 10, y: 20 },
     ]);
-    const unrelatedDirectory = path.join(project.root, "src", "album-manifests", "k");
+    const unrelatedDirectory = path.join(project.root, "src", "albums", "k");
     await mkdir(unrelatedDirectory, { recursive: true });
     await writeFile(
         path.join(unrelatedDirectory, "other.json"),
@@ -319,7 +319,7 @@ test("updateAlbumCover stores another tracked Album photo externally without cop
     const project = await tempProject();
     await writeFile(project.file, JSON.stringify(manifest()), "utf8");
     const consumerPhotos = (await readAlbumManifestFile(project.root, albumSlug)).photos;
-    const sourceDirectory = path.join(project.root, "src", "album-manifests", "k");
+    const sourceDirectory = path.join(project.root, "src", "albums", "k");
     await mkdir(sourceDirectory, { recursive: true });
     await writeFile(
         path.join(sourceDirectory, "source.json"),
@@ -581,7 +581,7 @@ test("rollback failure is explicit and preserves the original backup for recover
 test("external cover validation waits for and observes source inventory mutations", async () => {
     const project = await tempProject();
     await writeFile(project.file, JSON.stringify(manifest()), "utf8");
-    const sourceDirectory = path.join(project.root, "src", "album-manifests", "k");
+    const sourceDirectory = path.join(project.root, "src", "albums", "k");
     await mkdir(sourceDirectory, { recursive: true });
     await writeFile(path.join(sourceDirectory, "source.json"), JSON.stringify(manifest({
         photos: [{ filename: "cover.jpg", tags: [] }, { filename: "shared.jpg", tags: [] }],

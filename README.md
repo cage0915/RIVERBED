@@ -2,7 +2,7 @@
 
 RIVERBED is a static Astro photo site. Album data follows one final, manifest-backed flow:
 
-- One JSON manifest per Album in `src/album-manifests` holds its metadata, ordering, page layout (`blocks`), the local photo inventory, photo captions, and tags. The Page Manager in the dev server is the editor for these files.
+- One JSON manifest per Album in `src/albums` holds its metadata, ordering, page layout (`blocks`), the local photo inventory, photo captions, and tags. The Page Manager in the dev server is the editor for these files.
 - R2 contains the image bytes. A manifest references an existing object key; it does not copy image data.
 - Tag view is a catalog query across source Album manifests. Tagged photos keep their source Album slug and original R2 key.
 - An external cover is the only supported persistent cross-Album photo reference. Album Rows and Carousels may use only their own local inventory.

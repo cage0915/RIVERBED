@@ -9,7 +9,7 @@ import type { NormalizedAlbum, TaggedPhoto } from "./types.ts";
 export type { AlbumSummary } from "./catalog-source.ts";
 
 const manifestModules = import.meta.glob(
-    "/src/album-manifests/**/*.json",
+    "/src/albums/**/*.json",
     { eager: true },
 ) as Record<string, JsonModule>;
 

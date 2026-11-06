@@ -150,7 +150,7 @@ export function buildPhotoRenameProposal(input: {
 
     const diagnostics = validateAlbumInventory({
         albumSlug,
-        manifestPath: `src/album-manifests/${albumSlug}.json`,
+        manifestPath: `src/albums/${albumSlug}.json`,
         manifest: manifests[albumSlug],
     });
     if (diagnostics.length > 0) {
@@ -517,7 +517,7 @@ export async function executeAlbumPhotoRename(
             JSON.stringify(proposal.manifests[slug]) !== JSON.stringify(manifests[slug])
         );
         const sourceProposals: SourceProposal[] = changedSlugs.map((slug) => ({
-            target: path.resolve(projectRoot, 'src/album-manifests', `${slug}.json`),
+            target: path.resolve(projectRoot, 'src/albums', `${slug}.json`),
             content: `${JSON.stringify(proposal.manifests[slug], null, 2)}\n`,
         }));
 
@@ -615,7 +615,7 @@ export async function commitAlbumImportSources(
     const manifest = parseAlbumManifest(proposal.manifest, albumSlug);
     const diagnostics = validateAlbumInventory({
         albumSlug,
-        manifestPath: `src/album-manifests/${albumSlug}.json`,
+        manifestPath: `src/albums/${albumSlug}.json`,
         manifest,
     });
     if (diagnostics.length > 0) {
@@ -631,7 +631,7 @@ export async function commitAlbumImportSources(
         }, albumSlug);
         const finalDiagnostics = validateAlbumInventory({
             albumSlug,
-            manifestPath: `src/album-manifests/${albumSlug}.json`,
+            manifestPath: `src/albums/${albumSlug}.json`,
             manifest: finalManifest,
         });
         if (finalDiagnostics.length > 0) {
@@ -642,7 +642,7 @@ export async function commitAlbumImportSources(
             committedAssets = await commitAlbumAssetsWithinLock(projectRoot, albumSlug, assets, operations);
             await createSourceFilesAtomically(projectRoot, [
                 {
-                    target: path.resolve(projectRoot, 'src/album-manifests', `${albumSlug}.json`),
+                    target: path.resolve(projectRoot, 'src/albums', `${albumSlug}.json`),
                     content: `${JSON.stringify(finalManifest, null, 2)}\n`,
                 },
             ], operations.sourceFiles);
@@ -825,7 +825,7 @@ export async function deleteAlbumSourceFiles(
             throw new AlbumLifecycleConflictError(blockingKey, consumers);
         }
         const candidates = [
-            path.resolve(projectRoot, 'src/album-manifests', `${albumSlug}.json`),
+            path.resolve(projectRoot, 'src/albums', `${albumSlug}.json`),
         ];
         const existing: string[] = [];
         for (const candidate of candidates) {
@@ -924,7 +924,7 @@ export function buildAlbumPageProposal(input: {
     }, albumSlug);
     const diagnostics = validateAlbumInventory({
         albumSlug,
-        manifestPath: `src/album-manifests/${albumSlug}.json`,
+        manifestPath: `src/albums/${albumSlug}.json`,
         manifest: proposed,
     });
     if (diagnostics.length > 0) {

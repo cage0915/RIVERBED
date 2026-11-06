@@ -176,8 +176,8 @@ test('shared Album asset storage guard rejects a photo symlink inside a normal d
 
 async function lifecycleProject() {
     const root = await mkdtemp(path.join(tmpdir(), 'riverbed-lifecycle-'));
-    const sourceManifest = path.join(root, 'src/album-manifests/yama/source.json');
-    const consumerManifest = path.join(root, 'src/album-manifests/k/consumer.json');
+    const sourceManifest = path.join(root, 'src/albums/yama/source.json');
+    const consumerManifest = path.join(root, 'src/albums/k/consumer.json');
     const r2 = path.join(root, 'r2/yama/source');
     await Promise.all([
         mkdir(path.dirname(sourceManifest), { recursive: true }),
@@ -452,9 +452,9 @@ test('phase-two chained R2 rename failure restores every original byte without o
 
 test('import commits the new Album manifest', async () => {
     const root = await mkdtemp(path.join(tmpdir(), 'riverbed-import-source-'));
-    await mkdir(path.join(root, 'src/album-manifests/yama'), { recursive: true });
+    await mkdir(path.join(root, 'src/albums/yama'), { recursive: true });
     await writeFile(
-        path.join(root, 'src/album-manifests/yama/existing.json'),
+        path.join(root, 'src/albums/yama/existing.json'),
         JSON.stringify(album({ order: 10 })),
         'utf8',
     );
@@ -468,7 +468,7 @@ test('import commits the new Album manifest', async () => {
 
     await commitAlbumImportSources(root, 'yama/new-album', proposal);
 
-    const created = JSON.parse(await readFile(path.join(root, 'src/album-manifests/yama/new-album.json'), 'utf8'));
+    const created = JSON.parse(await readFile(path.join(root, 'src/albums/yama/new-album.json'), 'utf8'));
     assert.equal(created.order, 20);
     assert.deepEqual(created.blocks, [{ type: 'Row', photos: ['A.jpg'] }]);
 });
@@ -484,7 +484,7 @@ test('new Album order advances past the current maximum without renumbering exis
 
 test('imported Album metadata and layout round-trip through Page Manager', async () => {
     const root = await mkdtemp(path.join(tmpdir(), 'riverbed-page-manager-boundary-'));
-    await mkdir(path.join(root, 'src/album-manifests'), { recursive: true });
+    await mkdir(path.join(root, 'src/albums'), { recursive: true });
     const albumSlug = 'yama/page-manager';
     const proposal = createAlbumImport({
         albumSlug,
@@ -525,7 +525,7 @@ test('imported Album metadata and layout round-trip through Page Manager', async
     });
     await replaceSourceFilesAtomically([
         {
-            target: path.join(root, `src/album-manifests/${albumSlug}.json`),
+            target: path.join(root, `src/albums/${albumSlug}.json`),
             content: `${JSON.stringify(savedManifest, null, 2)}\n`,
         },
     ], root);
@@ -540,7 +540,7 @@ test('imported Album metadata and layout round-trip through Page Manager', async
 
 test('invalid import proposal creates no manifest', async () => {
     const root = await mkdtemp(path.join(tmpdir(), 'riverbed-invalid-import-'));
-    await mkdir(path.join(root, 'src/album-manifests/yama'), { recursive: true });
+    await mkdir(path.join(root, 'src/albums/yama'), { recursive: true });
     const proposal = createAlbumImport({
         albumSlug: 'yama/new-album',
         title: 'New Album',
@@ -551,12 +551,12 @@ test('invalid import proposal creates no manifest', async () => {
     proposal.manifest.title = '';
 
     await assert.rejects(commitAlbumImportSources(root, 'yama/new-album', proposal), /title/);
-    await assert.rejects(access(path.join(root, 'src/album-manifests/yama/new-album.json')), /ENOENT/);
+    await assert.rejects(access(path.join(root, 'src/albums/yama/new-album.json')), /ENOENT/);
 });
 
 test('concurrent imports serialize by folder and receive distinct increasing order values', async () => {
     const root = await mkdtemp(path.join(tmpdir(), 'riverbed-concurrent-import-'));
-    await mkdir(path.join(root, 'src/album-manifests'), { recursive: true });
+    await mkdir(path.join(root, 'src/albums'), { recursive: true });
     const first = createAlbumImport({
         albumSlug: 'yama/first', title: 'First', filenames: ['A.jpg'], order: 10,
     });
@@ -570,14 +570,14 @@ test('concurrent imports serialize by folder and receive distinct increasing ord
     ]);
 
     const orders = await Promise.all(['first', 'second'].map(async (name) =>
-        JSON.parse(await readFile(path.join(root, `src/album-manifests/yama/${name}.json`), 'utf8')).order
+        JSON.parse(await readFile(path.join(root, `src/albums/yama/${name}.json`), 'utf8')).order
     ));
     assert.deepEqual([...orders].sort((a, b) => a - b), [10, 20]);
 });
 
 test('same-slug concurrent imports cannot remove or overwrite the winning request asset', async () => {
     const root = await mkdtemp(path.join(tmpdir(), 'riverbed-same-import-'));
-    await mkdir(path.join(root, 'src/album-manifests'), { recursive: true });
+    await mkdir(path.join(root, 'src/albums'), { recursive: true });
     const first = createAlbumImport({ albumSlug: 'yama/same', title: 'First', filenames: ['A.jpg'], order: 10 });
     const second = createAlbumImport({ albumSlug: 'yama/same', title: 'Second', filenames: ['A.jpg'], order: 10 });
     const results = await Promise.allSettled([
@@ -585,13 +585,13 @@ test('same-slug concurrent imports cannot remove or overwrite the winning reques
         commitAlbumImportSources(root, 'yama/same', second, [{ name: 'A.jpg', bytes: new TextEncoder().encode('second') }]),
     ]);
     assert.equal(results.filter(({ status }) => status === 'fulfilled').length, 1);
-    const manifest = JSON.parse(await readFile(path.join(root, 'src/album-manifests/yama/same.json'), 'utf8'));
+    const manifest = JSON.parse(await readFile(path.join(root, 'src/albums/yama/same.json'), 'utf8'));
     assert.equal(await readFile(path.join(root, 'r2/yama/same/A.jpg'), 'utf8'), manifest.title.toLowerCase());
 });
 
 test('Nth asset write failure removes earlier assets and creates no manifest', async () => {
     const root = await mkdtemp(path.join(tmpdir(), 'riverbed-asset-failure-'));
-    await mkdir(path.join(root, 'src/album-manifests'), { recursive: true });
+    await mkdir(path.join(root, 'src/albums'), { recursive: true });
     const proposal = createAlbumImport({
         albumSlug: 'yama/failure', title: 'Failure', filenames: ['A.jpg', 'B.jpg'], order: 10,
     });
@@ -609,13 +609,13 @@ test('Nth asset write failure removes earlier assets and creates no manifest', a
     for (const filename of [
         'r2/yama/failure/A.jpg',
         'r2/yama/failure/B.jpg',
-        'src/album-manifests/yama/failure.json',
+        'src/albums/yama/failure.json',
     ]) await assert.rejects(access(path.join(root, filename)), /ENOENT/);
 });
 
 test('import preserves copied assets when manifest creation rollback is incomplete', async () => {
     const root = await mkdtemp(path.join(tmpdir(), 'riverbed-import-source-rollback-'));
-    await mkdir(path.join(root, 'src/album-manifests'), { recursive: true });
+    await mkdir(path.join(root, 'src/albums'), { recursive: true });
     const albumSlug = 'yama/uncertain-import';
     const proposal = createAlbumImport({
         albumSlug, title: 'Uncertain', filenames: ['A.jpg'], order: 10,
@@ -640,12 +640,12 @@ test('import preserves copied assets when manifest creation rollback is incomple
         return true;
     });
     assert.equal(await readFile(path.join(root, 'r2/yama/uncertain-import/A.jpg'), 'utf8'), 'asset');
-    assert.ok((await readdir(path.join(root, 'src/album-manifests/yama'))).length > 0);
+    assert.ok((await readdir(path.join(root, 'src/albums/yama'))).length > 0);
 });
 
 test('import removes copied assets after a clean manifest creation rollback', async () => {
     const root = await mkdtemp(path.join(tmpdir(), 'riverbed-import-clean-source-rollback-'));
-    await mkdir(path.join(root, 'src/album-manifests'), { recursive: true });
+    await mkdir(path.join(root, 'src/albums'), { recursive: true });
     const albumSlug = 'yama/clean-import';
     const proposal = createAlbumImport({ albumSlug, title: 'Clean', filenames: ['A.jpg'], order: 10 });
     await assert.rejects(commitAlbumImportSources(root, albumSlug, proposal, [{
@@ -659,7 +659,7 @@ test('import removes copied assets after a clean manifest creation rollback', as
         },
     }), /clean create failure/);
     await assert.rejects(access(path.join(root, 'r2/yama/clean-import/A.jpg')), /ENOENT/);
-    await assert.rejects(access(path.join(root, 'src/album-manifests/yama/clean-import.json')), /ENOENT/);
+    await assert.rejects(access(path.join(root, 'src/albums/yama/clean-import.json')), /ENOENT/);
 });
 
 test('Page Manager preserves copied assets when source replacement rollback is incomplete', async () => {
@@ -723,8 +723,8 @@ test('Page Manager removes copied assets after a clean source replacement rollba
 test('import rejects a manifest parent symlink without writing outside the project', async () => {
     const root = await mkdtemp(path.join(tmpdir(), 'riverbed-import-symlink-'));
     const external = await mkdtemp(path.join(tmpdir(), 'riverbed-import-external-'));
-    await mkdir(path.join(root, 'src/album-manifests'), { recursive: true });
-    await symlink(external, path.join(root, 'src/album-manifests/yama'));
+    await mkdir(path.join(root, 'src/albums'), { recursive: true });
+    await symlink(external, path.join(root, 'src/albums/yama'));
     const proposal = createAlbumImport({ albumSlug: 'yama/escape', title: 'Escape', filenames: ['A.jpg'], order: 10 });
 
     await assert.rejects(commitAlbumImportSources(root, 'yama/escape', proposal), /symlink/i);

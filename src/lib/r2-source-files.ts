@@ -22,7 +22,7 @@ const walkFiles = (directory: string, extension: string): string[] => {
 
 export function loadR2SourceIndex(projectRoot = process.cwd()): R2SourceIndex {
     const references: R2SourceReference[] = [];
-    const albumsRoot = path.join(projectRoot, 'src/album-manifests');
+    const albumsRoot = path.join(projectRoot, 'src/albums');
     const manifests = new Map<string, AlbumManifest>();
     for (const filename of walkFiles(albumsRoot, '.json')) {
         const albumSlug = path.relative(albumsRoot, filename).replace(/\.json$/, '').split(path.sep).join('/');

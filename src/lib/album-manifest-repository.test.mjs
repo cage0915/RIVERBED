@@ -50,8 +50,8 @@ function manifest(overrides = {}) {
 
 function createRepository() {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), "album-manifest-repository-"));
-    write(root, "src/album-manifests/yama/source.json", JSON.stringify(manifest({ title: "Source" })));
-    write(root, "src/album-manifests/yama/consumer.json", JSON.stringify(manifest({
+    write(root, "src/albums/yama/source.json", JSON.stringify(manifest({ title: "Source" })));
+    write(root, "src/albums/yama/consumer.json", JSON.stringify(manifest({
         title: "Consumer",
         order: 20,
         cover: {
@@ -107,7 +107,7 @@ test("production repository holds only valid Album manifests", () => {
     assert.equal(result.validCount, result.albumCount);
     assert.deepEqual(result.diagnostics, []);
     const externalCover = JSON.parse(fs.readFileSync(
-        path.join(projectRoot, "src/album-manifests/yama/2025-omoteginza-d3.json"),
+        path.join(projectRoot, "src/albums/yama/2025-omoteginza-d3.json"),
         "utf8",
     ));
     assert.deepEqual(externalCover.cover.photo, {
@@ -116,7 +116,7 @@ test("production repository holds only valid Album manifests", () => {
     });
     const catalogPath = path.join(projectRoot, "src/lib/albums/catalog.ts");
     const catalogSource = fs.readFileSync(catalogPath, "utf8");
-    assert.match(catalogSource, /import\.meta\.glob\(\s*["']\/src\/album-manifests\/\*\*\/\*\.json["']/);
+    assert.match(catalogSource, /import\.meta\.glob\(\s*["']\/src\/albums\/\*\*\/\*\.json["']/);
     assert.doesNotMatch(catalogSource, /astro:content|getCollection/);
     for (const api of ["getAlbumCatalog", "getAlbumSummaries", "getAlbumBySlug", "getTaggedPhotos"]) {
         assert.match(catalogSource, new RegExp(`export\\s+(?:async\\s+)?function\\s+${api}\\b`));
@@ -166,8 +166,8 @@ test("validator accepts valid manifests", () => {
 
 test("validator accumulates independent manifest failures", () => {
     const root = createRepository();
-    const consumerManifest = path.join(root, "src/album-manifests/yama/consumer.json");
-    const brokenManifest = path.join(root, "src/album-manifests/yama/broken.json");
+    const consumerManifest = path.join(root, "src/albums/yama/consumer.json");
+    const brokenManifest = path.join(root, "src/albums/yama/broken.json");
     const consumer = JSON.parse(fs.readFileSync(consumerManifest, "utf8"));
     consumer.blocks.push({ type: "PhotoCarousel", photos: ["missing.jpg"] });
     fs.writeFileSync(consumerManifest, JSON.stringify(consumer));
@@ -205,14 +205,14 @@ test("validator deterministically attributes both retired storage forms", () => 
             code: "retired-album-tag-sidecar",
             albumSlug: "yama/source",
             sourcePath: tagsPath,
-            manifestPath: path.join(root, "src/album-manifests/yama/source.json"),
+            manifestPath: path.join(root, "src/albums/yama/source.json"),
             fieldPath: "tags",
         },
         {
             code: "retired-album-mdx",
             albumSlug: "yama/source",
             sourcePath: mdxPath,
-            manifestPath: path.join(root, "src/album-manifests/yama/source.json"),
+            manifestPath: path.join(root, "src/albums/yama/source.json"),
             fieldPath: "blocks",
         },
     ]);
@@ -222,8 +222,8 @@ test("validator deterministically attributes both retired storage forms", () => 
 test("validator runs catalog diagnostics alongside retired-storage diagnostics", () => {
     const root = createRepository();
     const tagsPath = path.join(root, "src/album-tags/yama/consumer.json");
-    const sourceManifest = path.join(root, "src/album-manifests/yama/source.json");
-    const consumerManifest = path.join(root, "src/album-manifests/yama/consumer.json");
+    const sourceManifest = path.join(root, "src/albums/yama/source.json");
+    const consumerManifest = path.join(root, "src/albums/yama/consumer.json");
     write(root, "src/album-tags/yama/consumer.json", "{}");
     const consumer = JSON.parse(fs.readFileSync(consumerManifest, "utf8"));
     consumer.order = 10;
@@ -252,7 +252,7 @@ test("repository validator rejects a missing or empty manifest root through the 
         "missing-album-manifest-root",
     ]);
     const emptyRoot = fs.mkdtempSync(path.join(os.tmpdir(), "album-roots-empty-"));
-    fs.mkdirSync(path.join(emptyRoot, "src/album-manifests"), { recursive: true });
+    fs.mkdirSync(path.join(emptyRoot, "src/albums"), { recursive: true });
     const errors = [];
     assert.equal(runValidationCli({ projectRoot: emptyRoot, stdout: () => {}, stderr: (message) => errors.push(message) }), 1);
     assert.match(errors.join("\n"), /empty-album-repository/);
@@ -260,8 +260,8 @@ test("repository validator rejects a missing or empty manifest root through the 
 
 test("repository validator rejects source symlinks without following them", () => {
     for (const item of [
-        { relativePath: "src/album-manifests/yama/linked.json", kind: "file" },
-        { relativePath: "src/album-manifests/linked", kind: "directory" },
+        { relativePath: "src/albums/yama/linked.json", kind: "file" },
+        { relativePath: "src/albums/linked", kind: "directory" },
     ]) {
         const root = createRepository();
         const outside = fs.mkdtempSync(path.join(os.tmpdir(), "album-source-outside-"));
@@ -288,8 +288,8 @@ test("repository validator rejects source symlinks without following them", () =
 
 test("repository validator rejects invalid derived slugs", () => {
     const root = createRepository();
-    write(root, "src/album-manifests/yama/nested/album.json", "{}");
-    write(root, "src/album-manifests/yama/Bad.json", "{}");
+    write(root, "src/albums/yama/nested/album.json", "{}");
+    write(root, "src/albums/yama/Bad.json", "{}");
     const diagnostics = validateAlbumRepository(root).diagnostics;
     assert.equal(diagnostics.filter(({ code }) => code === "invalid-album-slug").length, 2);
     assert.equal(diagnostics.some(({ code }) => code === "invalid-album-manifest"), false);
@@ -328,7 +328,7 @@ test("retired Album frontmatter writers and compatibility route stay absent", ()
 
 test("temporary Album migration implementation and commands stay retired", () => {
     const packageJson = JSON.parse(fs.readFileSync(path.join(projectRoot, "package.json"), "utf8"));
-    assert.equal(fs.existsSync(path.join(projectRoot, "scripts/migrate-album-manifests.mjs")), false);
+    assert.equal(fs.existsSync(path.join(projectRoot, "scripts/migrate-albums.mjs")), false);
     assert.equal(fs.existsSync(path.join(projectRoot, "src/lib/albums/legacy-source.js")), false);
     assert.equal(fs.existsSync(path.join(projectRoot, "src/lib/albums/legacy-source.test.mjs")), false);
     assert.equal(packageJson.scripts["albums:migrate:check"], undefined);

@@ -3,7 +3,7 @@ import test from "node:test";
 
 import { validateAlbumInventory } from "./validation.ts";
 
-const MANIFEST_PATH = "src/album-manifests/yama/walk.json";
+const MANIFEST_PATH = "src/albums/yama/walk.json";
 
 function manifest(filenames, blocks, cover = { kind: "local", filename: filenames[0] }) {
     return {

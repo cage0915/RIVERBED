@@ -67,7 +67,7 @@ export function createAlbumImport({
     }, albumSlug);
     const diagnostics = validateAlbumInventory({
         albumSlug,
-        manifestPath: `src/album-manifests/${albumSlug}.json`,
+        manifestPath: `src/albums/${albumSlug}.json`,
         manifest,
     });
     if (diagnostics.length > 0) {

@@ -78,7 +78,7 @@ test('remote audit separates directory markers from deletable orphans', () => {
     const index = buildR2SourceIndex([{
         key: 'yama/album/used.jpg',
         kind: 'album-photo',
-        source: 'src/album-manifests/yama/album.json',
+        source: 'src/albums/yama/album.json',
     }]);
     const result = classifyRemoteObjects([
         { key: 'yama/' },
@@ -94,8 +94,8 @@ test('remote audit separates directory markers from deletable orphans', () => {
 
 test('filesystem source index reads local photos from manifest inventory', async () => {
     const root = await mkdtemp(path.join(tmpdir(), 'riverbed-r2-index-'));
-    await mkdir(path.join(root, 'src/album-manifests/yama'), { recursive: true });
-    await writeFile(path.join(root, 'src/album-manifests/yama/album.json'), JSON.stringify(manifest()), 'utf8');
+    await mkdir(path.join(root, 'src/albums/yama'), { recursive: true });
+    await writeFile(path.join(root, 'src/albums/yama/album.json'), JSON.stringify(manifest()), 'utf8');
 
     const index = loadR2SourceIndex(root);
     assert.equal(index.has('yama/album/cover.jpg'), true);
@@ -104,8 +104,8 @@ test('filesystem source index reads local photos from manifest inventory', async
 
 test('filesystem source index rejects an external cover that does not resolve to tracked inventory', async () => {
     const root = await mkdtemp(path.join(tmpdir(), 'riverbed-r2-unresolved-'));
-    await mkdir(path.join(root, 'src/album-manifests/k'), { recursive: true });
-    await writeFile(path.join(root, 'src/album-manifests/k/consumer.json'), JSON.stringify(manifest({
+    await mkdir(path.join(root, 'src/albums/k'), { recursive: true });
+    await writeFile(path.join(root, 'src/albums/k/consumer.json'), JSON.stringify(manifest({
         cover: {
             photo: { kind: 'external', assetKey: 'yama/missing/shared.jpg' },
             zoom: 1,
