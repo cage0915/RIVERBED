@@ -96,22 +96,19 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
     </div>
 
     <div class="photo-panorama-controls">
-        <div class="photo-panorama-dots" aria-label="Photo selector"></div>
         <button
             class="photo-panorama-view-toggle"
             type="button"
             aria-label={view === "carousel" ? "Switch to panorama view" : "Switch to carousel view"}
             aria-pressed={view === "panorama" ? "true" : "false"}
         >
-            <!-- Both symbols occupy the same 15 × 8 visual footprint. -->
-            <svg class="photo-panorama-view-icon photo-panorama-view-icon--carousel" viewBox="0 0 16 16" aria-hidden="true">
-                <rect x="0.5" y="4" width="3" height="8" rx="0.75"></rect>
-                <rect x="6.5" y="4" width="3" height="8" rx="0.75"></rect>
-                <rect x="12.5" y="4" width="3" height="8" rx="0.75"></rect>
-            </svg>
-            <svg class="photo-panorama-view-icon photo-panorama-view-icon--panorama" viewBox="0 0 16 16" aria-hidden="true">
-                <rect x="0.5" y="4" width="15" height="8" rx="0.75"></rect>
-            </svg>
+            <!--
+                The script adds one dot per slide to the carousel symbol, the current slide
+                drawn as a capsule; the panorama symbol is one capsule of the same total
+                width, so the two read as split and joined.
+            -->
+            <span class="photo-panorama-view-icon photo-panorama-view-icon--carousel" aria-hidden="true"></span>
+            <span class="photo-panorama-view-icon photo-panorama-view-icon--panorama" aria-hidden="true"></span>
             <span class="photo-panorama-view-label" aria-live="polite">
                 {view === "carousel" ? "Carousel view" : "Panorama view"}
             </span>
@@ -153,7 +150,7 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
     installPageLifecycle(document, () => {
         const controller = new AbortController();
         const initializedSections: HTMLElement[] = [];
-        const generatedDots: HTMLButtonElement[] = [];
+        const generatedViewDots: HTMLElement[] = [];
         const generatedSlices: HTMLElement[] = [];
         const resizeObservers: ResizeObserver[] = [];
         const frameIds = new Set<number>();
@@ -173,12 +170,12 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
 
             const track = section.querySelector<HTMLElement>(".photo-panorama-track");
             const stage = section.querySelector<HTMLElement>(".photo-panorama-stage");
-            const dotsContainer = section.querySelector<HTMLElement>(".photo-panorama-dots");
             const toggle = section.querySelector<HTMLButtonElement>(".photo-panorama-view-toggle");
             const viewLabel = section.querySelector<HTMLElement>(".photo-panorama-view-label");
+            const carouselIcon = section.querySelector<HTMLElement>(".photo-panorama-view-icon--carousel");
             const previous = section.querySelector<HTMLButtonElement>(".photo-panorama-arrow--previous");
             const next = section.querySelector<HTMLButtonElement>(".photo-panorama-arrow--next");
-            if (!track || !stage || !dotsContainer || !toggle || !previous || !next) return;
+            if (!track || !stage || !toggle || !carouselIcon || !previous || !next) return;
 
             section.dataset.photoPanoramaReady = "true";
             initializedSections.push(section);
@@ -268,7 +265,14 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
                 }
                 slides = sliceSlides;
             }
-            const dots: HTMLButtonElement[] = [];
+            const viewDots = slides.map(() => {
+                const dot = document.createElement("span");
+                dot.className = "photo-panorama-view-dot";
+                carouselIcon.appendChild(dot);
+                generatedViewDots.push(dot);
+                return dot;
+            });
+            toggle.style.setProperty("--panorama-view-dots", String(Math.max(slides.length, 1)));
             const requestedInitialIndex = Number.parseInt(section.dataset.initialSlide || "0", 10);
             let activeIndex = Math.min(
                 Math.max(Number.isFinite(requestedInitialIndex) ? requestedInitialIndex : 0, 0),
@@ -285,10 +289,8 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
                 slides.forEach((slide, slideIndex) => {
                     slide.toggleAttribute("data-active", slideIndex === activeIndex);
                 });
-                dots.forEach((dot, dotIndex) => {
-                    const isActive = dotIndex === activeIndex;
-                    dot.classList.toggle("active", isActive);
-                    dot.setAttribute("aria-current", isActive ? "true" : "false");
+                viewDots.forEach((dot, dotIndex) => {
+                    dot.classList.toggle("active", dotIndex === activeIndex);
                 });
                 previous.disabled = activeIndex === 0 || slides.length < 2;
                 next.disabled = activeIndex >= slides.length - 1 || slides.length < 2;
@@ -434,21 +436,6 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
                 };
                 if (image?.complete) applyRatio();
                 else image?.addEventListener("load", applyRatio, { signal: controller.signal });
-
-                if (slides.length > 1) {
-                    const dot = document.createElement("button");
-                    dot.type = "button";
-                    dot.className = "photo-panorama-dot";
-                    dot.setAttribute("aria-label", `Go to photo ${index + 1}`);
-                    dot.addEventListener("click", async () => {
-                        if (isChangingView) return;
-                        if (currentView() === "panorama") await setView("carousel");
-                        queueFrame(() => scrollToSlide(index));
-                    }, { signal: controller.signal });
-                    dotsContainer.appendChild(dot);
-                    dots.push(dot);
-                    generatedDots.push(dot);
-                }
             });
 
             toggle.addEventListener("click", () => {
@@ -527,6 +514,8 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
                 section.dataset.viewHint = "true";
                 hintTimer = window.setTimeout(() => {
                     delete section.dataset.viewHint;
+                section.querySelector<HTMLElement>(".photo-panorama-view-toggle")
+                    ?.style.removeProperty("--panorama-view-dots");
                     hintTimer = undefined;
                 }, VIEW_HINT_DURATION_MS);
             }, { threshold: 1, rootMargin: "0px 0px -15% 0px" });
@@ -544,7 +533,7 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
             resizeObservers.forEach((observer) => observer.disconnect());
             viewAnimations.forEach((animation) => animation.cancel());
             frameIds.forEach((id) => cancelAnimationFrame(id));
-            generatedDots.forEach((dot) => dot.remove());
+            generatedViewDots.forEach((dot) => dot.remove());
             generatedSlices.forEach((slice) => slice.remove());
             initializedSections.forEach((section) => {
                 section.querySelectorAll<HTMLElement>(".photo-panorama-track > *").forEach((slide) => {
@@ -663,46 +652,16 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
         margin-top: 0.75rem;
     }
 
-    .photo-panorama-dots {
-        display: flex;
-        min-height: 1.5rem;
-        align-items: center;
-        justify-content: center;
-        gap: 0.35rem;
-    }
-
-    .photo-panorama-section[data-view="panorama"] .photo-panorama-dots {
-        display: none;
-    }
-
-    .photo-panorama-section :global(.photo-panorama-dot) {
-        width: 6px;
-        height: 6px;
-        padding: 0;
-        border: 0;
-        border-radius: 9999px;
-        background: rgba(100, 100, 100, 0.25);
-        cursor: pointer;
-        transition: width 0.3s ease, background-color 0.3s ease;
-    }
-
-    .photo-panorama-section :global(.photo-panorama-dot:hover) {
-        background: rgba(100, 100, 100, 0.5);
-    }
-
-    .photo-panorama-section :global(.photo-panorama-dot.active) {
-        width: 18px;
-        background: rgba(120, 120, 120, 0.8);
-    }
-
     .photo-panorama-view-toggle {
+        /* Dots are 4px, the current-slide capsule 10px, with 3px gaps: 7px per slide + 3px. */
+        --panorama-view-icon-width: calc(var(--panorama-view-dots, 3) * 7px + 3px);
         position: relative;
         display: inline-grid;
-        width: 2rem;
+        min-width: 2rem;
         height: 1.5rem;
-        flex: 0 0 2rem;
+        flex: 0 0 auto;
         place-items: center;
-        padding: 0;
+        padding: 0 0.5rem;
         border: 1px solid rgba(100, 100, 100, 0.2);
         border-radius: 9999px;
         color: rgba(100, 100, 100, 0.75);
@@ -718,20 +677,41 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
         background: rgba(100, 100, 100, 0.08);
     }
 
-    .photo-panorama-view-toggle:focus-visible,
-    .photo-panorama-section :global(.photo-panorama-dot:focus-visible) {
+    .photo-panorama-view-toggle:focus-visible {
         outline: 2px solid rgba(59, 130, 246, 0.9);
         outline-offset: 2px;
     }
 
     .photo-panorama-view-icon {
         grid-area: 1 / 1;
-        width: 1rem;
-        height: 1rem;
-        fill: none;
-        stroke: currentColor;
-        stroke-width: 1;
+        width: var(--panorama-view-icon-width);
+        height: 4px;
         transition: opacity 0.18s ease, transform 0.18s ease;
+    }
+
+    .photo-panorama-view-icon--carousel {
+        display: flex;
+        gap: 3px;
+    }
+
+    .photo-panorama-view-icon--panorama,
+    .photo-panorama-section :global(.photo-panorama-view-dot) {
+        border-radius: 9999px;
+        background: currentColor;
+    }
+
+    .photo-panorama-section :global(.photo-panorama-view-dot) {
+        width: 4px;
+        height: 100%;
+        flex: 0 0 auto;
+        opacity: 0.4;
+        transition: width 0.3s ease, opacity 0.3s ease;
+    }
+
+    /* The current slide stretches into a capsule. */
+    .photo-panorama-section :global(.photo-panorama-view-dot.active) {
+        width: 10px;
+        opacity: 1;
     }
 
     .photo-panorama-section[data-view="carousel"] .photo-panorama-view-icon--panorama,
@@ -875,18 +855,6 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
     }
 
     @media (prefers-color-scheme: dark) {
-        .photo-panorama-section :global(.photo-panorama-dot) {
-            background: rgba(200, 200, 200, 0.25);
-        }
-
-        .photo-panorama-section :global(.photo-panorama-dot:hover) {
-            background: rgba(200, 200, 200, 0.5);
-        }
-
-        .photo-panorama-section :global(.photo-panorama-dot.active) {
-            background: rgba(255, 255, 255, 0.8);
-        }
-
         .photo-panorama-view-toggle {
             color: rgba(220, 220, 220, 0.78);
             border-color: rgba(255, 255, 255, 0.18);
@@ -923,11 +891,6 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
             display: none;
         }
 
-        /* Free scrolling has no discrete position to indicate, so drop the dots. */
-        .photo-panorama-dots {
-            display: none;
-        }
-
         /* Touch scrolling can rest anywhere instead of snapping slide by slide. */
         .photo-panorama-section[data-view="carousel"] .photo-panorama-track {
             scroll-snap-type: none;
@@ -941,9 +904,9 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
             animation: none;
         }
 
-        .photo-panorama-section :global(.photo-panorama-dot),
         .photo-panorama-view-toggle,
         .photo-panorama-view-icon,
+        .photo-panorama-section :global(.photo-panorama-view-dot),
         .photo-panorama-arrow {
             transition-duration: 0.01ms;
         }

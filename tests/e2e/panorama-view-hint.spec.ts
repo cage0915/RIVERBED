@@ -34,3 +34,26 @@ test("the first Panorama on screen hints its view toggle once per visitor", asyn
     await page.waitForTimeout(500);
     await expect(section).not.toHaveAttribute("data-view-hint");
 });
+
+test("the view toggle shows one dot per slide with the current one as a capsule", async ({ page }) => {
+    await page.goto("/yama/2026-tateyama-tsurugi");
+
+    const section = page.locator('[data-photo-panorama][data-panorama-slices="3"][data-view="carousel"]').first();
+    const dots = section.locator(".photo-panorama-view-dot");
+    await expect(dots).toHaveCount(3);
+
+    // Layout width: the hidden symbol is scaled down, which bounding boxes would include.
+    const iconWidths = await section.evaluate((element) =>
+        [".photo-panorama-view-icon--carousel", ".photo-panorama-view-icon--panorama"].map(
+            (selector) => element.querySelector<HTMLElement>(selector)!.offsetWidth,
+        )
+    );
+    // Three slides: two 4px dots, one 10px capsule and two 3px gaps.
+    expect(iconWidths).toEqual([24, 24]);
+
+    await expect(dots.nth(0)).toHaveClass(/active/);
+    await section.locator(".photo-panorama-arrow--next").evaluate((button: HTMLButtonElement) => button.click());
+    await expect(dots.nth(1)).toHaveClass(/active/);
+    await expect(dots.nth(0)).not.toHaveClass(/active/);
+    await expect.poll(() => dots.nth(1).evaluate((dot: HTMLElement) => dot.offsetWidth)).toBe(10);
+});

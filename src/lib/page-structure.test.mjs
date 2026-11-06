@@ -221,10 +221,13 @@ test('PhotoPanorama is a standalone block with full-width carousel and joined pr
     assert.match(panorama, /@media \(max-width: 767px\)[\s\S]*?\.photo-panorama-arrow\s*\{\s*display:\s*none/);
     assert.match(panorama, /@media \(max-width: 767px\)[\s\S]*?\[data-view="carousel"\] \.photo-panorama-track\s*\{\s*scroll-snap-type: none/);
     assert.match(panorama, /if \(track\.clientWidth === observedWidth\) return/);
-    assert.match(panorama, /@media \(max-width: 767px\)[\s\S]*?\.photo-panorama-dots\s*\{\s*display: none/);
-    assert.equal((panorama.match(/viewBox="0 0 16 16"/g) || []).length, 2);
-    assert.match(panorama, /photo-panorama-view-icon--carousel[\s\S]*?<rect x="0\.5" y="4" width="3" height="8"[\s\S]*?<rect x="6\.5" y="4" width="3" height="8"[\s\S]*?<rect x="12\.5" y="4" width="3" height="8"/);
-    assert.match(panorama, /photo-panorama-view-icon--panorama[\s\S]*?<rect x="0\.5" y="4" width="15" height="8"/);
+    // The view toggle is the only position indicator; there is no separate dots row.
+    assert.doesNotMatch(panorama, /photo-panorama-dots/);
+    // One carousel dot per slide (a capsule for the current one); the panorama
+    // capsule spans the dots' total width.
+    assert.match(panorama, /const viewDots = slides\.map/);
+    assert.match(panorama, /--panorama-view-icon-width: calc\(var\(--panorama-view-dots, 3\) \* 7px \+ 3px\)/);
+    assert.match(panorama, /dot\.classList\.toggle\("active", dotIndex === activeIndex\)/);
     assert.doesNotMatch(panorama, /tags-overlay[^}]*display:\s*none/);
     assert.doesNotMatch(readProjectFile('src/components/Photo.astro'), /\.photo-wrapper img\s*\{[^}]*border-radius/);
     assert.match(panorama, /data-view="panorama"[^}]*\.photo-panorama-track:hover :global\(\.tags-overlay\)/);
@@ -252,7 +255,6 @@ test('PhotoPanorama is a standalone block with full-width carousel and joined pr
     assert.match(panorama, /sliceWrapper\.dataset\.panoramaSourceItemKey = sourceItemKey/);
     assert.match(panorama, /data-single-photo-sliced[^}]*photo-panorama-single-source\)\s*\{\s*display: none/);
     assert.match(panorama, /\.photo-panorama-controls\s*\{\s*position: relative;\s*z-index: 3/);
-    assert.match(panorama, /data-view="panorama"\] \.photo-panorama-dots\s*\{\s*display: none/);
     assert.match(getStructure, /albumBlocksToPageBlocks\(manifest\.blocks\)/);
     assert.match(devTool, /label: 'Panorama', value: 'PhotoPanorama'/);
     assert.doesNotMatch(devTool, /enablePanorama|targetPanorama|sourcePanorama/);
