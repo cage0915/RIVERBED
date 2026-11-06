@@ -1,5 +1,6 @@
-import { defineCollection, z } from 'astro:content';
+import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
+import { z } from 'astro/zod';
 
 // Album metadata lives in the slug-paired manifest; MDX stores layout and prose.
 const albums = defineCollection({
