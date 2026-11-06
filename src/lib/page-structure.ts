@@ -139,9 +139,12 @@ export function applyDefaultCaptionBoundaryMargin(
 
 const isCarouselLike = (block?: PageBlock) => block?.type === 'PhotoCarousel' || block?.type === 'PhotoPanorama';
 
-// Mirrors the album CSS: a Carousel or Panorama promotes its own and the
-// preceding block's bottom margin to 1.5rem.
+// Mirrors the rendered margin with no blockMargin set: Text writes its own
+// inline 0.5rem, the last block has none, and a Carousel or Panorama promotes
+// its own and the preceding block's bottom margin to 1.5rem.
 function defaultBlockMargin(blocks: PageBlock[], index: number) {
+    if (blocks[index].type === 'Text') return '0.5';
+    if (index === blocks.length - 1) return '0';
     return isCarouselLike(blocks[index]) || isCarouselLike(blocks[index + 1]) ? '1.5' : '0.5';
 }
 

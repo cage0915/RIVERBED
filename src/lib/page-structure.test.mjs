@@ -150,10 +150,12 @@ test('Text blocks use one bottom block margin and retire legacy Text margins', (
         { type: 'Text', props: { align: 'left', size: 'title', mt: '2rem', mb: '1.5rem' }, text: 'Section' },
         { type: 'Text', props: { align: 'center', size: 'caption' }, text: 'Plain' },
         { type: 'Row', props: { blockMargin: '0.5rem' }, photos: [{ itemKey: 'one.jpg' }] },
+        { type: 'Row', props: {}, photos: [{ itemKey: 'two.jpg' }] },
     ]), [
         { type: 'Text', align: 'left', size: 'title', blockMargin: '1.5rem', text: 'Section' },
         { type: 'Text', text: 'Plain' },
         { type: 'Row', photos: ['one.jpg'] },
+        { type: 'Row', photos: ['two.jpg'] },
     ]);
 });
 
@@ -1648,6 +1650,17 @@ test('block margins are stored only when they differ from the Carousel-aware def
         { type: 'Row', props: { blockMargin: '1.5rem' }, photos: [{ itemKey: 'c.jpg' }] },
         { type: 'PhotoCarousel', props: { blockMargin: '1.5rem' }, photos: [{ itemKey: 'd.jpg' }] },
         { type: 'Row', props: { blockMargin: '0.5rem' }, photos: [{ itemKey: 'e.jpg' }] },
+        { type: 'Row', props: {}, photos: [{ itemKey: 'f.jpg' }] },
     ]);
-    assert.deepEqual(blocks.map(({ blockMargin }) => blockMargin), ['0.5rem', '0.5rem', undefined, undefined, undefined]);
+    assert.deepEqual(blocks.map(({ blockMargin }) => blockMargin), ['0.5rem', '0.5rem', undefined, undefined, undefined, undefined]);
+});
+
+test('Text and last-block margins follow their own rendered defaults', () => {
+    const blocks = pageBlocksToAlbumBlocks([
+        { type: 'Text', props: { blockMargin: '1.5rem' }, text: 'Before a carousel' },
+        { type: 'PhotoCarousel', props: {}, photos: [{ itemKey: 'a.jpg' }] },
+        { type: 'Text', props: { blockMargin: '0.5rem' }, text: 'Plain' },
+        { type: 'PhotoPanorama', props: { blockMargin: '1.5rem' }, photos: [{ itemKey: 'b.jpg' }] },
+    ]);
+    assert.deepEqual(blocks.map(({ blockMargin }) => blockMargin), ['1.5rem', undefined, undefined, '1.5rem']);
 });
