@@ -1,5 +1,6 @@
 import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
+import tailwindcss from '@tailwindcss/vite';
 import sirv from 'sirv';
 import devApiRoutes from './src/integrations/dev-api-routes.mjs';
 
@@ -10,6 +11,7 @@ export default defineConfig({
     integrations: [mdx(), devApiRoutes()],
     vite: {
         plugins: [
+            tailwindcss(),
             {
                 // Serve local source photos from ./r2 during development.
                 name: 'serve-root-r2',
