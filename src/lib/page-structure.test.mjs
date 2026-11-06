@@ -231,15 +231,25 @@ test('PhotoPanorama is a standalone block with full-width carousel and joined pr
     assert.doesNotMatch(panorama, /tags-overlay[^}]*display:\s*none/);
     assert.doesNotMatch(readProjectFile('src/components/Photo.astro'), /\.photo-wrapper img\s*\{[^}]*border-radius/);
     assert.match(panorama, /data-view="panorama"[^}]*\.photo-panorama-track:hover :global\(\.tags-overlay\)/);
-    assert.match(panorama, /const animations = slides\.map[\s\S]*?translate\([^)]*before\.top - after\.top[\s\S]*?scale\([\s\S]*?transformOrigin: "top left"[\s\S]*?slide\.animate\(keyframes/);
+    // FLIP photos scale from their bottom edge, offset to sit on the stage's bottom edge.
+    assert.match(panorama, /offsetX: before \? before\.left - after\.left[\s\S]*?scale: before && after\.width \? before\.width \/ after\.width/);
+    assert.match(panorama, /const offsetY = bottomGap \+ stageHeight - frame\.layoutBottom;[\s\S]*?transformOrigin = "bottom left"[\s\S]*?translate\([\s\S]*?scale\(/);
     assert.doesNotMatch(panorama, /scaleX\(/);
-    assert.match(panorama, /const keepBottomEdge = isPanorama[\s\S]*?beforeStageHeight - stage\.getBoundingClientRect\(\)\.height[\s\S]*?beforeScrollY - shrunk[\s\S]*?window\.scrollTo\(\{ top: target, behavior: "instant" \}\)/);
+    // Both directions hold the stage's bottom edge so the view toggle stays put.
+    assert.match(panorama, /const keepToggleInPlace = viewChanged && animate;[\s\S]*?stage\.getBoundingClientRect\(\)\.height - beforeStageHeight[\s\S]*?beforeScrollY \+ growth[\s\S]*?window\.scrollTo\(\{ top: target, behavior: "instant" \}\)/);
+    assert.doesNotMatch(panorama, /keepBottomEdge = isPanorama/);
+    // Each frame sets stage height, photo transforms and scroll from one progress value;
+    // height and scroll change by the same whole pixel count so rounding cannot shimmer.
+    assert.match(panorama, /const growth = Math\.round\(lerp\(0, afterStageHeight - beforeStageHeight, progress\)\);\s*const stageHeight = beforeStageHeight \+ growth;[\s\S]*?window\.scrollTo\(\{ top: beforeScrollY \+ growth, behavior: "instant" \}\)/);
+    assert.match(panorama, /clock\.currentTime = elapsed;\s*applyFrame\(/);
+    assert.doesNotMatch(panorama, /slide\.animate\(|stage\.animate\(/);
     assert.doesNotMatch(panorama, /window\.scrollBy/);
     assert.match(panorama, /html:has\(\.photo-panorama-section\[data-view-transitioning\]\)\)\s*\{\s*overflow-anchor: none/);
     assert.match(panorama, /useMobileCarouselReveal[\s\S]*?nextView === "carousel"[\s\S]*?activeIndex > 0[\s\S]*?max-width: 767px/);
-    assert.match(panorama, /const keyframes = useMobileCarouselReveal[\s\S]*?opacity: 0[\s\S]*?opacity: 1/);
-    assert.match(panorama, /duration: 650[\s\S]*?cubic-bezier\(0\.22, 1, 0\.36, 1\)/);
-    assert.match(panorama, /await Promise\.allSettled\(animations\.map\(\(animation\) => animation\.finished\)\)/);
+    assert.match(panorama, /if \(useMobileCarouselReveal\) \{\s*frame\.slide\.style\.opacity = String\(progress\);/);
+    assert.match(panorama, /const VIEW_ANIMATION_MS = 650;[\s\S]*?duration: VIEW_ANIMATION_MS,\s*easing: "cubic-bezier\(0\.22, 1, 0\.36, 1\)"/);
+    // The view change waits for the frame loop, then hands layout back to CSS.
+    assert.match(panorama, /else resolve\(\);[\s\S]*?clock\.cancel\(\);[\s\S]*?clearFrameStyles\(\);\s*holdBottomEdge\(\);/);
     assert.doesNotMatch(panorama, /scrollIntoView/);
     assert.match(panorama, /sourceSlides\.length === 1[\s\S]*?originalDisplayUrl = sourceLightbox\?\.dataset\.pswpSrc[\s\S]*?sourceImage\.removeAttribute\("srcset"\)[\s\S]*?sourceImage\.removeAttribute\("sizes"\)[\s\S]*?sourceImage\.src = originalDisplayUrl/);
     assert.match(panorama, /sourceSlides\.length === 1 && requestedSlices > 1/);

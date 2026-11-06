@@ -129,6 +129,7 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
 
     const VIEW_HINT_STORAGE_KEY = "riverbed:panorama-view-hint-seen";
     const VIEW_HINT_DURATION_MS = 2600;
+    const VIEW_ANIMATION_MS = 650;
 
     // Storage can be unavailable (private mode, blocked site data); then the hint
     // simply plays once per page instead of once per visitor.
@@ -154,7 +155,6 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
         const generatedSlices: HTMLElement[] = [];
         const resizeObservers: ResizeObserver[] = [];
         const frameIds = new Set<number>();
-        const viewAnimations = new Set<Animation>();
 
         const queueFrame = (callback: FrameRequestCallback) => {
             const id = requestAnimationFrame((time) => {
@@ -323,9 +323,27 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
                 const beforeRects = shouldAnimate && !useMobileCarouselReveal
                     ? slides.map((slide) => slide.getBoundingClientRect())
                     : [];
-                const beforeStageRect = shouldAnimate ? stage.getBoundingClientRect() : null;
+                // A visitor's toggle keeps the button where it was on screen: the stage
+                // grows or shrinks above it while the page scrolls along. The initial
+                // setup call (animate = false) leaves the scroll position alone.
+                const keepToggleInPlace = viewChanged && animate;
+                const beforeStageRect = shouldAnimate || keepToggleInPlace
+                    ? stage.getBoundingClientRect()
+                    : null;
                 const beforeStageHeight = beforeStageRect?.height ?? 0;
+                const beforeStageBottom = beforeStageRect?.bottom ?? 0;
                 const beforeScrollY = window.scrollY;
+                // The target comes from the stage height alone, not from re-measuring scroll
+                // position: mobile browsers apply scroll asynchronously, and a measure-and-correct
+                // loop overshoots there and jitters.
+                const holdBottomEdge = () => {
+                    const growth = stage.getBoundingClientRect().height - beforeStageHeight;
+                    const target = beforeScrollY + growth;
+                    // "instant" bypasses the page-wide scroll-smooth, which would lag a frame behind.
+                    if (Math.abs(window.scrollY - target) > 0.5) {
+                        window.scrollTo({ top: target, behavior: "instant" });
+                    }
+                };
 
                 isChangingView = true;
                 toggle.disabled = true;
@@ -344,72 +362,95 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
 
                 if (shouldAnimate) {
                     // FLIP keeps every photo visually continuous while flex sizing changes.
+                    // Each frame sets the stage height, the photo transforms and the page
+                    // scroll together from one eased progress value:
+                    // - Run freely, photo transforms play on the compositor while the scroll
+                    //   correction runs on the main thread, so a busy main thread (decoding
+                    //   the full-size panorama) lets the photo edge drift and snap back.
+                    // - The stage grows or shrinks in whole CSS pixels and the page scrolls by
+                    //   that same whole amount; scroll offsets can't take fractions, so any
+                    //   fractional step would round differently each frame and shimmer.
+                    // - Photos scale from their bottom edge and are offset to sit exactly on
+                    //   the stage's bottom edge, which is the one line held still on screen.
                     const afterRects = slides.map((slide) => slide.getBoundingClientRect());
-                    const afterStageHeight = stage.getBoundingClientRect().height;
+                    const afterStageRect = stage.getBoundingClientRect();
+                    const afterStageHeight = afterStageRect.height;
                     section.dataset.viewTransitioning = "true";
-                    const animations = slides.map((slide, index) => {
+
+                    const lerp = (from: number, to: number, progress: number) => from + (to - from) * progress;
+                    const slideFrames = slides.map((slide, index) => {
                         const before = beforeRects[index];
                         const after = afterRects[index];
-                        const keyframes = useMobileCarouselReveal
-                            ? [
-                                { opacity: 0 },
-                                { opacity: 1 },
-                            ]
-                            : [
-                                // Photos keep their aspect ratio in both views, so one uniform
-                                // scale tracks width and height without distorting the image.
-                                {
-                                    transform: `translate(${before.left - after.left}px, ${before.top - after.top}px) scale(${after.width ? before.width / after.width : 1})`,
-                                    transformOrigin: "top left",
-                                },
-                                { transform: "translate(0, 0) scale(1)", transformOrigin: "top left" },
-                            ];
-                        const animation = slide.animate(keyframes, {
-                            duration: 650,
-                            easing: "cubic-bezier(0.22, 1, 0.36, 1)",
-                        });
-                        viewAnimations.add(animation);
-                        animation.finished.finally(() => viewAnimations.delete(animation)).catch(() => {});
-                        return animation;
+                        return {
+                            slide,
+                            offsetX: before ? before.left - after.left : 0,
+                            scale: before && after.width ? before.width / after.width : 1,
+                            bottomGapBefore: before ? before.bottom - beforeStageBottom : 0,
+                            bottomGapAfter: after.bottom - afterStageRect.bottom,
+                            layoutBottom: after.bottom - afterStageRect.top,
+                        };
                     });
-                    if (Math.abs(beforeStageHeight - afterStageHeight) > 0.5) {
-                        const stageAnimation = stage.animate([
-                            { height: `${beforeStageHeight}px` },
-                            { height: `${afterStageHeight}px` },
-                        ], {
-                            duration: 650,
-                            easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+                    const clearFrameStyles = () => {
+                        stage.style.removeProperty("height");
+                        slides.forEach((slide) => {
+                            slide.style.removeProperty("transform");
+                            slide.style.removeProperty("transform-origin");
+                            slide.style.removeProperty("opacity");
                         });
-                        viewAnimations.add(stageAnimation);
-                        stageAnimation.finished.finally(() => viewAnimations.delete(stageAnimation)).catch(() => {});
-                        animations.push(stageAnimation);
-                    }
-
-                    // Panorama → carousel grows down from a fixed top edge; carousel → panorama
-                    // shrinks up toward a fixed bottom edge, so scroll along as the stage shrinks.
-                    const keepBottomEdge = isPanorama && beforeStageRect !== null;
-                    // The target comes from the stage height alone, not from re-measuring scroll
-                    // position: mobile browsers apply scroll asynchronously, and a measure-and-correct
-                    // loop overshoots there and jitters.
-                    const holdBottomEdge = () => {
-                        const shrunk = beforeStageHeight - stage.getBoundingClientRect().height;
-                        const target = beforeScrollY - shrunk;
+                    };
+                    const applyFrame = (progress: number) => {
+                        const growth = Math.round(lerp(0, afterStageHeight - beforeStageHeight, progress));
+                        const stageHeight = beforeStageHeight + growth;
+                        stage.style.height = `${stageHeight}px`;
+                        slideFrames.forEach((frame) => {
+                            if (useMobileCarouselReveal) {
+                                frame.slide.style.opacity = String(progress);
+                                return;
+                            }
+                            // Photos keep their aspect ratio in both views, so one uniform
+                            // scale tracks width and height without distorting the image.
+                            const bottomGap = lerp(frame.bottomGapBefore, frame.bottomGapAfter, progress);
+                            const offsetY = bottomGap + stageHeight - frame.layoutBottom;
+                            frame.slide.style.transformOrigin = "bottom left";
+                            frame.slide.style.transform = `translate(${frame.offsetX * (1 - progress)}px, ${offsetY}px) scale(${lerp(frame.scale, 1, progress)})`;
+                        });
                         // "instant" bypasses the page-wide scroll-smooth, which would lag a frame behind.
-                        if (Math.abs(window.scrollY - target) > 0.5) {
-                            window.scrollTo({ top: target, behavior: "instant" });
-                        }
+                        window.scrollTo({ top: beforeScrollY + growth, behavior: "instant" });
                     };
-                    const followBottomEdge = () => {
-                        if (controller.signal.aborted || !section.dataset.viewTransitioning) return;
-                        holdBottomEdge();
-                        queueFrame(followBottomEdge);
-                    };
-                    if (keepBottomEdge) queueFrame(followBottomEdge);
 
-                    await Promise.allSettled(animations.map((animation) => animation.finished));
+                    // A target-less effect is only a clock: it turns elapsed time into eased progress.
+                    const clock = new Animation(new KeyframeEffect(null, null, {
+                        duration: VIEW_ANIMATION_MS,
+                        easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+                        fill: "both",
+                    }));
+                    clock.pause();
+                    applyFrame(0);
+                    const startTime = performance.now();
+                    let stopOnAbort = () => {};
+                    await new Promise<void>((resolve) => {
+                        stopOnAbort = () => {
+                            clearFrameStyles();
+                            resolve();
+                        };
+                        controller.signal.addEventListener("abort", stopOnAbort, { once: true });
+                        const step = (time: number) => {
+                            const elapsed = Math.min(Math.max(time - startTime, 0), VIEW_ANIMATION_MS);
+                            clock.currentTime = elapsed;
+                            applyFrame(clock.effect?.getComputedTiming().progress ?? 1);
+                            if (elapsed < VIEW_ANIMATION_MS) queueFrame(step);
+                            else resolve();
+                        };
+                        queueFrame(step);
+                    });
+                    controller.signal.removeEventListener("abort", stopOnAbort);
+                    clock.cancel();
                     if (controller.signal.aborted) return;
-                    if (keepBottomEdge) holdBottomEdge();
+                    clearFrameStyles();
+                    holdBottomEdge();
                     delete section.dataset.viewTransitioning;
+                } else if (keepToggleInPlace) {
+                    holdBottomEdge();
                 }
 
                 if (!isPanorama) scrollToSlide(activeIndex, "auto");
@@ -531,7 +572,6 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
             hintObserver?.disconnect();
             if (hintTimer !== undefined) window.clearTimeout(hintTimer);
             resizeObservers.forEach((observer) => observer.disconnect());
-            viewAnimations.forEach((animation) => animation.cancel());
             frameIds.forEach((id) => cancelAnimationFrame(id));
             generatedViewDots.forEach((dot) => dot.remove());
             generatedSlices.forEach((slice) => slice.remove());

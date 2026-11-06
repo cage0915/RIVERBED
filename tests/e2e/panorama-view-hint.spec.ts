@@ -57,3 +57,43 @@ test("the view toggle shows one dot per slide with the current one as a capsule"
     await expect(dots.nth(0)).not.toHaveClass(/active/);
     await expect.poll(() => dots.nth(1).evaluate((dot: HTMLElement) => dot.offsetWidth)).toBe(10);
 });
+
+test("switching views keeps the toggle where it was on screen", async ({ page }) => {
+    await page.addInitScript(() => localStorage.setItem("riverbed:panorama-view-hint-seen", "true"));
+    await page.goto("/yama/2026-tateyama-tsurugi");
+
+    const index = await page.evaluate(() =>
+        [...document.querySelectorAll<HTMLElement>("[data-photo-panorama]")].findIndex(
+            (section) => section.dataset.panoramaSlices === "3" && section.dataset.view === "carousel",
+        )
+    );
+    const section = page.locator("[data-photo-panorama]").nth(index);
+    const toggle = section.locator(".photo-panorama-view-toggle");
+    await toggle.evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
+    // Loading the stand-in photos re-sizes the stage from their ratio; let that settle
+    // before measuring, so only the view switch can move the toggle.
+    await expect.poll(() =>
+        section.evaluate((element) =>
+            // The hidden source of a sliced photo is lazy and never loads; skip it.
+            [...element.querySelectorAll("img")]
+                .filter((image) => image.getClientRects().length > 0)
+                .every((image) => image.complete && image.naturalWidth > 0)
+        ),
+    ).toBe(true);
+    await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+    await toggle.evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
+    const toggleTop = () => toggle.evaluate((element) => element.getBoundingClientRect().top);
+    const startTop = await toggleTop();
+
+    for (const view of ["panorama", "carousel"]) {
+        const stageHeight = await section.locator(".photo-panorama-stage").evaluate((stage: HTMLElement) => stage.offsetHeight);
+        await toggle.click();
+        await expect(section).toHaveAttribute("data-view", view);
+        await expect(section).not.toHaveAttribute("data-view-transitioning");
+        // The stage really changed height, and the page scrolled to absorb it.
+        expect(
+            await section.locator(".photo-panorama-stage").evaluate((stage: HTMLElement) => stage.offsetHeight),
+        ).not.toBe(stageHeight);
+        expect(Math.abs((await toggleTop()) - startTop)).toBeLessThan(1);
+    }
+});
