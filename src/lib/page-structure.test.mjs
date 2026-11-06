@@ -226,7 +226,7 @@ test('PhotoPanorama is a standalone block with full-width carousel and joined pr
     assert.match(panorama, /photo-panorama-view-icon--carousel[\s\S]*?<rect x="0\.5" y="4" width="3" height="8"[\s\S]*?<rect x="6\.5" y="4" width="3" height="8"[\s\S]*?<rect x="12\.5" y="4" width="3" height="8"/);
     assert.match(panorama, /photo-panorama-view-icon--panorama[\s\S]*?<rect x="0\.5" y="4" width="15" height="8"/);
     assert.doesNotMatch(panorama, /tags-overlay[^}]*display:\s*none/);
-    assert.match(panorama, /@media \(min-width: 768px\)\s*\{[\s\S]*?\.photo-panorama-section \.photo-panorama-track :global\(\.photo-img\)\s*\{\s*border-radius: 0/);
+    assert.doesNotMatch(readProjectFile('src/components/Photo.astro'), /\.photo-wrapper img\s*\{[^}]*border-radius/);
     assert.match(panorama, /data-view="panorama"[^}]*\.photo-panorama-track:hover :global\(\.tags-overlay\)/);
     assert.match(panorama, /const animations = slides\.map[\s\S]*?translate\([^)]*before\.top - after\.top[\s\S]*?scale\([\s\S]*?transformOrigin: "top left"[\s\S]*?slide\.animate\(keyframes/);
     assert.doesNotMatch(panorama, /scaleX\(/);

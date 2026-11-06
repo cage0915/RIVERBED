@@ -398,7 +398,6 @@ const titleSections = extractTitleSections(albumRecord.blocks);
     .album-content :global(.album-photo-grid .photo-wrapper) {
         aspect-ratio: var(--album-grid-ratio, 1);
         overflow: hidden;
-        border-radius: 0;
         background: #1a1a1a;
     }
 
@@ -411,7 +410,6 @@ const titleSections = extractTitleSections(albumRecord.blocks);
         width: 100%;
         height: 100% !important;
         object-fit: contain;
-        border-radius: 0 !important;
     }
 
     .album-content :global(.album-photo-grid .tags-overlay),
@@ -552,10 +550,6 @@ const titleSections = extractTitleSections(albumRecord.blocks);
             flex-basis: 100%;
             opacity: 1;
             transform: none;
-        }
-
-        .album-content :global(.photo-wrapper img) {
-            border-radius: 0;
         }
 
         .album-content :global(.album-photo-grid) {
