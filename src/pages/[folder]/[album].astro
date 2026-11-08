@@ -688,8 +688,11 @@ const titleSections = extractTitleSections(albumRecord.blocks);
         ) as HTMLButtonElement | null;
         if (!page || !article || !toggleButton) return;
 
+        // A sliced Panorama's generated slices are clones of its one source photo.
         const photos = Array.from(
-            article.querySelectorAll<HTMLElement>(".photo-container"),
+            article.querySelectorAll<HTMLElement>(
+                ".photo-container:not([data-panorama-generated-slice])",
+            ),
         );
         if (photos.length === 0) {
             toggleButton.hidden = true;
@@ -727,7 +730,11 @@ const titleSections = extractTitleSections(albumRecord.blocks);
         };
 
         const targetScrollTop = (photo: HTMLElement) => {
-            const rect = photo.getBoundingClientRect();
+            // A sliced Panorama's source photo is hidden; its slices show in the stage.
+            const visibleTarget = photo.classList.contains("photo-panorama-single-source")
+                ? photo.closest(".photo-panorama-stage") ?? photo
+                : photo;
+            const rect = visibleTarget.getBoundingClientRect();
             const navigation = document.querySelector<HTMLElement>(
                 "[data-site-navigation]",
             );

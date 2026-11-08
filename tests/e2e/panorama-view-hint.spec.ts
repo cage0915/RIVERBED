@@ -35,6 +35,29 @@ test("the first Panorama on screen hints its view toggle once per visitor", asyn
     await expect(section).not.toHaveAttribute("data-view-hint");
 });
 
+test("the album grid shows a sliced Panorama photo once and returns to it on click", async ({ page }) => {
+    await page.goto("/yama/2026-tateyama-tsurugi");
+
+    const section = page.locator('[data-photo-panorama][data-panorama-slices="3"]').first();
+    await expect(section.locator(".photo-panorama-slice")).toHaveCount(3);
+    const sourceHref = await section
+        .locator(".photo-panorama-single-source [data-photo-lightbox-link]")
+        .getAttribute("href");
+
+    await page.locator("#toggle-photo-grid").click();
+
+    const grid = page.locator("[data-album-photo-grid]");
+    await expect(grid.locator(".photo-panorama-slice")).toHaveCount(0);
+    const tile = grid.locator(`.photo-container:has(a[href="${sourceHref}"])`);
+    await expect(tile).toHaveCount(1);
+
+    await tile.locator("[data-photo-lightbox-link]").click();
+    await expect(grid).toHaveCount(0);
+    await expect(section.locator(".photo-panorama-stage")).toBeInViewport();
+    await expect(section.locator(".photo-panorama-single-source")).toHaveCount(1);
+    await expect(section.locator(".photo-panorama-slice")).toHaveCount(3);
+});
+
 test("the view toggle shows one dot per slide with the current one as a capsule", async ({ page }) => {
     await page.goto("/yama/2026-tateyama-tsurugi");
 
