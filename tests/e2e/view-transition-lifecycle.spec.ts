@@ -212,10 +212,6 @@ test.describe("album lifecycle", () => {
         await expect(grid.locator(".photo-container")).toHaveCount(
             originalPhotoCount,
         );
-        await expect(
-            grid.locator(".album-photo-grid__row").first()
-                .locator(":scope > .photo-container"),
-        ).toHaveCount(3);
 
         const firstCell = grid.locator(".photo-container").first();
         await expect(firstCell.locator(".photo-img")).toHaveCSS(
@@ -258,26 +254,48 @@ test.describe("desktop Album photo grid", () => {
         await isolateRemotePhotos(page);
     });
 
-    test("groups five original-ratio photos into aligned rows", async ({
+    test("breaks rows by photo shape so they fill the width at similar heights", async ({
         page,
     }) => {
+        await page.goto("/yama/2026-tateyama-tsurugi");
+        await page.locator("#toggle-photo-grid").click();
+
+        const rows = page.locator(".album-photo-grid__row");
+        await expect(rows.first()).toHaveCSS("gap", "4.8px");
+
+        const measured = await rows.evaluateAll((elements) =>
+            elements.map((row) => {
+                const photos = Array.from(
+                    row.querySelectorAll<HTMLElement>(":scope > .photo-container"),
+                ).map((photo) => photo.getBoundingClientRect());
+                const rowRect = row.getBoundingClientRect();
+                return {
+                    count: photos.length,
+                    rightGap: rowRect.right - photos[photos.length - 1].right,
+                    heights: photos.map((photo) => photo.height),
+                };
+            })
+        );
+
+        expect(new Set(measured.map((row) => row.count)).size).toBeGreaterThan(1);
+        for (const row of measured) {
+            expect(Math.max(...row.heights) - Math.min(...row.heights)).toBeLessThan(1);
+        }
+        for (const row of measured.slice(0, -1)) {
+            expect(row.rightGap).toBeLessThan(1);
+            expect(row.heights[0]).toBeGreaterThan(100);
+            expect(row.heights[0]).toBeLessThan(230);
+        }
+    });
+
+    test("re-breaks rows when the width changes", async ({ page }) => {
         await page.goto("/yama/2024-beinandawu");
         await page.locator("#toggle-photo-grid").click();
 
-        const firstRowPhotos = page
-            .locator(".album-photo-grid__row")
-            .first()
-            .locator(":scope > .photo-container");
-        await expect(firstRowPhotos).toHaveCount(5);
-        await expect(
-            page.locator(".album-photo-grid__row").first(),
-        ).toHaveCSS("gap", "4.8px");
-        await expect.poll(async () => {
-            const heights = await firstRowPhotos.evaluateAll((photos) =>
-                photos.map((photo) => photo.getBoundingClientRect().height)
-            );
-            return Math.max(...heights) - Math.min(...heights);
-        }).toBeLessThan(1);
+        const rows = page.locator(".album-photo-grid__row");
+        const wideCount = await rows.count();
+        await page.setViewportSize({ width: 800, height: 900 });
+        await expect.poll(() => rows.count()).toBeGreaterThan(wideCount);
     });
 });
 

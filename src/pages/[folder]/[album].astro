@@ -386,12 +386,12 @@ const titleSections = extractTitleSections(albumRecord.blocks);
     }
 
     .album-content :global(.album-photo-grid__row > .photo-container) {
-        flex: var(--album-grid-ratio, 1) 1 0% !important;
+        /* Scaled so a lone narrow photo's grow can't sum below 1 and leave free space. */
+        flex: calc(var(--album-grid-ratio, 1) * 100) 1 0% !important;
         min-width: 0;
     }
 
     .album-content :global(.album-photo-grid__spacer) {
-        flex: 1 1 0%;
         min-width: 0;
     }
 
@@ -570,7 +570,11 @@ const titleSections = extractTitleSections(albumRecord.blocks);
 
 <script>
     import { installPageLifecycle } from "../../lib/client-page-lifecycle";
+    import { justifiedRows } from "../../lib/justified-rows";
     import { installMobileAlbumTagPan } from "../../lib/mobile-album-tag-pan";
+
+    const GRID_ROW_HEIGHT_DESKTOP = 150;
+    const GRID_ROW_HEIGHT_MOBILE = 96;
 
     let areAllTagsVisible = false;
 
@@ -709,6 +713,9 @@ const titleSections = extractTitleSections(albumRecord.blocks);
         let scrollFollowDelay: number | undefined;
         let scrollFollowTimer: number | undefined;
         let scrollObserver: ResizeObserver | undefined;
+        let gridObserver: ResizeObserver | undefined;
+        let gridRenderFrame: number | undefined;
+        let renderedGridWidth = 0;
 
         const stopScrollTracking = () => {
             if (scrollFrame !== undefined) cancelAnimationFrame(scrollFrame);
@@ -790,52 +797,72 @@ const titleSections = extractTitleSections(albumRecord.blocks);
             }, 450);
         };
 
-        const syncGridRatio = (photo: HTMLElement) => {
+        // The manifest's dimensions come first: they are known before the image
+        // loads, so rows don't re-break as the grid's photos arrive.
+        const photoRatio = (photo: HTMLElement) => {
             const image = photo.querySelector<HTMLImageElement>(".photo-img");
-            if (!image?.naturalWidth || !image.naturalHeight) return;
-            photo.style.setProperty(
-                "--album-grid-ratio",
-                String(image.naturalWidth / image.naturalHeight),
-            );
+            if (!image) return undefined;
+            const width = Number(image.getAttribute("width")) || image.naturalWidth;
+            const height = Number(image.getAttribute("height")) || image.naturalHeight;
+            return width > 0 && height > 0 ? width / height : undefined;
+        };
+
+        const syncGridRatio = (photo: HTMLElement) => {
+            const ratio = photoRatio(photo);
+            if (ratio === undefined) return false;
+            const value = String(ratio);
+            if (photo.style.getPropertyValue("--album-grid-ratio") === value) {
+                return false;
+            }
+            photo.style.setProperty("--album-grid-ratio", value);
+            return true;
+        };
+
+        const renderGridRows = () => {
+            if (!grid) return;
+            renderedGridWidth = grid.clientWidth;
+            const rows = justifiedRows(
+                photos.map((photo) => photoRatio(photo) ?? 1),
+                {
+                    width: renderedGridWidth,
+                    gap: parseFloat(getComputedStyle(grid).columnGap) || 0,
+                    targetHeight: mobileQuery.matches
+                        ? GRID_ROW_HEIGHT_MOBILE
+                        : GRID_ROW_HEIGHT_DESKTOP,
+                },
+            ).map(({ start, end, spacerGrow }) => {
+                const row = document.createElement("div");
+                row.className = "album-photo-grid__row";
+                row.dataset.keyboardNavigationTarget = "";
+                row.append(...photos.slice(start, end));
+                if (spacerGrow > 0) {
+                    const spacer = document.createElement("span");
+                    spacer.className = "album-photo-grid__spacer";
+                    spacer.setAttribute("aria-hidden", "true");
+                    spacer.style.flex = `${spacerGrow * 100} 1 0%`;
+                    row.append(spacer);
+                }
+                return row;
+            });
+            grid.replaceChildren(...rows);
+        };
+
+        const queueGridRender = () => {
+            if (gridRenderFrame !== undefined) return;
+            gridRenderFrame = requestAnimationFrame(() => {
+                gridRenderFrame = undefined;
+                renderGridRows();
+            });
         };
 
         photos.forEach((photo) => {
             const image = photo.querySelector<HTMLImageElement>(".photo-img");
             if (!image) return;
             if (image.complete) syncGridRatio(photo);
-            image.addEventListener("load", () => syncGridRatio(photo), {
-                signal,
-            });
+            image.addEventListener("load", () => {
+                if (syncGridRatio(photo) && gridActive) queueGridRender();
+            }, { signal });
         });
-
-        const renderGridRows = () => {
-            if (!grid) return;
-            const photosPerRow = mobileQuery.matches ? 3 : 5;
-            const rows: HTMLElement[] = [];
-
-            for (let index = 0; index < photos.length; index += photosPerRow) {
-                const row = document.createElement("div");
-                row.className = "album-photo-grid__row";
-                row.dataset.keyboardNavigationTarget = "";
-                const chunk = photos.slice(index, index + photosPerRow);
-                row.append(...chunk);
-
-                if (!mobileQuery.matches && chunk.length < photosPerRow) {
-                    for (
-                        let spacerIndex = chunk.length;
-                        spacerIndex < photosPerRow;
-                        spacerIndex += 1
-                    ) {
-                        const spacer = document.createElement("span");
-                        spacer.className = "album-photo-grid__spacer";
-                        spacer.setAttribute("aria-hidden", "true");
-                        row.append(spacer);
-                    }
-                }
-                rows.push(row);
-            }
-            grid.replaceChildren(...rows);
-        };
 
         const syncGridControls = () => {
             toggleButton.dataset.active = gridActive ? "true" : "false";
@@ -860,6 +887,12 @@ const titleSections = extractTitleSections(albumRecord.blocks);
         ) => {
             if (!gridActive) return;
             gridActive = false;
+            gridObserver?.disconnect();
+            gridObserver = undefined;
+            if (gridRenderFrame !== undefined) {
+                cancelAnimationFrame(gridRenderFrame);
+                gridRenderFrame = undefined;
+            }
 
             photos.forEach((photo) => {
                 const placeholder = placeholders.get(photo);
@@ -906,10 +939,15 @@ const titleSections = extractTitleSections(albumRecord.blocks);
                 syncGridRatio(photo);
             });
 
-            renderGridRows();
             article.append(grid);
             article.dataset.gridActive = "true";
             page.dataset.gridActive = "true";
+            renderGridRows();
+            // Width alone decides the rows; their height changes as they are built.
+            gridObserver = new ResizeObserver(() => {
+                if (grid && grid.clientWidth !== renderedGridWidth) queueGridRender();
+            });
+            gridObserver.observe(grid);
             syncGridControls();
             window.scrollTo({ top: 0, behavior: "smooth" });
         };
@@ -934,10 +972,6 @@ const titleSections = extractTitleSections(albumRecord.blocks);
             event.stopPropagation();
             restoreAlbumLayout(targetPhoto);
         }, { capture: true, signal });
-
-        mobileQuery.addEventListener("change", () => {
-            if (gridActive) renderGridRows();
-        }, { signal });
 
         syncGridControls();
 
