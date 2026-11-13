@@ -6,6 +6,7 @@ import SiteFooter from "../components/SiteFooter.astro";
 import SiteNavigation from "../components/SiteNavigation.astro";
 import ContentKeyboardNavigation from "../components/ContentKeyboardNavigation.astro";
 import PhotoLightbox from "../components/PhotoLightbox.astro";
+import PhotoFadeIn from "../components/PhotoFadeIn.astro";
 import YamaWalker from "../components/YamaWalker.astro";
 // Keep the shared font baseline to the weight every route uses. Fontsource's
 // numbered CJK faces include unicode-range declarations, so browsers fetch
@@ -38,7 +39,7 @@ const { title, hiker = false } = Astro.props;
 		<ClientRouter />
 	</head>
 	<body
-		class="bg-[#121212] text-zinc-100 min-h-screen antialiased selection:bg-blue-500/50"
+		class="bg-[#121212] text-zinc-100 min-h-screen antialiased selection:bg-white/20 selection:text-white"
 	>
 		<SiteNavigation />
 
@@ -48,6 +49,7 @@ const { title, hiker = false } = Astro.props;
 
 		<ContentKeyboardNavigation />
 		<PhotoLightbox />
+		<PhotoFadeIn />
 		<SiteFooter />
 		{hiker && <YamaWalker />}
 		<SiteDevTools />
@@ -55,19 +57,27 @@ const { title, hiker = false } = Astro.props;
 </html>
 
 <style is:global>
-	/* Elegant scrollbar */
+	/* Scrollbar: a quiet thumb on a track that matches the page background. */
 	::-webkit-scrollbar {
 		width: 8px;
 	}
 	::-webkit-scrollbar-track {
-		background: #555555;
+		background: #121212;
 	}
 	::-webkit-scrollbar-thumb {
-		background: #27272a;
+		background: #3f3f46;
 		border-radius: 4px;
 	}
 	::-webkit-scrollbar-thumb:hover {
-		background: #3f3f46;
+		background: #52525b;
+	}
+
+	/* Firefox has no ::-webkit-scrollbar. Chromium would let scrollbar-color
+	   override the rules above, so apply it only where they don't exist. */
+	@supports not selector(::-webkit-scrollbar) {
+		:root {
+			scrollbar-color: #3f3f46 #121212;
+		}
 	}
 
 	:root {

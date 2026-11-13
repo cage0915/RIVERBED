@@ -111,12 +111,28 @@ const fallbackUrl = `${R2_DOMAIN}/${encodedAssetKey}`;
         /* removed overflow: hidden to allow tags near border to overflow smoothly */
     }
 
+    /* Lazy photos reserve their box from width/height; the link paints that box
+       so it stays visible while the photo itself is still transparent. */
+    .photo-wrapper .pswp-link {
+        background: #1c1c1c;
+    }
+
     .photo-wrapper img {
         width: 100%;
         height: auto;
         display: block;
-        /* Lazy photos reserve their box from width/height; keep it visible against the page. */
-        background: #1c1c1c;
+    }
+
+    /* Fade each photo in once it has loaded. Without scripting nothing would
+       ever mark it loaded, so the photo stays plainly visible. */
+    @media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+        .photo-wrapper img {
+            transition: opacity 0.5s ease;
+        }
+
+        .photo-wrapper img:not([data-loaded]) {
+            opacity: 0;
+        }
     }
 
     .photo-caption--photo {

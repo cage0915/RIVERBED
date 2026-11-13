@@ -1,0 +1,28 @@
+---
+// Marks each album photo (.photo-img) as loaded so Photo.astro's CSS can fade
+// it in. Lives here, mounted once by the Layout, so Photo itself emits no script.
+---
+
+<script>
+    // load/error don't bubble, so listen in the capture phase. One listener on
+    // the document covers every page the client router swaps in, plus photos
+    // the dev tools add later.
+    const markLoaded = (target: EventTarget | null) => {
+        if (target instanceof HTMLImageElement && target.classList.contains("photo-img")) {
+            target.dataset.loaded = "";
+        }
+    };
+
+    document.addEventListener("load", (event) => markLoaded(event.target), true);
+    document.addEventListener("error", (event) => markLoaded(event.target), true);
+
+    // Photos that finished (from cache, or before this script ran) fire no
+    // further events; mark them on each page load.
+    document.addEventListener("astro:page-load", () => {
+        document
+            .querySelectorAll<HTMLImageElement>(".photo-img:not([data-loaded])")
+            .forEach((image) => {
+                if (image.complete) image.dataset.loaded = "";
+            });
+    });
+</script>
