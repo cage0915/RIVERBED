@@ -173,13 +173,13 @@
     "name": "大塔山",
     "elevation": 2663,
     "description": "",
+    "coverKey": "yama/2026-tataka/KCS00693.jpg",
     "location": {
       "latitude": 23.53579,
       "longitude": 120.808,
       "mapContext": "tw-mainland"
     },
-    "panorama": true,
-    "coverKey": "yama/2026-tataka/KCS00693.jpg"
+    "panorama": true
   },
   {
     "name": "大劍山",
@@ -195,9 +195,9 @@
   },
   {
     "name": "大霸尖山",
-    "alternateName": "B'bu' Papak",
     "elevation": 3492,
     "description": "",
+    "alternateName": "B'bu' Papak",
     "coverKey": "yama/2023-da-xiao-bajianshan/08.jpg",
     "location": {
       "latitude": 24.457719,
@@ -255,9 +255,9 @@
   },
   {
     "name": "中央尖山",
-    "alternateName": "B'bu Sgaga",
     "elevation": 3705,
     "description": "第一次注意到中央尖山是在2024年[志佳陽上雪山](/yama/2024-zhijiayang-xueshan)，第二天從飄簞山屋往志佳陽大山的路線上。當時將要日出，中央尖背著橘紅色天空的剪影很是醒目。從雪山山脈一帶看過去的山形形似鯊魚背鰭，從南北方向望去則是一座由石英砂岩和礫岩構成的金字塔。\n路線有挑戰性，是一座我想在更有經驗後才拜訪的一座山。",
+    "alternateName": "B'bu Sgaga",
     "coverKey": "yama/2024-hehuanbei/KCS03808.jpg",
     "location": {
       "latitude": 24.310175,
@@ -282,16 +282,9 @@
     "description": ""
   },
   {
-    "name": "天空堡壘",
-    "elevation": 3345,
-    "description": "",
-    "coverKey": "yama/2026-jiaminghu-2/KCS03901.jpg",
-    "location": {
-      "latitude": 23.316461,
-      "longitude": 121.127403,
-      "mapContext": "tw-mainland"
-    },
-    "panorama": true
+    "name": "井步山",
+    "elevation": null,
+    "description": ""
   },
   {
     "name": "天雲山",
@@ -316,6 +309,11 @@
     "panorama": true
   },
   {
+    "name": "日湯真山",
+    "elevation": null,
+    "description": ""
+  },
+  {
     "name": "水社大山",
     "elevation": null,
     "description": ""
@@ -329,13 +327,13 @@
     "name": "火炎山",
     "elevation": 596,
     "description": "",
+    "coverKey": "k/2022-wuxi-daanxi/000166010017.jpg",
     "location": {
       "latitude": 24.37732,
       "longitude": 120.73097,
       "mapContext": "tw-mainland"
     },
-    "panorama": true,
-    "coverKey": "k/2022-wuxi-daanxi/000166010017.jpg"
+    "panorama": true
   },
   {
     "name": "出雲山",
@@ -359,9 +357,9 @@
   },
   {
     "name": "北大武山",
-    "alternateName": "Kavulungan",
     "elevation": 3092,
     "description": "記憶中最美的北大武山是在龍泉營區看見的，那時沒有相機甚至沒有手機，卻只是看著衪發呆就能讓人暫時忘記身體與精神上的不自由。",
+    "alternateName": "Kavulungan",
     "coverKey": "yama/2026-jiaminghu-1/KCS04425.jpg",
     "location": {
       "latitude": 22.626995,
@@ -461,6 +459,11 @@
     "description": ""
   },
   {
+    "name": "玉山",
+    "elevation": null,
+    "description": ""
+  },
+  {
     "name": "玉山三叉峰",
     "elevation": null,
     "description": ""
@@ -472,9 +475,9 @@
   },
   {
     "name": "玉山主峰",
-    "alternateName": "Patungkuonʉ",
     "elevation": 3952,
     "description": "台灣最高峰，東北亞第一高峰。",
+    "alternateName": "Patungkuonʉ",
     "coverKey": "yama/2024-alishan-yushan/KCS00743.jpg",
     "location": {
       "latitude": 23.470022,
@@ -657,13 +660,13 @@
     "name": "向陽山北峰",
     "elevation": 3458,
     "description": "",
+    "coverKey": "yama/2026-jiaminghu-2/KCS04370.jpg",
     "location": {
       "latitude": 23.2913,
       "longitude": 121.00848,
       "mapContext": "tw-mainland"
     },
-    "panorama": true,
-    "coverKey": "yama/2026-jiaminghu-2/KCS04370.jpg"
+    "panorama": true
   },
   {
     "name": "安東軍山",
@@ -698,6 +701,11 @@
     "panorama": true
   },
   {
+    "name": "西大武山",
+    "elevation": null,
+    "description": ""
+  },
+  {
     "name": "西巒大山",
     "elevation": null,
     "description": ""
@@ -714,9 +722,9 @@
   },
   {
     "name": "秀姑巒山",
-    "alternateName": "Maqudas",
     "elevation": 3860,
     "description": "",
+    "alternateName": "Maqudas",
     "coverKey": "yama/2026-jiaminghu-2/KCS04256.jpg",
     "location": {
       "latitude": 23.497013,
@@ -817,13 +825,13 @@
     "name": "東卯山",
     "elevation": 1692,
     "description": "",
+    "coverKey": "yama/2026-daxueshan/KCS03009.jpg",
     "location": {
       "latitude": 24.1858,
       "longitude": 120.958,
       "mapContext": "tw-mainland"
     },
-    "panorama": true,
-    "coverKey": "yama/2026-daxueshan/KCS03009.jpg"
+    "panorama": true
   },
   {
     "name": "東洗水山",
@@ -910,8 +918,15 @@
   },
   {
     "name": "南大武山",
-    "elevation": null,
-    "description": ""
+    "elevation": 2841,
+    "description": "",
+    "coverKey": "yama/2026-hitoride/KCS06507.jpg",
+    "location": {
+      "latitude": 22.57222,
+      "longitude": 120.74861,
+      "mapContext": "tw-mainland"
+    },
+    "panorama": true
   },
   {
     "name": "南玉山",
@@ -925,9 +940,9 @@
   },
   {
     "name": "南湖大山",
-    "alternateName": "B'bu' Topuk",
     "elevation": 3740,
     "description": "",
+    "alternateName": "B'bu' Topuk",
     "coverKey": "yama/2025-taoshan/KCS02915.jpg",
     "location": {
       "latitude": 24.361795,
@@ -1103,13 +1118,13 @@
     "name": "基隆山東峰",
     "elevation": 467,
     "description": "",
+    "coverKey": "y/2025-shisunjian/KCS02300.jpg",
     "location": {
       "latitude": 25.1201,
       "longitude": 121.85528,
       "mapContext": "tw-mainland"
     },
-    "panorama": true,
-    "coverKey": "y/2025-shisunjian/KCS02300.jpg"
+    "panorama": true
   },
   {
     "name": "基隆嶼",
@@ -1160,9 +1175,9 @@
   },
   {
     "name": "雪山主峰",
-    "alternateName": "B'bu' Hagay",
     "elevation": 3886,
     "description": "",
+    "alternateName": "B'bu' Hagay",
     "coverKey": "yama/2024-dajian/KCS01495.jpg",
     "location": {
       "latitude": 24.383281,
@@ -1294,6 +1309,18 @@
     "description": ""
   },
   {
+    "name": "新康山",
+    "elevation": 3331,
+    "description": "",
+    "coverKey": "yama/2026-jiaminghu-2/KCS03901.jpg",
+    "location": {
+      "latitude": 23.316461,
+      "longitude": 121.127403,
+      "mapContext": "tw-mainland"
+    },
+    "panorama": true
+  },
+  {
     "name": "新望嶺",
     "elevation": 2481,
     "description": "",
@@ -1377,13 +1404,13 @@
     "name": "鳳林山主峰",
     "elevation": 2029,
     "description": "",
+    "coverKey": "y/2025/029.jpg",
     "location": {
       "latitude": 23.7614,
       "longitude": 121.389,
       "mapContext": "tw-mainland"
     },
-    "panorama": true,
-    "coverKey": "y/2025/029.jpg"
+    "panorama": true
   },
   {
     "name": "鳶嘴山",

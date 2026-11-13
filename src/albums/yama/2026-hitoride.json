@@ -1,0 +1,1018 @@
+{
+  "schemaVersion": 2,
+  "title": "北大武山",
+  "info": "2026.10",
+  "publishedAt": "2026-11-08",
+  "order": 310,
+  "cover": {
+    "photo": {
+      "kind": "local",
+      "filename": "2026-1101-0905-13.400.jpg"
+    },
+    "zoom": 1.01,
+    "offset": {
+      "x": 49.1,
+      "y": 32.4
+    }
+  },
+  "blocks": [
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "D1"
+    },
+    {
+      "type": "Row",
+      "caption": "Kulaljuc. 泰武. クワルス",
+      "photos": [
+        "2026-1031-0656-03.338.jpg",
+        "2026-1031-0801-15.517.jpg"
+      ]
+    },
+    {
+      "type": "PhotoPanorama",
+      "caption": "清晨的南北大武山",
+      "initialView": "panorama",
+      "panoramaSlices": 2,
+      "photos": [
+        "KCS06359.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "photos": [
+        "KCS06361.jpg",
+        "KCS06364.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "photos": [
+        "KCS06374.jpg",
+        "KCS06375.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "瓦魯斯溪",
+      "photos": [
+        "KCS06382.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "3rem",
+      "photos": [
+        "KCS06376.jpg",
+        "KCS06380.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "2026-1031-0922-32.909.jpg",
+        "KCS06366.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "3rem",
+      "photos": [
+        "KCS06368.jpg",
+        "2026-1031-1032-53.981.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "最喜歡的一段，應該是杜鵑林。沒看過這麼粗壯的杜鵑，步道旁堆積了很厚的一層落葉，踩下很有彈性。",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "2026-1031-1125-55.371.jpg",
+        "2026-1031-1129-43.953.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "2026-1031-1207-49.919.jpg",
+        "2026-1031-1217-30.617.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS06392.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "5.5k 神木",
+      "blockMargin": "3rem",
+      "photos": [
+        "KCS06389.jpg"
+      ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "D2"
+    },
+    {
+      "type": "Row",
+      "caption": "這次因為天氣預報是晴天，加上北大武山是最南端的百岳，想說不會太冷就只穿了短褲。沒想到抵達檜谷山屋後，才發現氣溫其實頗低，可能是因為山屋所在的位置沒有陽光直射。\n\n隔天半夜吃早餐時還看得到星星，出發後不久卻開始飄雨。原本以為只是水氣凝結形成的霧雨，沒想到雨勢越來越大。查看雷達回波後發現北起宜蘭南至屏東有一條狹長的雨帶。事後才知道這是陸風與東北季風輻合的結果。北邊因為有海岸山脈擋在第一線，雨區大多集中在沿岸，但到了屏東由於缺乏地形緩衝，雨便直接下在北大武山上。\n\n在一處可以避風的位置時算了算時間，如果維持原本的腳程很可能會在日出前一小時抵達三角點。以當時的雨勢提早抵達應該會很痛扣，於是決定先留在原地等待。雖然這個位置可以避風，但停止前進後身體也逐漸冷卻。原本想靠深蹲來加熱身體，又擔心蹲太多會耗盡下山的腿力，於是改成像練外丹功一樣甩手，結果完全沒用。就這樣捱過四十分鐘才再次出發。抵達稜線時，東方的天空已經逐漸透出亮光，隨著海陸風轉換天氣也開始放晴。當陽光終於照在身上時完全能感受到光速的溫暖。這次算是學到了教訓，上山一定要帶上長褲。",
+      "captionPosition": "left bottom",
+      "photos": [
+        "2026-1101-0614-23.569.jpg",
+        "KCS06423.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "2026-1101-0621-46.080.jpg",
+        "2026-1102-1454-53.000.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "3rem",
+      "photos": [
+        "2026-1101-0632-33.229.jpg",
+        "2026-1101-0651-09.720.jpg",
+        "2026-1101-0801-37.746.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "從這個方向看過去新康山山形頗似富士山。北大武山頂北邊和西邊因為有鐵杉.杜鵑圍繞，展望其實不是很好。三角點再往前一些，穿過灌木叢有個小平台視野較佳，但旁邊就是斷崖要小心。",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS06393.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "0.5rem",
+      "photos": [
+        "KCS06401.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "caption": "雲瀑持續翻過霧頭山，但另一側像是有排水孔一般，雲霧並沒有堆積起來。遠方可以看到玉山.關山.秀姑巒山和今年六月曾造訪的向陽山和三叉山。",
+      "captionPosition": "left bottom",
+      "blockMargin": "0.5rem",
+      "photos": [
+        "KCS06405.jpg",
+        "KCS06403.jpg",
+        "KCS06406.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "3rem",
+      "photos": [
+        "KCS06412.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "0.5rem",
+      "photos": [
+        "KCS06426.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "initialSlide": 2,
+      "photos": [
+        "KCS06449.jpg",
+        "KCS06447.jpg",
+        "KCS06448.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS06427.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "北大武的影子",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS06435.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "3rem",
+      "photos": [
+        "KCS06487.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "到稜線後上上下下許多樹根和石頭，但都有拉繩和鋼條，小心一些並不難走。",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "2026-1101-0830-46.079.jpg",
+        "2026-1101-0835-34.034.jpg",
+        "2026-1101-0735-09.954.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "栂 (つが) | \n中央山脈在過卑南主山後地勢陷落，直到以北大武山為最高點的大武地壘才又隆起，周圍並沒有高度相當的山頭，從平原眺望南北大武顯的高聳莊嚴，不過對喜歡坐一山望一山的我來說攀登北大武就不是特別有吸引力，甚至在半路停歇避雨時也考慮是不是就不要登頂了。\n\n但我錯了，上到稜線後不只是雲海，沿路鬱鬱蒼蒼的鐵杉更讓人驚喜。或群生或獨自佇立著，姿態各異其趣。可能也因為山脊狹長，少了雪山冷杉林的那種陰鬱感，走在衪們下方心情是踏實篤定的。\n\n年初去白馬栂池滑雪時，因為栂與梅的古字相通，以為就是梅樹的意思。這趟下山後翻閱日本時代攀登大武山的紀錄時一直看到這個字，但沿途並沒有注意到有梅花，問了AI才知道原來在日文中栂指的其實就是鐵杉！",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "2026-1101-0709-38.364.jpg",
+        "KCS06470.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "2026-1101-0718-16.717.jpg",
+        "2026-1101-0740-59.170.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "2026-1101-0741-27.327.jpg",
+        "2026-1101-0725-39.142.jpg",
+        "2026-1101-0905-13.400.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "2026-1101-0842-52.358.jpg",
+        "2026-1101-0844-19.278.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "3rem",
+      "photos": [
+        {
+          "column": [
+            "KCS06465.jpg",
+            "KCS06473.jpg"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "caption": "屏東平原",
+      "photos": [
+        "KCS06482.jpg",
+        "KCS06477.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "0.5rem",
+      "photos": [
+        "KCS06485.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "blockMargin": "3rem",
+      "photos": [
+        "KCS06488.jpg",
+        "KCS06494.jpg"
+      ]
+    },
+    {
+      "type": "PhotoCarousel",
+      "caption": "喜多麗斷崖望向南大武山 |\n第一天水氣多，沒能在傍晚時看到斷崖雲海夕景。第二天下山時南大武山總算露臉，來自下方谷地的霧氣常常在片刻間便潮起潮落。\n\n喜多麗的名稱來自日文「ひとり」，意思為一個人。當年興建大武祠時動員排灣族人搬運建材上山。由於此處斷崖地形狹窄無法多人並行，據說現場管理人員便不斷呼喊「ひとり」，要求搬運隊伍一個一個通過，因而得名。",
+      "captionPosition": "left bottom",
+      "photos": [
+        "KCS06496.jpg",
+        "KCS06507.jpg",
+        "KCS06509.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS06500.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS06513.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "3rem",
+      "photos": [
+        "KCS06502.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "下山後回泰武路上所見的南北大武山。",
+      "captionPosition": "left bottom",
+      "blockMargin": "1.5rem",
+      "photos": [
+        "KCS06521.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "photos": [
+        "KCS06523.jpg"
+      ]
+    }
+  ],
+  "photos": [
+    {
+      "filename": "2026-1031-0656-03.338.jpg",
+      "width": 2667,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "2026-1031-0801-15.517.jpg",
+      "width": 2000,
+      "height": 2667,
+      "tags": []
+    },
+    {
+      "filename": "KCS06359.jpg",
+      "width": 4959,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "北大武山",
+          "x": 14.72,
+          "y": 50.5
+        },
+        {
+          "name": "南大武山",
+          "x": 71.09,
+          "y": 44.75
+        }
+      ]
+    },
+    {
+      "filename": "KCS06361.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "南大武山",
+          "x": 31.52,
+          "y": 18.63
+        }
+      ]
+    },
+    {
+      "filename": "KCS06364.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS06374.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "井步山",
+          "x": 51.79,
+          "y": 23.6
+        },
+        {
+          "name": "大母母山",
+          "x": 34.22,
+          "y": 26.5
+        }
+      ]
+    },
+    {
+      "filename": "KCS06375.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "卑南主山",
+          "x": 48.5,
+          "y": 29.95
+        }
+      ]
+    },
+    {
+      "filename": "KCS06382.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS06376.jpg",
+      "width": 2000,
+      "height": 3000,
+      "tags": []
+    },
+    {
+      "filename": "KCS06380.jpg",
+      "width": 2000,
+      "height": 3000,
+      "tags": []
+    },
+    {
+      "filename": "2026-1031-0922-32.909.jpg",
+      "width": 2000,
+      "height": 2667,
+      "tags": []
+    },
+    {
+      "filename": "KCS06366.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS06368.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "2026-1031-1032-53.981.jpg",
+      "width": 2000,
+      "height": 2667,
+      "tags": []
+    },
+    {
+      "filename": "2026-1031-1125-55.371.jpg",
+      "width": 2667,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "2026-1031-1129-43.953.jpg",
+      "width": 2000,
+      "height": 2667,
+      "tags": []
+    },
+    {
+      "filename": "2026-1031-1207-49.919.jpg",
+      "width": 2000,
+      "height": 2667,
+      "tags": []
+    },
+    {
+      "filename": "2026-1031-1217-30.617.jpg",
+      "width": 2000,
+      "height": 2667,
+      "tags": []
+    },
+    {
+      "filename": "KCS06392.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS06389.jpg",
+      "width": 2000,
+      "height": 3000,
+      "tags": []
+    },
+    {
+      "filename": "2026-1101-0614-23.569.jpg",
+      "width": 2000,
+      "height": 1500,
+      "tags": []
+    },
+    {
+      "filename": "KCS06423.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "2026-1101-0621-46.080.jpg",
+      "width": 2000,
+      "height": 2667,
+      "tags": []
+    },
+    {
+      "filename": "2026-1102-1454-53.000.jpg",
+      "width": 1216,
+      "height": 1276,
+      "tags": []
+    },
+    {
+      "filename": "2026-1101-0632-33.229.jpg",
+      "width": 2000,
+      "height": 2667,
+      "tags": []
+    },
+    {
+      "filename": "2026-1101-0651-09.720.jpg",
+      "width": 2000,
+      "height": 2667,
+      "tags": []
+    },
+    {
+      "filename": "2026-1101-0801-37.746.jpg",
+      "width": 2000,
+      "height": 2667,
+      "tags": []
+    },
+    {
+      "filename": "KCS06393.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "新康山",
+          "x": 46.48,
+          "y": 42.04
+        }
+      ]
+    },
+    {
+      "filename": "KCS06401.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS06405.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "新康山",
+          "x": 94.26,
+          "y": 20.04
+        },
+        {
+          "name": "向陽山",
+          "x": 45.42,
+          "y": 18.02
+        },
+        {
+          "name": "三叉山",
+          "x": 58.35,
+          "y": 18.88
+        },
+        {
+          "name": "秀姑巒山",
+          "x": 42.13,
+          "y": 17.87
+        },
+        {
+          "name": "雲峰",
+          "x": 29.1,
+          "y": 18.6
+        },
+        {
+          "name": "卑南主山",
+          "x": 20.61,
+          "y": 17.87
+        },
+        {
+          "name": "關山",
+          "x": 15.78,
+          "y": 15.99
+        },
+        {
+          "name": "玉山",
+          "x": 10.28,
+          "y": 17.15
+        },
+        {
+          "name": "霧頭山",
+          "x": 40.3,
+          "y": 39.73
+        }
+      ]
+    },
+    {
+      "filename": "KCS06403.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "卑南主山",
+          "x": 62.4,
+          "y": 31.77
+        },
+        {
+          "name": "關山",
+          "x": 50.53,
+          "y": 27.72
+        },
+        {
+          "name": "玉山主峰",
+          "x": 36.15,
+          "y": 29.45
+        },
+        {
+          "name": "雲峰",
+          "x": 84.7,
+          "y": 32.42
+        },
+        {
+          "name": "小關山",
+          "x": 26.01,
+          "y": 35.03
+        },
+        {
+          "name": "玉山西峰",
+          "x": 13.95,
+          "y": 35.17
+        }
+      ]
+    },
+    {
+      "filename": "KCS06406.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "新康山",
+          "x": 48.79,
+          "y": 37.71
+        }
+      ]
+    },
+    {
+      "filename": "KCS06412.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "霧頭山",
+          "x": 51.69,
+          "y": 44.92
+        }
+      ]
+    },
+    {
+      "filename": "KCS06426.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "新康山",
+          "x": 84.12,
+          "y": 45.26
+        },
+        {
+          "name": "霧頭山",
+          "x": 52.17,
+          "y": 55.68
+        },
+        {
+          "name": "關山",
+          "x": 38.85,
+          "y": 43.08
+        },
+        {
+          "name": "卑南主山",
+          "x": 41.46,
+          "y": 43.95
+        },
+        {
+          "name": "玉山",
+          "x": 35.67,
+          "y": 43.66
+        },
+        {
+          "name": "雲峰",
+          "x": 46.48,
+          "y": 44.24
+        },
+        {
+          "name": "向陽山",
+          "x": 55.84,
+          "y": 43.66
+        },
+        {
+          "name": "三叉山",
+          "x": 63.37,
+          "y": 43.95
+        }
+      ]
+    },
+    {
+      "filename": "KCS06449.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "霧頭山",
+          "x": 34.7,
+          "y": 34.54
+        },
+        {
+          "name": "新康山",
+          "x": 88.85,
+          "y": 12.83
+        },
+        {
+          "name": "三叉山",
+          "x": 52.75,
+          "y": 12.25
+        },
+        {
+          "name": "向陽山",
+          "x": 39.43,
+          "y": 11.23
+        },
+        {
+          "name": "雲峰",
+          "x": 22.64,
+          "y": 12.39
+        },
+        {
+          "name": "卑南主山",
+          "x": 14.33,
+          "y": 11.67
+        },
+        {
+          "name": "關山",
+          "x": 9.12,
+          "y": 10.07
+        }
+      ]
+    },
+    {
+      "filename": "KCS06447.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "霧頭山",
+          "x": 46.86,
+          "y": 12.83
+        }
+      ]
+    },
+    {
+      "filename": "KCS06448.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "霧頭山",
+          "x": 50.14,
+          "y": 4.72
+        }
+      ]
+    },
+    {
+      "filename": "KCS06427.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS06435.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS06487.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "2026-1101-0830-46.079.jpg",
+      "width": 2000,
+      "height": 2667,
+      "tags": []
+    },
+    {
+      "filename": "2026-1101-0835-34.034.jpg",
+      "width": 2000,
+      "height": 2667,
+      "tags": []
+    },
+    {
+      "filename": "2026-1101-0735-09.954.jpg",
+      "width": 2000,
+      "height": 2667,
+      "tags": []
+    },
+    {
+      "filename": "2026-1101-0709-38.364.jpg",
+      "width": 2000,
+      "height": 2667,
+      "tags": []
+    },
+    {
+      "filename": "KCS06470.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "2026-1101-0718-16.717.jpg",
+      "width": 2000,
+      "height": 2666,
+      "tags": []
+    },
+    {
+      "filename": "2026-1101-0740-59.170.jpg",
+      "width": 2000,
+      "height": 2667,
+      "tags": []
+    },
+    {
+      "filename": "2026-1101-0741-27.327.jpg",
+      "width": 2000,
+      "height": 2667,
+      "tags": []
+    },
+    {
+      "filename": "2026-1101-0725-39.142.jpg",
+      "width": 2000,
+      "height": 2667,
+      "tags": []
+    },
+    {
+      "filename": "2026-1101-0905-13.400.jpg",
+      "width": 2000,
+      "height": 2667,
+      "tags": []
+    },
+    {
+      "filename": "2026-1101-0842-52.358.jpg",
+      "width": 2667,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "2026-1101-0844-19.278.jpg",
+      "width": 2000,
+      "height": 2667,
+      "tags": []
+    },
+    {
+      "filename": "KCS06465.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS06473.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS06482.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "西大武山",
+          "x": 23.99,
+          "y": 70.03
+        },
+        {
+          "name": "日湯真山",
+          "x": 55.55,
+          "y": 49.97
+        }
+      ]
+    },
+    {
+      "filename": "KCS06477.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS06485.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "西大武山",
+          "x": 53.23,
+          "y": 13.7
+        }
+      ]
+    },
+    {
+      "filename": "KCS06488.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS06494.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS06496.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "南大武山",
+          "x": 45.13,
+          "y": 20.58
+        }
+      ]
+    },
+    {
+      "filename": "KCS06507.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "南大武山",
+          "x": 51.59,
+          "y": 20.58
+        }
+      ]
+    },
+    {
+      "filename": "KCS06509.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "南大武山",
+          "x": 49.86,
+          "y": 18.84
+        }
+      ]
+    },
+    {
+      "filename": "KCS06500.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS06513.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "南大武山",
+          "x": 52.65,
+          "y": 14.11
+        }
+      ]
+    },
+    {
+      "filename": "KCS06502.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": []
+    },
+    {
+      "filename": "KCS06521.jpg",
+      "width": 3000,
+      "height": 2000,
+      "tags": [
+        {
+          "name": "南大武山",
+          "x": 77.46,
+          "y": 38.08
+        },
+        {
+          "name": "北大武山",
+          "x": 18.68,
+          "y": 32.57
+        }
+      ]
+    },
+    {
+      "filename": "KCS06523.jpg",
+      "width": 2000,
+      "height": 2720,
+      "tags": []
+    }
+  ]
+}
