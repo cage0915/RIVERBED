@@ -87,66 +87,77 @@
       "filename": "KCS01648.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4d6670",
       "tags": []
     },
     {
       "filename": "KCS01647.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#70848e",
       "tags": []
     },
     {
       "filename": "KCS01654.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#566b6c",
       "tags": []
     },
     {
       "filename": "KCS01657.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#5e6967",
       "tags": []
     },
     {
       "filename": "KCS01653.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#5e88a9",
       "tags": []
     },
     {
       "filename": "KCS03550.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#53666d",
       "tags": []
     },
     {
       "filename": "KCS03556.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#68756f",
       "tags": []
     },
     {
       "filename": "KCS03567.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#97a1a0",
       "tags": []
     },
     {
       "filename": "KCS03587.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#929798",
       "tags": []
     },
     {
       "filename": "KCS03609.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#808989",
       "tags": []
     },
     {
       "filename": "KCS03617.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#899494",
       "tags": []
     }
   ]

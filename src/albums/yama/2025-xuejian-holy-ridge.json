@@ -178,48 +178,56 @@
       "filename": "KCS01708.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#747877",
       "tags": []
     },
     {
       "filename": "KCS01714.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4c483f",
       "tags": []
     },
     {
       "filename": "KCS01742.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#66605a",
       "tags": []
     },
     {
       "filename": "KCS01747.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#636160",
       "tags": []
     },
     {
       "filename": "KCS01756.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#72665a",
       "tags": []
     },
     {
       "filename": "KCS01760.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#696461",
       "tags": []
     },
     {
       "filename": "KCS01765.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#524d4e",
       "tags": []
     },
     {
       "filename": "KCS02050.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#6a859c",
       "tags": [
         {
           "name": "頭鷹山",
@@ -237,6 +245,7 @@
       "filename": "KCS02059.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#5a728d",
       "tags": [
         {
           "name": "榛山",
@@ -249,12 +258,14 @@
       "filename": "KCS02061.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#61676e",
       "tags": []
     },
     {
       "filename": "KCS02069.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4a5865",
       "tags": [
         {
           "name": "加里山",
@@ -272,36 +283,42 @@
       "filename": "KCS02077.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#41442d",
       "tags": []
     },
     {
       "filename": "KCS02086.jpg",
       "width": 3000,
       "height": 7303,
+      "color": "#414c3e",
       "tags": []
     },
     {
       "filename": "KCS02100.jpg",
       "width": 2000,
       "height": 3000,
+      "color": "#556050",
       "tags": []
     },
     {
       "filename": "KCS02106.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#546261",
       "tags": []
     },
     {
       "filename": "KCS02108.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#242622",
       "tags": []
     },
     {
       "filename": "KCS02112.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4f6c88",
       "tags": [
         {
           "name": "大劍山",
@@ -314,6 +331,7 @@
       "filename": "KCS02116.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4d6a87",
       "tags": [
         {
           "name": "雪山主峰",
@@ -331,6 +349,7 @@
       "filename": "KCS02133.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4a667d",
       "tags": [
         {
           "name": "大霸尖山",
@@ -348,6 +367,7 @@
       "filename": "KCS02156.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#556f80",
       "tags": [
         {
           "name": "雪山主峰",
@@ -375,6 +395,7 @@
       "filename": "KCS02164.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#59676f",
       "tags": [
         {
           "name": "雪山主峰",
@@ -392,6 +413,7 @@
       "filename": "KCS02168.jpg",
       "width": 3000,
       "height": 2015,
+      "color": "#5d686e",
       "tags": [
         {
           "name": "雪山北峰",
@@ -409,6 +431,7 @@
       "filename": "KCS02169.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#5d6d7a",
       "tags": [
         {
           "name": "雪山主峰",
@@ -436,6 +459,7 @@
       "filename": "KCS02191.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#576068",
       "tags": [
         {
           "name": "雪山主峰",
@@ -453,6 +477,7 @@
       "filename": "KCS02207.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#575559",
       "tags": [
         {
           "name": "雪山主峰",
@@ -470,6 +495,7 @@
       "filename": "KCS02212.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#717275",
       "tags": [
         {
           "name": "雪山主峰",

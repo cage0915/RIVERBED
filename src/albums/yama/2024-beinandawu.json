@@ -116,6 +116,7 @@
       "filename": "KCS04834.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#95aeaf",
       "tags": [
         {
           "name": "北大武山",
@@ -133,30 +134,35 @@
       "filename": "KCS05018.jpg",
       "width": 2000,
       "height": 3000,
+      "color": "#484e42",
       "tags": []
     },
     {
       "filename": "KCS05023.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#5f7075",
       "tags": []
     },
     {
       "filename": "KCS05026.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#7b7f80",
       "tags": []
     },
     {
       "filename": "KCS05040.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#344c51",
       "tags": []
     },
     {
       "filename": "KCS05086.jpg",
       "width": 2000,
       "height": 3000,
+      "color": "#747d79",
       "tags": [
         {
           "name": "北大武山",
@@ -169,6 +175,7 @@
       "filename": "KCS05091.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#65716b",
       "tags": [
         {
           "name": "北大武山",
@@ -181,18 +188,21 @@
       "filename": "KCS05119.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#566663",
       "tags": []
     },
     {
       "filename": "KCS05124.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#556567",
       "tags": []
     },
     {
       "filename": "KCS05125.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#667072",
       "tags": [
         {
           "name": "霧頭山",
@@ -205,24 +215,28 @@
       "filename": "KCS05174.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#747777",
       "tags": []
     },
     {
       "filename": "KCS05134.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#626564",
       "tags": []
     },
     {
       "filename": "KCS05180.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#687376",
       "tags": []
     },
     {
       "filename": "KCS05198.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#727b7b",
       "tags": [
         {
           "name": "北大武山",

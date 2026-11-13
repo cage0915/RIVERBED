@@ -83,6 +83,7 @@
       "filename": "01.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#a2b1a5",
       "tags": [
         {
           "name": "大尖山",
@@ -105,6 +106,7 @@
       "filename": "03.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#92a2a0",
       "tags": [
         {
           "name": "大尖山",
@@ -117,6 +119,7 @@
       "filename": "04.jpg",
       "width": 4525,
       "height": 3000,
+      "color": "#7c826b",
       "tags": [
         {
           "name": "大尖山",
@@ -129,6 +132,7 @@
       "filename": "05.jpg",
       "width": 4525,
       "height": 3000,
+      "color": "#7e8785",
       "tags": [
         {
           "name": "大尖山",
@@ -141,6 +145,7 @@
       "filename": "06.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#8a9b8c",
       "tags": [
         {
           "name": "大尖山",
@@ -153,6 +158,7 @@
       "filename": "07.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#8b9d97",
       "tags": [
         {
           "name": "大尖山",
@@ -165,6 +171,7 @@
       "filename": "08.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#959e9a",
       "tags": [
         {
           "name": "大尖山",
@@ -187,18 +194,21 @@
       "filename": "09.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#989b8c",
       "tags": []
     },
     {
       "filename": "10.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#6f808e",
       "tags": []
     },
     {
       "filename": "11.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#96a09a",
       "tags": [
         {
           "name": "大尖山",
@@ -221,18 +231,21 @@
       "filename": "12.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#545742",
       "tags": []
     },
     {
       "filename": "13.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#7f8976",
       "tags": []
     },
     {
       "filename": "14.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#636a52",
       "tags": []
     }
   ]

@@ -62,66 +62,77 @@
       "filename": "001.jpg",
       "width": 1840,
       "height": 1232,
+      "color": "#b3bdb3",
       "tags": []
     },
     {
       "filename": "002.jpg",
       "width": 1840,
       "height": 1232,
+      "color": "#756b6c",
       "tags": []
     },
     {
       "filename": "003.jpg",
       "width": 1840,
       "height": 1232,
+      "color": "#6c6751",
       "tags": []
     },
     {
       "filename": "004.jpg",
       "width": 1840,
       "height": 1232,
+      "color": "#a58d80",
       "tags": []
     },
     {
       "filename": "005.jpg",
       "width": 1840,
       "height": 1232,
+      "color": "#bfb4c3",
       "tags": []
     },
     {
       "filename": "006.jpg",
       "width": 1840,
       "height": 1232,
+      "color": "#a85e61",
       "tags": []
     },
     {
       "filename": "007.jpg",
       "width": 1840,
       "height": 1232,
+      "color": "#5a6456",
       "tags": []
     },
     {
       "filename": "008.jpg",
       "width": 1840,
       "height": 1232,
+      "color": "#818188",
       "tags": []
     },
     {
       "filename": "009.jpg",
       "width": 1840,
       "height": 1232,
+      "color": "#7f8882",
       "tags": []
     },
     {
       "filename": "010.jpg",
       "width": 1840,
       "height": 1232,
+      "color": "#7a4f3d",
       "tags": []
     },
     {
       "filename": "011.jpg",
       "width": 1840,
       "height": 1232,
+      "color": "#675645",
       "tags": []
     }
   ]

@@ -173,6 +173,7 @@
       "filename": "KCS00671.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#55626a",
       "tags": [
         {
           "name": "大湖尖山",
@@ -190,6 +191,7 @@
       "filename": "KCS00670.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#536675",
       "tags": [
         {
           "name": "天雲山",
@@ -202,6 +204,7 @@
       "filename": "KCS00696.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4e606d",
       "tags": [
         {
           "name": "大塔山",
@@ -219,6 +222,7 @@
       "filename": "KCS00693.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#455059",
       "tags": [
         {
           "name": "大塔山",
@@ -231,6 +235,7 @@
       "filename": "KCS00695.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#485d6d",
       "tags": [
         {
           "name": "松山",
@@ -243,12 +248,14 @@
       "filename": "KCS00697.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#30546a",
       "tags": []
     },
     {
       "filename": "KCS00712.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#2d5c7d",
       "tags": [
         {
           "name": "郡大山",
@@ -266,6 +273,7 @@
       "filename": "KCS00715.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#41586e",
       "tags": [
         {
           "name": "關山北峰",
@@ -298,6 +306,7 @@
       "filename": "KCS00716.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#3d5062",
       "tags": [
         {
           "name": "關山北峰",
@@ -315,24 +324,28 @@
       "filename": "KCS00720.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#67727f",
       "tags": []
     },
     {
       "filename": "KCS00735.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#767c84",
       "tags": []
     },
     {
       "filename": "KCS00729.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#57656f",
       "tags": []
     },
     {
       "filename": "KCS00736.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4b6d89",
       "tags": [
         {
           "name": "郡大山",
@@ -350,6 +363,7 @@
       "filename": "KCS00737.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4e6678",
       "tags": [
         {
           "name": "新望嶺",
@@ -362,6 +376,7 @@
       "filename": "KCS00761.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#697781",
       "tags": [
         {
           "name": "玉山北北峰",
@@ -379,6 +394,7 @@
       "filename": "KCS00743.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#395674",
       "tags": [
         {
           "name": "玉山北北峰",
@@ -396,6 +412,7 @@
       "filename": "KCS00749.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#3a5f82",
       "tags": [
         {
           "name": "玉山南峰",
@@ -408,6 +425,7 @@
       "filename": "KCS00772.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#45586d",
       "tags": [
         {
           "name": "玉山南峰",
@@ -420,90 +438,105 @@
       "filename": "KCS00771.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#55647c",
       "tags": []
     },
     {
       "filename": "KCS00746.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#3f4539",
       "tags": []
     },
     {
       "filename": "KCS00780.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#364955",
       "tags": []
     },
     {
       "filename": "KCS00776.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#54606d",
       "tags": []
     },
     {
       "filename": "KCS00784.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#747a7f",
       "tags": []
     },
     {
       "filename": "KCS00849.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#5e6c7d",
       "tags": []
     },
     {
       "filename": "KCS00789.jpg",
       "width": 2000,
       "height": 3000,
+      "color": "#797a6d",
       "tags": []
     },
     {
       "filename": "KCS00707.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#484845",
       "tags": []
     },
     {
       "filename": "KCS00818.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#646361",
       "tags": []
     },
     {
       "filename": "KCS00831.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#5c5b56",
       "tags": []
     },
     {
       "filename": "KCS00862.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#454443",
       "tags": []
     },
     {
       "filename": "KCS00724.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#473b25",
       "tags": []
     },
     {
       "filename": "KCS00872.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#5b6447",
       "tags": []
     },
     {
       "filename": "KCS00879.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#6f7779",
       "tags": []
     },
     {
       "filename": "KCS00741.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#476986",
       "tags": [
         {
           "name": "郡大山",

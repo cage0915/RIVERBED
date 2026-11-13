@@ -9,6 +9,8 @@ interface Props {
     assetKey: string;
     width?: number;
     height?: number;
+    /** Average colour (#rrggbb) shown in the photo's box while it loads. */
+    color?: string;
     caption?: string;
     tags?: Tag[];
     priority?: boolean;
@@ -22,7 +24,7 @@ import {
 } from "../lib/constants";
 import RichText from "./RichText.astro";
 
-const { assetKey, width, height, caption, tags = [], priority = false } = Astro.props;
+const { assetKey, width, height, color, caption, tags = [], priority = false } = Astro.props;
 const encodedAssetKey = assetKey.split("/").map(encodeURIComponent).join("/");
 const imageUrl = getImageUrl(encodedAssetKey);
 const displayUrl = getThumbnailUrl(encodedAssetKey, 1100);
@@ -46,6 +48,7 @@ const fallbackUrl = `${R2_DOMAIN}/${encodedAssetKey}`;
             target="_blank"
             class="pswp-link block"
             data-photo-lightbox-link
+            style={color ? `--photo-color: ${color}` : undefined}
         >
             <img
                 src={displayUrl}
@@ -112,9 +115,16 @@ const fallbackUrl = `${R2_DOMAIN}/${encodedAssetKey}`;
     }
 
     /* Lazy photos reserve their box from width/height; the link paints that box
-       so it stays visible while the photo itself is still transparent. */
+       in the photo's average colour (or a neutral grey) while the photo itself
+       is still transparent. Once the fade-in has finished the fill is dropped,
+       so it can't show around a photo drawn smaller than its box. */
     .photo-wrapper .pswp-link {
-        background: #1c1c1c;
+        background-color: var(--photo-color, #1c1c1c);
+    }
+
+    .photo-wrapper .pswp-link:has(img[data-loaded]) {
+        background-color: transparent;
+        transition: background-color 0s 0.5s;
     }
 
     .photo-wrapper img {

@@ -53,42 +53,49 @@
       "filename": "KCS00491.jpg",
       "width": 2000,
       "height": 3000,
+      "color": "#849799",
       "tags": []
     },
     {
       "filename": "KCS00509.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#80958b",
       "tags": []
     },
     {
       "filename": "KCS04912.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#586a56",
       "tags": []
     },
     {
       "filename": "KCS04914.jpg",
       "width": 2000,
       "height": 3000,
+      "color": "#3e4c32",
       "tags": []
     },
     {
       "filename": "KCS04918.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#5f6a52",
       "tags": []
     },
     {
       "filename": "KCS04939.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#7d8f89",
       "tags": []
     },
     {
       "filename": "KCS04962.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#678894",
       "tags": []
     }
   ]

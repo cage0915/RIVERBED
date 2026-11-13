@@ -1,8 +1,8 @@
 import type { APIRoute } from 'astro';
 import fs from 'node:fs';
 import path from 'node:path';
-import sharp from 'sharp';
 
+import { readPhotoMetadata } from './_photo-metadata';
 import { createAlbumImport, validateAlbumSegment, validateImageFilename } from '../lib/album-import';
 import {
     AlbumAssetConflictError,
@@ -42,13 +42,7 @@ export const POST: APIRoute = async ({ request }) => {
             bytes: new Uint8Array(await file.arrayBuffer()),
         })));
         const photoDimensions = Object.fromEntries(await Promise.all(
-            payloads.map(async ({ name, bytes }) => {
-                const metadata = await sharp(bytes).metadata();
-                if (!metadata.width || !metadata.height) {
-                    throw new Error(`Unable to read image dimensions: ${name}`);
-                }
-                return [name, { width: metadata.width, height: metadata.height }];
-            }),
+            payloads.map(async ({ name, bytes }) => [name, await readPhotoMetadata(bytes, name)]),
         ));
         const importProposal = createPage
             ? createAlbumImport({

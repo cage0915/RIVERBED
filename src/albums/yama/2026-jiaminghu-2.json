@@ -410,30 +410,35 @@
       "filename": "KCS03825.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#315b7e",
       "tags": []
     },
     {
       "filename": "KCS03826.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#2d5b7e",
       "tags": []
     },
     {
       "filename": "KCS03832.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#27567c",
       "tags": []
     },
     {
       "filename": "KCS03830.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#50757e",
       "tags": []
     },
     {
       "filename": "KCS03843.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#274964",
       "tags": [
         {
           "name": "三叉山",
@@ -446,6 +451,7 @@
       "filename": "KCS03872.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#6e8593",
       "tags": [
         {
           "name": "北大武山",
@@ -458,6 +464,7 @@
       "filename": "KCS03880.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4d6d8a",
       "tags": [
         {
           "name": "玉山主峰",
@@ -480,6 +487,7 @@
       "filename": "KCS03897.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#474e4a",
       "tags": [
         {
           "name": "玉山主峰",
@@ -502,6 +510,7 @@
       "filename": "KCS03890.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#2a3638",
       "tags": [
         {
           "name": "玉山主峰",
@@ -534,12 +543,14 @@
       "filename": "KCS03889.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#3d392f",
       "tags": []
     },
     {
       "filename": "KCS03892.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4d595c",
       "tags": [
         {
           "name": "布拉克桑山",
@@ -552,6 +563,7 @@
       "filename": "KCS03901.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#424b4c",
       "tags": [
         {
           "name": "新康山",
@@ -574,6 +586,7 @@
       "filename": "KCS03905.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#2f4b57",
       "tags": [
         {
           "name": "三叉山",
@@ -586,30 +599,35 @@
       "filename": "KCS03909.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#706c58",
       "tags": []
     },
     {
       "filename": "KCS03916.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#716e5d",
       "tags": []
     },
     {
       "filename": "KCS03917.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#6b4b1c",
       "tags": []
     },
     {
       "filename": "KCS03914.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#a28553",
       "tags": []
     },
     {
       "filename": "KCS03920.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#3f4341",
       "tags": [
         {
           "name": "向陽山",
@@ -627,6 +645,7 @@
       "filename": "KCS03931.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#545b6b",
       "tags": [
         {
           "name": "玉山主峰",
@@ -644,18 +663,21 @@
       "filename": "KCS03932.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#020201",
       "tags": []
     },
     {
       "filename": "KCS03942.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#412f1e",
       "tags": []
     },
     {
       "filename": "KCS03981.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#644c28",
       "tags": [
         {
           "name": "新康山",
@@ -673,6 +695,7 @@
       "filename": "KCS03987.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#535a56",
       "tags": [
         {
           "name": "向陽山",
@@ -700,6 +723,7 @@
       "filename": "KCS03965.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#6e5e5a",
       "tags": [
         {
           "name": "向陽山",
@@ -712,6 +736,7 @@
       "filename": "KCS03983.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#5f4b33",
       "tags": [
         {
           "name": "向陽山",
@@ -724,6 +749,7 @@
       "filename": "KCS04011.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#969075",
       "tags": [
         {
           "name": "向陽山",
@@ -736,6 +762,7 @@
       "filename": "KCS03986.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#564839",
       "tags": [
         {
           "name": "關山",
@@ -748,6 +775,7 @@
       "filename": "KCS04012.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#96947f",
       "tags": [
         {
           "name": "關山",
@@ -760,6 +788,7 @@
       "filename": "KCS03961.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#474854",
       "tags": [
         {
           "name": "卑南主山",
@@ -777,6 +806,7 @@
       "filename": "KCS03977.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#61595a",
       "tags": [
         {
           "name": "卑南主山",
@@ -794,6 +824,7 @@
       "filename": "KCS03978.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#605955",
       "tags": [
         {
           "name": "北大武山",
@@ -816,6 +847,7 @@
       "filename": "KCS04016.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#6b766f",
       "tags": [
         {
           "name": "北大武山",
@@ -838,6 +870,7 @@
       "filename": "KCS03974.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#696761",
       "tags": [
         {
           "name": "布拉克桑山",
@@ -850,6 +883,7 @@
       "filename": "KCS03998.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4f5752",
       "tags": [
         {
           "name": "布拉克桑山",
@@ -862,6 +896,7 @@
       "filename": "KCS03992.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4e5955",
       "tags": [
         {
           "name": "玉山主峰",
@@ -889,6 +924,7 @@
       "filename": "KCS04010.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4f6c72",
       "tags": [
         {
           "name": "玉山主峰",
@@ -916,6 +952,7 @@
       "filename": "KCS04008.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#3f5d69",
       "tags": [
         {
           "name": "玉山主峰",
@@ -953,12 +990,14 @@
       "filename": "2026-0704-1157-07.118.jpg",
       "width": 2250,
       "height": 3000,
+      "color": "#748388",
       "tags": []
     },
     {
       "filename": "KCS04031.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#3b585f",
       "tags": [
         {
           "name": "關山",
@@ -986,6 +1025,7 @@
       "filename": "KCS04038.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#264449",
       "tags": [
         {
           "name": "三叉山",
@@ -998,6 +1038,7 @@
       "filename": "KCS04050.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#6c807a",
       "tags": [
         {
           "name": "新康山",
@@ -1010,12 +1051,14 @@
       "filename": "KCS04092.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#566d61",
       "tags": []
     },
     {
       "filename": "KCS04071.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#465a5f",
       "tags": [
         {
           "name": "布拉克桑山",
@@ -1028,6 +1071,7 @@
       "filename": "KCS04085.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#607064",
       "tags": [
         {
           "name": "布拉克桑山",
@@ -1040,42 +1084,49 @@
       "filename": "KCS04106.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#596454",
       "tags": []
     },
     {
       "filename": "KCS04076.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#3e4135",
       "tags": []
     },
     {
       "filename": "KCS04044.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#3e402f",
       "tags": []
     },
     {
       "filename": "KCS04159.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#383624",
       "tags": []
     },
     {
       "filename": "KCS04145.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#3e3c36",
       "tags": []
     },
     {
       "filename": "KCS04186.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#474643",
       "tags": []
     },
     {
       "filename": "KCS04116.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#3b6175",
       "tags": [
         {
           "name": "玉山主峰",
@@ -1138,6 +1189,7 @@
       "filename": "KCS04119.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#3d627c",
       "tags": [
         {
           "name": "玉山主峰",
@@ -1175,6 +1227,7 @@
       "filename": "KCS04120.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#436785",
       "tags": [
         {
           "name": "玉山主峰",
@@ -1197,6 +1250,7 @@
       "filename": "KCS04151.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#647066",
       "tags": [
         {
           "name": "向陽山",
@@ -1214,6 +1268,7 @@
       "filename": "KCS04163.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#516163",
       "tags": [
         {
           "name": "向陽山",
@@ -1226,6 +1281,7 @@
       "filename": "KCS04178.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#42616e",
       "tags": [
         {
           "name": "玉山主峰",
@@ -1283,6 +1339,7 @@
       "filename": "KCS04166.jpg",
       "width": 2000,
       "height": 3000,
+      "color": "#293f45",
       "tags": [
         {
           "name": "玉山主峰",
@@ -1320,6 +1377,7 @@
       "filename": "KCS04165.jpg",
       "width": 2000,
       "height": 3000,
+      "color": "#213944",
       "tags": [
         {
           "name": "大水窟山",
@@ -1337,6 +1395,7 @@
       "filename": "KCS04183.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#6b745e",
       "tags": [
         {
           "name": "三叉山",
@@ -1359,18 +1418,21 @@
       "filename": "KCS04192.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#535644",
       "tags": []
     },
     {
       "filename": "KCS04205.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4d6567",
       "tags": []
     },
     {
       "filename": "KCS04214.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#5d6655",
       "tags": [
         {
           "name": "向陽山",
@@ -1388,6 +1450,7 @@
       "filename": "KCS04239.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#5e7780",
       "tags": [
         {
           "name": "玉山主峰",
@@ -1440,6 +1503,7 @@
       "filename": "KCS04231.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#465f6b",
       "tags": [
         {
           "name": "玉山主峰",
@@ -1472,6 +1536,7 @@
       "filename": "KCS04237.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4f7586",
       "tags": [
         {
           "name": "達芬尖山",
@@ -1504,6 +1569,7 @@
       "filename": "KCS04255.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#2e5265",
       "tags": [
         {
           "name": "大水窟山",
@@ -1521,6 +1587,7 @@
       "filename": "KCS04256.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#254e68",
       "tags": [
         {
           "name": "大水窟山",
@@ -1538,6 +1605,7 @@
       "filename": "KCS04257.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#225274",
       "tags": [
         {
           "name": "秀姑巒山",
@@ -1550,6 +1618,7 @@
       "filename": "KCS04235.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#346382",
       "tags": [
         {
           "name": "馬利加南山",
@@ -1562,6 +1631,7 @@
       "filename": "KCS04259.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#627065",
       "tags": [
         {
           "name": "向陽山",
@@ -1579,6 +1649,7 @@
       "filename": "KCS04251.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#50696d",
       "tags": [
         {
           "name": "南雙頭山",
@@ -1616,6 +1687,7 @@
       "filename": "KCS04254.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4e5f60",
       "tags": [
         {
           "name": "雲峰",
@@ -1638,6 +1710,7 @@
       "filename": "KCS04273.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#6b7a71",
       "tags": [
         {
           "name": "玉山主峰",
@@ -1660,12 +1733,14 @@
       "filename": "KCS04288.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#3f5c6e",
       "tags": []
     },
     {
       "filename": "KCS04277.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#6e7968",
       "tags": [
         {
           "name": "新康山",
@@ -1683,6 +1758,7 @@
       "filename": "KCS04312.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#546e78",
       "tags": [
         {
           "name": "向陽山",
@@ -1700,6 +1776,7 @@
       "filename": "KCS04314.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#596a6b",
       "tags": [
         {
           "name": "向陽山",
@@ -1717,18 +1794,21 @@
       "filename": "KCS04321.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#767b66",
       "tags": []
     },
     {
       "filename": "KCS04322.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#586562",
       "tags": []
     },
     {
       "filename": "KCS04332.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#6b7866",
       "tags": [
         {
           "name": "三叉山",
@@ -1741,6 +1821,7 @@
       "filename": "KCS04340.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#596861",
       "tags": [
         {
           "name": "三叉山",
@@ -1753,30 +1834,35 @@
       "filename": "KCS04342.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#6b5128",
       "tags": []
     },
     {
       "filename": "KCS04346.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#576057",
       "tags": []
     },
     {
       "filename": "KCS04319.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#7b8b87",
       "tags": []
     },
     {
       "filename": "KCS04363.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#6c7f7e",
       "tags": []
     },
     {
       "filename": "KCS04366.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#5b6e6e",
       "tags": [
         {
           "name": "向陽山",
@@ -1789,6 +1875,7 @@
       "filename": "KCS04370.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#455a5f",
       "tags": [
         {
           "name": "三叉山",
@@ -1806,6 +1893,7 @@
       "filename": "KCS04374.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#546061",
       "tags": []
     }
   ]

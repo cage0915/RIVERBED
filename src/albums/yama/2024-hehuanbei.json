@@ -131,6 +131,7 @@
       "filename": "KCS03732.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#557076",
       "tags": [
         {
           "name": "中央尖山",
@@ -153,6 +154,7 @@
       "filename": "KCS03808.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#52758f",
       "tags": [
         {
           "name": "中央尖山",
@@ -165,6 +167,7 @@
       "filename": "KCS03789.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#49718f",
       "tags": [
         {
           "name": "南湖大山",
@@ -177,6 +180,7 @@
       "filename": "KCS03820.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#5c788f",
       "tags": [
         {
           "name": "無明山",
@@ -189,6 +193,7 @@
       "filename": "KCS03830.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#486e8a",
       "tags": [
         {
           "name": "清水大山",
@@ -201,6 +206,7 @@
       "filename": "KCS03831.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#456f8d",
       "tags": [
         {
           "name": "三角錐山",
@@ -213,6 +219,7 @@
       "filename": "KCS03791.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#477191",
       "tags": [
         {
           "name": "雪山主峰",
@@ -260,6 +267,7 @@
       "filename": "KCS03815.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#517695",
       "tags": [
         {
           "name": "雪山主峰",
@@ -272,6 +280,7 @@
       "filename": "KCS03806.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#527691",
       "tags": [
         {
           "name": "大劍山",
@@ -294,6 +303,7 @@
       "filename": "KCS03834.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#547b98",
       "tags": [
         {
           "name": "玉山主峰",
@@ -336,6 +346,7 @@
       "filename": "KCS03851.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4f6f7d",
       "tags": [
         {
           "name": "太魯閣大山",
@@ -378,6 +389,7 @@
       "filename": "KCS03857.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#537580",
       "tags": [
         {
           "name": "太魯閣大山",
@@ -400,6 +412,7 @@
       "filename": "KCS03837.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#3c6e90",
       "tags": [
         {
           "name": "奇萊主山",
@@ -412,6 +425,7 @@
       "filename": "KCS03869.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#456982",
       "tags": [
         {
           "name": "奇萊北峰",
@@ -424,6 +438,7 @@
       "filename": "KCS03866.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4d6e7a",
       "tags": [
         {
           "name": "合歡山北峰",
@@ -436,6 +451,7 @@
       "filename": "KCS03876.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#52707d",
       "tags": [
         {
           "name": "合歡山北峰",

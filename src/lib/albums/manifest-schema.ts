@@ -47,6 +47,15 @@ function requireFiniteNumber(value: unknown, field: string): number {
     return value;
 }
 
+function optionalHexColor(value: unknown, field: string): string | undefined {
+    if (value === undefined) return undefined;
+    const color = requireString(value, field);
+    if (!/^#[0-9a-f]{6}$/.test(color)) {
+        throw new Error(`${field} must be a lowercase #rrggbb colour`);
+    }
+    return color;
+}
+
 function optionalPositiveInteger(value: unknown, field: string): number | undefined {
     if (value === undefined) return undefined;
     const number = requireFiniteNumber(value, field);
@@ -249,7 +258,7 @@ export function parseAlbumManifest(input: unknown, albumSlug: string): AlbumMani
         const photo = requireRecord(value, `photo ${photoIndex}`);
         rejectUnknownFields(
             photo,
-            ["filename", "width", "height", "caption", "tags"],
+            ["filename", "width", "height", "color", "caption", "tags"],
             `photo ${photoIndex}`,
         );
         const filename = validateLocalPhotoFilename(
@@ -265,9 +274,11 @@ export function parseAlbumManifest(input: unknown, albumSlug: string): AlbumMani
         if ((width === undefined) !== (height === undefined)) {
             throw new Error(`photo ${photoIndex} width and height must be provided together`);
         }
+        const color = optionalHexColor(photo.color, `photo ${photoIndex} color`);
         return {
             filename,
             ...(width !== undefined && height !== undefined ? { width, height } : {}),
+            ...(color !== undefined ? { color } : {}),
             caption: optionalString(photo.caption, `photo ${photoIndex} caption`),
             tags: tagValues.map((tag, tagIndex) => parseTag(tag, tagIndex)),
         };

@@ -276,12 +276,14 @@
       "filename": "001.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#406e75",
       "tags": []
     },
     {
       "filename": "002.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#396b7f",
       "tags": [
         {
           "name": "雪山主峰",
@@ -294,18 +296,21 @@
       "filename": "003.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4c6f73",
       "tags": []
     },
     {
       "filename": "004.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#3c6c81",
       "tags": []
     },
     {
       "filename": "005.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#21688c",
       "tags": [
         {
           "name": "清水大山",
@@ -378,6 +383,7 @@
       "filename": "006.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#296c8c",
       "tags": [
         {
           "name": "曉星山",
@@ -455,6 +461,7 @@
       "filename": "007.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#366d87",
       "tags": [
         {
           "name": "奇萊主山",
@@ -507,6 +514,7 @@
       "filename": "008.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#25698c",
       "tags": [
         {
           "name": "鳳林山",
@@ -569,6 +577,7 @@
       "filename": "009.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#327593",
       "tags": [
         {
           "name": "玉山主峰",
@@ -641,6 +650,7 @@
       "filename": "010.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#2a6f8f",
       "tags": [
         {
           "name": "關山",
@@ -708,6 +718,7 @@
       "filename": "011.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#36677f",
       "tags": [
         {
           "name": "南大武山",
@@ -730,6 +741,7 @@
       "filename": "012.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#376b84",
       "tags": [
         {
           "name": "卑南主山",
@@ -752,12 +764,14 @@
       "filename": "013.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#616f64",
       "tags": []
     },
     {
       "filename": "014.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#517178",
       "tags": [
         {
           "name": "都蘭山",
@@ -770,6 +784,7 @@
       "filename": "015.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#5d8081",
       "tags": [
         {
           "name": "都蘭山",
@@ -782,60 +797,70 @@
       "filename": "016.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#718781",
       "tags": []
     },
     {
       "filename": "017.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#628d99",
       "tags": []
     },
     {
       "filename": "018.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#78867d",
       "tags": []
     },
     {
       "filename": "019.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#677a6e",
       "tags": []
     },
     {
       "filename": "020.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#607570",
       "tags": []
     },
     {
       "filename": "021.jpg",
       "width": 2000,
       "height": 3000,
+      "color": "#668082",
       "tags": []
     },
     {
       "filename": "022.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4c5d55",
       "tags": []
     },
     {
       "filename": "023.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#58655d",
       "tags": []
     },
     {
       "filename": "024.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#3b636e",
       "tags": []
     },
     {
       "filename": "025.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#2f6780",
       "tags": [
         {
           "name": "秀姑巒山",
@@ -858,6 +883,7 @@
       "filename": "026.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#1e4257",
       "tags": [
         {
           "name": "馬博拉斯山",
@@ -880,54 +906,63 @@
       "filename": "027.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#6e7f74",
       "tags": []
     },
     {
       "filename": "028.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4c675c",
       "tags": []
     },
     {
       "filename": "029.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#386270",
       "tags": []
     },
     {
       "filename": "030.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#596851",
       "tags": []
     },
     {
       "filename": "031.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#526a75",
       "tags": []
     },
     {
       "filename": "032.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#617c7f",
       "tags": []
     },
     {
       "filename": "033.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#577675",
       "tags": []
     },
     {
       "filename": "034.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#687b76",
       "tags": []
     },
     {
       "filename": "035.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4f6e7e",
       "tags": [
         {
           "name": "都蘭山",
@@ -940,6 +975,7 @@
       "filename": "036.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#486a77",
       "tags": [
         {
           "name": "都蘭山",
@@ -952,6 +988,7 @@
       "filename": "037.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#546d74",
       "tags": [
         {
           "name": "都蘭山",
@@ -964,6 +1001,7 @@
       "filename": "038.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#40707c",
       "tags": [
         {
           "name": "綠島",
@@ -976,18 +1014,21 @@
       "filename": "039.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4f707b",
       "tags": []
     },
     {
       "filename": "040.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#5e7875",
       "tags": []
     },
     {
       "filename": "041.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#6e9da8",
       "tags": [
         {
           "name": "綠島",
@@ -1000,6 +1041,7 @@
       "filename": "042.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#8199a0",
       "tags": []
     }
   ]

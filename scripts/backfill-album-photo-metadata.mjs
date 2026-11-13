@@ -3,6 +3,12 @@ import path from "node:path";
 
 import sharp from "sharp";
 
+import { averageColor } from "../src/dev-api/_photo-metadata.ts";
+
+// Fills in each manifest photo's intrinsic width/height and average colour,
+// reading the local source in ./r2 or, failing that, the public R2 copy.
+// Run with `npm run albums:metadata` (needs tsx for the shared helper).
+
 const projectRoot = process.cwd();
 const manifestRoot = path.join(projectRoot, "src", "albums");
 const localPhotoRoot = path.join(projectRoot, "r2");
@@ -48,6 +54,24 @@ async function readDimensions(assetKey) {
     return { width: metadata.width, height: metadata.height };
 }
 
+async function readColor(assetKey) {
+    const localPath = path.join(localPhotoRoot, ...assetKey.split("/"));
+    try {
+        await fs.access(localPath);
+        return await averageColor(localPath);
+    } catch (error) {
+        if (error?.code !== "ENOENT") throw error;
+    }
+
+    const response = await fetch(
+        `${remotePhotoRoot}/cdn-cgi/image/width=64,format=jpeg/${encodeAssetKey(assetKey)}`,
+    );
+    if (!response.ok) {
+        throw new Error(`Unable to read image for colour ${assetKey}: ${response.status}`);
+    }
+    return averageColor(new Uint8Array(await response.arrayBuffer()));
+}
+
 async function mapWithConcurrency(items, concurrency, mapper) {
     const results = new Array(items.length);
     let nextIndex = 0;
@@ -72,15 +96,21 @@ await mapWithConcurrency(manifestFiles, 8, async (manifestFile) => {
     let changed = false;
 
     manifest.photos = await mapWithConcurrency(manifest.photos, 4, async (photo) => {
-        if (Number.isInteger(photo.width) && Number.isInteger(photo.height)) {
+        const hasDimensions = Number.isInteger(photo.width) && Number.isInteger(photo.height);
+        const hasColor = typeof photo.color === "string";
+        if (hasDimensions && hasColor) {
             unchangedPhotos += 1;
             return photo;
         }
-        const dimensions = await readDimensions(`${albumSlug}/${photo.filename}`);
-        const { filename, width: _width, height: _height, ...rest } = photo;
+        const assetKey = `${albumSlug}/${photo.filename}`;
+        const dimensions = hasDimensions
+            ? { width: photo.width, height: photo.height }
+            : await readDimensions(assetKey);
+        const color = hasColor ? photo.color : await readColor(assetKey);
+        const { filename, width: _width, height: _height, color: _color, ...rest } = photo;
         changed = true;
         updatedPhotos += 1;
-        return { filename, ...dimensions, ...rest };
+        return { filename, ...dimensions, color, ...rest };
     });
 
     if (changed) {
@@ -89,5 +119,5 @@ await mapWithConcurrency(manifestFiles, 8, async (manifestFile) => {
 });
 
 console.log(
-    `Album photo dimensions ready: ${updatedPhotos} updated, ${unchangedPhotos} unchanged`,
+    `Album photo metadata ready: ${updatedPhotos} updated, ${unchangedPhotos} unchanged`,
 );

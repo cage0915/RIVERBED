@@ -115,6 +115,7 @@
       "filename": "KCS02233.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#84898a",
       "tags": [
         {
           "name": "石筍尖",
@@ -127,42 +128,49 @@
       "filename": "KCS02240-Pano.jpg",
       "width": 3000,
       "height": 1334,
+      "color": "#6c7773",
       "tags": []
     },
     {
       "filename": "KCS02242.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#697a83",
       "tags": []
     },
     {
       "filename": "KCS02252.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#7a7d7e",
       "tags": []
     },
     {
       "filename": "KCS02256.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#686b6e",
       "tags": []
     },
     {
       "filename": "KCS02265.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#445358",
       "tags": []
     },
     {
       "filename": "KCS02267.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#475352",
       "tags": []
     },
     {
       "filename": "KCS02285.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#768e9a",
       "tags": [
         {
           "name": "基隆嶼",
@@ -175,6 +183,7 @@
       "filename": "KCS02293.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#687b7c",
       "tags": [
         {
           "name": "無耳茶壺山",
@@ -192,6 +201,7 @@
       "filename": "KCS02290.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#597582",
       "tags": [
         {
           "name": "無耳茶壺山",
@@ -204,6 +214,7 @@
       "filename": "KCS02292.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#5b757e",
       "tags": [
         {
           "name": "半屏山",
@@ -216,12 +227,14 @@
       "filename": "KCS02295.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#737a75",
       "tags": []
     },
     {
       "filename": "KCS02305.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#677777",
       "tags": [
         {
           "name": "基隆山",
@@ -234,6 +247,7 @@
       "filename": "KCS02300.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#6e7c79",
       "tags": [
         {
           "name": "基隆山東峰",
@@ -246,12 +260,14 @@
       "filename": "KCS02312.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#8a8463",
       "tags": []
     },
     {
       "filename": "KCS02317.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#8b8270",
       "tags": []
     }
   ]

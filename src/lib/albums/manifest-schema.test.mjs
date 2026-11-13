@@ -70,6 +70,26 @@ test("requires positive integer photo dimensions as a pair", () => {
     }
 });
 
+test("parses an optional average photo colour", () => {
+    const input = validManifest();
+    input.photos[0].color = "#3a4250";
+
+    const manifest = parseAlbumManifest(input, "taiwan/morning-walk");
+    assert.equal(manifest.photos[0].color, "#3a4250");
+    assert.equal("color" in manifest.photos[1], false);
+});
+
+test("rejects a photo colour that is not lowercase #rrggbb", () => {
+    for (const color of ["#3A4250", "#abc", "3a4250", "rgb(0, 0, 0)", 0]) {
+        const input = validManifest();
+        input.photos[0].color = color;
+        assert.throws(
+            () => parseAlbumManifest(input, "taiwan/morning-walk"),
+            /photo 0 color/i,
+        );
+    }
+});
+
 test("parses and normalizes a valid external cover asset key", () => {
     const manifest = parseAlbumManifest(validManifest({
         cover: {

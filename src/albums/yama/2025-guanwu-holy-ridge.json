@@ -92,6 +92,7 @@
       "filename": "KCS08600.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#5e7376",
       "tags": [
         {
           "name": "榛山",
@@ -104,48 +105,56 @@
       "filename": "KCS08604.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4a6f7f",
       "tags": []
     },
     {
       "filename": "KCS08605.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#393836",
       "tags": []
     },
     {
       "filename": "KCS08612.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#586c45",
       "tags": []
     },
     {
       "filename": "KCS08634.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#425521",
       "tags": []
     },
     {
       "filename": "KCS08639.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#264d15",
       "tags": []
     },
     {
       "filename": "KCS08653.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#1b2019",
       "tags": []
     },
     {
       "filename": "KCS08661.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#1a1418",
       "tags": []
     },
     {
       "filename": "KCS08667.jpg",
       "width": 6428,
       "height": 2826,
+      "color": "#3d7dab",
       "tags": [
         {
           "name": "雪山主峰",
@@ -198,6 +207,7 @@
       "filename": "KCS08664.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#3d6a8a",
       "tags": [
         {
           "name": "雪山主峰",
@@ -215,6 +225,7 @@
       "filename": "KCS08662.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#2d5f84",
       "tags": [
         {
           "name": "大霸尖山",
@@ -232,6 +243,7 @@
       "filename": "KCS08683.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#376a8c",
       "tags": [
         {
           "name": "穆特勒布山",
@@ -249,6 +261,7 @@
       "filename": "KCS08677.jpg",
       "width": 3000,
       "height": 1675,
+      "color": "#5883a3",
       "tags": [
         {
           "name": "雪山主峰",

@@ -161,54 +161,63 @@
       "filename": "KCS03353.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#69765c",
       "tags": []
     },
     {
       "filename": "KCS03384.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#576752",
       "tags": []
     },
     {
       "filename": "KCS03361.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#536c6a",
       "tags": []
     },
     {
       "filename": "KCS03368.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#252a2e",
       "tags": []
     },
     {
       "filename": "KCS03386.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#303331",
       "tags": []
     },
     {
       "filename": "KCS03370.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#3d4e3a",
       "tags": []
     },
     {
       "filename": "KCS03380.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#434e4d",
       "tags": []
     },
     {
       "filename": "KCS03392.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#373425",
       "tags": []
     },
     {
       "filename": "KCS03397.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#487990",
       "tags": [
         {
           "name": "小基隆嶼",
@@ -221,6 +230,7 @@
       "filename": "KCS03406.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4e7587",
       "tags": [
         {
           "name": "小基隆嶼",
@@ -233,6 +243,7 @@
       "filename": "KCS03409.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4d6b78",
       "tags": [
         {
           "name": "小基隆嶼",
@@ -245,6 +256,7 @@
       "filename": "KCS03420.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#317192",
       "tags": [
         {
           "name": "基隆山",
@@ -277,48 +289,56 @@
       "filename": "KCS03431.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#67879c",
       "tags": []
     },
     {
       "filename": "2026-0530-1542-37.312.jpg",
       "width": 3000,
       "height": 2250,
+      "color": "#4f6b70",
       "tags": []
     },
     {
       "filename": "2026-0530-1523-00.123.jpg",
       "width": 2250,
       "height": 3000,
+      "color": "#475b69",
       "tags": []
     },
     {
       "filename": "2026-0530-1523-53.146.jpg",
       "width": 2250,
       "height": 3000,
+      "color": "#55595f",
       "tags": []
     },
     {
       "filename": "KCS03445.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#5f6e74",
       "tags": []
     },
     {
       "filename": "KCS03441.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#647782",
       "tags": []
     },
     {
       "filename": "KCS03447.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#6d7973",
       "tags": []
     },
     {
       "filename": "KCS03455.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#5b8094",
       "tags": [
         {
           "name": "小基隆嶼",
@@ -331,6 +351,7 @@
       "filename": "KCS03462.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#5d7b84",
       "tags": [
         {
           "name": "基隆嶼",
@@ -343,6 +364,7 @@
       "filename": "KCS03464.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#61808e",
       "tags": [
         {
           "name": "基隆嶼",
@@ -355,6 +377,7 @@
       "filename": "KCS03475.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#507386",
       "tags": [
         {
           "name": "基隆嶼",
@@ -372,6 +395,7 @@
       "filename": "KCS03479.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#607e8d",
       "tags": [
         {
           "name": "基隆嶼",
@@ -384,12 +408,14 @@
       "filename": "KCS03506.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#45768f",
       "tags": []
     },
     {
       "filename": "KCS03505.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4c758c",
       "tags": [
         {
           "name": "基隆山",
@@ -407,6 +433,7 @@
       "filename": "KCS03508.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#447087",
       "tags": [
         {
           "name": "基隆山",
@@ -424,18 +451,21 @@
       "filename": "KCS03495.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#3d6b84",
       "tags": []
     },
     {
       "filename": "KCS03513.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#54707d",
       "tags": []
     },
     {
       "filename": "KCS03481.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4b7287",
       "tags": []
     }
   ]

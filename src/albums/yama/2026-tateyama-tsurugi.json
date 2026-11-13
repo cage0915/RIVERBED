@@ -449,6 +449,7 @@
       "filename": "KCS05691.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4a6061",
       "tags": [
         {
           "name": "赤牛岳",
@@ -461,12 +462,14 @@
       "filename": "KCS05688.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#536c6d",
       "tags": []
     },
     {
       "filename": "KCS05704.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#3d616a",
       "tags": [
         {
           "name": "赤牛岳",
@@ -479,24 +482,28 @@
       "filename": "KCS05731.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#424d39",
       "tags": []
     },
     {
       "filename": "KCS05719.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#436a65",
       "tags": []
     },
     {
       "filename": "KCS05742.jpg",
       "width": 2000,
       "height": 3000,
+      "color": "#7a7343",
       "tags": []
     },
     {
       "filename": "KCS05750.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#2e4a4f",
       "tags": [
         {
           "name": "鹿島槍ヶ岳",
@@ -509,6 +516,7 @@
       "filename": "KCS05755.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#5e7374",
       "tags": [
         {
           "name": "大汝山",
@@ -536,18 +544,21 @@
       "filename": "KCS05769.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#64695e",
       "tags": []
     },
     {
       "filename": "KCS05771.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#615f49",
       "tags": []
     },
     {
       "filename": "KCS05788.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#7d8071",
       "tags": [
         {
           "name": "大汝山",
@@ -570,6 +581,7 @@
       "filename": "KCS05787.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#72725b",
       "tags": [
         {
           "name": "雄山",
@@ -592,12 +604,14 @@
       "filename": "KCS05791.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#787148",
       "tags": []
     },
     {
       "filename": "KCS05796.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#979576",
       "tags": [
         {
           "name": "大汝山",
@@ -625,18 +639,21 @@
       "filename": "2026-0925-1041-00.605.jpg",
       "width": 2667,
       "height": 2000,
+      "color": "#5c626b",
       "tags": []
     },
     {
       "filename": "2026-0925-1041-31.589.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#464744",
       "tags": []
     },
     {
       "filename": "KCS05800.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#5b6b66",
       "tags": [
         {
           "name": "雄山",
@@ -649,6 +666,7 @@
       "filename": "KCS05829.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#828467",
       "tags": [
         {
           "name": "雄山",
@@ -661,6 +679,7 @@
       "filename": "KCS05826.jpg",
       "width": 3645,
       "height": 2000,
+      "color": "#70806a",
       "tags": [
         {
           "name": "雄山",
@@ -678,60 +697,70 @@
       "filename": "KCS05848.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#89815b",
       "tags": []
     },
     {
       "filename": "KCS05866.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#86826e",
       "tags": []
     },
     {
       "filename": "KCS05937.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#5b554e",
       "tags": []
     },
     {
       "filename": "KCS05856.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#565b59",
       "tags": []
     },
     {
       "filename": "KCS05888.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#6f7573",
       "tags": []
     },
     {
       "filename": "2026-0925-1136-34.844.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#82817d",
       "tags": []
     },
     {
       "filename": "2026-0925-1200-18.907.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#6f7982",
       "tags": []
     },
     {
       "filename": "2026-0925-1236-25.285.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#7d858d",
       "tags": []
     },
     {
       "filename": "KCS05890.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#73786a",
       "tags": []
     },
     {
       "filename": "KCS05891.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#59707f",
       "tags": [
         {
           "name": "槍ヶ岳",
@@ -744,6 +773,7 @@
       "filename": "KCS05906.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#8e9699",
       "tags": [
         {
           "name": "剱岳",
@@ -756,6 +786,7 @@
       "filename": "KCS05912.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#758492",
       "tags": [
         {
           "name": "剱岳",
@@ -768,6 +799,7 @@
       "filename": "KCS05919.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#8397a9",
       "tags": [
         {
           "name": "針ノ木岳",
@@ -785,6 +817,7 @@
       "filename": "KCS05917.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#456179",
       "tags": [
         {
           "name": "針ノ木岳",
@@ -802,6 +835,7 @@
       "filename": "KCS05956.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#506570",
       "tags": [
         {
           "name": "針ノ木岳",
@@ -819,30 +853,35 @@
       "filename": "2026-0925-1305-39.077.jpg",
       "width": 2667,
       "height": 2000,
+      "color": "#6b625d",
       "tags": []
     },
     {
       "filename": "2026-0925-1310-40.498.jpg",
       "width": 2667,
       "height": 2000,
+      "color": "#826e60",
       "tags": []
     },
     {
       "filename": "2026-0925-1305-00.557.jpg",
       "width": 2667,
       "height": 2000,
+      "color": "#806c5a",
       "tags": []
     },
     {
       "filename": "2026-0925-1311-36.759.jpg",
       "width": 2667,
       "height": 2000,
+      "color": "#736558",
       "tags": []
     },
     {
       "filename": "KCS05940.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#727371",
       "tags": [
         {
           "name": "大汝山",
@@ -855,48 +894,56 @@
       "filename": "KCS05949.jpg",
       "width": 2000,
       "height": 3000,
+      "color": "#969088",
       "tags": []
     },
     {
       "filename": "KCS05972.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#b4b0a4",
       "tags": []
     },
     {
       "filename": "KCS06014.jpg",
       "width": 5261,
       "height": 2000,
+      "color": "#bab393",
       "tags": []
     },
     {
       "filename": "KCS06004.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#b8af95",
       "tags": []
     },
     {
       "filename": "KCS06023.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#c3b398",
       "tags": []
     },
     {
       "filename": "KCS06039.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#999273",
       "tags": []
     },
     {
       "filename": "KCS06055.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#a4a48e",
       "tags": []
     },
     {
       "filename": "KCS06074.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#94977d",
       "tags": [
         {
           "name": "雄山",
@@ -924,12 +971,14 @@
       "filename": "2026-0925-1552-40.679.jpg",
       "width": 2667,
       "height": 2000,
+      "color": "#696f72",
       "tags": []
     },
     {
       "filename": "KCS06083.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#708797",
       "tags": [
         {
           "name": "白馬岳",
@@ -947,6 +996,7 @@
       "filename": "KCS06093.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#677373",
       "tags": [
         {
           "name": "剱岳",
@@ -959,6 +1009,7 @@
       "filename": "KCS06089.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#576365",
       "tags": [
         {
           "name": "剱岳",
@@ -971,6 +1022,7 @@
       "filename": "KCS06076.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#55636a",
       "tags": [
         {
           "name": "剱岳",
@@ -983,36 +1035,42 @@
       "filename": "KCS06117.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#545e5d",
       "tags": []
     },
     {
       "filename": "KCS06105.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#656a59",
       "tags": []
     },
     {
       "filename": "KCS06106.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#7f8579",
       "tags": []
     },
     {
       "filename": "KCS06123.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#6f7160",
       "tags": []
     },
     {
       "filename": "KCS06134.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#666d5c",
       "tags": []
     },
     {
       "filename": "KCS06154.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#56727e",
       "tags": [
         {
           "name": "剱岳",
@@ -1025,6 +1083,7 @@
       "filename": "KCS06164.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#3e585e",
       "tags": [
         {
           "name": "剱岳",
@@ -1037,6 +1096,7 @@
       "filename": "KCS06167.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#325159",
       "tags": [
         {
           "name": "剱岳",
@@ -1049,6 +1109,7 @@
       "filename": "KCS06173.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#455c63",
       "tags": [
         {
           "name": "剱岳",
@@ -1061,6 +1122,7 @@
       "filename": "KCS06181.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#586b68",
       "tags": [
         {
           "name": "剱岳",
@@ -1073,30 +1135,35 @@
       "filename": "2026-0925-1641-17.792.jpg",
       "width": 2667,
       "height": 2000,
+      "color": "#667464",
       "tags": []
     },
     {
       "filename": "2026-0925-1647-34.512.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#5f6265",
       "tags": []
     },
     {
       "filename": "2026-0925-1652-54.009.jpg",
       "width": 2667,
       "height": 2000,
+      "color": "#5c6253",
       "tags": []
     },
     {
       "filename": "KCS06184.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#6f6d5e",
       "tags": []
     },
     {
       "filename": "KCS06187.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#758183",
       "tags": [
         {
           "name": "五竜岳",
@@ -1109,6 +1176,7 @@
       "filename": "KCS06190.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#848f8b",
       "tags": [
         {
           "name": "鹿島槍ヶ岳",
@@ -1121,72 +1189,84 @@
       "filename": "KCS06202.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#265a71",
       "tags": []
     },
     {
       "filename": "2026-0926-0750-36.571.jpg",
       "width": 2667,
       "height": 2000,
+      "color": "#817e72",
       "tags": []
     },
     {
       "filename": "2026-0926-0739-34.104.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#766b5b",
       "tags": []
     },
     {
       "filename": "2026-0926-0739-47.534.jpg",
       "width": 2667,
       "height": 2000,
+      "color": "#968174",
       "tags": []
     },
     {
       "filename": "2026-0926-0740-04.069.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#8c7d77",
       "tags": []
     },
     {
       "filename": "KCS06222.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#93864e",
       "tags": []
     },
     {
       "filename": "KCS06226.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#9b8d64",
       "tags": []
     },
     {
       "filename": "KCS06236.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#9d8b57",
       "tags": []
     },
     {
       "filename": "KCS06290.jpg",
       "width": 7114,
       "height": 2000,
+      "color": "#a89c79",
       "tags": []
     },
     {
       "filename": "KCS06315.jpg",
       "width": 7614,
       "height": 2000,
+      "color": "#94937a",
       "tags": []
     },
     {
       "filename": "KCS06296.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#8e8966",
       "tags": []
     },
     {
       "filename": "KCS06317.jpg",
       "width": 3579,
       "height": 2000,
+      "color": "#817955",
       "tags": []
     }
   ]

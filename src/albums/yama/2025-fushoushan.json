@@ -185,6 +185,7 @@
       "filename": "KCS05599.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#50728e",
       "tags": [
         {
           "name": "大劍山",
@@ -207,6 +208,7 @@
       "filename": "KCS05614.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#587a89",
       "tags": [
         {
           "name": "劍山",
@@ -219,36 +221,42 @@
       "filename": "KCS05685.jpg",
       "width": 2000,
       "height": 3000,
+      "color": "#31433c",
       "tags": []
     },
     {
       "filename": "KCS05690.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#705f4c",
       "tags": []
     },
     {
       "filename": "KCS05643.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4f5e5d",
       "tags": []
     },
     {
       "filename": "KCS05686.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#42653f",
       "tags": []
     },
     {
       "filename": "KCS05639.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#768c96",
       "tags": []
     },
     {
       "filename": "KCS05669.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#5d7b8d",
       "tags": [
         {
           "name": "桃山",
@@ -261,6 +269,7 @@
       "filename": "KCS05673.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4f758f",
       "tags": [
         {
           "name": "大劍山",
@@ -288,6 +297,7 @@
       "filename": "KCS05713.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#3b6f90",
       "tags": [
         {
           "name": "大劍山",
@@ -310,6 +320,7 @@
       "filename": "KCS05703.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#38698d",
       "tags": [
         {
           "name": "雪山主峰",
@@ -347,6 +358,7 @@
       "filename": "KCS05706.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#3b6a8e",
       "tags": [
         {
           "name": "雪山主峰",
@@ -364,6 +376,7 @@
       "filename": "KCS05714.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#336a88",
       "tags": [
         {
           "name": "佳陽山",
@@ -376,6 +389,7 @@
       "filename": "KCS05715.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#3e7295",
       "tags": [
         {
           "name": "劍山",
@@ -388,6 +402,7 @@
       "filename": "KCS05718.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#406d8f",
       "tags": [
         {
           "name": "畢祿山",
@@ -400,6 +415,7 @@
       "filename": "KCS05689.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#42698a",
       "tags": [
         {
           "name": "合歡山北峰",
@@ -412,6 +428,7 @@
       "filename": "KCS05743.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#537587",
       "tags": [
         {
           "name": "合歡山北峰",
@@ -424,6 +441,7 @@
       "filename": "KCS05767.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4c7491",
       "tags": [
         {
           "name": "大劍山",
@@ -441,6 +459,7 @@
       "filename": "KCS05768.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4e7390",
       "tags": [
         {
           "name": "佳陽山",
@@ -453,6 +472,7 @@
       "filename": "KCS05772.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#577a96",
       "tags": [
         {
           "name": "雪山主峰",
@@ -465,12 +485,14 @@
       "filename": "KCS05778.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#57778e",
       "tags": []
     },
     {
       "filename": "KCS05823.jpg",
       "width": 6000,
       "height": 2105,
+      "color": "#5f798a",
       "tags": [
         {
           "name": "佳陽山",
@@ -488,96 +510,112 @@
       "filename": "KCS05828.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#5f7e8f",
       "tags": []
     },
     {
       "filename": "KCS05838.jpg",
       "width": 2000,
       "height": 3000,
+      "color": "#42676d",
       "tags": []
     },
     {
       "filename": "KCS05840.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#5c7b8d",
       "tags": []
     },
     {
       "filename": "KCS05603.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#43493a",
       "tags": []
     },
     {
       "filename": "KCS05766.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#615c3b",
       "tags": []
     },
     {
       "filename": "KCS05731.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#644e3a",
       "tags": []
     },
     {
       "filename": "KCS05732.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#6e6b39",
       "tags": []
     },
     {
       "filename": "KCS05759.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#535533",
       "tags": []
     },
     {
       "filename": "KCS05760.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#445135",
       "tags": []
     },
     {
       "filename": "KCS05749.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#6a592e",
       "tags": []
     },
     {
       "filename": "KCS05750.jpg",
       "width": 2000,
       "height": 3000,
+      "color": "#717141",
       "tags": []
     },
     {
       "filename": "KCS05755.jpg",
       "width": 2000,
       "height": 3000,
+      "color": "#626231",
       "tags": []
     },
     {
       "filename": "KCS05762.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#587636",
       "tags": []
     },
     {
       "filename": "KCS05763.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#546c40",
       "tags": []
     },
     {
       "filename": "KCS05785.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#5f6046",
       "tags": []
     },
     {
       "filename": "KCS05800.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#292924",
       "tags": []
     }
   ]

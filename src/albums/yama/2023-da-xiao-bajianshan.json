@@ -104,24 +104,28 @@
       "filename": "01.jpg",
       "width": 3130,
       "height": 2075,
+      "color": "#4f6044",
       "tags": []
     },
     {
       "filename": "02.jpg",
       "width": 3130,
       "height": 2075,
+      "color": "#5f685b",
       "tags": []
     },
     {
       "filename": "03.jpg",
       "width": 3130,
       "height": 2075,
+      "color": "#686763",
       "tags": []
     },
     {
       "filename": "04.jpg",
       "width": 3130,
       "height": 2075,
+      "color": "#798478",
       "tags": [
         {
           "name": "奇峻山",
@@ -159,6 +163,7 @@
       "filename": "05.jpg",
       "width": 3130,
       "height": 2075,
+      "color": "#86918c",
       "tags": [
         {
           "name": "東洗水山",
@@ -186,6 +191,7 @@
       "filename": "06.jpg",
       "width": 3130,
       "height": 2075,
+      "color": "#79888c",
       "tags": [
         {
           "name": "穆特勒布山",
@@ -213,6 +219,7 @@
       "filename": "07.jpg",
       "width": 3130,
       "height": 2075,
+      "color": "#748077",
       "tags": [
         {
           "name": "大霸尖山",
@@ -230,6 +237,7 @@
       "filename": "08.jpg",
       "width": 3130,
       "height": 2075,
+      "color": "#869296",
       "tags": [
         {
           "name": "大霸尖山",
@@ -242,6 +250,7 @@
       "filename": "09.jpg",
       "width": 3130,
       "height": 2075,
+      "color": "#8ca0a8",
       "tags": [
         {
           "name": "小霸尖山",
@@ -254,6 +263,7 @@
       "filename": "11.jpg",
       "width": 3130,
       "height": 2075,
+      "color": "#8d9d9e",
       "tags": [
         {
           "name": "巴紗拉雲山",
@@ -286,6 +296,7 @@
       "filename": "10.jpg",
       "width": 3130,
       "height": 2075,
+      "color": "#809394",
       "tags": [
         {
           "name": "雪山北峰",
@@ -313,6 +324,7 @@
       "filename": "12.jpg",
       "width": 3130,
       "height": 2075,
+      "color": "#76909c",
       "tags": [
         {
           "name": "南湖大山",
@@ -330,30 +342,35 @@
       "filename": "13.jpg",
       "width": 3130,
       "height": 2075,
+      "color": "#585541",
       "tags": []
     },
     {
       "filename": "14.jpg",
       "width": 3130,
       "height": 2075,
+      "color": "#6d7a5a",
       "tags": []
     },
     {
       "filename": "15.jpg",
       "width": 3130,
       "height": 2075,
+      "color": "#8b836b",
       "tags": []
     },
     {
       "filename": "16.jpg",
       "width": 3130,
       "height": 2075,
+      "color": "#4e5233",
       "tags": []
     },
     {
       "filename": "17.jpg",
       "width": 3130,
       "height": 2075,
+      "color": "#726e55",
       "tags": []
     }
   ]

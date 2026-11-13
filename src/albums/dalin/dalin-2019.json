@@ -46,30 +46,35 @@
       "filename": "01.JPG",
       "width": 1840,
       "height": 1232,
+      "color": "#9fafa1",
       "tags": []
     },
     {
       "filename": "02.JPG",
       "width": 1840,
       "height": 1232,
+      "color": "#818564",
       "tags": []
     },
     {
       "filename": "03.JPG",
       "width": 1840,
       "height": 1232,
+      "color": "#b6b9aa",
       "tags": []
     },
     {
       "filename": "06.JPG",
       "width": 1840,
       "height": 1232,
+      "color": "#939ca2",
       "tags": []
     },
     {
       "filename": "05.JPG",
       "width": 1840,
       "height": 1232,
+      "color": "#97a19d",
       "tags": []
     }
   ]

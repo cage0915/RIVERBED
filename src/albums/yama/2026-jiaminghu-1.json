@@ -394,90 +394,105 @@
       "filename": "2026-0703-0804-10.035.jpg",
       "width": 3000,
       "height": 2250,
+      "color": "#5a5d5f",
       "tags": []
     },
     {
       "filename": "KCS03575.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#3d3b33",
       "tags": []
     },
     {
       "filename": "2026-0703-0841-54.077.jpg",
       "width": 2250,
       "height": 3000,
+      "color": "#545952",
       "tags": []
     },
     {
       "filename": "2026-0703-0848-37.919.jpg",
       "width": 2250,
       "height": 3000,
+      "color": "#474f4d",
       "tags": []
     },
     {
       "filename": "2026-0703-0853-09.166.jpg",
       "width": 2250,
       "height": 3000,
+      "color": "#52575c",
       "tags": []
     },
     {
       "filename": "KCS03590.jpg",
       "width": 2347,
       "height": 3000,
+      "color": "#3d606e",
       "tags": []
     },
     {
       "filename": "KCS03595.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4a5843",
       "tags": []
     },
     {
       "filename": "KCS03601.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#424f44",
       "tags": []
     },
     {
       "filename": "KCS03630.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#506564",
       "tags": []
     },
     {
       "filename": "KCS03703.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#435868",
       "tags": []
     },
     {
       "filename": "KCS03728.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#313f29",
       "tags": []
     },
     {
       "filename": "KCS03747.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4c544b",
       "tags": []
     },
     {
       "filename": "KCS03798.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#585a3e",
       "tags": []
     },
     {
       "filename": "KCS03754.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#445c5c",
       "tags": []
     },
     {
       "filename": "KCS03762.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#36535a",
       "tags": [
         {
           "name": "向陽山",
@@ -500,6 +515,7 @@
       "filename": "KCS03774.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4d584c",
       "tags": [
         {
           "name": "向陽山",
@@ -512,24 +528,28 @@
       "filename": "KCS03770.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#576360",
       "tags": []
     },
     {
       "filename": "KCS03777.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#8a8e89",
       "tags": []
     },
     {
       "filename": "KCS03784.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#7a7c6f",
       "tags": []
     },
     {
       "filename": "KCS03790.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#91928c",
       "tags": [
         {
           "name": "魔保來山",
@@ -542,6 +562,7 @@
       "filename": "KCS03785.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#797f7f",
       "tags": [
         {
           "name": "溪頭山",
@@ -554,12 +575,14 @@
       "filename": "KCS03809.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#9da9b2",
       "tags": []
     },
     {
       "filename": "2026-0703-1518-34.004.jpg",
       "width": 3000,
       "height": 2250,
+      "color": "#485254",
       "tags": [
         {
           "name": "三叉山",
@@ -572,6 +595,7 @@
       "filename": "KCS04394.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#53200d",
       "tags": [
         {
           "name": "馬利加南山",
@@ -584,6 +608,7 @@
       "filename": "KCS04396.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#311c17",
       "tags": [
         {
           "name": "秀姑巒山",
@@ -601,12 +626,14 @@
       "filename": "KCS04410.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#57381a",
       "tags": []
     },
     {
       "filename": "KCS04423.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4d433e",
       "tags": [
         {
           "name": "關山",
@@ -619,6 +646,7 @@
       "filename": "KCS04424.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#362a27",
       "tags": [
         {
           "name": "關山",
@@ -631,6 +659,7 @@
       "filename": "KCS04422.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#5a4f52",
       "tags": [
         {
           "name": "卑南主山",
@@ -648,6 +677,7 @@
       "filename": "KCS04425.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#493e3d",
       "tags": [
         {
           "name": "北大武山",
@@ -660,6 +690,7 @@
       "filename": "KCS04429.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#5e554b",
       "tags": [
         {
           "name": "關山",
@@ -672,6 +703,7 @@
       "filename": "KCS04432.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#435054",
       "tags": [
         {
           "name": "關山",
@@ -704,12 +736,14 @@
       "filename": "KCS04428.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#574e47",
       "tags": []
     },
     {
       "filename": "KCS04449.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#706f60",
       "tags": [
         {
           "name": "關山",
@@ -732,6 +766,7 @@
       "filename": "KCS04452.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#403f36",
       "tags": [
         {
           "name": "鷹仔嘴山",
@@ -744,42 +779,49 @@
       "filename": "KCS04443.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#282314",
       "tags": []
     },
     {
       "filename": "KCS04465.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#232f2b",
       "tags": []
     },
     {
       "filename": "KCS04470.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#3b3422",
       "tags": []
     },
     {
       "filename": "KCS04484.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#131f18",
       "tags": []
     },
     {
       "filename": "KCS04479.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#302c23",
       "tags": []
     },
     {
       "filename": "KCS04476.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#384e52",
       "tags": []
     },
     {
       "filename": "KCS04487.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4a5149",
       "tags": [
         {
           "name": "溪頭山",
@@ -797,6 +839,7 @@
       "filename": "KCS04515.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#555a53",
       "tags": [
         {
           "name": "溪頭山",
@@ -814,12 +857,14 @@
       "filename": "KCS04525.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4b4a3c",
       "tags": []
     },
     {
       "filename": "KCS04526.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#62655e",
       "tags": [
         {
           "name": "魔保來山",
@@ -832,6 +877,7 @@
       "filename": "KCS04508.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#536363",
       "tags": [
         {
           "name": "溪頭山",
@@ -844,6 +890,7 @@
       "filename": "KCS04509.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#525f61",
       "tags": [
         {
           "name": "溪頭山",
@@ -856,12 +903,14 @@
       "filename": "KCS04489.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#153848",
       "tags": []
     },
     {
       "filename": "KCS04548.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#1d2b2f",
       "tags": [
         {
           "name": "魔保來山",
@@ -874,24 +923,28 @@
       "filename": "KCS04522.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#2c454a",
       "tags": []
     },
     {
       "filename": "KCS04562.jpg",
       "width": 2000,
       "height": 3000,
+      "color": "#1e2216",
       "tags": []
     },
     {
       "filename": "KCS04559.jpg",
       "width": 2000,
       "height": 3000,
+      "color": "#1d2112",
       "tags": []
     },
     {
       "filename": "KCS04589.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#496567",
       "tags": [
         {
           "name": "魔保來山",
@@ -904,54 +957,63 @@
       "filename": "KCS04615.jpg",
       "width": 2000,
       "height": 3000,
+      "color": "#363c30",
       "tags": []
     },
     {
       "filename": "KCS04641.jpg",
       "width": 2000,
       "height": 3000,
+      "color": "#2a342a",
       "tags": []
     },
     {
       "filename": "KCS04594.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#403f30",
       "tags": []
     },
     {
       "filename": "KCS04624.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#32444c",
       "tags": []
     },
     {
       "filename": "KCS04629.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#405a67",
       "tags": []
     },
     {
       "filename": "KCS04631.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#3f5159",
       "tags": []
     },
     {
       "filename": "KCS04644.jpg",
       "width": 2000,
       "height": 3000,
+      "color": "#535147",
       "tags": []
     },
     {
       "filename": "KCS04633.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#466271",
       "tags": []
     },
     {
       "filename": "KCS04665.jpg",
       "width": 3000,
       "height": 1297,
+      "color": "#3f6a80",
       "tags": [
         {
           "name": "關山",
@@ -979,6 +1041,7 @@
       "filename": "KCS04670.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#23536e",
       "tags": [
         {
           "name": "海諾南山",
@@ -996,6 +1059,7 @@
       "filename": "KCS04657.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#2f6481",
       "tags": [
         {
           "name": "海諾南山",
@@ -1008,6 +1072,7 @@
       "filename": "KCS04679.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#3e657c",
       "tags": [
         {
           "name": "關山",
@@ -1020,12 +1085,14 @@
       "filename": "KCS04695.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#59605e",
       "tags": []
     },
     {
       "filename": "KCS04715.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#55838c",
       "tags": [
         {
           "name": "新港山",
@@ -1043,6 +1110,7 @@
       "filename": "KCS04716.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#497686",
       "tags": [
         {
           "name": "新港山",
@@ -1060,6 +1128,7 @@
       "filename": "KCS04710.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#5c797f",
       "tags": [
         {
           "name": "新港山",
@@ -1077,6 +1146,7 @@
       "filename": "KCS04717.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#407795",
       "tags": [
         {
           "name": "新港山",

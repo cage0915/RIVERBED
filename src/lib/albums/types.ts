@@ -68,6 +68,8 @@ export type AlbumManifest = {
         filename: string;
         width?: number;
         height?: number;
+        /** Average colour (#rrggbb), painted while the photo loads. */
+        color?: string;
         caption?: string;
         tags: PhotoTag[];
     }>;
@@ -80,6 +82,7 @@ export type ResolvedAlbumPhoto = {
     assetKey: string;
     width?: number;
     height?: number;
+    color?: string;
     caption?: string;
     tags: PhotoTag[];
     isContent: boolean;

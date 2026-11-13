@@ -178,24 +178,28 @@
       "filename": "KCS01347.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#6e787a",
       "tags": []
     },
     {
       "filename": "KCS01363.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#6c663d",
       "tags": []
     },
     {
       "filename": "KCS01382.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#3c553c",
       "tags": []
     },
     {
       "filename": "KCS01391.jpg",
       "width": 2000,
       "height": 3000,
+      "color": "#909faa",
       "tags": [
         {
           "name": "大屯山南峰",
@@ -208,6 +212,7 @@
       "filename": "KCS01401.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#75828b",
       "tags": [
         {
           "name": "大屯山南峰",
@@ -220,6 +225,7 @@
       "filename": "KCS01410.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#586774",
       "tags": [
         {
           "name": "七星山",
@@ -242,6 +248,7 @@
       "filename": "KCS01420.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#64757b",
       "tags": [
         {
           "name": "小油坑",
@@ -274,12 +281,14 @@
       "filename": "KCS01428.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#5d727f",
       "tags": []
     },
     {
       "filename": "KCS01478.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#748486",
       "tags": [
         {
           "name": "竹子山",
@@ -292,6 +301,7 @@
       "filename": "KCS01494.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#66767a",
       "tags": [
         {
           "name": "大屯山",
@@ -304,18 +314,21 @@
       "filename": "KCS01497.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#646b6e",
       "tags": []
     },
     {
       "filename": "KCS01505.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#647885",
       "tags": []
     },
     {
       "filename": "KCS01515.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#6a808e",
       "tags": [
         {
           "name": "竹子山",
@@ -328,12 +341,14 @@
       "filename": "KCS01528.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#5c7180",
       "tags": []
     },
     {
       "filename": "KCS01534.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#566770",
       "tags": [
         {
           "name": "觀音山",
@@ -346,6 +361,7 @@
       "filename": "KCS02344.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#64737e",
       "tags": [
         {
           "name": "竹子山",
@@ -358,12 +374,14 @@
       "filename": "KCS02348.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#645f52",
       "tags": []
     },
     {
       "filename": "KCS02357.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#71766c",
       "tags": [
         {
           "name": "七星山",
@@ -381,6 +399,7 @@
       "filename": "KCS02378.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#7f7d78",
       "tags": [
         {
           "name": "七星山",
@@ -403,6 +422,7 @@
       "filename": "KCS02374.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#83735a",
       "tags": [
         {
           "name": "觀音山",
@@ -415,24 +435,28 @@
       "filename": "KCS02375.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#63686b",
       "tags": []
     },
     {
       "filename": "KCS02377.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#7b6143",
       "tags": []
     },
     {
       "filename": "KCS02391.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#735139",
       "tags": []
     },
     {
       "filename": "KCS02395.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#593727",
       "tags": []
     }
   ]

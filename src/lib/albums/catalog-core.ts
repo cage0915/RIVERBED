@@ -156,6 +156,7 @@ export function createAlbumCatalog(records: AlbumSourceRecord[]): AlbumCatalog {
             ...(photo.width !== undefined && photo.height !== undefined
                 ? { width: photo.width, height: photo.height }
                 : {}),
+            ...(photo.color !== undefined ? { color: photo.color } : {}),
             caption: photo.caption,
             tags: photo.tags.map((tag) => ({ ...tag })),
             isContent: contentFilenameSet.has(photo.filename),

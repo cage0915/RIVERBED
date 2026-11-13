@@ -150,132 +150,154 @@
       "filename": "001.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#787e75",
       "tags": []
     },
     {
       "filename": "002.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#73633f",
       "tags": []
     },
     {
       "filename": "003.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#8f9d9e",
       "tags": []
     },
     {
       "filename": "004.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#7e857a",
       "tags": []
     },
     {
       "filename": "005.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#809093",
       "tags": []
     },
     {
       "filename": "006.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#707569",
       "tags": []
     },
     {
       "filename": "007.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#868d85",
       "tags": []
     },
     {
       "filename": "008.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#808987",
       "tags": []
     },
     {
       "filename": "009.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#70787b",
       "tags": []
     },
     {
       "filename": "010.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#819393",
       "tags": []
     },
     {
       "filename": "011.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#818c90",
       "tags": []
     },
     {
       "filename": "012.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#848a83",
       "tags": []
     },
     {
       "filename": "013.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#9d9c96",
       "tags": []
     },
     {
       "filename": "014.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#738086",
       "tags": []
     },
     {
       "filename": "015.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#899588",
       "tags": []
     },
     {
       "filename": "016.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#919e9f",
       "tags": []
     },
     {
       "filename": "017.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#7e9cb0",
       "tags": []
     },
     {
       "filename": "018.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#75a8d5",
       "tags": []
     },
     {
       "filename": "019.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#6d869b",
       "tags": []
     },
     {
       "filename": "020.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#909caa",
       "tags": []
     },
     {
       "filename": "021.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#73a5ba",
       "tags": []
     },
     {
       "filename": "022.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#719fc1",
       "tags": []
     }
   ]

@@ -64,42 +64,49 @@
       "filename": "01.JPG",
       "width": 1840,
       "height": 1232,
+      "color": "#9ea397",
       "tags": []
     },
     {
       "filename": "02.JPG",
       "width": 1840,
       "height": 1232,
+      "color": "#85919e",
       "tags": []
     },
     {
       "filename": "03.JPG",
       "width": 1840,
       "height": 1232,
+      "color": "#88959e",
       "tags": []
     },
     {
       "filename": "04.JPG",
       "width": 1840,
       "height": 1232,
+      "color": "#8c8a88",
       "tags": []
     },
     {
       "filename": "05.JPG",
       "width": 1840,
       "height": 1232,
+      "color": "#a68e94",
       "tags": []
     },
     {
       "filename": "06.JPG",
       "width": 1840,
       "height": 1232,
+      "color": "#998e8a",
       "tags": []
     },
     {
       "filename": "07.JPG",
       "width": 1840,
       "height": 1232,
+      "color": "#726a6f",
       "tags": []
     }
   ]

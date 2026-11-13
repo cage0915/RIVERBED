@@ -573,132 +573,154 @@
       "filename": "KCS05005.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#626c7a",
       "tags": []
     },
     {
       "filename": "2026-0920-0747-35.861.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#52534e",
       "tags": []
     },
     {
       "filename": "2026-0920-0749-25.377.jpg",
       "width": 2396,
       "height": 1797,
+      "color": "#768089",
       "tags": []
     },
     {
       "filename": "2026-0920-1151-55.572.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#60665c",
       "tags": []
     },
     {
       "filename": "2026-0920-1130-47.636.jpg",
       "width": 2667,
       "height": 2000,
+      "color": "#4c6768",
       "tags": []
     },
     {
       "filename": "2026-0920-1153-06.873.jpg",
       "width": 2667,
       "height": 2000,
+      "color": "#667062",
       "tags": []
     },
     {
       "filename": "KCS05121.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#a6a9a0",
       "tags": []
     },
     {
       "filename": "2026-0920-1122-31.277.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#6d6240",
       "tags": []
     },
     {
       "filename": "2026-0920-1126-58.851.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#657545",
       "tags": []
     },
     {
       "filename": "2026-0920-1328-23.783.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#636641",
       "tags": []
     },
     {
       "filename": "2026-0920-1046-28.308.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#5a603b",
       "tags": []
     },
     {
       "filename": "2026-0920-1038-27.475.jpg",
       "width": 2667,
       "height": 2000,
+      "color": "#645d32",
       "tags": []
     },
     {
       "filename": "2026-0920-1329-18.030.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#695532",
       "tags": []
     },
     {
       "filename": "2026-0920-1525-02.119.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#645333",
       "tags": []
     },
     {
       "filename": "2026-0920-1209-48.983.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#6a4e32",
       "tags": []
     },
     {
       "filename": "2026-0920-1210-08.044.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#874636",
       "tags": []
     },
     {
       "filename": "2026-0920-1244-01.359.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#7e6d5c",
       "tags": []
     },
     {
       "filename": "2026-0920-1217-50.160.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#57594e",
       "tags": []
     },
     {
       "filename": "2026-0920-1222-22.264.jpg",
       "width": 2667,
       "height": 2000,
+      "color": "#555650",
       "tags": []
     },
     {
       "filename": "2026-0920-1257-51.367.jpg",
       "width": 2667,
       "height": 2000,
+      "color": "#6a665f",
       "tags": []
     },
     {
       "filename": "KCS05143.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#677b62",
       "tags": []
     },
     {
       "filename": "KCS05166.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4e655e",
       "tags": [
         {
           "name": "雪倉岳",
@@ -711,96 +733,112 @@
       "filename": "KCS05192.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#84908a",
       "tags": []
     },
     {
       "filename": "2026-0920-1336-14.191.jpg",
       "width": 2667,
       "height": 2000,
+      "color": "#797e80",
       "tags": []
     },
     {
       "filename": "2026-0920-1542-59.762.jpg",
       "width": 2667,
       "height": 2000,
+      "color": "#767976",
       "tags": []
     },
     {
       "filename": "2026-0920-1812-01.228.jpg",
       "width": 2667,
       "height": 2000,
+      "color": "#6a4a30",
       "tags": []
     },
     {
       "filename": "2026-0920-1702-20.483.jpg",
       "width": 2667,
       "height": 2000,
+      "color": "#aa7243",
       "tags": []
     },
     {
       "filename": "2026-0920-1709-06.423.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#856a4d",
       "tags": []
     },
     {
       "filename": "2026-0920-1659-23.321.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#422412",
       "tags": []
     },
     {
       "filename": "2026-0920-1746-27.874.jpg",
       "width": 2667,
       "height": 2000,
+      "color": "#915a30",
       "tags": []
     },
     {
       "filename": "2026-0921-0722-40.179.jpg",
       "width": 2667,
       "height": 2000,
+      "color": "#706f74",
       "tags": []
     },
     {
       "filename": "2026-0921-0727-01.214.jpg",
       "width": 2667,
       "height": 2000,
+      "color": "#645e54",
       "tags": []
     },
     {
       "filename": "2026-0921-0823-56.555.jpg",
       "width": 2667,
       "height": 2000,
+      "color": "#6c6f67",
       "tags": []
     },
     {
       "filename": "2026-0921-0912-10.829.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#69615b",
       "tags": []
     },
     {
       "filename": "2026-0921-0836-25.429.jpg",
       "width": 2667,
       "height": 2000,
+      "color": "#71573e",
       "tags": []
     },
     {
       "filename": "2026-0921-0910-18.213.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#a79b94",
       "tags": []
     },
     {
       "filename": "2026-0921-0924-11.043.jpg",
       "width": 2667,
       "height": 2000,
+      "color": "#797773",
       "tags": []
     },
     {
       "filename": "KCS05304.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#8191a0",
       "tags": [
         {
           "name": "剱岳",
@@ -813,6 +851,7 @@
       "filename": "KCS05308.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#80919f",
       "tags": [
         {
           "name": "剱岳",
@@ -825,156 +864,182 @@
       "filename": "2026-0921-0827-32.970.jpg",
       "width": 2667,
       "height": 2000,
+      "color": "#726549",
       "tags": []
     },
     {
       "filename": "2026-0921-1153-01.933.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#765f3e",
       "tags": []
     },
     {
       "filename": "2026-0921-1159-30.378.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#6f5137",
       "tags": []
     },
     {
       "filename": "2026-0921-0908-08.733.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#645442",
       "tags": []
     },
     {
       "filename": "2026-0921-1143-44.507.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#535140",
       "tags": []
     },
     {
       "filename": "2026-0921-1246-44.285.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#414c32",
       "tags": []
     },
     {
       "filename": "2026-0921-1141-06.240.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#494c2f",
       "tags": []
     },
     {
       "filename": "2026-0921-1142-52.382.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#796747",
       "tags": []
     },
     {
       "filename": "2026-0921-1142-17.062.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#544b39",
       "tags": []
     },
     {
       "filename": "2026-0921-1214-04.557.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#5f6d4d",
       "tags": []
     },
     {
       "filename": "2026-0921-1227-44.824.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#47733a",
       "tags": []
     },
     {
       "filename": "2026-0921-0926-09.229.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#5d6143",
       "tags": []
     },
     {
       "filename": "2026-0921-1140-37.367.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#636054",
       "tags": []
     },
     {
       "filename": "2026-0921-1140-47.897.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#745738",
       "tags": []
     },
     {
       "filename": "2026-0921-1200-54.137.jpg",
       "width": 2667,
       "height": 2000,
+      "color": "#6f7754",
       "tags": []
     },
     {
       "filename": "2026-0921-1232-25.136.jpg",
       "width": 2667,
       "height": 2000,
+      "color": "#605f44",
       "tags": []
     },
     {
       "filename": "2026-0921-1248-15.535.jpg",
       "width": 2667,
       "height": 2000,
+      "color": "#6c7867",
       "tags": []
     },
     {
       "filename": "2026-0921-1250-09.451.jpg",
       "width": 2667,
       "height": 2000,
+      "color": "#787767",
       "tags": []
     },
     {
       "filename": "2026-0921-1257-57.647.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#5b583f",
       "tags": []
     },
     {
       "filename": "2026-0921-1315-14.368.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#677055",
       "tags": []
     },
     {
       "filename": "KCS05320.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#969992",
       "tags": []
     },
     {
       "filename": "KCS05353.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#868876",
       "tags": []
     },
     {
       "filename": "KCS05338.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#858f88",
       "tags": []
     },
     {
       "filename": "KCS05352.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#8295a5",
       "tags": []
     },
     {
       "filename": "KCS05365.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#908879",
       "tags": []
     },
     {
       "filename": "KCS05402.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#a4a9a5",
       "tags": [
         {
           "name": "白馬鑓ヶ岳",
@@ -987,6 +1052,7 @@
       "filename": "KCS05414.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#9aabb8",
       "tags": [
         {
           "name": "剱岳",
@@ -999,12 +1065,14 @@
       "filename": "KCS05425.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#9c9a87",
       "tags": []
     },
     {
       "filename": "KCS05429.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#a2a69c",
       "tags": [
         {
           "name": "白馬旭岳",
@@ -1017,6 +1085,7 @@
       "filename": "KCS05441.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#7c7a78",
       "tags": [
         {
           "name": "槍ヶ岳",
@@ -1029,6 +1098,7 @@
       "filename": "KCS05482.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#5c7e96",
       "tags": [
         {
           "name": "剱岳",
@@ -1051,6 +1121,7 @@
       "filename": "KCS05495.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#73868e",
       "tags": [
         {
           "name": "剱岳",
@@ -1073,6 +1144,7 @@
       "filename": "KCS05494.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#5f728d",
       "tags": [
         {
           "name": "剱岳",
@@ -1085,6 +1157,7 @@
       "filename": "KCS05507.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#808787",
       "tags": [
         {
           "name": "剱岳",
@@ -1097,6 +1170,7 @@
       "filename": "KCS05506.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#666666",
       "tags": [
         {
           "name": "剱岳",
@@ -1109,6 +1183,7 @@
       "filename": "KCS05523.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#949b9b",
       "tags": [
         {
           "name": "剱岳",
@@ -1121,6 +1196,7 @@
       "filename": "KCS05524.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#8c8c88",
       "tags": [
         {
           "name": "剱岳",
@@ -1133,18 +1209,21 @@
       "filename": "KCS05504.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#594731",
       "tags": []
     },
     {
       "filename": "KCS05529.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#585a50",
       "tags": []
     },
     {
       "filename": "KCS05535.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#6e766b",
       "tags": [
         {
           "name": "富士山",
@@ -1197,12 +1276,14 @@
       "filename": "KCS05538.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#696d5c",
       "tags": []
     },
     {
       "filename": "KCS05540.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#90876e",
       "tags": [
         {
           "name": "白馬鑓ヶ岳",
@@ -1215,12 +1296,14 @@
       "filename": "KCS05539.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#705e3a",
       "tags": []
     },
     {
       "filename": "KCS05543.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#635946",
       "tags": [
         {
           "name": "高妻山",
@@ -1243,6 +1326,7 @@
       "filename": "KCS05547.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#797662",
       "tags": [
         {
           "name": "高妻山",
@@ -1270,6 +1354,7 @@
       "filename": "KCS05552.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#59757a",
       "tags": [
         {
           "name": "剱岳",
@@ -1292,6 +1377,7 @@
       "filename": "KCS05563.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#86a2aa",
       "tags": [
         {
           "name": "剱岳",
@@ -1304,6 +1390,7 @@
       "filename": "KCS05553.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#8a9997",
       "tags": [
         {
           "name": "剱岳",
@@ -1316,6 +1403,7 @@
       "filename": "KCS05556.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#7b969c",
       "tags": [
         {
           "name": "立山真砂岳",
@@ -1338,144 +1426,168 @@
       "filename": "KCS05566.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#837857",
       "tags": []
     },
     {
       "filename": "KCS05578.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#707d69",
       "tags": []
     },
     {
       "filename": "KCS05572.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#64583c",
       "tags": []
     },
     {
       "filename": "KCS05583.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#59432f",
       "tags": []
     },
     {
       "filename": "KCS05589.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#6c6b60",
       "tags": []
     },
     {
       "filename": "KCS05577.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#76705c",
       "tags": []
     },
     {
       "filename": "KCS05587.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4f5344",
       "tags": []
     },
     {
       "filename": "2026-0922-0724-10.231.jpg",
       "width": 2667,
       "height": 2000,
+      "color": "#515f5e",
       "tags": []
     },
     {
       "filename": "2026-0922-0725-40.878.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#525140",
       "tags": []
     },
     {
       "filename": "2026-0922-0729-31.706.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#2d3624",
       "tags": []
     },
     {
       "filename": "2026-0922-0730-48.797.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#3a4931",
       "tags": []
     },
     {
       "filename": "2026-0922-0750-19.717.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#4a5245",
       "tags": []
     },
     {
       "filename": "2026-0922-0751-07.062.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#4c5442",
       "tags": []
     },
     {
       "filename": "2026-0922-0806-25.276.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#405f46",
       "tags": []
     },
     {
       "filename": "2026-0922-0807-58.820.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#416350",
       "tags": []
     },
     {
       "filename": "2026-0922-0735-18.766.jpg",
       "width": 2667,
       "height": 2000,
+      "color": "#696d65",
       "tags": []
     },
     {
       "filename": "2026-0922-0742-40.210.jpg",
       "width": 2667,
       "height": 2000,
+      "color": "#80817f",
       "tags": []
     },
     {
       "filename": "2026-0922-0749-01.662.jpg",
       "width": 2667,
       "height": 2000,
+      "color": "#5b5e62",
       "tags": []
     },
     {
       "filename": "2026-0922-0749-51.660.jpg",
       "width": 2667,
       "height": 2000,
+      "color": "#727a72",
       "tags": []
     },
     {
       "filename": "2026-0922-0752-45.066.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#777d7a",
       "tags": []
     },
     {
       "filename": "2026-0922-0754-22.673.jpg",
       "width": 2667,
       "height": 2000,
+      "color": "#696a68",
       "tags": []
     },
     {
       "filename": "2026-0922-0832-09.932.jpg",
       "width": 2667,
       "height": 2000,
+      "color": "#8e8c78",
       "tags": []
     },
     {
       "filename": "KCS05595.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#5e6c67",
       "tags": []
     },
     {
       "filename": "KCS05603.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#5e6d57",
       "tags": []
     }
   ]

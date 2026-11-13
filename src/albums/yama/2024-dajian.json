@@ -277,60 +277,70 @@
       "filename": "KCS01151.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#687479",
       "tags": []
     },
     {
       "filename": "KCS01185.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#444d3e",
       "tags": []
     },
     {
       "filename": "KCS01612.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4b523d",
       "tags": []
     },
     {
       "filename": "KCS01182.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#433d23",
       "tags": []
     },
     {
       "filename": "KCS01229.jpg",
       "width": 2000,
       "height": 3000,
+      "color": "#7e8063",
       "tags": []
     },
     {
       "filename": "KCS01232.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#606f78",
       "tags": []
     },
     {
       "filename": "KCS01257.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#7d7f74",
       "tags": []
     },
     {
       "filename": "KCS01261.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#686c4c",
       "tags": []
     },
     {
       "filename": "KCS01287.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#5a6d7e",
       "tags": []
     },
     {
       "filename": "KCS01314.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#688397",
       "tags": [
         {
           "name": "畢祿山",
@@ -343,6 +353,7 @@
       "filename": "KCS01353.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#70899d",
       "tags": [
         {
           "name": "合歡山北峰",
@@ -355,6 +366,7 @@
       "filename": "KCS01400.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#626f7c",
       "tags": [
         {
           "name": "南湖大山",
@@ -372,6 +384,7 @@
       "filename": "KCS01368.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#96a0a9",
       "tags": [
         {
           "name": "中央尖山",
@@ -384,6 +397,7 @@
       "filename": "KCS01370.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#83929f",
       "tags": [
         {
           "name": "南湖大山",
@@ -396,6 +410,7 @@
       "filename": "KCS01431.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#46667f",
       "tags": [
         {
           "name": "雪山主峰",
@@ -418,6 +433,7 @@
       "filename": "KCS01399.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#586775",
       "tags": [
         {
           "name": "雪山主峰",
@@ -435,12 +451,14 @@
       "filename": "KCS01399-2.jpg",
       "width": 2000,
       "height": 3000,
+      "color": "#54616e",
       "tags": []
     },
     {
       "filename": "KCS01320.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4a5763",
       "tags": [
         {
           "name": "翠池三叉山",
@@ -453,6 +471,7 @@
       "filename": "KCS01481.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#69746f",
       "tags": [
         {
           "name": "油婆蘭山",
@@ -465,12 +484,14 @@
       "filename": "KCS01473.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#68715a",
       "tags": []
     },
     {
       "filename": "KCS01490.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#556b77",
       "tags": [
         {
           "name": "南湖大山",
@@ -483,6 +504,7 @@
       "filename": "KCS01492.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#5b646a",
       "tags": [
         {
           "name": "中央尖山",
@@ -495,6 +517,7 @@
       "filename": "KCS01495.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#636a7b",
       "tags": [
         {
           "name": "雪山主峰",
@@ -512,6 +535,7 @@
       "filename": "KCS01504.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#162d3c",
       "tags": [
         {
           "name": "佳陽山",
@@ -524,6 +548,7 @@
       "filename": "KCS01537.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#526979",
       "tags": [
         {
           "name": "佳陽山",
@@ -536,6 +561,7 @@
       "filename": "KCS01541.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#5e6b66",
       "tags": [
         {
           "name": "佳陽山",
@@ -548,12 +574,14 @@
       "filename": "KCS01512.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#635c43",
       "tags": []
     },
     {
       "filename": "KCS01530.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#80755e",
       "tags": [
         {
           "name": "大劍山",
@@ -571,6 +599,7 @@
       "filename": "KCS01535.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#6b7c7a",
       "tags": [
         {
           "name": "玉山主峰",
@@ -633,6 +662,7 @@
       "filename": "KCS01540.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#738080",
       "tags": [
         {
           "name": "太魯閣大山",
@@ -645,6 +675,7 @@
       "filename": "KCS01544.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#77888c",
       "tags": [
         {
           "name": "奇萊北峰",
@@ -657,48 +688,56 @@
       "filename": "KCS01548.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#756144",
       "tags": []
     },
     {
       "filename": "KCS01559.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#3e4441",
       "tags": []
     },
     {
       "filename": "KCS01564.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#566565",
       "tags": []
     },
     {
       "filename": "KCS01549.jpg",
       "width": 2000,
       "height": 3000,
+      "color": "#636b69",
       "tags": []
     },
     {
       "filename": "KCS01572.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#637369",
       "tags": []
     },
     {
       "filename": "KCS01546.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#606156",
       "tags": []
     },
     {
       "filename": "KCS01581.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#6e6f5f",
       "tags": []
     },
     {
       "filename": "KCS01599.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#74827b",
       "tags": [
         {
           "name": "大劍山",
@@ -711,6 +750,7 @@
       "filename": "KCS01587.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#60747e",
       "tags": [
         {
           "name": "大劍山",
@@ -723,6 +763,7 @@
       "filename": "KCS01596.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#889287",
       "tags": [
         {
           "name": "佳陽山",

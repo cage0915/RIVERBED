@@ -346,18 +346,21 @@
       "filename": "2026-1031-0656-03.338.jpg",
       "width": 2667,
       "height": 2000,
+      "color": "#4a4c4b",
       "tags": []
     },
     {
       "filename": "2026-1031-0801-15.517.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#40545d",
       "tags": []
     },
     {
       "filename": "KCS06359.jpg",
       "width": 4959,
       "height": 2000,
+      "color": "#567588",
       "tags": [
         {
           "name": "北大武山",
@@ -375,6 +378,7 @@
       "filename": "KCS06361.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4a5a67",
       "tags": [
         {
           "name": "南大武山",
@@ -387,12 +391,14 @@
       "filename": "KCS06364.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#417290",
       "tags": []
     },
     {
       "filename": "KCS06374.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#314750",
       "tags": [
         {
           "name": "井步山",
@@ -410,6 +416,7 @@
       "filename": "KCS06375.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#3e5a6b",
       "tags": [
         {
           "name": "卑南主山",
@@ -422,126 +429,147 @@
       "filename": "KCS06382.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#506a71",
       "tags": []
     },
     {
       "filename": "KCS06376.jpg",
       "width": 2000,
       "height": 3000,
+      "color": "#345260",
       "tags": []
     },
     {
       "filename": "KCS06380.jpg",
       "width": 2000,
       "height": 3000,
+      "color": "#455e6c",
       "tags": []
     },
     {
       "filename": "2026-1031-0922-32.909.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#6f5f50",
       "tags": []
     },
     {
       "filename": "KCS06366.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#606232",
       "tags": []
     },
     {
       "filename": "KCS06368.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#31301f",
       "tags": []
     },
     {
       "filename": "2026-1031-1032-53.981.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#3d413f",
       "tags": []
     },
     {
       "filename": "2026-1031-1125-55.371.jpg",
       "width": 2667,
       "height": 2000,
+      "color": "#403e3a",
       "tags": []
     },
     {
       "filename": "2026-1031-1129-43.953.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#3f3c37",
       "tags": []
     },
     {
       "filename": "2026-1031-1207-49.919.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#474a38",
       "tags": []
     },
     {
       "filename": "2026-1031-1217-30.617.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#33382d",
       "tags": []
     },
     {
       "filename": "KCS06392.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#30444c",
       "tags": []
     },
     {
       "filename": "KCS06389.jpg",
       "width": 2000,
       "height": 3000,
+      "color": "#576359",
       "tags": []
     },
     {
       "filename": "2026-1101-0614-23.569.jpg",
       "width": 2000,
       "height": 1500,
+      "color": "#3a372f",
       "tags": []
     },
     {
       "filename": "KCS06423.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#363c37",
       "tags": []
     },
     {
       "filename": "2026-1101-0621-46.080.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#544938",
       "tags": []
     },
     {
       "filename": "2026-1102-1454-53.000.jpg",
       "width": 1216,
       "height": 1276,
+      "color": "#e1e3d9",
       "tags": []
     },
     {
       "filename": "2026-1101-0632-33.229.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#32383e",
       "tags": []
     },
     {
       "filename": "2026-1101-0651-09.720.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#56606c",
       "tags": []
     },
     {
       "filename": "2026-1101-0801-37.746.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#474440",
       "tags": []
     },
     {
       "filename": "KCS06393.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#6c6960",
       "tags": [
         {
           "name": "新康山",
@@ -554,12 +582,14 @@
       "filename": "KCS06401.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#9a9990",
       "tags": []
     },
     {
       "filename": "KCS06405.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#688ea6",
       "tags": [
         {
           "name": "新康山",
@@ -612,6 +642,7 @@
       "filename": "KCS06403.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#90a1a1",
       "tags": [
         {
           "name": "卑南主山",
@@ -649,6 +680,7 @@
       "filename": "KCS06406.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#859a9a",
       "tags": [
         {
           "name": "新康山",
@@ -661,6 +693,7 @@
       "filename": "KCS06412.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#54798a",
       "tags": [
         {
           "name": "霧頭山",
@@ -673,6 +706,7 @@
       "filename": "KCS06426.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#55808d",
       "tags": [
         {
           "name": "新康山",
@@ -720,6 +754,7 @@
       "filename": "KCS06449.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#426982",
       "tags": [
         {
           "name": "霧頭山",
@@ -762,6 +797,7 @@
       "filename": "KCS06447.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#3e5c74",
       "tags": [
         {
           "name": "霧頭山",
@@ -774,6 +810,7 @@
       "filename": "KCS06448.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#2b4359",
       "tags": [
         {
           "name": "霧頭山",
@@ -786,108 +823,126 @@
       "filename": "KCS06427.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#6f8080",
       "tags": []
     },
     {
       "filename": "KCS06435.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#3d768e",
       "tags": []
     },
     {
       "filename": "KCS06487.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#6c91af",
       "tags": []
     },
     {
       "filename": "2026-1101-0830-46.079.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#3a444d",
       "tags": []
     },
     {
       "filename": "2026-1101-0835-34.034.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#494847",
       "tags": []
     },
     {
       "filename": "2026-1101-0735-09.954.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#585c61",
       "tags": []
     },
     {
       "filename": "2026-1101-0709-38.364.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#3b3c36",
       "tags": []
     },
     {
       "filename": "KCS06470.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#202119",
       "tags": []
     },
     {
       "filename": "2026-1101-0718-16.717.jpg",
       "width": 2000,
       "height": 2666,
+      "color": "#48535b",
       "tags": []
     },
     {
       "filename": "2026-1101-0740-59.170.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#646b76",
       "tags": []
     },
     {
       "filename": "2026-1101-0741-27.327.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#4d5856",
       "tags": []
     },
     {
       "filename": "2026-1101-0725-39.142.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#3b4852",
       "tags": []
     },
     {
       "filename": "2026-1101-0905-13.400.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#3e5162",
       "tags": []
     },
     {
       "filename": "2026-1101-0842-52.358.jpg",
       "width": 2667,
       "height": 2000,
+      "color": "#334863",
       "tags": []
     },
     {
       "filename": "2026-1101-0844-19.278.jpg",
       "width": 2000,
       "height": 2667,
+      "color": "#3c5c82",
       "tags": []
     },
     {
       "filename": "KCS06465.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#3e4950",
       "tags": []
     },
     {
       "filename": "KCS06473.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#14262b",
       "tags": []
     },
     {
       "filename": "KCS06482.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#536c80",
       "tags": [
         {
           "name": "西大武山",
@@ -905,12 +960,14 @@
       "filename": "KCS06477.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#49657f",
       "tags": []
     },
     {
       "filename": "KCS06485.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#435964",
       "tags": [
         {
           "name": "西大武山",
@@ -923,18 +980,21 @@
       "filename": "KCS06488.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4e5251",
       "tags": []
     },
     {
       "filename": "KCS06494.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4c4e44",
       "tags": []
     },
     {
       "filename": "KCS06496.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#759fbc",
       "tags": [
         {
           "name": "南大武山",
@@ -947,6 +1007,7 @@
       "filename": "KCS06507.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#527792",
       "tags": [
         {
           "name": "南大武山",
@@ -959,6 +1020,7 @@
       "filename": "KCS06509.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#6f94af",
       "tags": [
         {
           "name": "南大武山",
@@ -971,12 +1033,14 @@
       "filename": "KCS06500.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#505e63",
       "tags": []
     },
     {
       "filename": "KCS06513.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#335778",
       "tags": [
         {
           "name": "南大武山",
@@ -989,12 +1053,14 @@
       "filename": "KCS06502.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#456979",
       "tags": []
     },
     {
       "filename": "KCS06521.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#3d708c",
       "tags": [
         {
           "name": "南大武山",
@@ -1012,6 +1078,7 @@
       "filename": "KCS06523.jpg",
       "width": 2000,
       "height": 2720,
+      "color": "#4a6875",
       "tags": []
     }
   ]

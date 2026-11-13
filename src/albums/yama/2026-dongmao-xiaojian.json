@@ -65,6 +65,7 @@
       "filename": "KCS00600.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4b708b",
       "tags": [
         {
           "name": "鳶嘴山",
@@ -77,6 +78,7 @@
       "filename": "KCS00631.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#547288",
       "tags": [
         {
           "name": "治茆山",
@@ -139,6 +141,7 @@
       "filename": "KCS00601.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#507085",
       "tags": [
         {
           "name": "東郡大山",
@@ -181,6 +184,7 @@
       "filename": "KCS00633.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#476d87",
       "tags": [
         {
           "name": "卓社大山",
@@ -198,6 +202,7 @@
       "filename": "KCS00618.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#2d5169",
       "tags": [
         {
           "name": "劍山",
@@ -225,6 +230,7 @@
       "filename": "KCS00627.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#2e5c7f",
       "tags": [
         {
           "name": "白姑大山",
@@ -257,6 +263,7 @@
       "filename": "KCS00629.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#3b6585",
       "tags": [
         {
           "name": "白姑大山西峰",
@@ -274,6 +281,7 @@
       "filename": "KCS00635.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#38617d",
       "tags": [
         {
           "name": "大雪山",
@@ -286,6 +294,7 @@
       "filename": "KCS00638.jpg",
       "width": 2000,
       "height": 3000,
+      "color": "#405d69",
       "tags": [
         {
           "name": "劍山",

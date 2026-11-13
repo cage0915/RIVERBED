@@ -125,6 +125,7 @@
       "filename": "001.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#849fae",
       "tags": [
         {
           "name": "七星山",
@@ -137,6 +138,7 @@
       "filename": "002.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#6a8591",
       "tags": [
         {
           "name": "七星山",
@@ -149,6 +151,7 @@
       "filename": "003.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#849495",
       "tags": [
         {
           "name": "七星山",
@@ -161,12 +164,14 @@
       "filename": "004.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#889796",
       "tags": []
     },
     {
       "filename": "005.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#7f9fb1",
       "tags": [
         {
           "name": "竹子山",
@@ -179,24 +184,28 @@
       "filename": "006.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#72807b",
       "tags": []
     },
     {
       "filename": "007.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#606b66",
       "tags": []
     },
     {
       "filename": "008.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#727f7e",
       "tags": []
     },
     {
       "filename": "009.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#818787",
       "tags": [
         {
           "name": "大油坑",
@@ -209,12 +218,14 @@
       "filename": "010.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#5d6649",
       "tags": []
     },
     {
       "filename": "011.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#84a7a7",
       "tags": [
         {
           "name": "七星山",
@@ -227,42 +238,49 @@
       "filename": "012.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#999b91",
       "tags": []
     },
     {
       "filename": "013.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#8d9182",
       "tags": []
     },
     {
       "filename": "014.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#737365",
       "tags": []
     },
     {
       "filename": "015.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#74936f",
       "tags": []
     },
     {
       "filename": "016.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4b6a4b",
       "tags": []
     },
     {
       "filename": "017.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#566257",
       "tags": []
     },
     {
       "filename": "018.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#404c43",
       "tags": []
     }
   ]

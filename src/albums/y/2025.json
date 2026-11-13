@@ -259,84 +259,98 @@
       "filename": "001.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#34312d",
       "tags": []
     },
     {
       "filename": "002.jpg",
       "width": 4525,
       "height": 3000,
+      "color": "#5d6f70",
       "tags": []
     },
     {
       "filename": "003.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#5e7980",
       "tags": []
     },
     {
       "filename": "004.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#536971",
       "tags": []
     },
     {
       "filename": "005.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#7ca5a9",
       "tags": []
     },
     {
       "filename": "006.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#727e78",
       "tags": []
     },
     {
       "filename": "007.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#453b3f",
       "tags": []
     },
     {
       "filename": "008.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#7b655a",
       "tags": []
     },
     {
       "filename": "009.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#756c63",
       "tags": []
     },
     {
       "filename": "010.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#5b433e",
       "tags": []
     },
     {
       "filename": "011.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#6d675e",
       "tags": []
     },
     {
       "filename": "012.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#becbc9",
       "tags": []
     },
     {
       "filename": "013.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#82959e",
       "tags": []
     },
     {
       "filename": "014.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#849bad",
       "tags": [
         {
           "name": "基隆嶼",
@@ -349,6 +363,7 @@
       "filename": "015.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#8a999f",
       "tags": [
         {
           "name": "基隆嶼",
@@ -361,12 +376,14 @@
       "filename": "016.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#596f7a",
       "tags": []
     },
     {
       "filename": "017.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#7f8d93",
       "tags": [
         {
           "name": "七腳川山",
@@ -379,6 +396,7 @@
       "filename": "018.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#718c9d",
       "tags": [
         {
           "name": "七腳川山",
@@ -391,6 +409,7 @@
       "filename": "019.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#87989d",
       "tags": [
         {
           "name": "奇萊主山",
@@ -403,6 +422,7 @@
       "filename": "020.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#696b6a",
       "tags": [
         {
           "name": "奇萊主山",
@@ -415,6 +435,7 @@
       "filename": "021.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#616f77",
       "tags": [
         {
           "name": "奇萊主山",
@@ -427,48 +448,56 @@
       "filename": "022.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#586e6f",
       "tags": []
     },
     {
       "filename": "023.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#767872",
       "tags": []
     },
     {
       "filename": "024.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#9e9f9f",
       "tags": []
     },
     {
       "filename": "025.jpg",
       "width": 4525,
       "height": 3000,
+      "color": "#686d6a",
       "tags": []
     },
     {
       "filename": "026.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#83817e",
       "tags": []
     },
     {
       "filename": "027.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#6e7f72",
       "tags": []
     },
     {
       "filename": "028.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#757857",
       "tags": []
     },
     {
       "filename": "029.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#697a6d",
       "tags": [
         {
           "name": "鳳林山主峰",
@@ -486,6 +515,7 @@
       "filename": "030.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#69837f",
       "tags": [
         {
           "name": "鳳林山主峰",
@@ -503,60 +533,70 @@
       "filename": "031.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#647067",
       "tags": []
     },
     {
       "filename": "032.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#526469",
       "tags": []
     },
     {
       "filename": "033.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#969d98",
       "tags": []
     },
     {
       "filename": "034.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#3a5c63",
       "tags": []
     },
     {
       "filename": "035.jpg",
       "width": 2250,
       "height": 3000,
+      "color": "#687a67",
       "tags": []
     },
     {
       "filename": "036.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4a6976",
       "tags": []
     },
     {
       "filename": "037.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#73888f",
       "tags": []
     },
     {
       "filename": "038.jpg",
       "width": 2000,
       "height": 3000,
+      "color": "#646f6a",
       "tags": []
     },
     {
       "filename": "039.jpg",
       "width": 2250,
       "height": 3000,
+      "color": "#727a81",
       "tags": []
     },
     {
       "filename": "040.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#586f7d",
       "tags": [
         {
           "name": "北插天山",
@@ -589,6 +629,7 @@
       "filename": "041.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#516b77",
       "tags": [
         {
           "name": "觀音山",
@@ -606,6 +647,7 @@
       "filename": "042.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#5c727a",
       "tags": [
         {
           "name": "大屯山",

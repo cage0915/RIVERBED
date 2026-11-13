@@ -66,66 +66,77 @@
       "filename": "01.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#6b6b6b",
       "tags": []
     },
     {
       "filename": "02.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#777777",
       "tags": []
     },
     {
       "filename": "03.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#737373",
       "tags": []
     },
     {
       "filename": "04.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#5b5b5b",
       "tags": []
     },
     {
       "filename": "05.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#4d4d4d",
       "tags": []
     },
     {
       "filename": "07.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#78815d",
       "tags": []
     },
     {
       "filename": "08.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#959a94",
       "tags": []
     },
     {
       "filename": "09.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#656e60",
       "tags": []
     },
     {
       "filename": "10.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#6c865a",
       "tags": []
     },
     {
       "filename": "11.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#929584",
       "tags": []
     },
     {
       "filename": "12.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#a8a7a4",
       "tags": []
     }
   ]

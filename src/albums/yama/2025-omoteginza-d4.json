@@ -133,6 +133,7 @@
       "filename": "KCS08043.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#666d72",
       "tags": [
         {
           "name": "富士山",
@@ -150,6 +151,7 @@
       "filename": "KCS08044.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#6b7176",
       "tags": [
         {
           "name": "富士山",
@@ -182,6 +184,7 @@
       "filename": "KCS08046.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#706d62",
       "tags": [
         {
           "name": "赤岳",
@@ -229,6 +232,7 @@
       "filename": "KCS08049.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#6c7a79",
       "tags": [
         {
           "name": "槍ヶ岳",
@@ -241,30 +245,35 @@
       "filename": "KCS08051.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#6c7d7d",
       "tags": []
     },
     {
       "filename": "KCS08053.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#8a9285",
       "tags": []
     },
     {
       "filename": "KCS08054.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#a5987f",
       "tags": []
     },
     {
       "filename": "KCS08056.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#72777b",
       "tags": []
     },
     {
       "filename": "KCS08062.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#5e6e66",
       "tags": [
         {
           "name": "槍ヶ岳",
@@ -277,96 +286,112 @@
       "filename": "KCS08070.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#718365",
       "tags": []
     },
     {
       "filename": "KCS08080.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#738055",
       "tags": []
     },
     {
       "filename": "KCS08085.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#717f69",
       "tags": []
     },
     {
       "filename": "KCS08084.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#63736f",
       "tags": []
     },
     {
       "filename": "KCS08092.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#6a7362",
       "tags": []
     },
     {
       "filename": "KCS08104.jpg",
       "width": 2000,
       "height": 3000,
+      "color": "#83877b",
       "tags": []
     },
     {
       "filename": "KCS08105.jpg",
       "width": 2000,
       "height": 3000,
+      "color": "#8b9688",
       "tags": []
     },
     {
       "filename": "KCS08148.jpg",
       "width": 2000,
       "height": 3000,
+      "color": "#85724f",
       "tags": []
     },
     {
       "filename": "KCS08117.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#757d67",
       "tags": []
     },
     {
       "filename": "KCS08132.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#697463",
       "tags": []
     },
     {
       "filename": "KCS08136.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#6a7264",
       "tags": []
     },
     {
       "filename": "KCS08149.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#5e6656",
       "tags": []
     },
     {
       "filename": "KCS08153.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#4f624e",
       "tags": []
     },
     {
       "filename": "KCS08171.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#515c55",
       "tags": []
     },
     {
       "filename": "KCS08163.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#7f898b",
       "tags": []
     },
     {
       "filename": "KCS08169.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#788482",
       "tags": [
         {
           "name": "前穂高岳",
@@ -384,6 +409,7 @@
       "filename": "KCS08181.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#74827c",
       "tags": [
         {
           "name": "明神岳",
@@ -396,6 +422,7 @@
       "filename": "KCS08178.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#778884",
       "tags": [
         {
           "name": "明神岳",
@@ -408,18 +435,21 @@
       "filename": "KCS08186.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#687d78",
       "tags": []
     },
     {
       "filename": "KCS08193.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#6f8486",
       "tags": []
     },
     {
       "filename": "KCS08197.jpg",
       "width": 3000,
       "height": 2000,
+      "color": "#323649",
       "tags": []
     }
   ]

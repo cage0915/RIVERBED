@@ -308,162 +308,189 @@
       "filename": "001.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#9ca8a3",
       "tags": []
     },
     {
       "filename": "002.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#a2b19e",
       "tags": []
     },
     {
       "filename": "003.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#b4b0aa",
       "tags": []
     },
     {
       "filename": "004.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#95a88f",
       "tags": []
     },
     {
       "filename": "005.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#475043",
       "tags": []
     },
     {
       "filename": "007.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#b4bfb9",
       "tags": []
     },
     {
       "filename": "008.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#a2b8b7",
       "tags": []
     },
     {
       "filename": "009.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#a6b7b1",
       "tags": []
     },
     {
       "filename": "010.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#5a5553",
       "tags": []
     },
     {
       "filename": "011.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#99b6b4",
       "tags": []
     },
     {
       "filename": "012.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#788581",
       "tags": []
     },
     {
       "filename": "013.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#66878b",
       "tags": []
     },
     {
       "filename": "014.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#557ba0",
       "tags": []
     },
     {
       "filename": "015.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#7d9297",
       "tags": []
     },
     {
       "filename": "016.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#606b72",
       "tags": []
     },
     {
       "filename": "017.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#8b9a98",
       "tags": []
     },
     {
       "filename": "018.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#afb3aa",
       "tags": []
     },
     {
       "filename": "019.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#a7a99f",
       "tags": []
     },
     {
       "filename": "020.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#8d8b87",
       "tags": []
     },
     {
       "filename": "021.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#7e807b",
       "tags": []
     },
     {
       "filename": "022.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#88918b",
       "tags": []
     },
     {
       "filename": "023.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#6d7576",
       "tags": []
     },
     {
       "filename": "006.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#a5abad",
       "tags": []
     },
     {
       "filename": "024.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#a4a39b",
       "tags": []
     },
     {
       "filename": "025.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#c1bfb3",
       "tags": []
     },
     {
       "filename": "026.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#d5d3ca",
       "tags": []
     },
     {
       "filename": "027.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#7290a5",
       "tags": [
         {
           "name": "龜山島",
@@ -476,12 +503,14 @@
       "filename": "028.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#758b95",
       "tags": []
     },
     {
       "filename": "029.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#63889b",
       "tags": [
         {
           "name": "龜山島",
@@ -494,6 +523,7 @@
       "filename": "030.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#2c4667",
       "tags": [
         {
           "name": "龜山島",
@@ -506,6 +536,7 @@
       "filename": "031.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#6f8699",
       "tags": [
         {
           "name": "龜山島",
@@ -518,90 +549,105 @@
       "filename": "032.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#a3acad",
       "tags": []
     },
     {
       "filename": "033.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#99a5a5",
       "tags": []
     },
     {
       "filename": "034.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#787469",
       "tags": []
     },
     {
       "filename": "035.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#7b6f5a",
       "tags": []
     },
     {
       "filename": "036.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#8a8581",
       "tags": []
     },
     {
       "filename": "037.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#757575",
       "tags": []
     },
     {
       "filename": "038.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#a7a7a7",
       "tags": []
     },
     {
       "filename": "039.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#919191",
       "tags": []
     },
     {
       "filename": "040.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#717171",
       "tags": []
     },
     {
       "filename": "041.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#767676",
       "tags": []
     },
     {
       "filename": "042.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#626262",
       "tags": []
     },
     {
       "filename": "043.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#7c7c7c",
       "tags": []
     },
     {
       "filename": "044.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#747474",
       "tags": []
     },
     {
       "filename": "045.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#646464",
       "tags": []
     },
     {
       "filename": "046.jpg",
       "width": 3000,
       "height": 1989,
+      "color": "#7a7a7a",
       "tags": []
     }
   ]
