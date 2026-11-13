@@ -7,6 +7,7 @@ import SiteNavigation from "../components/SiteNavigation.astro";
 import ContentKeyboardNavigation from "../components/ContentKeyboardNavigation.astro";
 import PhotoLightbox from "../components/PhotoLightbox.astro";
 import PhotoFadeIn from "../components/PhotoFadeIn.astro";
+import NavigationProgress from "../components/NavigationProgress.astro";
 import YamaWalker from "../components/YamaWalker.astro";
 // Keep the shared font baseline to the weight every route uses. Fontsource's
 // numbered CJK faces include unicode-range declarations, so browsers fetch
@@ -41,6 +42,7 @@ const { title, hiker = false } = Astro.props;
 	<body
 		class="bg-[#121212] text-zinc-100 min-h-screen antialiased selection:bg-white/20 selection:text-white"
 	>
+		<NavigationProgress />
 		<SiteNavigation />
 
 		<main class="mx-auto max-w-[1100px] px-4 sm:px-8 pt-20 pb-8">

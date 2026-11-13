@@ -1,0 +1,98 @@
+---
+// A thin bar along the top edge while the client router fetches the next page,
+// so a tap visibly registered even when the page is slow to arrive. It shows
+// only when loading takes longer than SHOW_DELAY_MS, so fast navigations don't
+// flash it. Persisted across swaps so it can finish on the new page.
+---
+
+<div
+    id="navigation-progress"
+    class="navigation-progress"
+    aria-hidden="true"
+    transition:persist
+></div>
+
+<script>
+    const SHOW_DELAY_MS = 120;
+    const RESET_AFTER_MS = 600;
+
+    let showTimer: number | undefined;
+    let resetTimer: number | undefined;
+
+    const bar = () => document.getElementById("navigation-progress");
+
+    const clearTimers = () => {
+        window.clearTimeout(showTimer);
+        window.clearTimeout(resetTimer);
+        showTimer = resetTimer = undefined;
+    };
+
+    document.addEventListener("astro:before-preparation", () => {
+        clearTimers();
+        const element = bar();
+        if (!element) return;
+        delete element.dataset.state;
+        showTimer = window.setTimeout(() => {
+            element.dataset.state = "loading";
+        }, SHOW_DELAY_MS);
+    });
+
+    // The next page has arrived (or the navigation fell through): finish.
+    // Runs twice per navigation (after-preparation, then page-load); the
+    // second call must leave the pending reset alone.
+    const finish = () => {
+        window.clearTimeout(showTimer);
+        showTimer = undefined;
+        const element = bar();
+        if (element?.dataset.state !== "loading") return;
+        window.clearTimeout(resetTimer);
+        element.dataset.state = "done";
+        resetTimer = window.setTimeout(() => {
+            delete element.dataset.state;
+        }, RESET_AFTER_MS);
+    };
+
+    document.addEventListener("astro:after-preparation", finish);
+    document.addEventListener("astro:page-load", finish);
+</script>
+
+<style is:global>
+    .navigation-progress {
+        position: fixed;
+        inset: 0 0 auto;
+        z-index: 100;
+        height: 2px;
+        background: rgba(255, 255, 255, 0.75);
+        transform: scaleX(0);
+        transform-origin: left;
+        opacity: 0;
+        pointer-events: none;
+        /* Its own view-transition group, so it isn't frozen in the page
+           snapshot while the pages cross-fade. */
+        view-transition-name: navigation-progress;
+    }
+
+    /* Moves quickly at first, then creeps toward 90% while it waits. */
+    .navigation-progress[data-state="loading"] {
+        opacity: 1;
+        transform: scaleX(0.9);
+        transition:
+            transform 10s cubic-bezier(0.05, 0.7, 0.1, 1),
+            opacity 0.15s ease;
+    }
+
+    .navigation-progress[data-state="done"] {
+        opacity: 0;
+        transform: scaleX(1);
+        transition:
+            transform 0.2s ease-out,
+            opacity 0.3s ease 0.2s;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .navigation-progress[data-state="loading"] {
+            transform: scaleX(1);
+            transition: opacity 0.15s ease;
+        }
+    }
+</style>
