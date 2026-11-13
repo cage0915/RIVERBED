@@ -1,0 +1,818 @@
+---
+// A stick-figure hiker pinned to the bottom of /yama pages. Its horizontal
+// position tracks how far the page has been scrolled, and its legs swing only
+// while the page scrolls; once it stops, the feet step together. Once the
+// page rests, the hiker lifts a camera, takes a photo and checks it; at either
+// end of the page it sets its backpack down instead, and picks it up again
+// once the page moves. It sits down to look up at a photo opened in the
+// lightbox, settles down leaning back against its backpack when left alone,
+// and leaves fading footprints as it walks.
+---
+
+<div
+	data-yama-walker
+	aria-hidden="true"
+	class="pointer-events-none fixed inset-x-0 bottom-0 z-40 h-14"
+	style="background: linear-gradient(to top, rgb(18 18 18 / 0.7) 0%, rgb(18 18 18 / 0.5) 30%, rgb(18 18 18 / 0.22) 62%, rgb(18 18 18 / 0.06) 85%, rgb(18 18 18 / 0) 100%);"
+>
+	<div
+		data-yama-walker-body
+		class="absolute bottom-1 left-0 w-[25.6px] text-zinc-400 drop-shadow-[0_0_2px_rgba(0,0,0,0.8)]"
+	>
+		<svg
+			class="block overflow-visible"
+			viewBox="0 0 32 44"
+			width="25.6"
+			height="35.2"
+			fill="none"
+			stroke="currentColor"
+			stroke-width="1.6"
+			stroke-linecap="round"
+			stroke-linejoin="round"
+		>
+			<g data-yama-walker-figure>
+				<!-- Far-side limbs, drawn first and dimmer. -->
+				<polyline data-limb="back-arm" points="17,13 17,18.5 17,24" opacity="0.45" />
+				<polyline data-limb="back-leg" points="16,26 16,32.5 16,40.5" opacity="0.45" />
+
+				<!-- Backpack behind the shoulders; set down on the ground at times. -->
+				<g data-yama-walker-pack>
+					<rect x="9" y="11.5" width="6" height="13" rx="1.6" />
+					<line x1="10.5" y1="15" x2="13.5" y2="15" />
+				</g>
+
+				<!-- Torso: a slim capsule, leaning slightly forward. -->
+				<g data-yama-walker-torso>
+					<rect
+						x="14.6"
+						y="10.2"
+						width="4.2"
+						height="15.8"
+						rx="2.1"
+						fill="currentColor"
+						fill-opacity="0.2"
+						stroke-width="1.2"
+						transform="rotate(5 16.7 18.1)"
+					/>
+				</g>
+
+				<!-- Head with a baseball cap; tilts at the neck to look down. -->
+				<g data-yama-walker-head>
+					<circle cx="18" cy="6" r="3.6" />
+					<path d="M14.5 5 A3.6 3.6 0 0 1 21.5 5 Z" fill="currentColor" stroke-width="1" />
+					<line x1="21" y1="5" x2="25" y2="5.7" stroke-width="1.4" />
+				</g>
+
+				<!-- Camera, shown only while the hiker holds it up. -->
+				<g data-yama-walker-camera opacity="0" stroke-width="1.1">
+					<rect x="21.6" y="6.4" width="4.4" height="3.4" rx="0.6" />
+					<rect x="26" y="7.1" width="2.6" height="2" fill="currentColor" />
+					<g data-yama-walker-flash opacity="0" stroke-width="0.9">
+						<line x1="29.6" y1="8.1" x2="31.6" y2="8.1" />
+						<line x1="29.4" y1="6.5" x2="31.2" y2="5.2" />
+						<line x1="29.4" y1="9.7" x2="31.2" y2="11" />
+					</g>
+				</g>
+
+				<!-- Near-side limbs. -->
+				<polyline data-limb="front-leg" points="16,26 16,32.5 16,40.5" />
+				<polyline data-limb="front-arm" points="17,13 17,18.5 17,24" />
+			</g>
+		</svg>
+	</div>
+</div>
+
+<style is:global>
+	.yama-walker-footprint {
+		position: absolute;
+		bottom: 6px;
+		width: 3px;
+		height: 1.5px;
+		border-radius: 9999px;
+		background: rgb(161 161 170 / 0.55);
+		pointer-events: none;
+		animation: yama-walker-footprint 1.6s ease-in forwards;
+	}
+
+	@keyframes yama-walker-footprint {
+		from {
+			opacity: 1;
+		}
+		to {
+			opacity: 0;
+		}
+	}
+</style>
+
+<script>
+	import { installPageLifecycle } from "../lib/client-page-lifecycle";
+
+	// Walking and running gaits; the hiker blends between them by speed.
+	// stride: scroll distance (px) for one full stride, left foot then right.
+	// kneeBend: extra knee bend while a leg swings forward. elbowBend: the
+	// elbow's resting bend. lean: forward tilt of the upper body (deg).
+	const WALK = { stride: 160, legSwing: 26, armSwing: 24, kneeBend: 40, elbowBend: 18, lean: 0 };
+	const RUN = { stride: 240, legSwing: 38, armSwing: 42, kneeBend: 85, elbowBend: 80, lean: 12 };
+	// Speeds (px/ms of scrolling) where running starts and where it is full,
+	// and how quickly the speed reading settles (ms).
+	const RUN_FROM_SPEED = 1;
+	const RUN_FULL_SPEED = 2.5;
+	const SPEED_SMOOTHING = 120;
+
+	// How long the page must rest before the camera comes up, how long raising
+	// and lowering take, and the pause before the shutter fires (all ms).
+	const IDLE_DELAY = 600;
+	const RAISE_DURATION = 320;
+	const LOWER_DURATION = 160;
+	const SHUTTER_DELAY = 350;
+	const FLASH_DURATION = 220;
+	// After the shot: pause, bring the camera down to check the photo, look at
+	// it for a while, then put it away and stand normally again.
+	const REVIEW_START = 450;
+	const REVIEW_DURATION = 320;
+	const REVIEW_HOLD = 1400;
+	const STOW_DURATION = 380;
+	const STOW_START = REVIEW_START + REVIEW_DURATION + REVIEW_HOLD;
+	const HEAD_TILT = 28;
+	const NECK = { x: 17.4, y: 10.2 };
+	// How far the camera travels from eye level down to chest height.
+	const REVIEW_CAMERA_OFFSET = { x: -1, y: 6.8 };
+
+	// Backpack at either end of the page: how long setting it down and picking
+	// it back up take (ms), the pivot at the top of the pack where the hand
+	// grips it, the pack's bottom edge, where it hangs from the hand mid-way,
+	// and how far forward it rests on the ground.
+	const PACK_DOWN_DURATION = 1400;
+	const PACK_UP_DURATION = 600;
+	const PACK_TOP = { x: 12, y: 11.5 };
+	const PACK_BOTTOM = 24.5;
+	const PACK_HANG = { x: 12.5, y: 9 };
+	const PACK_GROUND_X = 13.5;
+	const PACK_HEAD_TILT = 16;
+	// How far the hiker bends forward from the hips to set the pack on the
+	// ground or pick it up (deg).
+	const PACK_BEND = 40;
+
+	// Coming to a stop: after this long without moving (ms), the feet step
+	// together and the arms settle, over the given times (ms).
+	const STOP_AFTER = 180;
+	const STOP_SETTLE_DURATION = 260;
+	const STOP_RELEASE_DURATION = 120;
+
+	// Catching breath after a long run: if the hiker ran (at least halfway into
+	// a running gait) for this many px of scrolling before stopping, it bends
+	// forward with knees bent and arms hanging, breathing hard, for a while
+	// (ms), then stands up straight again and skips the photo for that stop.
+	// After a shorter run it simply stops and takes a photo.
+	const PANT_MIN_RUN_DISTANCE = 1200;
+	const PANT_DURATION = 2200;
+	const PANT_IN_DURATION = 250;
+	const PANT_OUT_DURATION = 500;
+	const PANT_LEAN = 30;
+	const PANT_DROP = 1.4;
+	const PANT_BREATHS_PER_SECOND = 2.2;
+	const PANT_BREATH_DROP = 0.4;
+
+	// Within this share of either end, a stop takes no photo.
+	const END_ZONE = 0.05;
+	// Once the pack is back on, the hiker walks to where the page now is: a
+	// share of the remaining gap per ms, but never slower than a floor (px/ms).
+	const CATCH_UP_RATE = 1 / 180;
+	const CATCH_UP_MIN_SPEED = 0.8;
+
+	// Sitting on the ground (while a photo is open in the lightbox): how long
+	// sitting down and standing up take (ms), how far the hips drop to reach
+	// the ground, and how far the head tips back to look up.
+	const SIT_DURATION = 700;
+	const STAND_DURATION = 450;
+	const SIT_DROP = 13;
+	const LOOK_UP_TILT = -22;
+
+	// Lounging after a long rest (ms without scrolling). Mid-page: stand with
+	// feet together, turn round, set the pack on the ground in front (behind,
+	// relative to the way the hiker was walking), turn back, sit down in front
+	// of it and lean back against it. At either end the pack is already on the
+	// ground in front, so the hiker just turns round and sits back against it.
+	// Getting up plays it in reverse, faster.
+	const LONG_IDLE = 10000;
+	const LOUNGE_IN_DURATION = 3600;
+	const LOUNGE_OUT_DURATION = 2200;
+	const LOUNGE_TURN_IN_DURATION = 2000;
+	const LOUNGE_TURN_OUT_DURATION = 1200;
+	// Leaning back against the pack, and the head tipping forward to stay level.
+	const RECLINE_LEAN = -30;
+	const RECLINE_HEAD_TILT = 16;
+
+	type RestAction = "photo" | "pack" | "none";
+	// "carry": the pack is on the back and gets set down first.
+	// "turn": the pack is already on the ground in front.
+	type LoungeMode = "carry" | "turn";
+
+	const HIP = { x: 16, y: 26 };
+	const SHOULDER = { x: 17, y: 13 };
+	const THIGH = 6.5;
+	const SHIN = 8;
+	const UPPER_ARM = 5.5;
+	const FOREARM = 5.5;
+	const GROUND_Y = HIP.y + THIGH + SHIN;
+	// Where each hand grips the camera.
+	const FRONT_GRIP = { x: 22.6, y: 9.4 };
+	const BACK_GRIP = { x: 21.8, y: 8 };
+
+	type Point = { x: number; y: number };
+
+	// Angles are degrees from straight down; positive points forward (+x).
+	const reach = (from: Point, angle: number, length: number): Point => {
+		const rad = (angle * Math.PI) / 180;
+		return { x: from.x + Math.sin(rad) * length, y: from.y + Math.cos(rad) * length };
+	};
+
+	const joint = (root: Point, upperAngle: number, upper: number, lowerAngle: number, lower: number) => {
+		const middle = reach(root, upperAngle, upper);
+		return [root, middle, reach(middle, lowerAngle, lower)];
+	};
+
+	// Two-bone reach from `root` toward `target`; `side` picks which way the
+	// middle joint bends (1 = below the line for an elbow, -1 = above for a
+	// raised knee).
+	const twoBone = (root: Point, target: Point, upper: number, lower: number, side: 1 | -1): Point[] => {
+		const dx = target.x - root.x;
+		const dy = target.y - root.y;
+		const distance = Math.min(Math.hypot(dx, dy), upper + lower - 0.01);
+		const toTarget = Math.atan2(dy, dx);
+		const bend = Math.acos((upper ** 2 + distance ** 2 - lower ** 2) / (2 * upper * distance));
+		const middleAngle = toTarget + side * bend;
+		const middle = {
+			x: root.x + Math.cos(middleAngle) * upper,
+			y: root.y + Math.sin(middleAngle) * upper,
+		};
+		const end = {
+			x: root.x + Math.cos(toTarget) * distance,
+			y: root.y + Math.sin(toTarget) * distance,
+		};
+		return [root, middle, end];
+	};
+
+	// Two-bone reach from the shoulder to a hand target, elbow hanging below.
+	const reachFor = (target: Point) => twoBone(SHOULDER, target, UPPER_ARM, FOREARM, 1);
+
+	const SHOOT_FRONT_ARM = reachFor(FRONT_GRIP);
+	const SHOOT_BACK_ARM = reachFor(BACK_GRIP);
+	const REVIEW_FRONT_ARM = reachFor({ x: 22.4, y: 16.4 });
+	const REVIEW_BACK_ARM = reachFor({ x: 21.4, y: 15 });
+
+	const blend = (from: Point[], to: Point[], amount: number) =>
+		from.map((point, index) => ({
+			x: point.x + (to[index].x - point.x) * amount,
+			y: point.y + (to[index].y - point.y) * amount,
+		}));
+
+	const toPoints = (points: Point[]) =>
+		points.map(({ x, y }) => `${x.toFixed(2)},${y.toFixed(2)}`).join(" ");
+
+	const easeInOut = (t: number) => (t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2);
+	const clamp01 = (t: number) => Math.min(Math.max(t, 0), 1);
+
+	const mix = (from: number, to: number, amount: number) => from + (to - from) * amount;
+
+	// Move `value` toward `target` (0 or 1) at the given rates (ms for a full
+	// rise or fall).
+	const approach = (value: number, target: number, elapsed: number, riseMs: number, fallMs: number) =>
+		target > value
+			? Math.min(target, value + elapsed / riseMs)
+			: Math.max(target, value - elapsed / fallMs);
+
+	// One leg and the opposite arm at gait phase `phase` (radians), `run` of
+	// the way from walking (0) to running (1).
+	const pose = (phase: number, run: number) => {
+		const thigh = Math.sin(phase) * mix(WALK.legSwing, RUN.legSwing, run);
+		// The knee bends most while the leg is travelling forward under the body.
+		const knee =
+			mix(4, 10, run) + Math.max(0, Math.cos(phase)) * mix(WALK.kneeBend, RUN.kneeBend, run);
+		const upperArm = -Math.sin(phase) * mix(WALK.armSwing, RUN.armSwing, run);
+		// Elbows bend more when the arm swings in front of the body.
+		const elbow = mix(WALK.elbowBend, RUN.elbowBend, run) + Math.max(0, upperArm) * 0.8;
+		return {
+			leg: joint(HIP, thigh, THIGH, thigh - knee, SHIN),
+			arm: joint(SHOULDER, upperArm, UPPER_ARM, upperArm + elbow, FOREARM),
+		};
+	};
+
+	// Feet together and arms hanging, used while the backpack is on the ground.
+	const STAND_POSE = {
+		frontLeg: joint(HIP, 3, THIGH, 1, SHIN),
+		backLeg: joint(HIP, -3, THIGH, -2, SHIN),
+		frontArm: joint(SHOULDER, 4, UPPER_ARM, 14, FOREARM),
+		backArm: joint(SHOULDER, -4, UPPER_ARM, 8, FOREARM),
+	};
+
+	// Sitting on the ground: knees up, feet flat in front, hands on the knees.
+	// Arms are drawn in the upper body's frame, which drops by SIT_DROP, so
+	// their targets are lifted by the same amount.
+	const SIT_HIP = { x: HIP.x, y: HIP.y + SIT_DROP };
+	const SIT_FRONT_LEG = twoBone(SIT_HIP, { x: 24.5, y: GROUND_Y }, THIGH, SHIN, -1);
+	const SIT_BACK_LEG = twoBone(SIT_HIP, { x: 22.5, y: GROUND_Y }, THIGH, SHIN, -1);
+	const SIT_POSE = {
+		frontLeg: SIT_FRONT_LEG,
+		backLeg: SIT_BACK_LEG,
+		frontArm: reachFor({ x: SIT_FRONT_LEG[1].x + 0.5, y: SIT_FRONT_LEG[1].y - SIT_DROP }),
+		backArm: reachFor({ x: SIT_BACK_LEG[1].x, y: SIT_BACK_LEG[1].y - SIT_DROP }),
+	};
+	// Leaning back against the pack: legs stretched out further, hands resting
+	// on the thighs (in the upper body's frame, before the lean is applied).
+	const RECLINE_POSE = {
+		frontLeg: twoBone(SIT_HIP, { x: 27.5, y: GROUND_Y }, THIGH, SHIN, -1),
+		backLeg: twoBone(SIT_HIP, { x: 26, y: GROUND_Y }, THIGH, SHIN, -1),
+		frontArm: reachFor({ x: 21.5, y: 22.5 }),
+		backArm: reachFor({ x: 20.5, y: 23 }),
+	};
+
+	// Catching breath: hips a little lower, knees bent forward, arms hanging
+	// straight down (drawn in the upper body's frame, so they cancel its lean).
+	const PANT_HIP = { x: HIP.x, y: HIP.y + PANT_DROP };
+	const PANT_POSE = {
+		frontLeg: twoBone(PANT_HIP, { x: 18, y: GROUND_Y }, THIGH, SHIN, -1),
+		backLeg: twoBone(PANT_HIP, { x: 14.8, y: GROUND_Y }, THIGH, SHIN, -1),
+		frontArm: joint(SHOULDER, -PANT_LEAN + 6, UPPER_ARM, -PANT_LEAN + 14, FOREARM),
+		backArm: joint(SHOULDER, -PANT_LEAN - 2, UPPER_ARM, -PANT_LEAN + 6, FOREARM),
+	};
+
+	// Turn a point in the figure's frame into the upper body's frame, which is
+	// rotated by `lean` degrees around the hip.
+	const toUpperFrame = (point: Point, lean: number): Point => {
+		const rad = (-lean * Math.PI) / 180;
+		const dx = point.x - HIP.x;
+		const dy = point.y - HIP.y;
+		return {
+			x: HIP.x + dx * Math.cos(rad) - dy * Math.sin(rad),
+			y: HIP.y + dx * Math.sin(rad) + dy * Math.cos(rad),
+		};
+	};
+
+	installPageLifecycle(document, () => {
+		const walker = document.querySelector<HTMLElement>("[data-yama-walker]");
+		const body = walker?.querySelector<HTMLElement>("[data-yama-walker-body]");
+		const figure = walker?.querySelector<SVGGElement>("[data-yama-walker-figure]");
+		const camera = walker?.querySelector<SVGGElement>("[data-yama-walker-camera]");
+		const flash = walker?.querySelector<SVGGElement>("[data-yama-walker-flash]");
+		const head = walker?.querySelector<SVGGElement>("[data-yama-walker-head]");
+		const pack = walker?.querySelector<SVGGElement>("[data-yama-walker-pack]");
+		const torso = walker?.querySelector<SVGGElement>("[data-yama-walker-torso]");
+		if (!walker || !body || !figure || !camera || !flash || !head || !pack || !torso) return;
+
+		const limb = (name: string) =>
+			figure.querySelector<SVGPolylineElement>(`[data-limb="${name}"]`)!;
+		const frontLeg = limb("front-leg");
+		const backLeg = limb("back-leg");
+		const frontArm = limb("front-arm");
+		const backArm = limb("back-arm");
+
+		const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+		const controller = new AbortController();
+		let frame = 0;
+		let idleTimer = 0;
+		let longIdleTimer = 0;
+		// The scroll position the hiker is drawn at. It follows the page
+		// directly, except that it waits while the hiker gets up or puts the
+		// backpack back on, and then walks to catch up.
+		let shownY = window.scrollY;
+		let catchingUp = false;
+		// Gait phase (radians), the smoothed walking speed (px/ms), and how far
+		// the gait is from walking (0) to running (1).
+		let phase = (shownY / WALK.stride) * Math.PI * 2;
+		let speed = 0;
+		let run = 0;
+		// Which heel strike last left a footprint.
+		let lastStep = Math.floor((phase - Math.PI / 2) / Math.PI);
+		let facingLeft = false;
+		// The way the scroll is heading; the hiker only turns to it once it is
+		// standing with its backpack on.
+		let headingLeft = false;
+		// How far the arms are in the camera pose (0 = walking arms), and how far
+		// that camera pose has moved from eye level (0) down to reviewing (1).
+		let raised = 0;
+		let review = 0;
+		let resting = false;
+		// When the current rest began; lounging follows after LONG_IDLE.
+		let restStartedAt = 0;
+		// What this stop is for, and how far the backpack has gone from the back
+		// (0) to the ground beside the feet (1). The pack is only set down after
+		// a real walk.
+		let restAction: RestAction = "none";
+		let packDown = 0;
+		let hasWalked = false;
+		// When the camera reached eye level.
+		let peakAt = 0;
+		// Sitting for the lightbox (0 = standing, 1 = seated), looking up at the
+		// open photo, and progress through lounging against the pack.
+		let sitAmount = 0;
+		let lookUp = 0;
+		let lounge = 0;
+		// When the hiker last moved, and how far it has stood still (feet
+		// together, 1) rather than mid-stride (0).
+		let lastMovedAt = 0;
+		let standStill = 1;
+		// Distance (px) run since last stopping, whether this stop is for
+		// catching breath (no photo), when that began, and how far into the
+		// catching-breath pose the hiker is.
+		let runDistance = 0;
+		let tiredStop = false;
+		let pantStartedAt = 0;
+		let pant = 0;
+		let loungeMode: LoungeMode = "carry";
+		let lightboxOpen = Boolean(document.querySelector(".pswp"));
+		let lastFrameTime = performance.now();
+
+		const leaveFootprint = (x: number) => {
+			const print = document.createElement("span");
+			print.className = "yama-walker-footprint";
+			print.style.left = `${(x - 1.5).toFixed(1)}px`;
+			print.addEventListener("animationend", () => print.remove(), { once: true });
+			walker.appendChild(print);
+		};
+
+		const render = (now: number) => {
+			frame = 0;
+			const elapsed = Math.min(now - lastFrameTime, 100);
+			lastFrameTime = now;
+			const reduced = reducedMotion.matches;
+
+			const y = window.scrollY;
+			const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+			const longIdle = resting && restStartedAt > 0 && now - restStartedAt >= LONG_IDLE;
+
+			// Settle only once the hiker has stopped and any camera or backpack
+			// movement has finished. Checked again at the end of the frame, so the
+			// frame where the hiker comes to a stop still leads into settling.
+			const pantingNow = () => pant > 0 || (pantStartedAt > 0 && now - pantStartedAt < PANT_DURATION);
+			const settled = () =>
+				raised === 0 &&
+				(packDown === 0 || packDown === 1) &&
+				shownY === y &&
+				speed === 0 &&
+				!pantingNow();
+			// Lounge after a long rest, or straight after setting the pack down at
+			// either end of the page.
+			const endRest = () => resting && restAction === "pack" && packDown === 1;
+			const shouldLounge = () => (longIdle || endRest()) && settled();
+			const shouldSit = () => lightboxOpen && lounge === 0 && settled();
+
+			const wantLounge = shouldLounge();
+			if (lounge === 0 && wantLounge) loungeMode = packDown === 1 ? "turn" : "carry";
+			const carryMode = loungeMode === "carry";
+			lounge = reduced
+				? Number(wantLounge)
+				: approach(
+						lounge,
+						wantLounge ? 1 : 0,
+						elapsed,
+						carryMode ? LOUNGE_IN_DURATION : LOUNGE_TURN_IN_DURATION,
+						carryMode ? LOUNGE_OUT_DURATION : LOUNGE_TURN_OUT_DURATION,
+					);
+
+			const wantSit = shouldSit();
+			sitAmount = reduced
+				? Number(wantSit)
+				: approach(sitAmount, wantSit ? 1 : 0, elapsed, SIT_DURATION, STAND_DURATION);
+
+			// Each action waits for the others to be fully put away first.
+			const packResting =
+				resting &&
+				restAction === "pack" &&
+				raised === 0 &&
+				shownY === y &&
+				sitAmount === 0 &&
+				lounge === 0 &&
+				!pantingNow() &&
+				!(lightboxOpen && packDown === 0);
+			if (packResting) {
+				packDown = reduced ? 1 : Math.min(1, packDown + elapsed / PACK_DOWN_DURATION);
+			} else if (sitAmount === 0 && lounge === 0) {
+				packDown = reduced ? 0 : Math.max(0, packDown - elapsed / PACK_UP_DURATION);
+			}
+
+			// No walking until standing with the pack on; then catch up to the page.
+			const settledDown = packDown > 0 || sitAmount > 0 || lounge > 0;
+			let nextY = shownY;
+			if (settledDown) {
+				if (y !== shownY) catchingUp = true;
+			} else if (catchingUp && !reduced) {
+				const gap = y - shownY;
+				const step = Math.max(Math.abs(gap) * elapsed * CATCH_UP_RATE, elapsed * CATCH_UP_MIN_SPEED);
+				nextY = Math.abs(gap) <= step ? y : shownY + Math.sign(gap) * step;
+			} else {
+				nextY = y;
+			}
+			if (nextY === y) catchingUp = false;
+			if (nextY !== shownY) headingLeft = nextY < shownY;
+			// Advance the stride by distance walked in either direction, so it always
+			// plays forward relative to the way the hiker faces. Running strides
+			// are longer, so the legs don't flicker at speed.
+			const moved = Math.abs(nextY - shownY);
+			const instantSpeed = elapsed > 0 ? moved / elapsed : 0;
+			speed += (instantSpeed - speed) * clamp01(elapsed / SPEED_SMOOTHING);
+			if (speed < 0.01) speed = 0;
+			run = reduced
+				? 0
+				: easeInOut(clamp01((speed - RUN_FROM_SPEED) / (RUN_FULL_SPEED - RUN_FROM_SPEED)));
+			phase += (moved / mix(WALK.stride, RUN.stride, run)) * Math.PI * 2;
+			shownY = nextY;
+
+			// Once moving stops for a moment, bring the feet together. After a long
+			// run, catch breath; moving again cuts it short.
+			if (moved > 0) {
+				lastMovedAt = now;
+				pantStartedAt = 0;
+				tiredStop = false;
+				if (run >= 0.5) runDistance += moved;
+			}
+			const stopped = now - lastMovedAt > STOP_AFTER;
+			if (stopped && runDistance > 0) {
+				if (runDistance >= PANT_MIN_RUN_DISTANCE && !reduced) {
+					pantStartedAt = now;
+					tiredStop = true;
+				}
+				runDistance = 0;
+			}
+			const stillTarget = stopped ? 1 : 0;
+			standStill = reduced
+				? stillTarget
+				: approach(standStill, stillTarget, elapsed, STOP_SETTLE_DURATION, STOP_RELEASE_DURATION);
+			const pantTarget = pantStartedAt > 0 && now - pantStartedAt < PANT_DURATION ? 1 : 0;
+			pant = reduced ? 0 : approach(pant, pantTarget, elapsed, PANT_IN_DURATION, PANT_OUT_DURATION);
+			if (pant === 0 && pantTarget === 0) pantStartedAt = 0;
+			const pantEased = easeInOut(pant);
+			const breath =
+				pantStartedAt > 0
+					? Math.sin(((now - pantStartedAt) / 1000) * Math.PI * 2 * PANT_BREATHS_PER_SECOND)
+					: 0;
+			if (!settledDown) facingLeft = headingLeft;
+
+			const progress = maxScroll > 0 ? Math.min(Math.max(shownY / maxScroll, 0), 1) : 0;
+			const travel = walker.clientWidth - body.offsetWidth;
+			const bodyX = progress * travel;
+			body.style.transform = `translateX(${bodyX}px)`;
+
+			const photoResting =
+				resting &&
+				restAction === "photo" &&
+				packDown === 0 &&
+				shownY === y &&
+				speed === 0 &&
+				sitAmount === 0 &&
+				lounge === 0 &&
+				!pantingNow() &&
+				!tiredStop &&
+				!lightboxOpen &&
+				!longIdle;
+
+			// Raise the camera while resting, lower it as soon as the page moves.
+			if (reduced) {
+				raised = photoResting ? 1 : 0;
+			} else if (photoResting) {
+				raised = Math.min(1, raised + elapsed / RAISE_DURATION);
+			} else {
+				raised = Math.max(0, raised - elapsed / LOWER_DURATION);
+			}
+			if (photoResting && raised === 1 && !peakAt) peakAt = now;
+
+			const sincePeak = peakAt ? now - peakAt : -1;
+			const sinceShutter = peakAt ? sincePeak - SHUTTER_DELAY : -1;
+			const stowStart = SHUTTER_DELAY + STOW_START;
+			if (photoResting && sincePeak >= 0) {
+				review = reduced
+					? Number(sinceShutter >= REVIEW_START)
+					: easeInOut(clamp01((sinceShutter - REVIEW_START) / REVIEW_DURATION));
+				const stow = reduced
+					? Number(sincePeak >= stowStart)
+					: clamp01((sincePeak - stowStart) / STOW_DURATION);
+				raised = Math.min(raised, 1 - stow);
+			}
+			if (raised === 0) review = 0;
+
+			// Lounging, in stages (see LONG_IDLE). `turned` is how far the body has
+			// turned to face back the way it came; `placing` is progress setting
+			// the pack down in front while turned.
+			const stage = (from: number, to: number) => clamp01((lounge - from) / (to - from));
+			const loungeStand = carryMode ? easeInOut(stage(0, 0.06)) : 0;
+			const turned = carryMode
+				? easeInOut(stage(0.06, 0.14)) * (1 - easeInOut(stage(0.55, 0.63)))
+				: easeInOut(stage(0, 0.2));
+			const placing = carryMode ? stage(0.14, 0.55) : 0;
+			const loungeSit = easeInOut(carryMode ? stage(0.63, 0.84) : stage(0.2, 0.65));
+			const recline = easeInOut(carryMode ? stage(0.84, 1) : stage(0.65, 1));
+			// Turning is drawn as a horizontal flip about the body's centre line,
+			// squeezing through zero width on the way round.
+			const turnFlip = (amount: number) =>
+				`translate(${HIP.x} 0) scale(${(1 - 2 * amount).toFixed(3)} 1) translate(${-HIP.x} 0)`;
+			const bodyTurn = turnFlip(turned);
+
+			const seated = sitAmount === 1 || lounge === 1;
+			const lookUpTarget = lightboxOpen && seated ? 1 : 0;
+			lookUp = reduced ? lookUpTarget : approach(lookUp, lookUpTarget, elapsed, 500, 300);
+
+			// The stride comes from distance scrolled, not from time, so the legs
+			// only move while the page moves.
+			const front = pose(phase, run);
+			const back = pose(phase + Math.PI, run);
+			// Step the feet together first when setting the pack down, and back
+			// into the stride last when picking it up. Sitting and leaning back
+			// layer on top.
+			const stand = Math.max(easeInOut(clamp01(packDown / 0.2)), loungeStand, easeInOut(standStill));
+			const sit = Math.max(easeInOut(sitAmount), loungeSit);
+			front.leg = blend(front.leg, STAND_POSE.frontLeg, stand);
+			back.leg = blend(back.leg, STAND_POSE.backLeg, stand);
+			front.arm = blend(front.arm, STAND_POSE.frontArm, stand);
+			back.arm = blend(back.arm, STAND_POSE.backArm, stand);
+			front.leg = blend(front.leg, PANT_POSE.frontLeg, pantEased);
+			back.leg = blend(back.leg, PANT_POSE.backLeg, pantEased);
+			front.arm = blend(front.arm, PANT_POSE.frontArm, pantEased);
+			back.arm = blend(back.arm, PANT_POSE.backArm, pantEased);
+			front.leg = blend(front.leg, SIT_POSE.frontLeg, sit);
+			back.leg = blend(back.leg, SIT_POSE.backLeg, sit);
+			front.arm = blend(front.arm, SIT_POSE.frontArm, sit);
+			back.arm = blend(back.arm, SIT_POSE.backArm, sit);
+			front.leg = blend(front.leg, RECLINE_POSE.frontLeg, recline);
+			back.leg = blend(back.leg, RECLINE_POSE.backLeg, recline);
+			front.arm = blend(front.arm, RECLINE_POSE.frontArm, recline);
+			back.arm = blend(back.arm, RECLINE_POSE.backArm, recline);
+			const lift = easeInOut(raised);
+			frontLeg.setAttribute("points", toPoints(front.leg));
+			backLeg.setAttribute("points", toPoints(back.leg));
+			frontLeg.setAttribute("transform", bodyTurn);
+			backLeg.setAttribute("transform", bodyTurn);
+			const heldFront = blend(SHOOT_FRONT_ARM, REVIEW_FRONT_ARM, review);
+			const heldBack = blend(SHOOT_BACK_ARM, REVIEW_BACK_ARM, review);
+			const frontArmPose = blend(front.arm, heldFront, lift);
+			const backArmPose = blend(back.arm, heldBack, lift);
+
+			// Backpack, once the feet are together: reach back for it, swing it
+			// round to hang from the hand, set it on the ground in front, then let
+			// go. Picking it up plays the same path in reverse. Used at the ends of
+			// the page, and (while turned round) to set the pack down for lounging.
+			const packProgress = carryMode && lounge > 0 ? 0.2 + 0.8 * placing : packDown;
+			const grab = clamp01((packProgress - 0.2) / 0.12);
+			const carry = easeInOut(clamp01((packProgress - 0.32) / 0.38));
+			const drop = easeInOut(clamp01((packProgress - 0.7) / 0.17));
+			const release = clamp01((packProgress - 0.87) / 0.13);
+			const holdingPack = grab * (1 - release);
+			// The upper body drops with the hips to sit, tips forward from the
+			// hips when running, and back when leaning against the pack.
+			const lowestFoot = Math.max(front.leg[2].y, back.leg[2].y);
+			// Bend forward while handling the pack, most as it nears the ground,
+			// and straighten up again once it has been let go.
+			const bend = PACK_BEND * holdingPack * (0.25 * carry + 0.75 * drop);
+			// Catching breath bends the body forward and lowers the hips; each
+			// breath heaves it gently up and down, without rocking it.
+			const pantLean = PANT_LEAN * pantEased;
+			const pantDrop = (PANT_DROP + PANT_BREATH_DROP * (0.5 + 0.5 * breath)) * pantEased;
+			const lean = mix(WALK.lean, RUN.lean, run) + pantLean + RECLINE_LEAN * recline + bend;
+			const hipDrop = SIT_DROP * sit + pantDrop;
+			const upper = `${bodyTurn} translate(0 ${hipDrop.toFixed(2)}) rotate(${lean.toFixed(2)} ${HIP.x} ${HIP.y})`;
+			torso.setAttribute("transform", upper);
+			frontArm.setAttribute("transform", upper);
+			backArm.setAttribute("transform", upper);
+
+			const packX = PACK_HANG.x * carry + (PACK_GROUND_X - PACK_HANG.x) * drop;
+			const packY =
+				PACK_HANG.y * carry +
+				(lowestFoot - PACK_BOTTOM - PACK_HANG.y) * drop -
+				3 * Math.sin(Math.PI * carry);
+			const packTilt = -12 * Math.sin(Math.PI * carry);
+			// A pack on the body moves with the upper body and turns with it. One on
+			// the ground stays where it was set down: facing back the way the hiker
+			// came when set down for lounging, otherwise facing forward.
+			const onBody = 1 - drop;
+			const packTurn = drop === 1 ? turnFlip(carryMode && lounge > 0 ? 1 : 0) : bodyTurn;
+			const packLean = (mix(WALK.lean, RUN.lean, run) + pantLean) * onBody;
+			pack.setAttribute(
+				"transform",
+				`${packTurn} rotate(${packLean.toFixed(2)} ${HIP.x} ${HIP.y + hipDrop * onBody}) translate(${packX.toFixed(2)} ${(packY + hipDrop * onBody).toFixed(2)}) rotate(${packTilt.toFixed(1)} ${PACK_TOP.x} ${PACK_TOP.y})`,
+			);
+
+			// Front arm: walking or camera, then carrying the pack.
+			// The pack is drawn in the figure's frame; the arm in the (bent) upper
+			// body's frame.
+			const packArm = reachFor(toUpperFrame({ x: PACK_TOP.x + packX, y: PACK_TOP.y + packY }, lean));
+			const frontArmPoints = blend(frontArmPose, packArm, holdingPack);
+			frontArm.setAttribute("points", toPoints(frontArmPoints));
+			backArm.setAttribute("points", toPoints(backArmPose));
+
+			camera.setAttribute("opacity", String(Math.max(0, lift * 2 - 1)));
+			camera.setAttribute(
+				"transform",
+				`${upper} translate(${REVIEW_CAMERA_OFFSET.x * review} ${REVIEW_CAMERA_OFFSET.y * review})`,
+			);
+			const headTilt =
+				HEAD_TILT * review * lift +
+				PACK_HEAD_TILT * holdingPack * carry +
+				LOOK_UP_TILT * lookUp +
+				RECLINE_HEAD_TILT * recline -
+				0.5 * pantLean;
+			head.setAttribute("transform", `${upper} rotate(${headTilt.toFixed(2)} ${NECK.x} ${NECK.y})`);
+
+			const flashing = photoResting && sinceShutter >= 0 && sinceShutter < FLASH_DURATION;
+			flash.setAttribute("opacity", flashing ? String(1 - sinceShutter / FLASH_DURATION) : "0");
+
+			// Drop the body so the lower foot always touches the ground line.
+			figure.setAttribute(
+				"transform",
+				`translate(0 ${GROUND_Y - lowestFoot})${facingLeft ? " translate(32 0) scale(-1 1)" : ""}`,
+			);
+
+			// A footprint at each heel strike, under the leading foot.
+			const scale = body.offsetWidth / 32;
+			const step = Math.floor((phase - Math.PI / 2) / Math.PI);
+			if (step !== lastStep) {
+				lastStep = step;
+				if (moved > 0 && !reduced) {
+					const footX = Math.max(front.leg[2].x, back.leg[2].x);
+					leaveFootprint(bodyX + (facingLeft ? 32 - footX : footX) * scale);
+				}
+			}
+
+			const photoAnimating =
+				resting && restAction === "photo"
+					? !peakAt || sincePeak < stowStart + STOW_DURATION
+					: raised > 0;
+			const packAnimating =
+				resting && restAction === "pack" ? packDown < 1 : packDown > 0;
+			const settleAnimating =
+				lounge !== Number(shouldLounge()) ||
+				sitAmount !== Number(shouldSit()) ||
+				lookUp !== lookUpTarget;
+			// Keep drawing while the speed settles, so the hiker eases back from a
+			// run into a walking posture after the page stops.
+			const pantAnimating = pantingNow();
+			if (
+				photoAnimating ||
+				packAnimating ||
+				settleAnimating ||
+				pantAnimating ||
+				standStill !== stillTarget ||
+				shownY !== y ||
+				speed > 0
+			) {
+				schedule();
+			}
+		};
+
+		const schedule = () => {
+			if (!frame) frame = requestAnimationFrame(render);
+		};
+
+		const settleLater = () => {
+			window.clearTimeout(idleTimer);
+			idleTimer = window.setTimeout(() => {
+				const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+				const y = window.scrollY;
+				const progress = maxScroll > 0 ? y / maxScroll : 0;
+				const atEnd = maxScroll > 0 && (y <= 1 || y >= maxScroll - 1);
+				const nearEnd = progress < END_ZONE || progress > 1 - END_ZONE;
+				restAction = hasWalked && atEnd ? "pack" : nearEnd ? "none" : "photo";
+				resting = true;
+				restStartedAt = performance.now();
+				// A little past LONG_IDLE, so the frame it schedules is sure to see it.
+				window.clearTimeout(longIdleTimer);
+				longIdleTimer = window.setTimeout(schedule, LONG_IDLE + 50);
+				lastFrameTime = performance.now();
+				schedule();
+			}, IDLE_DELAY);
+		};
+
+		const handleScroll = () => {
+			if (resting) lastFrameTime = performance.now();
+			resting = false;
+			restStartedAt = 0;
+			window.clearTimeout(longIdleTimer);
+			hasWalked = true;
+			peakAt = 0;
+			schedule();
+			settleLater();
+		};
+
+		// PhotoSwipe adds its `.pswp` element to <body> while a photo is open.
+		const lightboxWatcher = new MutationObserver(() => {
+			const open = Boolean(document.querySelector(".pswp"));
+			if (open === lightboxOpen) return;
+			lightboxOpen = open;
+			if (frame === 0) lastFrameTime = performance.now();
+			schedule();
+		});
+		lightboxWatcher.observe(document.body, { childList: true });
+
+		window.addEventListener("scroll", handleScroll, { passive: true, signal: controller.signal });
+		window.addEventListener("resize", schedule, { signal: controller.signal });
+		render(performance.now());
+		settleLater();
+
+		return () => {
+			controller.abort();
+			lightboxWatcher.disconnect();
+			window.clearTimeout(idleTimer);
+			window.clearTimeout(longIdleTimer);
+			if (frame) cancelAnimationFrame(frame);
+			walker.querySelectorAll(".yama-walker-footprint").forEach((print) => print.remove());
+		};
+	});
+</script>

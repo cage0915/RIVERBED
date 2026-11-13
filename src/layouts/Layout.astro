@@ -6,6 +6,7 @@ import SiteFooter from "../components/SiteFooter.astro";
 import SiteNavigation from "../components/SiteNavigation.astro";
 import ContentKeyboardNavigation from "../components/ContentKeyboardNavigation.astro";
 import PhotoLightbox from "../components/PhotoLightbox.astro";
+import YamaWalker from "../components/YamaWalker.astro";
 // Keep the shared font baseline to the weight every route uses. Fontsource's
 // numbered CJK faces include unicode-range declarations, so browsers fetch
 // only the chunks needed by the text on the current page.
@@ -19,6 +20,7 @@ interface Props {
 }
 
 const { title } = Astro.props;
+const isYamaPage = Astro.url.pathname.split("/").filter(Boolean)[0] === "yama";
 ---
 
 <!doctype html>
@@ -46,6 +48,7 @@ const { title } = Astro.props;
 		<ContentKeyboardNavigation />
 		<PhotoLightbox />
 		<SiteFooter />
+		{isYamaPage && <YamaWalker />}
 		<SiteDevTools />
 	</body>
 </html>
