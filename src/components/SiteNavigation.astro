@@ -122,7 +122,7 @@ const currentPath = Astro.url.pathname;
 	<div
 		id="mobile-menu"
 		data-site-mobile-menu
-		class="hidden sm:hidden border-t border-white/5 bg-[#121212]/95 backdrop-blur-xl overflow-hidden transition-all duration-300 ease-in-out max-h-0"
+		class="hidden sm:hidden border-t border-white/5 bg-[#121212]/95 backdrop-blur-xl overflow-hidden transition-[max-height] duration-300 ease-in-out max-h-0"
 	>
 		<div class="flex items-center px-4">
 			<div class="flex min-w-0 flex-1 flex-row items-center gap-6 overflow-x-auto py-4 scrollbar-none mask-linear-right">
@@ -185,8 +185,9 @@ const currentPath = Astro.url.pathname;
 
 			if (open) {
 				mobileMenu.classList.remove("hidden");
-				void mobileMenu.offsetWidth;
-				mobileMenu.style.maxHeight = "500px";
+				// Animate to the menu's real height: a larger cap would spend most of
+				// the transition on invisible height, so closing would seem to stall.
+				mobileMenu.style.maxHeight = `${mobileMenu.scrollHeight}px`;
 			} else {
 				mobileMenu.style.maxHeight = "0px";
 				closeTimer = window.setTimeout(() => {

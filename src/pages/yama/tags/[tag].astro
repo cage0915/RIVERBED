@@ -365,8 +365,16 @@ function chunkArray<T>(array: T[], size: number): T[][] {
     .tag-album-group:nth-child(4) {
         animation-delay: 0.4s;
     }
-    .tag-album-group:nth-child(5) {
+    /* Later groups follow the fifth instead of starting before the first. */
+    .tag-album-group:nth-child(n + 5) {
         animation-delay: 0.5s;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .tag-album-group {
+            opacity: 1;
+            animation: none;
+        }
     }
 
     @media (max-width: 767px) {

@@ -717,7 +717,7 @@ const titleSections = extractTitleSections(albumRecord.blocks);
         let readingScrollY = 0;
         let scrollFrame: number | undefined;
         let scrollFollowFrame: number | undefined;
-        let scrollFollowDelay: number | undefined;
+        let scrollSettleFrame: number | undefined;
         let scrollFollowTimer: number | undefined;
         let scrollObserver: ResizeObserver | undefined;
         let gridObserver: ResizeObserver | undefined;
@@ -729,8 +729,8 @@ const titleSections = extractTitleSections(albumRecord.blocks);
             if (scrollFollowFrame !== undefined) {
                 cancelAnimationFrame(scrollFollowFrame);
             }
-            if (scrollFollowDelay !== undefined) {
-                window.clearTimeout(scrollFollowDelay);
+            if (scrollSettleFrame !== undefined) {
+                cancelAnimationFrame(scrollSettleFrame);
             }
             if (scrollFollowTimer !== undefined) {
                 window.clearTimeout(scrollFollowTimer);
@@ -738,7 +738,7 @@ const titleSections = extractTitleSections(albumRecord.blocks);
             scrollObserver?.disconnect();
             scrollFrame = undefined;
             scrollFollowFrame = undefined;
-            scrollFollowDelay = undefined;
+            scrollSettleFrame = undefined;
             scrollFollowTimer = undefined;
             scrollObserver = undefined;
         };
@@ -785,7 +785,32 @@ const titleSections = extractTitleSections(albumRecord.blocks);
                 behavior: "smooth",
             });
 
-            scrollFollowDelay = window.setTimeout(() => {
+            // Start holding the photo in place only once the smooth scroll has
+            // landed: a long one is still under way after any fixed delay, and an
+            // instant correction then would cut it short with a visible jump.
+            const startedAt = performance.now();
+            let lastY = window.scrollY;
+            let stillFrames = 0;
+            let moved = false;
+            const waitForScrollToSettle = () => {
+                scrollSettleFrame = requestAnimationFrame(() => {
+                    scrollSettleFrame = undefined;
+                    const still = Math.abs(window.scrollY - lastY) < 1;
+                    stillFrames = still ? stillFrames + 1 : 0;
+                    moved ||= !still;
+                    lastY = window.scrollY;
+                    // A smooth scroll can take a frame or two to begin moving.
+                    const landed = moved
+                        || Math.abs(window.scrollY - targetScrollTop(photo)) < 2;
+                    if ((landed && stillFrames >= 3) || performance.now() - startedAt > 3000) {
+                        followAfterScroll();
+                    } else {
+                        waitForScrollToSettle();
+                    }
+                });
+            };
+
+            const followAfterScroll = () => {
                 const keepPhotoPositioned = () => {
                     if (scrollFollowFrame !== undefined) return;
                     scrollFollowFrame = requestAnimationFrame(() => {
@@ -801,7 +826,8 @@ const titleSections = extractTitleSections(albumRecord.blocks);
                     stopScrollTracking,
                     1400,
                 );
-            }, 450);
+            };
+            waitForScrollToSettle();
         };
 
         // The manifest's dimensions come first: they are known before the image

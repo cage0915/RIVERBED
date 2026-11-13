@@ -232,12 +232,20 @@ const sortedFolders = folderSlugs
         transform: scale(var(--zoom));
         transition:
             opacity 0.8s ease,
-            transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
-            object-position 0.6s;
+            transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
+    /* The incoming slide fades in on top of the outgoing one, which stays
+       opaque underneath; fading both at once would let the dark backdrop
+       show through halfway. */
     .album-cover .slide.active {
+        z-index: 1;
         opacity: 1;
+    }
+
+    .album-cover .slide.leaving {
+        opacity: 1;
+        transition: none;
     }
 
     /* Home captions stay visible; they sit on a bottom gradient over the photo. */

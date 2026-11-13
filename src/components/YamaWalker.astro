@@ -549,7 +549,9 @@
 			if (!settledDown) facingLeft = headingLeft;
 
 			const progress = maxScroll > 0 ? Math.min(Math.max(shownY / maxScroll, 0), 1) : 0;
-			const travel = walker.clientWidth - body.offsetWidth;
+			// Measured once per frame, before the writes below dirty layout.
+			const bodyWidth = body.offsetWidth;
+			const travel = walker.clientWidth - bodyWidth;
 			const bodyX = progress * travel;
 			body.style.transform = `translateX(${bodyX}px)`;
 
@@ -721,7 +723,7 @@
 			);
 
 			// A footprint at each heel strike, under the leading foot.
-			const scale = body.offsetWidth / 32;
+			const scale = bodyWidth / 32;
 			const step = Math.floor((phase - Math.PI / 2) / Math.PI);
 			if (step !== lastStep) {
 				lastStep = step;

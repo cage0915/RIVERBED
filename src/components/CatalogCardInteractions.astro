@@ -2,6 +2,7 @@
     import { installPageLifecycle } from "../lib/client-page-lifecycle";
 
     const INTERVAL_MS = 5000;
+    const FADE_MS = 800; // Matches the slide opacity transition in index.astro.
 
     installPageLifecycle(document, () => {
         const root = document.querySelector<HTMLElement>("[data-catalog-grid]");
@@ -9,6 +10,7 @@
 
         const cards = root.querySelectorAll<HTMLElement>("[data-catalog-card]");
         const intervals: number[] = [];
+        const timers: number[] = [];
         const observers: IntersectionObserver[] = [];
 
         cards.forEach((card) => {
@@ -35,11 +37,28 @@
                 const queueNextSlide = () => {
                     loadSlide(slides[(current + 1) % slides.length]);
                 };
-                const advance = () => {
-                    slides[current].classList.remove("active");
+                let leavingTimer: number | undefined;
+                const advance = async () => {
+                    const outgoing = slides[current];
+                    const incoming = slides[(current + 1) % slides.length];
+                    loadSlide(incoming);
+                    // Don't fade in a photo that hasn't arrived yet; try again next tick.
+                    try {
+                        await incoming.decode();
+                    } catch {
+                        return;
+                    }
+                    if (interval === undefined) return;
                     current = (current + 1) % slides.length;
-                    loadSlide(slides[current]);
-                    slides[current].classList.add("active");
+                    window.clearTimeout(leavingTimer);
+                    slides.forEach((slide) => slide.classList.remove("leaving"));
+                    outgoing.classList.replace("active", "leaving");
+                    incoming.classList.add("active");
+                    leavingTimer = window.setTimeout(
+                        () => outgoing.classList.remove("leaving"),
+                        FADE_MS,
+                    );
+                    timers.push(leavingTimer);
                     queueNextSlide();
                 };
                 const start = () => {
@@ -73,6 +92,7 @@
 
         return () => {
             intervals.forEach((interval) => window.clearInterval(interval));
+            timers.forEach((timer) => window.clearTimeout(timer));
             observers.forEach((observer) => observer.disconnect());
         };
     });

@@ -205,7 +205,11 @@ const fallbackUrl = `${R2_DOMAIN}/${encodedAssetKey}`;
         font-size: 0.6rem;
         white-space: nowrap;
         backdrop-filter: blur(4px);
-        transition: all 0.2s ease;
+        transition:
+            transform 0.2s ease,
+            background-color 0.2s ease,
+            color 0.2s ease,
+            box-shadow 0.2s ease;
         border: 1px solid rgba(255, 255, 255, 0.2);
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         transform: rotate(-45deg);
