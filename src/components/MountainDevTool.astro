@@ -937,6 +937,10 @@
         .dev-mountain-grid--context { grid-template-columns: minmax(0, 1fr); }
         .dev-mountain-grid-action { width: 100%; }
     }
+    /* Match the page's floating buttons, which sit 1rem from the edge on phones. */
+    @media (max-width: 639px) {
+        .dev-mountain-manager-button { right: 1rem; }
+    }
 </style>
 
 <script>

@@ -1766,6 +1766,15 @@
         text-overflow: ellipsis;
         white-space: nowrap;
     }
+    /* Match the page's floating buttons, which sit 1rem from the edge on phones. */
+    @media (max-width: 639px) {
+        .dev-gear-btn:not(.in-container),
+        .dev-tag-toggle:not(.in-container),
+        .dev-album-sync-btn:not(.in-container),
+        .dev-save-btn:not(.in-container) {
+            right: 1rem;
+        }
+    }
 </style>
 
 <script>
