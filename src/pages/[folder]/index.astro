@@ -8,6 +8,7 @@ import { getAlbumSummaries } from "../../lib/albums/catalog";
 import {
     FOLDER_METADATA,
     getFolderCols,
+    getFolderFooter,
     getFolderTitle,
     getThumbnailSrcSet,
     getThumbnailUrl,
@@ -32,7 +33,11 @@ const isDev = import.meta.env.DEV;
 const isYama = folder === "yama";
 ---
 
-<Layout title={`${folderTitle} - RIVERBED`}>
+<Layout
+    title={`${folderTitle} - RIVERBED`}
+    description={getFolderFooter(folder) ?? folderTitle}
+    shareImage={folderAlbums[0]?.cover.assetKey}
+>
     <div class="py-8">
         {
             isYama && (

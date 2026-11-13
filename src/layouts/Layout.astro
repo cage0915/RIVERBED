@@ -9,6 +9,7 @@ import PhotoLightbox from "../components/PhotoLightbox.astro";
 import PhotoFadeIn from "../components/PhotoFadeIn.astro";
 import NavigationProgress from "../components/NavigationProgress.astro";
 import YamaWalker from "../components/YamaWalker.astro";
+import { getShareImageUrl } from "../lib/constants";
 // Keep the shared font baseline to the weight every route uses. Fontsource's
 // numbered CJK faces include unicode-range declarations, so browsers fetch
 // only the chunks needed by the text on the current page.
@@ -21,17 +22,44 @@ interface Props {
 	title: string;
 	/** Show the walking hiker along the bottom of the page (Yama posts). */
 	hiker?: boolean;
+	/** Meta and link-preview description. */
+	description?: string;
+	/** R2 asset key of the photo shown when the page is shared. */
+	shareImage?: string;
+	/** Open Graph type: an Album page is an article, everything else a website. */
+	shareType?: "website" | "article";
 }
 
-const { title, hiker = false } = Astro.props;
+const {
+	title,
+	hiker = false,
+	description = "RIVERBED",
+	shareImage,
+	shareType = "website",
+} = Astro.props;
+// Previews already name the site (og:site_name), so drop the title suffix.
+const shareTitle = title.replace(/ - RIVERBED$/, "");
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
+const shareImageUrl = shareImage ? getShareImageUrl(shareImage) : undefined;
 ---
 
 <!doctype html>
 <html lang="zh-Hant" class="scroll-smooth">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="description" content="RIVERBED" />
+		<meta name="description" content={description} />
 		<meta name="viewport" content="width=device-width" />
+		<meta name="theme-color" content="#121212" />
+		<link rel="canonical" href={canonicalUrl} />
+		<meta property="og:site_name" content="RIVERBED" />
+		<meta property="og:locale" content="zh_TW" />
+		<meta property="og:type" content={shareType} />
+		<meta property="og:title" content={shareTitle} />
+		<meta property="og:description" content={description} />
+		<meta property="og:url" content={canonicalUrl} />
+		{shareImageUrl && <meta property="og:image" content={shareImageUrl} />}
+		{shareImageUrl && <meta property="og:image:alt" content={shareTitle} />}
+		<meta name="twitter:card" content={shareImageUrl ? "summary_large_image" : "summary"} />
 		<link rel="icon" type="image/x-icon" href="/favicon.ico" />
 		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 		<link rel="alternate" type="application/rss+xml" title="RIVERBED RSS" href="/rss.xml" />

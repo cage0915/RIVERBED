@@ -87,7 +87,7 @@ function chunkArray<T>(array: T[], size: number): T[][] {
 }
 ---
 
-<Layout title={`#${decodedTag} - RIVERBED`}>
+<Layout title={`#${decodedTag} - RIVERBED`} shareImage={representativePhotoKey ?? matchingPhotos[0]?.assetKey}>
     <div class="fixed bottom-8 right-8 max-sm:right-4 z-40 flex flex-col gap-3">
         <button
             onclick="window.scrollTo({top: 0, behavior: 'smooth'})"

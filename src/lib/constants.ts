@@ -49,3 +49,13 @@ export const getThumbnailSrcSet = (
         .map((width) => `${getThumbnailUrl(itemKey, width)} ${width}w`)
         .join(", ");
 };
+
+/**
+ * Link-preview (Open Graph) image for an R2 asset key. Always the public
+ * production URL, since crawlers fetch it from outside; a 1200px JPEG suits
+ * every major preview renderer.
+ */
+export const getShareImageUrl = (itemKey: string) => {
+    const encodedKey = itemKey.split('/').map(encodeURIComponent).join('/');
+    return `${R2_DOMAIN}/cdn-cgi/image/width=1200,quality=80,format=jpeg/${encodedKey}`;
+};

@@ -8,6 +8,7 @@ import "@fontsource/noto-sans-jp/700.css";
 import "@fontsource/noto-sans-tc/300.css";
 import "@fontsource/noto-sans-tc/700.css";
 import { albumPathParams } from "../../lib/static-paths";
+import { getFolderTitle } from "../../lib/constants";
 import { getAlbumBySlug, getAlbumSummaries } from "../../lib/albums/catalog";
 import type { AlbumBlock } from "../../lib/albums/types";
 
@@ -75,7 +76,13 @@ const nextAlbum = albumIndex >= 0 && albumIndex < folderAlbums.length - 1
 const titleSections = extractTitleSections(albumRecord.blocks);
 ---
 
-<Layout title={`${albumRecord.title} - RIVERBED`} hiker={folder === "yama"}>
+<Layout
+    title={`${albumRecord.title} - RIVERBED`}
+    hiker={folder === "yama"}
+    description={[getFolderTitle(folder), albumRecord.info].filter(Boolean).join(" · ")}
+    shareImage={albumRecord.cover.assetKey}
+    shareType="article"
+>
     <div class="fixed bottom-8 right-8 max-sm:right-4 z-40 flex flex-col gap-3">
         <button
             onclick="window.scrollTo({top: 0, behavior: 'smooth'})"
