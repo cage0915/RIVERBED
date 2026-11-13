@@ -264,8 +264,8 @@
     },
     {
       "filename": "002.jpg",
-      "width": 4525,
-      "height": 3000,
+      "width": 3000,
+      "height": 4525,
       "color": "#5d6f70",
       "tags": []
     },
@@ -467,8 +467,8 @@
     },
     {
       "filename": "025.jpg",
-      "width": 4525,
-      "height": 3000,
+      "width": 3000,
+      "height": 4525,
       "color": "#686d6a",
       "tags": []
     },

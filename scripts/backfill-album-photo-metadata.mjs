@@ -1,9 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 
-import sharp from "sharp";
-
-import { averageColor } from "../src/dev-api/_photo-metadata.ts";
+import { averageColor, orientedSize } from "../src/dev-api/_photo-metadata.ts";
 
 // Fills in each manifest photo's intrinsic width/height and average colour,
 // reading the local source in ./r2 or, failing that, the public R2 copy.
@@ -32,11 +30,11 @@ async function readDimensions(assetKey) {
     const localPath = path.join(localPhotoRoot, ...assetKey.split("/"));
     try {
         await fs.access(localPath);
-        const metadata = await sharp(localPath).metadata();
-        if (!metadata.width || !metadata.height) {
+        const { width, height } = await orientedSize(localPath);
+        if (!width || !height) {
             throw new Error(`Invalid local image metadata for ${assetKey}`);
         }
-        return { width: metadata.width, height: metadata.height };
+        return { width, height };
     } catch (error) {
         if (error?.code !== "ENOENT") throw error;
     }

@@ -8,11 +8,21 @@ export type PhotoMetadata = { width: number; height: number; color: string };
  * loads. scripts/backfill-album-photo-metadata.mjs reuses averageColor for existing photos.
  */
 export async function readPhotoMetadata(bytes: Uint8Array, name: string): Promise<PhotoMetadata> {
-    const metadata = await sharp(bytes).metadata();
-    if (!metadata.width || !metadata.height) {
+    const { width, height } = await orientedSize(bytes);
+    if (!width || !height) {
         throw new Error(`Unable to read image dimensions: ${name}`);
     }
-    return { width: metadata.width, height: metadata.height, color: await averageColor(bytes) };
+    return { width, height, color: await averageColor(bytes) };
+}
+
+/**
+ * Size as displayed, after EXIF orientation. Browsers rotate photos shot
+ * sideways, so the raw stored size would describe a landscape box for a
+ * portrait photo and the row would only settle once it loaded.
+ */
+export async function orientedSize(input: Uint8Array | string): Promise<{ width: number; height: number }> {
+    const { autoOrient } = await sharp(input).metadata();
+    return { width: autoOrient.width, height: autoOrient.height };
 }
 
 export async function averageColor(input: Uint8Array | string): Promise<string> {
