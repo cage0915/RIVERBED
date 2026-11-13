@@ -34,3 +34,38 @@
     margin: auto;
   }
 }
+
+/* CJK typography: a slight gap between Han/kana and Latin letters or digits
+   (e.g. 「1907年」, 「AI才知道」) without typing spaces, and evenly broken
+   headings. Browsers without support simply ignore these. */
+@layer base {
+  :root {
+    text-autospace: normal;
+  }
+
+  /* Short, usually centred lines: even out the line lengths. */
+  h1,
+  h2,
+  h3,
+  .text-block--title {
+    text-wrap: balance;
+  }
+
+  /* No text-wrap: pretty on captions or prose: Safari re-breaks the whole
+     paragraph with it, ending CJK lines one or two characters early. */
+}
+
+/* Left-aligned captions and Text blocks are set flush on both sides, as CJK
+   books are: the leftover space at a line end (from 禁則 moving a character
+   down, or from half-width letters and digits) is spread across the line.
+   The last line of each paragraph stays left-aligned. Row and Text write their
+   alignment as an inline style (and the dev tools rewrite it the same way), so
+   match that rather than change what they emit.
+   Only on wider screens: a phone line holds ~20 characters, so the same
+   leftover spread over fewer gaps makes spacing visibly vary line to line. */
+@media (min-width: 640px) {
+  .photo-caption[style*='text-align: left'],
+  .text-block[style*='text-align: left'] {
+    text-align: justify !important;
+  }
+}
