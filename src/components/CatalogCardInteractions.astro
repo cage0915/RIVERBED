@@ -3,6 +3,9 @@
 
     const INTERVAL_MS = 5000;
     const FADE_MS = 800; // Matches the slide opacity transition in index.astro.
+    // Cards change one after another in page order (top to bottom): each
+    // card's fade starts as the previous card's fade finishes.
+    const STAGGER_MS = FADE_MS;
 
     installPageLifecycle(document, () => {
         const root = document.querySelector<HTMLElement>("[data-catalog-grid]");
@@ -12,81 +15,105 @@
         const intervals: number[] = [];
         const timers: number[] = [];
         const observers: IntersectionObserver[] = [];
+        // One clock for every card, so the cascade stays in order even after
+        // cards scroll out of view and start again.
+        const epoch = performance.now();
+        const slideshowCards = Array.from(cards).filter(
+            (card) => card.querySelectorAll("img.slide").length > 1,
+        );
+        // Stretch the cycle when the cascade wouldn't fit, so fades never overlap.
+        const cycle = Math.max(INTERVAL_MS, slideshowCards.length * STAGGER_MS);
 
-        cards.forEach((card) => {
+        slideshowCards.forEach((card, order) => {
             const slides = Array.from(
                 card.querySelectorAll<HTMLImageElement>("img.slide"),
             );
+            const offset = order * STAGGER_MS;
 
-            if (slides.length > 1) {
-                let current = Math.max(
-                    0,
-                    slides.findIndex((slide) => slide.classList.contains("active")),
-                );
-                let interval: number | undefined;
-                const loadSlide = (slide: HTMLImageElement) => {
-                    if (slide.dataset.src) {
-                        slide.src = slide.dataset.src;
-                        delete slide.dataset.src;
-                    }
-                    if (slide.dataset.srcset) {
-                        slide.srcset = slide.dataset.srcset;
-                        delete slide.dataset.srcset;
-                    }
-                };
-                const queueNextSlide = () => {
-                    loadSlide(slides[(current + 1) % slides.length]);
-                };
-                let leavingTimer: number | undefined;
-                const advance = async () => {
-                    const outgoing = slides[current];
-                    const incoming = slides[(current + 1) % slides.length];
-                    loadSlide(incoming);
-                    // Don't fade in a photo that hasn't arrived yet; try again next tick.
-                    try {
-                        await incoming.decode();
-                    } catch {
-                        return;
-                    }
-                    if (interval === undefined) return;
-                    current = (current + 1) % slides.length;
-                    window.clearTimeout(leavingTimer);
-                    slides.forEach((slide) => slide.classList.remove("leaving"));
-                    outgoing.classList.replace("active", "leaving");
-                    incoming.classList.add("active");
-                    leavingTimer = window.setTimeout(
-                        () => outgoing.classList.remove("leaving"),
-                        FADE_MS,
-                    );
-                    timers.push(leavingTimer);
-                    queueNextSlide();
-                };
-                const start = () => {
-                    if (interval !== undefined) return;
-                    queueNextSlide();
-                    interval = window.setInterval(advance, INTERVAL_MS);
-                    intervals.push(interval);
-                };
-                const stop = () => {
-                    if (interval === undefined) return;
-                    window.clearInterval(interval);
-                    const intervalIndex = intervals.indexOf(interval);
-                    if (intervalIndex !== -1) intervals.splice(intervalIndex, 1);
-                    interval = undefined;
-                };
-
-                if ("IntersectionObserver" in window) {
-                    const observer = new IntersectionObserver((entries) => {
-                        entries.forEach((entry) => {
-                            if (entry.isIntersecting) start();
-                            else stop();
-                        });
-                    }, { rootMargin: "200px" });
-                    observer.observe(card);
-                    observers.push(observer);
-                } else {
-                    start();
+            let current = Math.max(
+                0,
+                slides.findIndex((slide) => slide.classList.contains("active")),
+            );
+            let interval: number | undefined;
+            let startTimer: number | undefined;
+            let running = false;
+            const loadSlide = (slide: HTMLImageElement) => {
+                if (slide.dataset.src) {
+                    slide.src = slide.dataset.src;
+                    delete slide.dataset.src;
                 }
+                if (slide.dataset.srcset) {
+                    slide.srcset = slide.dataset.srcset;
+                    delete slide.dataset.srcset;
+                }
+            };
+            const queueNextSlide = () => {
+                loadSlide(slides[(current + 1) % slides.length]);
+            };
+            let leavingTimer: number | undefined;
+            const advance = async () => {
+                const outgoing = slides[current];
+                const incoming = slides[(current + 1) % slides.length];
+                loadSlide(incoming);
+                // Don't fade in a photo that hasn't arrived yet; try again next tick.
+                try {
+                    await incoming.decode();
+                } catch {
+                    return;
+                }
+                if (!running) return;
+                current = (current + 1) % slides.length;
+                window.clearTimeout(leavingTimer);
+                slides.forEach((slide) => slide.classList.remove("leaving"));
+                outgoing.classList.replace("active", "leaving");
+                incoming.classList.add("active");
+                leavingTimer = window.setTimeout(
+                    () => outgoing.classList.remove("leaving"),
+                    FADE_MS,
+                );
+                timers.push(leavingTimer);
+                queueNextSlide();
+            };
+            const start = () => {
+                if (running) return;
+                running = true;
+                queueNextSlide();
+                // Wait for this card's next turn on the shared clock.
+                const elapsed = performance.now() - epoch - offset;
+                const tick = Math.max(1, Math.floor(elapsed / cycle) + 1);
+                const delay = tick * cycle - elapsed;
+                startTimer = window.setTimeout(() => {
+                    startTimer = undefined;
+                    if (!running) return;
+                    advance();
+                    interval = window.setInterval(advance, cycle);
+                    intervals.push(interval);
+                }, delay);
+                timers.push(startTimer);
+            };
+            const stop = () => {
+                if (!running) return;
+                running = false;
+                window.clearTimeout(startTimer);
+                startTimer = undefined;
+                if (interval === undefined) return;
+                window.clearInterval(interval);
+                const intervalIndex = intervals.indexOf(interval);
+                if (intervalIndex !== -1) intervals.splice(intervalIndex, 1);
+                interval = undefined;
+            };
+
+            if ("IntersectionObserver" in window) {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) start();
+                        else stop();
+                    });
+                }, { rootMargin: "200px" });
+                observer.observe(card);
+                observers.push(observer);
+            } else {
+                start();
             }
         });
 
