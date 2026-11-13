@@ -33,6 +33,26 @@ export function rowItemWidths(items: RowItemMetrics[], available: number): numbe
     return items.map(({ ratio, extraHeight }) => (height - extraHeight) * ratio);
 }
 
+/** Album Columns stack photos with a 0.5rem gap (see the album page styles). */
+export const COLUMN_GAP_PX = 8;
+
+/**
+ * Server-side flex for a Row from manifest sizes, so the first paint already
+ * has equal heights; each item is a photo's size or a Column's photo sizes.
+ * Undefined when any size is unknown, leaving the item to the client script.
+ */
+export function rowItemFlexFromSizes(
+    items: { width?: number; height?: number }[][],
+): (string | undefined)[] {
+    const metrics = items.map((sizes): RowItemMetrics | undefined => {
+        if (!sizes.length || sizes.some(({ width, height }) => !width || !height)) return undefined;
+        const ratios = sizes.map(({ width, height }) => width! / height!);
+        return { ratio: stackedRatio(ratios), extraHeight: COLUMN_GAP_PX * (ratios.length - 1) };
+    });
+    if (metrics.some((item) => item === undefined)) return items.map(() => undefined);
+    return rowItemFlex(metrics as RowItemMetrics[]);
+}
+
 function imageRatio(image: HTMLImageElement): number | undefined {
     const width = image.naturalWidth || Number(image.getAttribute('width'));
     const height = image.naturalHeight || Number(image.getAttribute('height'));

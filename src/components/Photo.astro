@@ -14,6 +14,8 @@ interface Props {
     caption?: string;
     tags?: Tag[];
     priority?: boolean;
+    /** Row flex precomputed from manifest sizes, so first paint is already right. */
+    flex?: string;
 }
 
 import {
@@ -24,7 +26,7 @@ import {
 } from "../lib/constants";
 import RichText from "./RichText.astro";
 
-const { assetKey, width, height, color, caption, tags = [], priority = false } = Astro.props;
+const { assetKey, width, height, color, caption, tags = [], priority = false, flex } = Astro.props;
 const encodedAssetKey = assetKey.split("/").map(encodeURIComponent).join("/");
 const imageUrl = getImageUrl(encodedAssetKey);
 const displayUrl = getThumbnailUrl(encodedAssetKey, 1100);
@@ -33,7 +35,7 @@ const isDev = import.meta.env.DEV;
 const fallbackUrl = `${R2_DOMAIN}/${encodedAssetKey}`;
 ---
 
-<div class="photo-container">
+<div class="photo-container" style={flex ? `flex: ${flex}` : undefined}>
     <div
         class="photo-wrapper"
         data-item-key={assetKey}

@@ -6,6 +6,7 @@ import PhotoCarousel from "./PhotoCarousel.astro";
 import PhotoPanorama from "./PhotoPanorama.astro";
 import Text from "./Text.astro";
 import { albumBlockPhotos } from "../lib/albums/blocks";
+import { rowItemFlexFromSizes } from "../lib/photo-row-layout";
 import type { NormalizedAlbum } from "../lib/albums/types";
 
 interface Props {
@@ -30,6 +31,11 @@ const photoProps = (filename: string) => {
         priority: filename === priorityFilename,
     };
 };
+
+const rowFlex = (items: (string | { column: string[] })[]) =>
+    rowItemFlexFromSizes(items.map((item) =>
+        (typeof item === "string" ? [item] : item.column).map((filename) => photos.get(filename) ?? {})
+    ));
 ---
 
 {album.blocks.map((block) => {
@@ -40,15 +46,17 @@ const photoProps = (filename: string) => {
                     <p>{block.text}</p>
                 </Text>
             );
-        case "Row":
+        case "Row": {
+            const flex = rowFlex(block.photos);
             return (
                 <Row caption={block.caption} captionPosition={block.captionPosition} blockMargin={block.blockMargin}>
-                    {block.photos.map((item) => typeof item === "string"
-                        ? <Photo {...photoProps(item)} />
-                        : <Column>{item.column.map((filename) => <Photo {...photoProps(filename)} />)}</Column>
+                    {block.photos.map((item, index) => typeof item === "string"
+                        ? <Photo {...photoProps(item)} flex={flex[index]} />
+                        : <Column flex={flex[index]}>{item.column.map((filename) => <Photo {...photoProps(filename)} />)}</Column>
                     )}
                 </Row>
             );
+        }
         case "PhotoCarousel":
             return (
                 <PhotoCarousel

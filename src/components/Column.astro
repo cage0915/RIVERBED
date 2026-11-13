@@ -2,8 +2,14 @@
 // Stacks photos at a shared width inside a Row; the Row sizes the whole
 // Column so its height matches the neighbouring photos. Styled by the album
 // page so the dev page-structure preview can build the same markup.
+interface Props {
+    /** Row flex precomputed from manifest sizes, so first paint is already right. */
+    flex?: string;
+}
+
+const { flex } = Astro.props;
 ---
 
-<div class="photo-column" data-photo-column>
+<div class="photo-column" data-photo-column style={flex ? `flex: ${flex}` : undefined}>
     <slot />
 </div>
