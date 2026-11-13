@@ -184,6 +184,13 @@
 	// share of the remaining gap per ms, but never slower than a floor (px/ms).
 	const CATCH_UP_RATE = 1 / 180;
 	const CATCH_UP_MIN_SPEED = 0.8;
+	// The hiker never moves faster than this (px of scroll per ms). When the
+	// page scrolls faster, it falls behind and keeps running after the page
+	// stops, always heading for wherever the page is now.
+	const MAX_SPEED = 4;
+	// Resting near either end, the hiker turns to face back into the page
+	// (ms for the turn).
+	const FACE_BACK_DURATION = 400;
 
 	// Sitting on the ground (while a photo is open in the lightbox): how long
 	// sitting down and standing up take (ms), how far the hips drop to reach
@@ -378,8 +385,8 @@
 		let idleTimer = 0;
 		let longIdleTimer = 0;
 		// The scroll position the hiker is drawn at. It follows the page
-		// directly, except that it waits while the hiker gets up or puts the
-		// backpack back on, and then walks to catch up.
+		// directly, up to MAX_SPEED, except that it waits while the hiker gets up
+		// or puts the backpack back on, and then walks to catch up.
 		let shownY = window.scrollY;
 		let catchingUp = false;
 		// Gait phase (radians), the smoothed walking speed (px/ms), and how far
@@ -389,10 +396,16 @@
 		let run = 0;
 		// Which heel strike last left a footprint.
 		let lastStep = Math.floor((phase - Math.PI / 2) / Math.PI);
-		let facingLeft = false;
+		// Starting near the right end, face back into the page (near the left
+		// end it already faces right).
+		const startMaxScroll = document.documentElement.scrollHeight - window.innerHeight;
+		let facingLeft = startMaxScroll > 0 && shownY / startMaxScroll > 1 - END_ZONE;
 		// The way the scroll is heading; the hiker only turns to it once it is
 		// standing with its backpack on.
-		let headingLeft = false;
+		let headingLeft = facingLeft;
+		// How far the hiker has turned round to face back into the page while
+		// resting near either end (0 = not turned, 1 = turned).
+		let faceBack = 0;
 		// How far the arms are in the camera pose (0 = walking arms), and how far
 		// that camera pose has moved from eye level (0) down to reviewing (1).
 		let raised = 0;
@@ -455,6 +468,7 @@
 				(packDown === 0 || packDown === 1) &&
 				shownY === y &&
 				speed === 0 &&
+				faceBack === 0 &&
 				!pantingNow();
 			// Lounge after a long rest, or straight after setting the pack down at
 			// either end of the page.
@@ -501,9 +515,12 @@
 			let nextY = shownY;
 			if (settledDown) {
 				if (y !== shownY) catchingUp = true;
-			} else if (catchingUp && !reduced) {
+			} else if (!reduced) {
 				const gap = y - shownY;
-				const step = Math.max(Math.abs(gap) * elapsed * CATCH_UP_RATE, elapsed * CATCH_UP_MIN_SPEED);
+				const maxStep = elapsed * MAX_SPEED;
+				const step = catchingUp
+					? Math.min(Math.max(Math.abs(gap) * elapsed * CATCH_UP_RATE, elapsed * CATCH_UP_MIN_SPEED), maxStep)
+					: maxStep;
 				nextY = Math.abs(gap) <= step ? y : shownY + Math.sign(gap) * step;
 			} else {
 				nextY = y;
@@ -560,6 +577,33 @@
 			const bodyX = progress * travel;
 			body.style.transform = `translateX(${bodyX}px)`;
 
+			// Resting near either end facing out of the page: turn round to face
+			// back into it. (At the very ends after a walk, setting the pack down
+			// and leaning back against it already ends facing inward.) Moving
+			// again turns back.
+			const facingOut = progress > 1 - END_ZONE ? !facingLeft : progress < END_ZONE ? facingLeft : false;
+			const faceBackTarget =
+				resting &&
+				restAction !== "pack" &&
+				facingOut &&
+				shownY === y &&
+				speed === 0 &&
+				raised === 0 &&
+				packDown === 0 &&
+				sitAmount === 0 &&
+				lounge === 0 &&
+				!pantingNow()
+					? 1
+					: 0;
+			faceBack = reduced
+				? faceBackTarget
+				: approach(faceBack, faceBackTarget, elapsed, FACE_BACK_DURATION, FACE_BACK_DURATION);
+			if (faceBack === 1) {
+				faceBack = 0;
+				facingLeft = !facingLeft;
+				headingLeft = facingLeft;
+			}
+
 			const photoResting =
 				resting &&
 				restAction === "photo" &&
@@ -612,7 +656,7 @@
 			// squeezing through zero width on the way round.
 			const turnFlip = (amount: number) =>
 				`translate(${HIP.x} 0) scale(${(1 - 2 * amount).toFixed(3)} 1) translate(${-HIP.x} 0)`;
-			const bodyTurn = turnFlip(turned);
+			const bodyTurn = turnFlip(turned + easeInOut(faceBack));
 
 			const seated = sitAmount === 1 || lounge === 1;
 			const lookUpTarget = lightboxOpen && seated ? 1 : 0;
@@ -757,6 +801,8 @@
 				settleAnimating ||
 				pantAnimating ||
 				standStill !== stillTarget ||
+				faceBack > 0 ||
+				faceBackTarget > 0 ||
 				shownY !== y ||
 				speed > 0
 			) {
