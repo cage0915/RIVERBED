@@ -75,7 +75,7 @@ const nextAlbum = albumIndex >= 0 && albumIndex < folderAlbums.length - 1
 const titleSections = extractTitleSections(albumRecord.blocks);
 ---
 
-<Layout title={`${albumRecord.title} - RIVERBED`}>
+<Layout title={`${albumRecord.title} - RIVERBED`} hiker={folder === "yama"}>
     <div class="fixed bottom-8 right-8 z-40 flex flex-col gap-3">
         <button
             onclick="window.scrollTo({top: 0, behavior: 'smooth'})"

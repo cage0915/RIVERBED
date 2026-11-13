@@ -17,10 +17,11 @@ import "photoswipe/dist/photoswipe.css";
 
 interface Props {
 	title: string;
+	/** Show the walking hiker along the bottom of the page (Yama posts). */
+	hiker?: boolean;
 }
 
-const { title } = Astro.props;
-const isYamaPage = Astro.url.pathname.split("/").filter(Boolean)[0] === "yama";
+const { title, hiker = false } = Astro.props;
 ---
 
 <!doctype html>
@@ -48,7 +49,7 @@ const isYamaPage = Astro.url.pathname.split("/").filter(Boolean)[0] === "yama";
 		<ContentKeyboardNavigation />
 		<PhotoLightbox />
 		<SiteFooter />
-		{isYamaPage && <YamaWalker />}
+		{hiker && <YamaWalker />}
 		<SiteDevTools />
 	</body>
 </html>
