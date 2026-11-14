@@ -292,6 +292,6 @@ test("accepts an optional walker and rejects unknown ones", () => {
     assert.equal(parseAlbumManifest(validManifest({ walker: "cow" }), "taiwan/morning-walk").walker, "cow");
     assert.throws(
         () => parseAlbumManifest(validManifest({ walker: "goat" }), "taiwan/morning-walk"),
-        /walker must be one of: hiker, cow/,
+        /walker must be one of: hiker, cow, ski/,
     );
 });

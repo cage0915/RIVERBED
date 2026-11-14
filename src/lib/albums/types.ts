@@ -51,8 +51,8 @@ export type PhotoPanoramaBlock = BlockSpacing & BlockCaption & {
 
 export type AlbumBlock = TextBlock | RowBlock | PhotoCarouselBlock | PhotoPanoramaBlock;
 
-/** Animals that can walk along the bottom of a Yama page; the hiker is the default. */
-export const ALBUM_WALKERS = ["hiker", "cow"] as const;
+/** Figures that can travel along the bottom of a Yama page; the hiker is the default. */
+export const ALBUM_WALKERS = ["hiker", "cow", "ski"] as const;
 export type AlbumWalker = (typeof ALBUM_WALKERS)[number];
 
 export type AlbumManifest = {

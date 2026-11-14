@@ -1,0 +1,802 @@
+---
+// A stick-figure skier on two skis, pinned to the bottom of /yama pages in
+// place of the hiker on albums that ask for it. Its horizontal position
+// tracks how far the page has been scrolled. At low speed it walks on its
+// skis, sliding one ski and then the other while each pole plants as its arm
+// swings back. Once the page scrolls fast, it double-poles hard three times
+// and then glides in a beginner's crouch with the poles under its arms,
+// kicking up snow behind the tails; stopping out of the glide, it sits back
+// and the ski fronts throw up snow. Its skis leave a fading track. Once the
+// page rests it stands on its planted poles, and near either end it hops
+// round to face back into the page.
+---
+
+<div
+	data-yama-ski
+	aria-hidden="true"
+	class="pointer-events-none fixed inset-x-0 bottom-0 z-40 h-14 sm:px-2"
+	style="background: linear-gradient(to top, rgb(18 18 18 / 0.7) 0%, rgb(18 18 18 / 0.5) 30%, rgb(18 18 18 / 0.22) 62%, rgb(18 18 18 / 0.06) 85%, rgb(18 18 18 / 0) 100%);"
+>
+	<div
+		data-yama-ski-body
+		class="absolute bottom-1 left-0 w-[32px] text-zinc-400 drop-shadow-[0_0_2px_rgba(0,0,0,0.8)]"
+	>
+		<svg
+			class="block overflow-visible"
+			viewBox="0 0 40 44"
+			width="32"
+			height="35.2"
+			fill="none"
+			stroke="currentColor"
+			stroke-width="1.6"
+			stroke-linecap="round"
+			stroke-linejoin="round"
+		>
+			<!-- Limbs and poles start in the standing pose the script draws at rest,
+			     so the skier is whole before the script runs. Keep these in step
+			     with STAND below. -->
+			<g data-yama-ski-figure>
+				<g data-yama-ski-turn>
+					<!-- Skis: each moves with its foot, except after a crash, when they
+					     stay where they came off. -->
+					<g data-yama-ski-ski="far" transform="translate(1.4 0)">
+						<path d="M7 42 L32 42 Q35 42 35.6 39.6" stroke-width="1.2" />
+					</g>
+					<g data-yama-ski-ski="near">
+						<path d="M7 42 L32 42 Q35 42 35.6 39.6" stroke-width="1.2" />
+					</g>
+
+					<!-- The person, thrown clear of the skis in a crash. -->
+					<g data-yama-ski-person>
+						<!-- Far side, drawn first: the arm and pole dimmer, the leg as
+						     strong as the near one. -->
+						<g opacity="0.45">
+							<polyline data-yama-ski-pole="far" stroke-width="1" points="32.29,13.50 32.29,41.10" />
+							<line data-yama-ski-basket="far" stroke-width="1" x1="31.09" y1="38.90" x2="33.49" y2="38.90" />
+							<polyline data-yama-ski-arm="far" points="23.83,12.02 26.60,17.57 32.29,15.10" />
+						</g>
+						<rect data-yama-ski-boot="far" x="18.2" y="38.8" width="4.6" height="3.2" rx="1" fill="currentColor" stroke="none" transform="translate(1.4 0)" />
+						<polyline data-yama-ski-leg="far" points="22.47,24.95 22.74,32.44 21.90,40.40" />
+
+						<!-- Torso: a slim capsule from the hips to the shoulders. -->
+						<rect
+							data-yama-ski-torso
+							x="-2.2"
+							y="-14.8"
+							width="4.4"
+							height="16.6"
+							rx="2.2"
+							fill="currentColor"
+							fill-opacity="0.2"
+							stroke-width="1.2"
+							transform="translate(21.07 24.95) rotate(6)"
+						/>
+
+						<!-- Head in a bobble hat and goggles, drawn about its centre. -->
+						<g data-yama-ski-head stroke-width="1" transform="translate(22.76 7.63) rotate(2)">
+							<circle r="3.4" />
+							<path d="M-3.4 -0.5 A3.4 3.4 0 0 1 3.4 -0.5 Z" fill="currentColor" />
+							<circle cx="-0.4" cy="-4.4" r="1.1" fill="currentColor" stroke="none" />
+							<rect x="0.9" y="-0.2" width="3.3" height="1.9" rx="0.6" fill="currentColor" stroke="none" />
+						</g>
+
+						<!-- Near side: boot, leg, arm and pole. -->
+						<rect data-yama-ski-boot="near" x="18.2" y="38.8" width="4.6" height="3.2" rx="1" fill="currentColor" stroke="none" />
+						<polyline data-yama-ski-leg="near" points="21.07,24.95 21.34,32.44 20.50,40.40" />
+						<polyline data-yama-ski-arm="near" points="22.43,12.02 25.20,17.57 30.89,15.10" />
+						<polyline data-yama-ski-pole="near" stroke-width="1" points="30.89,13.50 30.89,41.10" />
+						<line data-yama-ski-basket="near" stroke-width="1" x1="29.69" y1="38.90" x2="32.09" y2="38.90" />
+					</g>
+				</g>
+			</g>
+		</svg>
+	</div>
+</div>
+
+<style is:global>
+	/* No skier while an album shows its photo grid. */
+	body:has([data-album-photo-grid]) [data-yama-ski] {
+		display: none;
+	}
+
+	.yama-ski-track {
+		position: absolute;
+		bottom: 5px;
+		height: 1px;
+		background: rgb(161 161 170 / 0.45);
+		pointer-events: none;
+		animation: yama-ski-track 2.4s ease-in forwards;
+	}
+
+	@keyframes yama-ski-track {
+		from {
+			opacity: 1;
+		}
+		to {
+			opacity: 0;
+		}
+	}
+
+	.yama-ski-spray {
+		position: absolute;
+		bottom: 6px;
+		width: 1.6px;
+		height: 1.6px;
+		border-radius: 9999px;
+		background: rgb(212 212 216 / 0.8);
+		pointer-events: none;
+		animation: yama-ski-spray 0.55s ease-out forwards;
+	}
+
+	@keyframes yama-ski-spray {
+		from {
+			opacity: 0.9;
+			transform: translate(0, 0);
+		}
+		to {
+			opacity: 0;
+			transform: translate(var(--dx), var(--dy));
+		}
+	}
+</style>
+
+<script>
+	import { installPageLifecycle } from "../lib/client-page-lifecycle";
+
+	type Point = { x: number; y: number };
+	// One side's leg, arm and pole.
+	type Limb = { ankle: Point; knee: Point; elbow: Point; hand: Point; tip: Point };
+	// Every point the figure is drawn from; poses are blended point by point.
+	// limbs[0] is the near side, limbs[1] the far side.
+	type Pose = {
+		hip: Point;
+		shoulder: Point;
+		head: Point;
+		headTilt: number;
+		limbs: [Limb, Limb];
+	};
+	// Joint angles a pose is built from, in degrees. shin: forward tilt from
+	// the ankle; thigh: backward tilt from the knee; lean: forward tilt of the
+	// torso; arm: the shoulder-to-hand direction from straight down, positive
+	// forward; reach: shoulder-to-hand distance.
+	type Angles = { shin: number; thigh: number; lean: number; arm: number; reach: number; headTilt: number };
+
+	// The figure faces +x. The SVG is 40 units wide; the skis lie on GROUND_Y,
+	// and the ankles sit at ANKLE when standing (each ski moves with its foot).
+	const WIDTH = 40;
+	const GROUND_Y = 42;
+	const ANKLE = { x: 20.5, y: 40.4 };
+	const SHIN = 8;
+	const THIGH = 7.5;
+	const TORSO = 13;
+	const NECK = 4.4;
+	const UPPER_ARM = 6.2;
+	const FOREARM = 6.2;
+	const POLE = 26;
+	// The far limbs sit a little behind the near ones.
+	const FAR_OFFSET = 1.4;
+	// Where along the ski the tail sprays snow, and the ski's middle.
+	const SKI_TAIL_X = 8;
+	const SKI_FRONT_X = 33;
+	const SKI_CENTER_X = WIDTH / 2;
+
+	// Speeds and distances below are on screen (px), not in page scroll, so
+	// the skier looks the same however long the page is.
+
+	// Walking on skis: distance (px) for one full stride (near ski, then far
+	// ski), growing with speed so the legs never flicker; how far
+	// each ski slides forward and back of the ankle's resting place, and how
+	// little it lifts while sliding forward.
+	const STRIDE_SLOW = 16;
+	const STRIDE_FAST = 28;
+	const FAST_SPEED = 0.1;
+	const STEP_REACH = 4.5;
+	const SKI_LIFT = 0.6;
+	// How far each arm swings either side of WALK.arm (deg), and how high a
+	// pole tip lifts while its arm swings forward again.
+	const ARM_SWING = 35;
+	const POLE_LIFT = 3;
+	// From RUN_FROM_SPEED to RUN_FULL_SPEED (px/ms) the walk folds into a
+	// tuck. Before tucking, the skier double-poles hard POLE_STROKES times
+	// over POLE_BURST_DURATION ms, each stroke spending PUSH_SHARE of its time
+	// pushing. It eases into the first stroke over POLE_IN_DURATION ms, and
+	// folds into the tuck (or back to walking) over TUCK_IN_DURATION and
+	// TUCK_OUT_DURATION ms.
+	const RUN_FROM_SPEED = 0.12;
+	const RUN_FULL_SPEED = 0.25;
+	const POLE_STROKES = 3;
+	const POLE_BURST_DURATION = 900;
+	const PUSH_SHARE = 0.4;
+	const POLE_IN_DURATION = 110;
+	const TUCK_IN_DURATION = 380;
+	const TUCK_OUT_DURATION = 300;
+	const SPEED_SMOOTHING = 120;
+	// The skier never moves faster than this (px per ms); when the page
+	// scrolls faster it falls behind and keeps going after it stops. It
+	// gathers speed at ACCELERATION (px/ms per ms) rather than jumping to it,
+	// and eases off at DECELERATION as it draws level with the page.
+	const MAX_SPEED = 0.6;
+	const ACCELERATION = 0.0004;
+	const DECELERATION = 0.0008;
+	// Coming to a stop: after this long without moving (ms), it stands up on
+	// its poles over the given times (ms).
+	const STOP_AFTER = 180;
+	const STOP_SETTLE_DURATION = 320;
+	const STOP_RELEASE_DURATION = 140;
+
+	// How long the page must rest before the skier counts as resting (ms).
+	const IDLE_DELAY = 600;
+	// Within this share of either end, a resting skier hops round to face
+	// back into the page: how long the hop takes (ms) and how high it goes.
+	const END_ZONE = 0.05;
+	const FACE_BACK_DURATION = 520;
+	const HOP_HEIGHT = 4;
+
+	// Snow: a track segment once the skis have moved this far (px), and spray
+	// from the tails every SPRAY_EVERY ms once the tuck is this far in.
+	const TRACK_MIN_LENGTH = 2;
+	const SPRAY_FROM_RUN = 0.35;
+	const SPRAY_EVERY = 45;
+	// Braking: when the skier stops at least this far into the glide, it
+	// sits back over BRAKE_DURATION ms, throwing BRAKE_FLAKES flakes from the
+	// ski fronts every SPRAY_EVERY ms during the first BRAKE_SPRAY_SHARE of it.
+	const BRAKE_FROM_TUCK = 0.5;
+	const BRAKE_DURATION = 560;
+	const BRAKE_SPRAY_SHARE = 0.55;
+	const BRAKE_FLAKES = 3;
+
+	// Crashing: reaching the bottom of the page faster than CRASH_SPEED (px/ms),
+	// the skier doesn't slow down for it. The skis skid SKID_DISTANCE further
+	// over SKID_DURATION ms and stop dead, throwing CRASH_FLAKES flakes, while
+	// the person flies on at FLY_SPEED_SHARE of the speed it arrived,
+	// FLY_DISTANCE (figure units) forward and FLY_HEIGHT high at the top,
+	// tumbling FLY_SPIN deg, and off the screen.
+	// After OFFSCREEN_DURATION ms it walks back on foot at WALK_BACK_SPEED
+	// (units/ms), lifting each boot FOOT_LIFT, turns round over
+	// CRASH_TURN_DURATION ms, and steps into one ski and then the other, each
+	// over STEP_IN_DURATION ms, lifting the boot STEP_IN_LIFT.
+	const CRASH_SPEED = 0.3;
+	const SKID_DISTANCE = 5;
+	const SKID_DURATION = 260;
+	const CRASH_FLAKES = 12;
+	const FLY_SPEED_SHARE = 0.75;
+	const FLY_DISTANCE = 90;
+	const FLY_HEIGHT = 22;
+	const FLY_SPIN = 200;
+	const OFFSCREEN_DURATION = 900;
+	const WALK_BACK_SPEED = 0.05;
+	const FOOT_LIFT = 2.2;
+	const CRASH_TURN_DURATION = 350;
+	const STEP_IN_DURATION = 420;
+	const STEP_IN_LIFT = 3;
+
+	const STAND: Angles = { shin: 6, thigh: 2, lean: 6, arm: 70, reach: 9, headTilt: 2 };
+	// Walking: knees softly bent so either ski can reach; arm and reach are
+	// the middle of each arm's swing.
+	const WALK: Angles = { shin: 22, thigh: 18, lean: 10, arm: 30, reach: 9, headTilt: 3 };
+	// Double-poling: reaching forward with the poles planted, then folding at
+	// the hips and driving the hands back past the thighs.
+	const POLE_REACH: Angles = { shin: 10, thigh: 4, lean: 14, arm: 80, reach: 12, headTilt: 4 };
+	const POLE_PUSH: Angles = { shin: 24, thigh: 22, lean: 52, arm: -40, reach: 12, headTilt: 14 };
+	// Gliding fast: a beginner's crouch, not a racer's tuck. Knees bent, a
+	// little forward lean, hands out in front with the poles held back under
+	// the arms, tips pointing a little downward (deg below level).
+	const TUCK: Angles = { shin: 24, thigh: 36, lean: 26, arm: 38, reach: 9, headTilt: 3 };
+	const TUCK_POLE_DROP = 14;
+	// Braking from a glide: the skier sits back with the hands up for balance
+	// while the ski fronts throw up snow.
+	const BRAKE: Angles = { shin: 22, thigh: 34, lean: -2, arm: 55, reach: 10, headTilt: -4 };
+	// Thrown through the air: legs trailing, arms flung up, poles still in hand.
+	const FLY: Angles = { shin: -10, thigh: 30, lean: 20, arm: 150, reach: 11, headTilt: -10 };
+
+	const rad = (degrees: number) => (degrees * Math.PI) / 180;
+	const add = (from: Point, angle: number, length: number, up = true): Point => ({
+		x: from.x + Math.sin(rad(angle)) * length,
+		y: from.y + (up ? -1 : 1) * Math.cos(rad(angle)) * length,
+	});
+	const mix = (from: number, to: number, amount: number) => from + (to - from) * amount;
+	const mixPoint = (from: Point, to: Point, amount: number): Point => ({
+		x: mix(from.x, to.x, amount),
+		y: mix(from.y, to.y, amount),
+	});
+	const mixAngles = (from: Angles, to: Angles, amount: number): Angles => ({
+		shin: mix(from.shin, to.shin, amount),
+		thigh: mix(from.thigh, to.thigh, amount),
+		lean: mix(from.lean, to.lean, amount),
+		arm: mix(from.arm, to.arm, amount),
+		reach: mix(from.reach, to.reach, amount),
+		headTilt: mix(from.headTilt, to.headTilt, amount),
+	});
+	const mixLimb = (from: Limb, to: Limb, amount: number): Limb => ({
+		ankle: mixPoint(from.ankle, to.ankle, amount),
+		knee: mixPoint(from.knee, to.knee, amount),
+		elbow: mixPoint(from.elbow, to.elbow, amount),
+		hand: mixPoint(from.hand, to.hand, amount),
+		tip: mixPoint(from.tip, to.tip, amount),
+	});
+	const mixPose = (from: Pose, to: Pose, amount: number): Pose => ({
+		hip: mixPoint(from.hip, to.hip, amount),
+		shoulder: mixPoint(from.shoulder, to.shoulder, amount),
+		head: mixPoint(from.head, to.head, amount),
+		headTilt: mix(from.headTilt, to.headTilt, amount),
+		limbs: [mixLimb(from.limbs[0], to.limbs[0], amount), mixLimb(from.limbs[1], to.limbs[1], amount)],
+	});
+	const easeInOut = (t: number) => (t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2);
+	const clamp01 = (t: number) => Math.min(Math.max(t, 0), 1);
+	const approach = (value: number, target: number, elapsed: number, riseMs: number, fallMs: number) =>
+		target > value
+			? Math.min(target, value + elapsed / riseMs)
+			: Math.max(target, value - elapsed / fallMs);
+
+	// The middle joint of a two-bone limb reaching from `root` toward
+	// `target`; side 1 bends it down and back (an elbow), -1 forward (a knee).
+	const joint = (root: Point, target: Point, upper: number, lower: number, side: 1 | -1): Point => {
+		const dx = target.x - root.x;
+		const dy = target.y - root.y;
+		const distance = Math.max(0.5, Math.min(Math.hypot(dx, dy), upper + lower - 0.05));
+		const bend = Math.acos(
+			Math.min(1, Math.max(-1, (upper ** 2 + distance ** 2 - lower ** 2) / (2 * upper * distance))),
+		);
+		const angle = Math.atan2(dy, dx) + side * bend;
+		return { x: root.x + Math.cos(angle) * upper, y: root.y + Math.sin(angle) * upper };
+	};
+	const elbowFor = (shoulder: Point, hand: Point) => joint(shoulder, hand, UPPER_ARM, FOREARM, 1);
+
+	// A pole planted behind the hand, its tip `lift` above the snow.
+	const plantedTip = (hand: Point, lift: number): Point => {
+		const dy = Math.min(Math.max(GROUND_Y - lift - hand.y, 0), POLE);
+		return { x: hand.x - Math.sqrt(POLE ** 2 - dy ** 2), y: hand.y + dy };
+	};
+
+	// A pose with both feet together under the body and both arms alike.
+	const build = (angles: Angles, tipFor: (hand: Point) => Point): Pose => {
+		const knee = add(ANKLE, angles.shin, SHIN);
+		const hip = add(knee, -angles.thigh, THIGH);
+		const shoulder = add(hip, angles.lean, TORSO);
+		// The neck bends back a little, so the skier looks ahead.
+		const head = add(shoulder, angles.lean * 0.7, NECK);
+		const hand = add(shoulder, angles.arm, angles.reach, false);
+		const limb: Limb = { ankle: ANKLE, knee, elbow: elbowFor(shoulder, hand), hand, tip: tipFor(hand) };
+		return { hip, shoulder, head, headTilt: angles.headTilt, limbs: [limb, { ...limb }] };
+	};
+
+	const STAND_POSE = build(STAND, (hand) => plantedTip(hand, 0));
+	const BRAKE_POSE = build(BRAKE, (hand) => add(hand, -90 - TUCK_POLE_DROP, POLE));
+	const TUCK_POSE = build(TUCK, (hand) => add(hand, -90 - TUCK_POLE_DROP, POLE));
+	const WALK_BODY = build(WALK, (hand) => hand);
+	const FLY_POSE = build(FLY, (hand) => add(hand, FLY.arm, POLE * 0.8, false));
+
+	// A double-pole stroke at `stroke` (0..1): the push with the tips
+	// planted, then the swing forward with the tips lifted clear.
+	const doublePole = (stroke: number): Pose => {
+		if (stroke < PUSH_SHARE) {
+			const push = easeInOut(stroke / PUSH_SHARE);
+			return build(mixAngles(POLE_REACH, POLE_PUSH, push), (hand) => plantedTip(hand, 0));
+		}
+		const swing = (stroke - PUSH_SHARE) / (1 - PUSH_SHARE);
+		return build(mixAngles(POLE_PUSH, POLE_REACH, easeInOut(swing)), (hand) =>
+			plantedTip(hand, Math.sin(Math.PI * swing) * POLE_LIFT),
+		);
+	};
+
+	// Walking at a point in its stride. Each ski slides forward, barely
+	// lifted, then stays put on the snow as the body passes over it; the arm
+	// on the same side swings the other way, its pole planted while it pushes
+	// back and lifted clear while it swings forward. The far side is half a
+	// stride behind.
+	const walk = (phase: number, footLift = SKI_LIFT): Pose => {
+		const { hip, shoulder } = WALK_BODY;
+		const limb = (sidePhase: number): Limb => {
+			const swinging = Math.cos(sidePhase);
+			const ankle = {
+				x: ANKLE.x + Math.sin(sidePhase) * STEP_REACH,
+				y: ANKLE.y - Math.max(0, swinging) * footLift,
+			};
+			const hand = add(shoulder, WALK.arm - Math.sin(sidePhase) * ARM_SWING, WALK.reach, false);
+			return {
+				ankle,
+				knee: joint(hip, ankle, THIGH, SHIN, -1),
+				elbow: elbowFor(shoulder, hand),
+				hand,
+				tip: plantedTip(hand, Math.max(0, -swinging) * POLE_LIFT),
+			};
+		};
+		return { ...WALK_BODY, limbs: [limb(phase), limb(phase + Math.PI)] };
+	};
+
+	// Where a crash is `t` ms in, for a person thrown at `flySpeed` (figure
+	// units per ms): its pose, its offset and tumble from where it stood on
+	// the skis, whether it faces back the way it came, how far the skis
+	// skidded, and whether it is over.
+	type CrashFrame = {
+		pose: Pose;
+		offset: Point;
+		spin: number;
+		turned: number;
+		skid: number;
+		done: boolean;
+	};
+	const crashAt = (t: number, flySpeed: number): CrashFrame => {
+		// Flying keeps the speed the skier arrived with: no slowing down.
+		const FLY_END = FLY_DISTANCE / flySpeed;
+		const WALK_BACK_START = FLY_END + OFFSCREEN_DURATION;
+		const WALK_BACK_END = WALK_BACK_START + (FLY_DISTANCE - SKID_DISTANCE) / WALK_BACK_SPEED;
+		const TURN_END = WALK_BACK_END + CRASH_TURN_DURATION;
+		const STEP_IN_END = TURN_END + 2 * STEP_IN_DURATION;
+		const skid = SKID_DISTANCE * (1 - (1 - clamp01(t / SKID_DURATION)) ** 2);
+		if (t < FLY_END) {
+			const f = t / FLY_END;
+			return {
+				pose: mixPose(TUCK_POSE, FLY_POSE, easeInOut(clamp01(f / 0.35))),
+				offset: { x: flySpeed * t, y: -FLY_HEIGHT * Math.sin(Math.PI * f) },
+				spin: FLY_SPIN * f,
+				turned: 0,
+				skid,
+				done: false,
+			};
+		}
+		if (t < WALK_BACK_END) {
+			const walked = Math.max(0, t - WALK_BACK_START) * WALK_BACK_SPEED;
+			const left = FLY_DISTANCE - SKID_DISTANCE - walked;
+			const stride = (walked * (WIDTH / 32)) / STRIDE_SLOW;
+			return {
+				pose: mixPose(walk(stride * Math.PI * 2, FOOT_LIFT), STAND_POSE, easeInOut(clamp01(1 - left / 4))),
+				offset: { x: SKID_DISTANCE + left, y: 0 },
+				spin: 0,
+				turned: 1,
+				skid,
+				done: false,
+			};
+		}
+		const offset = { x: SKID_DISTANCE, y: 0 };
+		if (t < TURN_END) {
+			const turned = 1 - easeInOut((t - WALK_BACK_END) / CRASH_TURN_DURATION);
+			return { pose: STAND_POSE, offset, spin: 0, turned, skid, done: false };
+		}
+		if (t < STEP_IN_END) {
+			// Lift one boot onto its ski and stamp it in, then the other.
+			const step = (t - TURN_END) / STEP_IN_DURATION;
+			const side = step < 1 ? 0 : 1;
+			// Shuffle back to where the skier stood before the skid meanwhile.
+			const back = SKID_DISTANCE * (1 - easeInOut(step / 2));
+			const lift = Math.sin(Math.PI * (step - side)) * STEP_IN_LIFT;
+			const limbs = STAND_POSE.limbs.map((limb, index) => {
+				if (index !== side) return limb;
+				const ankle = { x: limb.ankle.x, y: limb.ankle.y - lift };
+				return { ...limb, ankle, knee: joint(STAND_POSE.hip, ankle, THIGH, SHIN, -1) };
+			}) as [Limb, Limb];
+			const shuffled = { x: back, y: 0 };
+			return { pose: { ...STAND_POSE, limbs }, offset: shuffled, spin: 0, turned: 0, skid: back, done: false };
+		}
+		return { pose: STAND_POSE, offset: { x: 0, y: 0 }, spin: 0, turned: 0, skid: 0, done: true };
+	};
+
+	const toPoints = (points: Point[], dx = 0) =>
+		points.map(({ x, y }) => `${(x + dx).toFixed(2)},${y.toFixed(2)}`).join(" ");
+
+	installPageLifecycle(document, () => {
+		const skier = document.querySelector<HTMLElement>("[data-yama-ski]");
+		const body = skier?.querySelector<HTMLElement>("[data-yama-ski-body]");
+		const figure = skier?.querySelector<SVGGElement>("[data-yama-ski-figure]");
+		const turn = skier?.querySelector<SVGGElement>("[data-yama-ski-turn]");
+		const torso = skier?.querySelector<SVGRectElement>("[data-yama-ski-torso]");
+		const head = skier?.querySelector<SVGGElement>("[data-yama-ski-head]");
+		const person = skier?.querySelector<SVGGElement>("[data-yama-ski-person]");
+		if (!skier || !body || !figure || !turn || !torso || !head || !person) return;
+		const part = <T extends Element>(name: string, side: string) =>
+			skier.querySelector<T>(`[data-yama-ski-${name}="${side}"]`)!;
+		const sides = (["near", "far"] as const).map((side, index) => ({
+			index,
+			dx: side === "far" ? FAR_OFFSET : 0,
+			ski: part<SVGGElement>("ski", side),
+			boot: part<SVGRectElement>("boot", side),
+			leg: part<SVGPolylineElement>("leg", side),
+			arm: part<SVGPolylineElement>("arm", side),
+			pole: part<SVGPolylineElement>("pole", side),
+			basket: part<SVGLineElement>("basket", side),
+		}));
+
+		const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+		const controller = new AbortController();
+		let frame = 0;
+		let idleTimer = 0;
+		let shownY = window.scrollY;
+		// Stride phase (radians) and smoothed speed (px/ms).
+		let phase = 0;
+		let speed = 0;
+		// How fast (px/ms on screen) the skier actually moved last frame.
+		let velocity = 0;
+		// Speeding up: when the double-pole burst began (0 = none), whether it
+		// has finished so the skier may tuck, how far the poses have gone into
+		// double-poling and into the tuck (0..1).
+		let burstStartedAt = 0;
+		let tuckReady = false;
+		let poling = 0;
+		let tuck = 0;
+		// When the current brake began (0 = not braking), and whether the
+		// skier moved last frame.
+		let brakeStartedAt = 0;
+		let wasMoving = false;
+		// When the current crash began (0 = none).
+		let crashStartedAt = 0;
+		// How fast (figure units per ms) the person is thrown.
+		let flySpeed = 0;
+		const startMaxScroll = document.documentElement.scrollHeight - window.innerHeight;
+		let facingLeft = startMaxScroll > 0 && shownY / startMaxScroll > 1 - END_ZONE;
+		let faceBack = 0;
+		let resting = false;
+		let lastMovedAt = 0;
+		let standStill = 1;
+		// Where (px) the last track segment ended, and when snow last sprayed.
+		let trackX: number | null = null;
+		let lastSprayAt = 0;
+		let lastFrameTime = performance.now();
+
+		const leaveTrack = (from: number, to: number) => {
+			const track = document.createElement("span");
+			track.className = "yama-ski-track";
+			track.style.left = `${Math.min(from, to).toFixed(1)}px`;
+			track.style.width = `${Math.abs(to - from).toFixed(1)}px`;
+			track.addEventListener("animationend", () => track.remove(), { once: true });
+			skier.appendChild(track);
+		};
+
+		// A flake thrown from x toward `direction` (1 = right, -1 = left);
+		// `strength` scales how far it flies.
+		const spray = (x: number, direction: number, strength = 1) => {
+			const flake = document.createElement("span");
+			flake.className = "yama-ski-spray";
+			flake.style.left = `${x.toFixed(1)}px`;
+			flake.style.setProperty("--dx", `${(direction * strength * (4 + Math.random() * 9)).toFixed(1)}px`);
+			flake.style.setProperty("--dy", `${(-strength * (3 + Math.random() * 6)).toFixed(1)}px`);
+			flake.addEventListener("animationend", () => flake.remove(), { once: true });
+			skier.appendChild(flake);
+		};
+
+		const render = (now: number) => {
+			frame = 0;
+			const elapsed = Math.min(now - lastFrameTime, 100);
+			lastFrameTime = now;
+			const reduced = reducedMotion.matches;
+
+			const y = window.scrollY;
+			const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+			const bodyWidth = body.offsetWidth;
+			// On desktop the strip's side padding keeps the skier off the screen edges.
+			const inset = parseFloat(getComputedStyle(skier).paddingLeft) || 0;
+			const travel = Math.max(0, skier.clientWidth - 2 * inset - bodyWidth);
+			// Screen px moved per px of scroll.
+			const screenPerScroll = maxScroll > 0 ? travel / maxScroll : 0;
+			const gap = y - shownY;
+			// Heading for the very bottom of the page, the skier doesn't slow down.
+			const headingToBottom = maxScroll > 0 && y >= maxScroll - 1 && gap > 0;
+			// Speed up from last frame's speed, but slow down in time to stop
+			// where the page is.
+			const allowed = Math.min(
+				MAX_SPEED,
+				velocity + ACCELERATION * elapsed,
+				headingToBottom ? Infinity : Math.sqrt(2 * DECELERATION * Math.abs(gap) * screenPerScroll),
+			);
+			const maxStep = screenPerScroll > 0 ? (elapsed * allowed) / screenPerScroll : Infinity;
+			// No moving while crashed.
+			const nextY =
+				crashStartedAt > 0
+					? shownY
+					: reduced || Math.abs(gap) <= maxStep
+						? y
+						: shownY + Math.sign(gap) * maxStep;
+			// Arriving at the bottom still going fast: crash.
+			const crashNow =
+				!reduced && crashStartedAt === 0 && headingToBottom && nextY === y && velocity >= CRASH_SPEED;
+			if (crashNow) {
+				crashStartedAt = now;
+				flySpeed = (FLY_SPEED_SHARE * velocity) / (bodyWidth / WIDTH);
+			}
+			// Turn to the way the page is heading, unless hopping round.
+			if (nextY !== shownY && faceBack === 0) facingLeft = nextY < shownY;
+			const moved = Math.abs(nextY - shownY);
+			const movedOnScreen = moved * screenPerScroll;
+			velocity = elapsed > 0 ? movedOnScreen / elapsed : 0;
+			const instantSpeed = elapsed > 0 ? movedOnScreen / elapsed : 0;
+			speed += (instantSpeed - speed) * clamp01(elapsed / SPEED_SMOOTHING);
+			if (speed < 0.0005) speed = 0;
+			const run = reduced
+				? 0
+				: easeInOut(clamp01((speed - RUN_FROM_SPEED) / (RUN_FULL_SPEED - RUN_FROM_SPEED)));
+			const stride = mix(STRIDE_SLOW, STRIDE_FAST, easeInOut(clamp01(speed / FAST_SPEED)));
+			phase += (movedOnScreen / stride) * Math.PI * 2;
+			shownY = nextY;
+			if (moved > 0) lastMovedAt = now;
+			// Stopping out of a glide brakes; moving again cancels it.
+			if (moved > 0 || crashStartedAt > 0) brakeStartedAt = 0;
+			else if (wasMoving && tuck >= BRAKE_FROM_TUCK && !reduced) brakeStartedAt = now;
+			wasMoving = moved > 0;
+			const sinceBrake = brakeStartedAt ? (now - brakeStartedAt) / BRAKE_DURATION : 1;
+			if (sinceBrake >= 1) brakeStartedAt = 0;
+			const braking = brakeStartedAt > 0;
+			const brake = braking
+				? easeInOut(clamp01(sinceBrake / 0.2)) * (1 - easeInOut(clamp01((sinceBrake - 0.6) / 0.4)))
+				: 0;
+			const stillTarget = now - lastMovedAt > STOP_AFTER ? 1 : 0;
+			standStill = reduced
+				? stillTarget
+				: approach(standStill, stillTarget, elapsed, STOP_SETTLE_DURATION, STOP_RELEASE_DURATION);
+
+			const progress = maxScroll > 0 ? clamp01(shownY / maxScroll) : 0;
+			const bodyX = inset + progress * travel;
+			body.style.transform = `translateX(${bodyX}px)`;
+
+			// Resting near either end facing out of the page: hop round.
+			const facingOut = progress > 1 - END_ZONE ? !facingLeft : progress < END_ZONE ? facingLeft : false;
+			const faceBackTarget =
+				resting && facingOut && shownY === y && speed === 0 && standStill === 1 && crashStartedAt === 0
+					? 1
+					: 0;
+			faceBack = reduced
+				? faceBackTarget
+				: approach(faceBack, faceBackTarget, elapsed, FACE_BACK_DURATION, FACE_BACK_DURATION);
+			if (faceBack === 1) {
+				faceBack = 0;
+				facingLeft = !facingLeft;
+			}
+
+			// Speeding up: three hard double-pole strokes first, then the tuck.
+			// Slowing back to a walk cancels both.
+			if (run === 0) {
+				burstStartedAt = 0;
+				tuckReady = false;
+			} else if (!tuckReady && burstStartedAt === 0) {
+				burstStartedAt = now;
+			}
+			const sinceBurst = burstStartedAt ? now - burstStartedAt : 0;
+			if (burstStartedAt && sinceBurst >= POLE_BURST_DURATION) tuckReady = true;
+			const bursting = burstStartedAt > 0 && !tuckReady;
+			poling = approach(poling, bursting ? 1 : 0, elapsed, POLE_IN_DURATION, TUCK_IN_DURATION);
+			tuck = approach(tuck, tuckReady ? run : 0, elapsed, TUCK_IN_DURATION, TUCK_OUT_DURATION);
+			const strokes = Math.min(sinceBurst / POLE_BURST_DURATION, 1) * POLE_STROKES;
+			const stroke = strokes >= POLE_STROKES ? 0 : strokes % 1;
+
+			// Blend the poses: walking, double-poling, the tuck, and standing on
+			// the poles once stopped.
+			const moving = mixPose(
+				mixPose(walk(phase), doublePole(stroke), easeInOut(poling)),
+				TUCK_POSE,
+				easeInOut(tuck),
+			);
+			const crash = crashStartedAt > 0 ? crashAt(now - crashStartedAt, flySpeed) : null;
+			if (crash?.done) crashStartedAt = 0;
+			const pose = crash
+				? crash.pose
+				: mixPose(mixPose(moving, STAND_POSE, easeInOut(standStill)), BRAKE_POSE, brake);
+
+			// The person is thrown clear of the skis, tumbling about the hips, and
+			// faces back the way it came while walking back.
+			if (crash) {
+				const flip = 1 - 2 * crash.turned;
+				person.setAttribute(
+					"transform",
+					`translate(${crash.offset.x.toFixed(2)} ${crash.offset.y.toFixed(2)}) ` +
+						`translate(${ANKLE.x} 0) scale(${flip.toFixed(3)} 1) translate(${-ANKLE.x} 0) ` +
+						`rotate(${crash.spin.toFixed(1)} ${pose.hip.x.toFixed(2)} ${pose.hip.y.toFixed(2)})`,
+				);
+			} else {
+				person.removeAttribute("transform");
+			}
+
+			for (const { index, dx, ski, boot, leg, arm, pole, basket } of sides) {
+				const { ankle, knee, elbow, hand, tip } = pose.limbs[index];
+				const foot = `translate(${(ankle.x - ANKLE.x + dx).toFixed(2)} ${(ankle.y - ANKLE.y).toFixed(2)})`;
+				boot.setAttribute("transform", foot);
+				ski.setAttribute("transform", crash ? `translate(${(crash.skid + dx).toFixed(2)} 0)` : foot);
+				leg.setAttribute("points", toPoints([pose.hip, knee, ankle], dx));
+				arm.setAttribute("points", toPoints([pose.shoulder, elbow, hand], dx));
+				// The grip pokes out a little above the hand; the basket sits just
+				// above the tip, across the pole.
+				const length = Math.hypot(tip.x - hand.x, tip.y - hand.y) || 1;
+				const ux = (tip.x - hand.x) / length;
+				const uy = (tip.y - hand.y) / length;
+				const grip = { x: hand.x - ux * 1.6, y: hand.y - uy * 1.6 };
+				pole.setAttribute("points", toPoints([grip, tip], dx));
+				const basketAt = { x: tip.x - ux * 2.2 + dx, y: tip.y - uy * 2.2 };
+				basket.setAttribute("x1", (basketAt.x - uy * 1.2).toFixed(2));
+				basket.setAttribute("y1", (basketAt.y + ux * 1.2).toFixed(2));
+				basket.setAttribute("x2", (basketAt.x + uy * 1.2).toFixed(2));
+				basket.setAttribute("y2", (basketAt.y - ux * 1.2).toFixed(2));
+			}
+			const torsoAngle = (Math.atan2(pose.shoulder.x - pose.hip.x, pose.hip.y - pose.shoulder.y) * 180) / Math.PI;
+			torso.setAttribute(
+				"transform",
+				`translate(${pose.hip.x.toFixed(2)} ${pose.hip.y.toFixed(2)}) rotate(${torsoAngle.toFixed(2)})`,
+			);
+			head.setAttribute(
+				"transform",
+				`translate(${pose.head.x.toFixed(2)} ${pose.head.y.toFixed(2)}) rotate(${pose.headTilt.toFixed(2)})`,
+			);
+
+			// Hopping round is a horizontal flip about the skis' middle while the
+			// whole figure leaves the snow.
+			const flip = 1 - 2 * easeInOut(faceBack);
+			turn.setAttribute(
+				"transform",
+				`translate(${SKI_CENTER_X} 0) scale(${flip.toFixed(3)} 1) translate(${-SKI_CENTER_X} 0)`,
+			);
+			const hop = HOP_HEIGHT * Math.sin(Math.PI * faceBack);
+			figure.setAttribute(
+				"transform",
+				`translate(0 ${(-hop).toFixed(2)})${facingLeft ? ` translate(${WIDTH} 0) scale(-1 1)` : ""}`,
+			);
+
+			// A fading track behind the skis, and snow off the tails in a tuck.
+			const scale = bodyWidth / WIDTH;
+			const skiX = bodyX + SKI_CENTER_X * scale;
+			if (moved === 0 || reduced || trackX === null) {
+				trackX = skiX;
+			} else if (Math.abs(skiX - trackX) >= TRACK_MIN_LENGTH) {
+				leaveTrack(trackX, skiX);
+				trackX = skiX;
+			}
+			if (moved > 0 && !reduced && tuck > SPRAY_FROM_RUN && now - lastSprayAt >= SPRAY_EVERY) {
+				lastSprayAt = now;
+				const tailX = bodyX + (facingLeft ? WIDTH - SKI_TAIL_X : SKI_TAIL_X) * scale;
+				spray(tailX, facingLeft ? 1 : -1);
+			}
+			if (crashNow) {
+				const frontX = bodyX + (facingLeft ? WIDTH - SKI_FRONT_X : SKI_FRONT_X) * scale;
+				for (let index = 0; index < CRASH_FLAKES; index += 1) spray(frontX, facingLeft ? -1 : 1, 1.8);
+			}
+			if (braking && sinceBrake < BRAKE_SPRAY_SHARE && now - lastSprayAt >= SPRAY_EVERY) {
+				lastSprayAt = now;
+				const frontX = bodyX + (facingLeft ? WIDTH - SKI_FRONT_X : SKI_FRONT_X) * scale;
+				for (let index = 0; index < BRAKE_FLAKES; index += 1) spray(frontX, facingLeft ? -1 : 1, 1.3);
+			}
+
+			if (
+				standStill !== stillTarget ||
+				crashStartedAt > 0 ||
+				crash !== null ||
+				bursting ||
+				braking ||
+				poling > 0 ||
+				tuck !== (tuckReady ? run : 0) ||
+				faceBack > 0 ||
+				faceBackTarget > 0 ||
+				shownY !== y ||
+				speed > 0
+			) {
+				schedule();
+			}
+		};
+
+		const schedule = () => {
+			if (!frame) frame = requestAnimationFrame(render);
+		};
+
+		const settleLater = () => {
+			window.clearTimeout(idleTimer);
+			idleTimer = window.setTimeout(() => {
+				resting = true;
+				lastFrameTime = performance.now();
+				schedule();
+			}, IDLE_DELAY);
+		};
+
+		const handleScroll = () => {
+			if (resting) lastFrameTime = performance.now();
+			resting = false;
+			schedule();
+			settleLater();
+		};
+
+		window.addEventListener("scroll", handleScroll, { passive: true, signal: controller.signal });
+		window.addEventListener("resize", schedule, { signal: controller.signal });
+		render(performance.now());
+		settleLater();
+
+		return () => {
+			controller.abort();
+			window.clearTimeout(idleTimer);
+			if (frame) cancelAnimationFrame(frame);
+			skier.querySelectorAll(".yama-ski-track, .yama-ski-spray").forEach((mark) => mark.remove());
+		};
+	});
+</script>
