@@ -3,6 +3,7 @@
   "title": "大小霸",
   "info": "2025.12",
   "order": 180,
+  "walker": "cow",
   "cover": {
     "photo": {
       "kind": "local",

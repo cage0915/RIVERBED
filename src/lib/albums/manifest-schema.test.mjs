@@ -286,3 +286,12 @@ test("rejects malformed blocks", () => {
     }
     assert.throws(() => parseAlbumManifest(validManifest({ blocks: undefined }), "taiwan/morning-walk"), /blocks/);
 });
+
+test("accepts an optional walker and rejects unknown ones", () => {
+    assert.equal(parseAlbumManifest(validManifest(), "taiwan/morning-walk").walker, undefined);
+    assert.equal(parseAlbumManifest(validManifest({ walker: "cow" }), "taiwan/morning-walk").walker, "cow");
+    assert.throws(
+        () => parseAlbumManifest(validManifest({ walker: "goat" }), "taiwan/morning-walk"),
+        /walker must be one of: hiker, cow/,
+    );
+});

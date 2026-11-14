@@ -3,6 +3,7 @@
   "title": "表銀座 D1",
   "info": "2025.7 中房溫泉 - 燕岳",
   "order": 110,
+  "walker": "cow",
   "cover": {
     "photo": {
       "kind": "local",

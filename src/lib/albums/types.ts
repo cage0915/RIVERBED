@@ -51,6 +51,10 @@ export type PhotoPanoramaBlock = BlockSpacing & BlockCaption & {
 
 export type AlbumBlock = TextBlock | RowBlock | PhotoCarouselBlock | PhotoPanoramaBlock;
 
+/** Animals that can walk along the bottom of a Yama page; the hiker is the default. */
+export const ALBUM_WALKERS = ["hiker", "cow"] as const;
+export type AlbumWalker = (typeof ALBUM_WALKERS)[number];
+
 export type AlbumManifest = {
     schemaVersion: 2;
     title: string;
@@ -58,6 +62,8 @@ export type AlbumManifest = {
     publishedAt?: string;
     order: number;
     gap?: string;
+    /** Which walker a Yama page shows (default: the hiker). */
+    walker?: AlbumWalker;
     cover: {
         photo: LocalCoverPhoto | ExternalCoverPhoto;
         zoom: number;

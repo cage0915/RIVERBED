@@ -1,4 +1,5 @@
 import { normalizeAssetKey, validateAlbumSlug, validateLocalPhotoFilename } from "./keys.ts";
+import { ALBUM_WALKERS } from "./types.ts";
 import type {
     AlbumBlock,
     AlbumManifest,
@@ -219,7 +220,7 @@ export function parseAlbumManifest(input: unknown, albumSlug: string): AlbumMani
     const manifest = requireRecord(input, "album manifest");
     rejectUnknownFields(
         manifest,
-        ["schemaVersion", "title", "info", "publishedAt", "order", "gap", "cover", "blocks", "photos"],
+        ["schemaVersion", "title", "info", "publishedAt", "order", "gap", "walker", "cover", "blocks", "photos"],
         "album manifest",
     );
 
@@ -236,6 +237,8 @@ export function parseAlbumManifest(input: unknown, albumSlug: string): AlbumMani
 
     const order = requireFiniteNumber(manifest.order, "order");
     if (!Number.isInteger(order)) throw new Error("order must be an integer");
+
+    const walker = optionalEnum(manifest.walker, ALBUM_WALKERS, "walker");
 
     const coverInput = requireRecord(manifest.cover, "cover");
     rejectUnknownFields(coverInput, ["photo", "zoom", "offset"], "cover");
@@ -295,6 +298,7 @@ export function parseAlbumManifest(input: unknown, albumSlug: string): AlbumMani
         publishedAt,
         order,
         gap: optionalString(manifest.gap, "gap"),
+        ...(walker !== undefined ? { walker } : {}),
         cover: { photo: coverPhoto, zoom, offset },
         blocks,
         photos,

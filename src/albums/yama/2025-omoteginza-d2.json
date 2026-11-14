@@ -3,6 +3,7 @@
   "title": "表銀座 D2",
   "info": "2025.7 燕岳 - 大天井岳",
   "order": 120,
+  "walker": "cow",
   "cover": {
     "photo": {
       "kind": "local",

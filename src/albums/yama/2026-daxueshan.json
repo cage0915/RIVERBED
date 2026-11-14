@@ -3,6 +3,7 @@
   "title": "大雪山",
   "info": "2026.5",
   "order": 250,
+  "walker": "cow",
   "cover": {
     "photo": {
       "kind": "local",

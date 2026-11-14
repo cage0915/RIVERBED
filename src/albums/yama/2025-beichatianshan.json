@@ -3,6 +3,7 @@
   "title": "北插天山",
   "info": "2025.11",
   "order": 170,
+  "walker": "cow",
   "cover": {
     "photo": {
       "kind": "local",

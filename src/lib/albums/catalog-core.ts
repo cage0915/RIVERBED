@@ -176,6 +176,7 @@ export function createAlbumCatalog(records: AlbumSourceRecord[]): AlbumCatalog {
             publishedAt: record.manifest.publishedAt,
             order: record.manifest.order,
             gap: record.manifest.gap,
+            walker: record.manifest.walker,
             slug,
             folder,
             albumId,

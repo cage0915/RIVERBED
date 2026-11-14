@@ -4,6 +4,7 @@
   "info": "2026.9",
   "publishedAt": "2026-10-28",
   "order": 290,
+  "walker": "cow",
   "cover": {
     "photo": {
       "kind": "local",

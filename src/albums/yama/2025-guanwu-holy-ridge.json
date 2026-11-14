@@ -3,6 +3,7 @@
   "title": "觀霧望聖稜線",
   "info": "2025.9",
   "order": 150,
+  "walker": "cow",
   "cover": {
     "photo": {
       "kind": "local",

@@ -3,6 +3,7 @@
   "title": "大屯山系",
   "info": "2025.1, 2025.3",
   "order": 60,
+  "walker": "cow",
   "cover": {
     "photo": {
       "kind": "local",

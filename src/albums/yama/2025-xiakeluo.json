@@ -3,6 +3,7 @@
   "title": "霞喀羅",
   "info": "2025.11",
   "order": 160,
+  "walker": "cow",
   "cover": {
     "photo": {
       "kind": "local",

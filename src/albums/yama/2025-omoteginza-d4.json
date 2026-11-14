@@ -3,6 +3,7 @@
   "title": "表銀座 D4",
   "info": "2025.7 槍岳 - 上高地",
   "order": 140,
+  "walker": "cow",
   "cover": {
     "photo": {
       "kind": "local",

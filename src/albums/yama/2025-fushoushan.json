@@ -3,6 +3,7 @@
   "title": "福壽山農場",
   "info": "2025.7",
   "order": 100,
+  "walker": "cow",
   "cover": {
     "photo": {
       "kind": "local",

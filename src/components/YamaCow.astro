@@ -1,0 +1,629 @@
+---
+// A dairy cow pinned to the bottom of /yama pages, in place of the hiker on
+// albums that ask for it. Its horizontal position tracks how far the page has
+// been scrolled, and its four legs step only while the page scrolls. Once the
+// page rests, it lowers its head to graze, now and then lifting it to chew;
+// at either end of the page (or after grazing a long while) it kneels on its
+// front legs and lies down, rising hind end first once the page moves. Its
+// tail swishes every few seconds.
+---
+
+<div
+	data-yama-cow
+	aria-hidden="true"
+	class="pointer-events-none fixed inset-x-0 bottom-0 z-40 h-14"
+	style="background: linear-gradient(to top, rgb(18 18 18 / 0.7) 0%, rgb(18 18 18 / 0.5) 30%, rgb(18 18 18 / 0.22) 62%, rgb(18 18 18 / 0.06) 85%, rgb(18 18 18 / 0) 100%);"
+>
+	<div
+		data-yama-cow-body
+		class="absolute bottom-1 left-0 w-[38.4px] text-zinc-400 drop-shadow-[0_0_2px_rgba(0,0,0,0.8)]"
+	>
+		<svg
+			class="block overflow-visible"
+			viewBox="0 0 48 32"
+			width="38.4"
+			height="25.6"
+			fill="none"
+			stroke="currentColor"
+			stroke-width="1.6"
+			stroke-linecap="round"
+			stroke-linejoin="round"
+		>
+			<defs>
+				<clipPath id="yama-cow-hide">
+					<rect x="9" y="9.5" width="25" height="11" rx="5" />
+				</clipPath>
+			</defs>
+			<!-- The head, neck, legs and tail start in the standing pose the script
+			     draws at rest, so the cow is whole before the script runs. Keep these
+			     in step with the pose constants below. -->
+			<g data-yama-cow-figure>
+				<g data-yama-cow-turn>
+					<!-- Far-side legs, drawn first and dimmer. -->
+					<polyline data-leg="far-hind" opacity="0.45" points="14.7,17 16.5,21 13.44,24.95 14.7,30" />
+					<polyline data-leg="far-fore" opacity="0.45" points="30.7,17 29.5,21 32.39,25.08 30.7,30" />
+
+					<!-- Everything carried by the body: it pitches and drops to lie down. -->
+					<g data-yama-cow-trunk>
+						<polyline data-yama-cow-tail stroke-width="1" points="9.6,11.2 9.03,14.45 8.23,17.65 7.21,20.79" />
+						<ellipse
+							data-yama-cow-tuft
+							cx="7.21"
+							cy="20.79"
+							rx="0.6"
+							ry="1.2"
+							fill="currentColor"
+							stroke="none"
+							transform="rotate(-162 7.21 20.79)"
+						/>
+						<polyline data-yama-cow-neck stroke-width="2.4" points="32.51,10.77 35.85,7.05" />
+						<!-- Body: a wide capsule, like the hiker's torso. -->
+						<rect
+							x="9"
+							y="9.5"
+							width="25"
+							height="11"
+							rx="5"
+							fill="currentColor"
+							fill-opacity="0.2"
+							stroke-width="1.2"
+						/>
+						<!-- Holstein patches. -->
+						<g clip-path="url(#yama-cow-hide)" fill="currentColor" fill-opacity="0.75" stroke="none">
+							<path d="M13 9 C16 9 18 11.5 17 13.5 C16 15.5 12.5 15 11.5 13 C10.5 11 11 9 13 9 Z" />
+							<path d="M22 9 C25.5 9 27 11 26.2 13 C25.4 15 22.5 16.5 20.8 14.6 C19.4 13 19.5 9 22 9 Z" />
+							<path d="M28.5 16 C30.5 15.5 32 17 31.5 19 C31 21 28 21 27.5 19.5 C27 18 27.2 16.3 28.5 16 Z" />
+							<path d="M19.2 21 C18.8 18.4 20.4 16.9 22.4 17.1 C24.5 17.3 25.6 19.2 25.2 21 Z" />
+						</g>
+						<!-- Udder. -->
+						<path d="M14 20.5 Q15.6 23.4 17.2 20.5" stroke-width="1" />
+
+						<!-- Head, drawn pointing along +x from the top of the neck. -->
+						<!-- Head: a round skull with a big oval muzzle in front, a horn
+						     curling up, and an ear sticking out behind. -->
+						<g data-yama-cow-head stroke-width="1" transform="translate(35.85 7.05) rotate(22) scale(1.2)">
+							<path d="M0.4 -1.4 Q-2.2 -2.6 -3 -1.2 Q-1.6 -0.2 0.2 -0.4 Z" fill="currentColor" fill-opacity="0.2" />
+							<path d="M1 -3.1 Q0.8 -5.6 2.9 -6.2 Q2.2 -4.8 2.7 -3.5 Z" fill="currentColor" fill-opacity="0.2" />
+							<path
+								d="M0.6 1.8 C-1 0 -0.2 -3.4 2.6 -3.6 C4.6 -3.7 5.6 -2.4 6.2 -0.8 C8.2 -1 9.6 0.2 9.4 1.6 C9.2 3.2 7.6 3.6 6.4 3.4 C4.6 3.2 2.4 3 0.6 1.8 Z"
+								fill="currentColor"
+								fill-opacity="0.2"
+							/>
+							<path d="M6.2 -0.8 C4.9 0 4.7 2.2 5.6 3.3" stroke-width="0.9" />
+							<circle cx="3.4" cy="-1.1" r="0.55" fill="currentColor" stroke="none" />
+							<ellipse cx="8.3" cy="1.3" rx="0.45" ry="0.65" fill="currentColor" stroke="none" />
+						</g>
+					</g>
+
+					<!-- Near-side legs. -->
+					<polyline data-leg="near-hind" points="13.5,17 15.3,21 12.24,24.95 13.5,30" />
+					<polyline data-leg="near-fore" points="29.5,17 28.3,21 31.19,25.08 29.5,30" />
+				</g>
+			</g>
+		</svg>
+	</div>
+</div>
+
+<style is:global>
+	/* No cow while an album shows its photo grid. */
+	body:has([data-album-photo-grid]) [data-yama-cow] {
+		display: none;
+	}
+</style>
+
+<script>
+	import { installPageLifecycle } from "../lib/client-page-lifecycle";
+
+	type Point = { x: number; y: number };
+
+	// The figure faces +x. The SVG is 48 units wide; the ground line sits at
+	// GROUND_Y. The body is a rounded rectangle from x 9 to 34.
+	const WIDTH = 48;
+	const GROUND_Y = 30;
+	const CENTER_X = 21.5;
+	// Where the legs leave the body.
+	const HIND_ROOT = { x: 13.5, y: 17 };
+	const FORE_ROOT = { x: 29.5, y: 17 };
+	// Hind legs zigzag like a real cow's: the stifle sits forward under the
+	// belly, fixed to the body, and the hock below it points back.
+	const STIFLE = { x: 1.8, y: 4 };
+	const GASKIN = 5;
+	const CANNON = 5.2;
+	// Front legs mirror them: the elbow sits back under the chest, fixed to
+	// the body, and the knee below it bends forward.
+	const ELBOW = { x: -1.2, y: 4 };
+	const FOREARM = 5;
+	const FORE_CANNON = 5.2;
+	// The body pitches about the hind leg roots.
+	const PIVOT = HIND_ROOT;
+	const FORE_SPAN = FORE_ROOT.x - HIND_ROOT.x;
+
+	// Walking: scroll distance (px) for one full gait cycle, which grows with
+	// speed so the legs never flicker; how far each hoof reaches forward and
+	// back, and how high a stepping hoof lifts.
+	const STRIDE_SLOW = 150;
+	const STRIDE_FAST = 360;
+	const FAST_SPEED = 3;
+	const STEP_REACH = 2.6;
+	const STEP_LIFT = 2.2;
+	// Running: from RUN_FROM_SPEED to RUN_FULL_SPEED (px/ms) the walk (each
+	// leg a quarter cycle apart) blends into a bound: hind legs together, then
+	// front legs together, in long, unhurried strides (px of scroll per cycle)
+	// that reach and lift further. The body rocks (deg), leaves the ground
+	// for a moment while the front legs reach forward (RUN_HOP, in figure
+	// units), and the tail streams out behind.
+	const RUN_FROM_SPEED = 1;
+	const RUN_FULL_SPEED = 2.5;
+	const RUN_STRIDE = 900;
+	const RUN_REACH = 6.8;
+	const RUN_LIFT = 4.6;
+	const RUN_ROCK = 7;
+	const RUN_HOP = 2.6;
+	// How far apart (radians of the cycle) the two legs of a pair land when
+	// bounding: the hind legs nearly together, the front legs one just after
+	// the other.
+	const RUN_HIND_STAGGER = 0.2;
+	const RUN_FORE_STAGGER = 0.8;
+	const SPEED_SMOOTHING = 120;
+	// The cow never moves faster than this (px of scroll per ms); when the
+	// page scrolls faster it falls behind and keeps walking after it stops.
+	const MAX_SPEED = 4;
+	// After getting up, it walks to where the page now is: a share of the
+	// remaining gap per ms, but never slower than a floor (px/ms).
+	const CATCH_UP_RATE = 1 / 180;
+	const CATCH_UP_MIN_SPEED = 0.8;
+	// Coming to a stop: after this long without moving (ms), the hooves come
+	// back under the body over the given times (ms).
+	const STOP_AFTER = 180;
+	const STOP_SETTLE_DURATION = 260;
+	const STOP_RELEASE_DURATION = 120;
+
+	// Neck: where it leaves the body, its length, and its angle (degrees from
+	// straight down, positive forward) when up, grazing and lying.
+	const NECK_ROOT = { x: 30.5, y: 13 };
+	const NECK_LENGTH = 8;
+	const NECK_UP = 138;
+	const NECK_GRAZE = 46;
+	const NECK_LYING = 124;
+	// Head angle (SVG rotation from +x) when up and when grazing.
+	const HEAD_UP = 22;
+	const HEAD_GRAZE = 96;
+	// How much larger than drawn the head is shown.
+	const HEAD_SCALE = 1.2;
+
+	// How long the page must rest before grazing starts, and how long lowering
+	// and raising the head take (all ms).
+	const IDLE_DELAY = 600;
+	const GRAZE_DOWN_DURATION = 650;
+	const GRAZE_UP_DURATION = 260;
+	// Grazing cycle: head down tearing at the grass, then up chewing (ms).
+	const GRAZE_CYCLE = 6200;
+	const GRAZE_HEAD_UP_AT = 3800;
+	const GRAZE_HEAD_UP_FOR = 1900;
+	const GRAZE_LIFT_DURATION = 450;
+	const CHEW_PER_SECOND = 1.6;
+
+	// Lying down: front knees first, then the hind end; getting up plays it in
+	// reverse (hind end first), faster. Both in ms.
+	const LIE_DURATION = 2600;
+	const RISE_DURATION = 1500;
+	// How far the shoulders drop while kneeling, and how far the body drops to
+	// rest on the ground.
+	const KNEEL_DROP = 6;
+	const LIE_DROP = 9.3;
+	// After grazing this long without scrolling (ms), it lies down mid-page too.
+	const LONG_IDLE = 20000;
+	// Within this share of either end, a resting cow turns to face back into
+	// the page (ms for the turn).
+	const END_ZONE = 0.05;
+	const FACE_BACK_DURATION = 450;
+
+	// Tail: where it leaves the rump, its segments, and swishes now and then.
+	const TAIL_ROOT = { x: 9.6, y: 11.2 };
+	const TAIL_SEGMENT = 3.3;
+	const TAIL_SEGMENTS = 3;
+	const SWISH_DURATION = 1100;
+	const SWISH_MIN_GAP = 2200;
+	const SWISH_MAX_GAP = 6500;
+
+	type RestAction = "graze" | "lie";
+
+	// Angles are degrees from straight down; positive points forward (+x).
+	const reach = (from: Point, angle: number, length: number): Point => {
+		const rad = (angle * Math.PI) / 180;
+		return { x: from.x + Math.sin(rad) * length, y: from.y + Math.cos(rad) * length };
+	};
+
+	// Two-bone reach from `root` toward `target`; `side` picks which way the
+	// middle joint bends (-1 = forward, like a front knee; 1 = back, like a hock).
+	const twoBone = (
+		root: Point,
+		target: Point,
+		side: 1 | -1,
+		upper: number,
+		lower: number,
+	): Point[] => {
+		const dx = target.x - root.x;
+		const dy = target.y - root.y;
+		const distance = Math.max(0.5, Math.min(Math.hypot(dx, dy), upper + lower - 0.05));
+		const toTarget = Math.atan2(dy, dx);
+		const bend = Math.acos(
+			Math.min(1, Math.max(-1, (upper ** 2 + distance ** 2 - lower ** 2) / (2 * upper * distance))),
+		);
+		const middleAngle = toTarget + side * bend;
+		const middle = {
+			x: root.x + Math.cos(middleAngle) * upper,
+			// A knee or hock never sinks below the ground.
+			y: Math.min(root.y + Math.sin(middleAngle) * upper, GROUND_Y),
+		};
+		return [
+			root,
+			middle,
+			{ x: root.x + Math.cos(toTarget) * distance, y: root.y + Math.sin(toTarget) * distance },
+		];
+	};
+
+	const toPoints = (points: Point[]) =>
+		points.map(({ x, y }) => `${x.toFixed(2)},${y.toFixed(2)}`).join(" ");
+
+	const easeInOut = (t: number) => (t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2);
+	const clamp01 = (t: number) => Math.min(Math.max(t, 0), 1);
+	const mix = (from: number, to: number, amount: number) => from + (to - from) * amount;
+	const approach = (value: number, target: number, elapsed: number, riseMs: number, fallMs: number) =>
+		target > value
+			? Math.min(target, value + elapsed / riseMs)
+			: Math.max(target, value - elapsed / fallMs);
+
+	installPageLifecycle(document, () => {
+		const cow = document.querySelector<HTMLElement>("[data-yama-cow]");
+		const body = cow?.querySelector<HTMLElement>("[data-yama-cow-body]");
+		const figure = cow?.querySelector<SVGGElement>("[data-yama-cow-figure]");
+		const turn = cow?.querySelector<SVGGElement>("[data-yama-cow-turn]");
+		const trunk = cow?.querySelector<SVGGElement>("[data-yama-cow-trunk]");
+		const head = cow?.querySelector<SVGGElement>("[data-yama-cow-head]");
+		const neck = cow?.querySelector<SVGPolylineElement>("[data-yama-cow-neck]");
+		const tail = cow?.querySelector<SVGPolylineElement>("[data-yama-cow-tail]");
+		const tuft = cow?.querySelector<SVGEllipseElement>("[data-yama-cow-tuft]");
+		if (!cow || !body || !figure || !turn || !trunk || !head || !neck || !tail || !tuft) return;
+		const leg = (name: string) => cow.querySelector<SVGPolylineElement>(`[data-leg="${name}"]`)!;
+		const legs = {
+			nearHind: leg("near-hind"),
+			farHind: leg("far-hind"),
+			nearFore: leg("near-fore"),
+			farFore: leg("far-fore"),
+		};
+
+		const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+		const controller = new AbortController();
+		let frame = 0;
+		let idleTimer = 0;
+		let longIdleTimer = 0;
+		let swishTimer = 0;
+		let shownY = window.scrollY;
+		let catchingUp = false;
+		// Gait phase (radians) and smoothed walking speed (px/ms).
+		let phase = 0;
+		let speed = 0;
+		const startMaxScroll = document.documentElement.scrollHeight - window.innerHeight;
+		let facingLeft = startMaxScroll > 0 && shownY / startMaxScroll > 1 - END_ZONE;
+		let headingLeft = facingLeft;
+		let faceBack = 0;
+		let resting = false;
+		let restStartedAt = 0;
+		let restAction: RestAction = "graze";
+		let hasWalked = false;
+		// Head lowered to graze (0..1), and progress lying down (0..1).
+		let graze = 0;
+		let grazeStartedAt = 0;
+		let lie = 0;
+		let lastMovedAt = 0;
+		let standStill = 1;
+		let swishStartedAt = 0;
+		let swishDirection = 1;
+		let lastFrameTime = performance.now();
+
+		const render = (now: number) => {
+			frame = 0;
+			const elapsed = Math.min(now - lastFrameTime, 100);
+			lastFrameTime = now;
+			const reduced = reducedMotion.matches;
+
+			const y = window.scrollY;
+			const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+			const longIdle = resting && restStartedAt > 0 && now - restStartedAt >= LONG_IDLE;
+			const still = () => shownY === y && speed === 0 && faceBack === 0;
+			// Near either end facing out of the page (turned round before resting).
+			const restProgress = maxScroll > 0 ? clamp01(shownY / maxScroll) : 0;
+			const facingOutNow =
+				restProgress > 1 - END_ZONE ? !facingLeft : restProgress < END_ZONE ? facingLeft : false;
+
+			// Lie down at the ends after a walk, or after grazing a long while.
+			// The head comes up and the cow turns into the page first.
+			const wantLie =
+				resting && (restAction === "lie" || longIdle) && still() && graze === 0 && (lie > 0 || !facingOutNow);
+			lie = reduced ? Number(wantLie) : approach(lie, wantLie ? 1 : 0, elapsed, LIE_DURATION, RISE_DURATION);
+
+			// No walking until fully up; then catch up to the page.
+			let nextY = shownY;
+			if (lie > 0) {
+				if (y !== shownY) catchingUp = true;
+			} else if (!reduced) {
+				const gap = y - shownY;
+				const maxStep = elapsed * MAX_SPEED;
+				const step = catchingUp
+					? Math.min(Math.max(Math.abs(gap) * elapsed * CATCH_UP_RATE, elapsed * CATCH_UP_MIN_SPEED), maxStep)
+					: maxStep;
+				nextY = Math.abs(gap) <= step ? y : shownY + Math.sign(gap) * step;
+			} else {
+				nextY = y;
+			}
+			if (nextY === y) catchingUp = false;
+			if (nextY !== shownY) headingLeft = nextY < shownY;
+			const moved = Math.abs(nextY - shownY);
+			const instantSpeed = elapsed > 0 ? moved / elapsed : 0;
+			speed += (instantSpeed - speed) * clamp01(elapsed / SPEED_SMOOTHING);
+			if (speed < 0.01) speed = 0;
+			const run = reduced
+				? 0
+				: easeInOut(clamp01((speed - RUN_FROM_SPEED) / (RUN_FULL_SPEED - RUN_FROM_SPEED)));
+			const stride = mix(
+				mix(STRIDE_SLOW, STRIDE_FAST, easeInOut(clamp01(speed / FAST_SPEED))),
+				RUN_STRIDE,
+				run,
+			);
+			phase += (moved / stride) * Math.PI * 2;
+			shownY = nextY;
+			if (moved > 0) lastMovedAt = now;
+			const stillTarget = now - lastMovedAt > STOP_AFTER ? 1 : 0;
+			standStill = reduced
+				? stillTarget
+				: approach(standStill, stillTarget, elapsed, STOP_SETTLE_DURATION, STOP_RELEASE_DURATION);
+			if (lie === 0) facingLeft = headingLeft;
+
+			const progress = maxScroll > 0 ? clamp01(shownY / maxScroll) : 0;
+			const bodyWidth = body.offsetWidth;
+			const travel = cow.clientWidth - bodyWidth;
+			body.style.transform = `translateX(${progress * travel}px)`;
+
+			// Resting near either end facing out of the page: turn round first.
+			const facingOut = progress > 1 - END_ZONE ? !facingLeft : progress < END_ZONE ? facingLeft : false;
+			const faceBackTarget =
+				resting && facingOut && shownY === y && speed === 0 && graze === 0 && lie === 0 ? 1 : 0;
+			faceBack = reduced
+				? faceBackTarget
+				: approach(faceBack, faceBackTarget, elapsed, FACE_BACK_DURATION, FACE_BACK_DURATION);
+			if (faceBack === 1) {
+				faceBack = 0;
+				facingLeft = !facingLeft;
+				headingLeft = facingLeft;
+			}
+
+			// Graze while resting mid-page.
+			const wantGraze =
+				resting &&
+				restAction === "graze" &&
+				!longIdle &&
+				still() &&
+				faceBackTarget === 0 &&
+				lie === 0 &&
+				standStill === 1;
+			if (wantGraze && graze === 0 && grazeStartedAt === 0) grazeStartedAt = now;
+			graze = reduced
+				? Number(wantGraze)
+				: approach(graze, wantGraze ? 1 : 0, elapsed, GRAZE_DOWN_DURATION, GRAZE_UP_DURATION);
+			if (graze === 0 && !wantGraze) grazeStartedAt = 0;
+			// Within each grazing cycle, lift the head for a while to chew.
+			const cycleTime = grazeStartedAt ? (now - grazeStartedAt) % GRAZE_CYCLE : 0;
+			const liftIn = clamp01((cycleTime - GRAZE_HEAD_UP_AT) / GRAZE_LIFT_DURATION);
+			const liftOut = clamp01((cycleTime - GRAZE_HEAD_UP_AT - GRAZE_HEAD_UP_FOR) / GRAZE_LIFT_DURATION);
+			const chewLift = reduced ? 0 : easeInOut(liftIn) * (1 - easeInOut(liftOut));
+			const headDown = easeInOut(graze) * (1 - chewLift);
+			const chew =
+				graze > 0 && !reduced ? Math.sin(((now - grazeStartedAt) / 1000) * Math.PI * 2 * CHEW_PER_SECOND) : 0;
+
+			// Lying down: kneel on the front legs, then drop the hind end, then
+			// settle. Getting up runs this backwards, so the hind end rises first.
+			const kneel = easeInOut(clamp01(lie / 0.42));
+			const hindDown = easeInOut(clamp01((lie - 0.38) / 0.42));
+			const settle = easeInOut(clamp01((lie - 0.72) / 0.28));
+			const foreDrop = KNEEL_DROP * kneel + (LIE_DROP - KNEEL_DROP) * settle;
+			const hindDrop = LIE_DROP * hindDown;
+			// Bounding rocks the body: the front rises while the front legs reach
+			// forward, and dips while the hind legs do.
+			const rock = RUN_ROCK * run * Math.cos(phase);
+			const pitch = (Math.atan2(foreDrop - hindDrop, FORE_SPAN) * 180) / Math.PI + rock;
+			const pitchRad = (pitch * Math.PI) / 180;
+			// Map a point on the body into the figure's frame.
+			const onBody = (p: Point): Point => {
+				const dx = p.x - PIVOT.x;
+				const dy = p.y - PIVOT.y;
+				return {
+					x: PIVOT.x + dx * Math.cos(pitchRad) - dy * Math.sin(pitchRad),
+					y: PIVOT.y + hindDrop + dx * Math.sin(pitchRad) + dy * Math.cos(pitchRad),
+				};
+			};
+			trunk.setAttribute(
+				"transform",
+				`translate(0 ${hindDrop.toFixed(2)}) rotate(${pitch.toFixed(2)} ${PIVOT.x} ${PIVOT.y})`,
+			);
+
+			// Legs. Each hoof steps in a lateral-sequence walk (hind, fore, other
+			// hind, other fore, a quarter cycle apart); standing still brings it
+			// back under its root, and lying down folds it under the body.
+			const gait = 1 - easeInOut(standStill);
+			const hoof = (root: Point, legPhase: number): Point => ({
+				x: root.x + Math.sin(legPhase) * mix(STEP_REACH, RUN_REACH, run) * gait,
+				y: GROUND_Y - Math.max(0, Math.cos(legPhase)) * mix(STEP_LIFT, RUN_LIFT, run) * gait,
+			});
+			const placeLeg = (
+				element: SVGPolylineElement,
+				rootOnBody: Point,
+				legPhase: number,
+				fore: boolean,
+				dx: number,
+			) => {
+				const root = onBody({ x: rootOnBody.x + dx, y: rootOnBody.y });
+				const step = hoof({ x: rootOnBody.x + dx, y: rootOnBody.y }, legPhase);
+				// Folded: front hooves tuck back under the chest with the knees on the
+				// ground; hind legs fold up beneath the haunch, hocks raised behind.
+				const fold = fore ? kneel : hindDown;
+				const tucked = { x: rootOnBody.x + dx + (fore ? -8 : -6), y: GROUND_Y };
+				const target = { x: mix(step.x, tucked.x, fold), y: mix(step.y, tucked.y, fold) };
+				const upperJoint = fore ? ELBOW : STIFLE;
+				const joint = onBody({ x: rootOnBody.x + dx + upperJoint.x, y: rootOnBody.y + upperJoint.y });
+				joint.y = Math.min(joint.y, GROUND_Y);
+				const points = [
+					root,
+					...(fore
+						? twoBone(joint, target, -1, FOREARM, FORE_CANNON)
+						: twoBone(joint, target, 1, GASKIN, CANNON)),
+				];
+				element.setAttribute("points", toPoints(points));
+				return points[points.length - 1].y;
+			};
+			const lowest = Math.max(
+				placeLeg(legs.nearHind, HIND_ROOT, phase, false, 0),
+				placeLeg(legs.nearFore, FORE_ROOT, phase + mix(Math.PI / 2, Math.PI, run), true, 0),
+				placeLeg(legs.farHind, HIND_ROOT, phase + mix(Math.PI, RUN_HIND_STAGGER, run), false, 1.2),
+				placeLeg(
+					legs.farFore,
+					FORE_ROOT,
+					phase + mix((3 * Math.PI) / 2, Math.PI + RUN_FORE_STAGGER, run),
+					true,
+					1.2,
+				),
+			);
+
+			// Neck and head. Walking nods the head with each step; grazing tears at
+			// the grass with small tugs; lifting it to chew bobs the jaw.
+			const nod = Math.sin(phase * 2) * 2.5 * gait;
+			// Running stretches the neck out forward.
+			const neckAngle = mix(mix(NECK_UP, NECK_GRAZE, headDown), NECK_LYING, settle) + nod - 14 * run;
+			const neckEnd = reach(NECK_ROOT, neckAngle, NECK_LENGTH);
+			// Drawn from the body's outline, so the line doesn't show through it.
+			neck.setAttribute("points", toPoints([reach(NECK_ROOT, neckAngle, 3), neckEnd]));
+			const headAngle =
+				mix(HEAD_UP, HEAD_GRAZE, headDown) + chew * (2.5 * headDown + 1.5 * chewLift) - nod * 0.6;
+			head.setAttribute(
+				"transform",
+				`translate(${neckEnd.x.toFixed(2)} ${neckEnd.y.toFixed(2)}) rotate(${headAngle.toFixed(2)}) scale(${HEAD_SCALE})`,
+			);
+
+			// Tail: hangs just behind the rump, sways with the walk, swishes now
+			// and then, and lies along the ground when the cow lies down.
+			const sinceSwish = swishStartedAt ? now - swishStartedAt : -1;
+			const swishing = sinceSwish >= 0 && sinceSwish < SWISH_DURATION && !reduced;
+			const swishAmount = swishing ? Math.sin((Math.PI * sinceSwish) / SWISH_DURATION) : 0;
+			const tailPoints: Point[] = [TAIL_ROOT];
+			let tailEnd = TAIL_ROOT;
+			for (let index = 0; index < TAIL_SEGMENTS; index += 1) {
+				const lag = index * 0.9;
+				const swish =
+					swishDirection * swishAmount * (16 + index * 14) * Math.sin((sinceSwish / 1000) * Math.PI * 4 - lag);
+				const sway = Math.sin(phase - lag) * (3 + index * 3) * gait;
+				const base = mix(mix(-10 - index * 4, -55 - index * 10, run), -70 + index * 8, settle) + pitch;
+				tailEnd = reach(tailEnd, base + swish + sway, TAIL_SEGMENT);
+				tailPoints.push(tailEnd);
+			}
+			tail.setAttribute("points", toPoints(tailPoints));
+			const last = tailPoints[TAIL_SEGMENTS - 1];
+			tuft.setAttribute("cx", tailEnd.x.toFixed(2));
+			tuft.setAttribute("cy", tailEnd.y.toFixed(2));
+			tuft.setAttribute(
+				"transform",
+				`rotate(${((Math.atan2(tailEnd.x - last.x, last.y - tailEnd.y) * 180) / Math.PI).toFixed(1)} ${tailEnd.x.toFixed(2)} ${tailEnd.y.toFixed(2)})`,
+			);
+
+			// Turning is a horizontal flip about the body's centre.
+			const flip = 1 - 2 * easeInOut(faceBack);
+			turn.setAttribute(
+				"transform",
+				`translate(${CENTER_X} 0) scale(${flip.toFixed(3)} 1) translate(${-CENTER_X} 0)`,
+			);
+			// Drop the figure so the lowest hoof stands on the ground line, then
+			// lift it clear of the ground at the top of each bound.
+			const hop = RUN_HOP * run * Math.sin(Math.max(0, -Math.cos(phase)) * (Math.PI / 2));
+			const groundShift = lie > 0 ? 0 : GROUND_Y - lowest - hop;
+			figure.setAttribute(
+				"transform",
+				`translate(0 ${groundShift.toFixed(2)})${facingLeft ? ` translate(${WIDTH} 0) scale(-1 1)` : ""}`,
+			);
+
+			const lieTarget = Number(wantLie);
+			if (
+				lie !== lieTarget ||
+				(wantGraze || graze > 0) ||
+				swishing ||
+				standStill !== stillTarget ||
+				faceBack > 0 ||
+				faceBackTarget > 0 ||
+				shownY !== y ||
+				speed > 0
+			) {
+				schedule();
+			}
+		};
+
+		const schedule = () => {
+			if (!frame) frame = requestAnimationFrame(render);
+		};
+		const wake = () => {
+			if (frame === 0) lastFrameTime = performance.now();
+			schedule();
+		};
+
+		const queueSwish = () => {
+			window.clearTimeout(swishTimer);
+			swishTimer = window.setTimeout(
+				() => {
+					if (!reducedMotion.matches && !document.hidden) {
+						swishStartedAt = performance.now();
+						swishDirection = Math.random() < 0.5 ? -1 : 1;
+						wake();
+					}
+					queueSwish();
+				},
+				SWISH_MIN_GAP + Math.random() * (SWISH_MAX_GAP - SWISH_MIN_GAP),
+			);
+		};
+
+		const settleLater = () => {
+			window.clearTimeout(idleTimer);
+			idleTimer = window.setTimeout(() => {
+				const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+				const y = window.scrollY;
+				const atEnd = maxScroll > 0 && (y <= 1 || y >= maxScroll - 1);
+				restAction = hasWalked && atEnd ? "lie" : "graze";
+				resting = true;
+				restStartedAt = performance.now();
+				window.clearTimeout(longIdleTimer);
+				longIdleTimer = window.setTimeout(wake, LONG_IDLE + 50);
+				wake();
+			}, IDLE_DELAY);
+		};
+
+		const handleScroll = () => {
+			if (resting) lastFrameTime = performance.now();
+			resting = false;
+			restStartedAt = 0;
+			window.clearTimeout(longIdleTimer);
+			hasWalked = true;
+			schedule();
+			settleLater();
+		};
+
+		window.addEventListener("scroll", handleScroll, { passive: true, signal: controller.signal });
+		window.addEventListener("resize", schedule, { signal: controller.signal });
+		render(performance.now());
+		settleLater();
+		queueSwish();
+
+		return () => {
+			controller.abort();
+			window.clearTimeout(idleTimer);
+			window.clearTimeout(longIdleTimer);
+			window.clearTimeout(swishTimer);
+			if (frame) cancelAnimationFrame(frame);
+		};
+	});
+</script>

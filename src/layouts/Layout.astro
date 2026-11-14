@@ -9,6 +9,7 @@ import PhotoLightbox from "../components/PhotoLightbox.astro";
 import PhotoFadeIn from "../components/PhotoFadeIn.astro";
 import NavigationProgress from "../components/NavigationProgress.astro";
 import YamaWalker from "../components/YamaWalker.astro";
+import YamaCow from "../components/YamaCow.astro";
 import { getShareImageUrl } from "../lib/constants";
 // Keep the shared font baseline to the weight every route uses. Fontsource's
 // numbered CJK faces include unicode-range declarations, so browsers fetch
@@ -20,8 +21,8 @@ import "photoswipe/dist/photoswipe.css";
 
 interface Props {
 	title: string;
-	/** Show the walking hiker along the bottom of the page (Yama posts). */
-	hiker?: boolean;
+	/** Which walker strolls along the bottom of the page (Yama posts), if any. */
+	walker?: "hiker" | "cow";
 	/** Meta and link-preview description. */
 	description?: string;
 	/** R2 asset key of the photo shown when the page is shared. */
@@ -32,7 +33,7 @@ interface Props {
 
 const {
 	title,
-	hiker = false,
+	walker,
 	description = "RIVERBED",
 	shareImage,
 	shareType = "website",
@@ -81,7 +82,8 @@ const shareImageUrl = shareImage ? getShareImageUrl(shareImage) : undefined;
 		<PhotoLightbox />
 		<PhotoFadeIn />
 		<SiteFooter />
-		{hiker && <YamaWalker />}
+		{walker === "hiker" && <YamaWalker />}
+		{walker === "cow" && <YamaCow />}
 		<SiteDevTools />
 	</body>
 </html>
