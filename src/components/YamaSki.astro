@@ -19,7 +19,7 @@
 >
 	<div
 		data-yama-ski-body
-		class="absolute bottom-1 left-0 w-[32px] text-zinc-400 drop-shadow-[0_0_2px_rgba(0,0,0,0.8)]"
+		class="absolute bottom-1 left-0 sm:left-2 w-[32px] text-zinc-400 drop-shadow-[0_0_2px_rgba(0,0,0,0.8)]"
 	>
 		<svg
 			class="block overflow-visible"
@@ -562,7 +562,8 @@
 			const y = window.scrollY;
 			const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
 			const bodyWidth = body.offsetWidth;
-			// On desktop the strip's side padding keeps the skier off the screen edges.
+			// On desktop the strip's side padding (sm:px-2) keeps the skier off the
+			// screen edges; its sm:left-2 starts it there before this script runs.
 			const inset = parseFloat(getComputedStyle(skier).paddingLeft) || 0;
 			const travel = Math.max(0, skier.clientWidth - 2 * inset - bodyWidth);
 			// Screen px moved per px of scroll.
@@ -624,7 +625,7 @@
 
 			const progress = maxScroll > 0 ? clamp01(shownY / maxScroll) : 0;
 			const bodyX = inset + progress * travel;
-			body.style.transform = `translateX(${bodyX}px)`;
+			body.style.transform = `translateX(${bodyX - inset}px)`;
 
 			// Resting near either end facing out of the page: hop round.
 			const facingOut = progress > 1 - END_ZONE ? !facingLeft : progress < END_ZONE ? facingLeft : false;

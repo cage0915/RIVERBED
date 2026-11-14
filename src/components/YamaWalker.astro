@@ -17,7 +17,7 @@
 >
 	<div
 		data-yama-walker-body
-		class="absolute bottom-1 left-0 w-[25.6px] text-zinc-400 drop-shadow-[0_0_2px_rgba(0,0,0,0.8)]"
+		class="absolute bottom-1 left-0 sm:left-2 w-[25.6px] text-zinc-400 drop-shadow-[0_0_2px_rgba(0,0,0,0.8)]"
 	>
 		<svg
 			class="block overflow-visible"
@@ -515,7 +515,8 @@
 
 			// Measured once per frame, before the writes below dirty layout.
 			const bodyWidth = body.offsetWidth;
-			// On desktop the strip's side padding keeps the hiker off the screen edges.
+			// On desktop the strip's side padding (sm:px-2) keeps the hiker off the
+			// screen edges; its sm:left-2 starts it there before this script runs.
 			const inset = parseFloat(getComputedStyle(walker).paddingLeft) || 0;
 			const travel = Math.max(0, walker.clientWidth - 2 * inset - bodyWidth);
 			// Screen px moved per px of scroll.
@@ -586,7 +587,7 @@
 
 			const progress = maxScroll > 0 ? Math.min(Math.max(shownY / maxScroll, 0), 1) : 0;
 			const bodyX = inset + progress * travel;
-			body.style.transform = `translateX(${bodyX}px)`;
+			body.style.transform = `translateX(${bodyX - inset}px)`;
 
 			// Resting near either end facing out of the page: turn round to face
 			// back into it. (At the very ends after a walk, setting the pack down
@@ -793,10 +794,17 @@
 				}
 			}
 
+			// A photo still to come keeps the frames going, but not one this stop
+			// has given up on (catching breath, a long rest, the lightbox): that
+			// photo never comes, and waiting for it would redraw forever.
 			const photoAnimating =
-				resting && restAction === "photo"
-					? !peakAt || sincePeak < stowStart + STOW_DURATION
-					: raised > 0;
+				raised > 0 ||
+				(resting &&
+					restAction === "photo" &&
+					!tiredStop &&
+					!longIdle &&
+					!lightboxOpen &&
+					(!peakAt || sincePeak < stowStart + STOW_DURATION));
 			const packAnimating =
 				resting && restAction === "pack" ? packDown < 1 : packDown > 0;
 			const settleAnimating =

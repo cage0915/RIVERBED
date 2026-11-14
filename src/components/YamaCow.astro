@@ -16,7 +16,7 @@
 >
 	<div
 		data-yama-cow-body
-		class="absolute bottom-1 left-0 w-[38.4px] text-zinc-400 drop-shadow-[0_0_2px_rgba(0,0,0,0.8)]"
+		class="absolute bottom-1 left-0 sm:left-2 w-[38.4px] text-zinc-400 drop-shadow-[0_0_2px_rgba(0,0,0,0.8)]"
 	>
 		<svg
 			class="block overflow-visible"
@@ -347,7 +347,8 @@
 			lie = reduced ? Number(wantLie) : approach(lie, wantLie ? 1 : 0, elapsed, LIE_DURATION, RISE_DURATION);
 
 			const bodyWidth = body.offsetWidth;
-			// On desktop the strip's side padding keeps the cow off the screen edges.
+			// On desktop the strip's side padding (sm:px-2) keeps the cow off the
+			// screen edges; its sm:left-2 starts it there before this script runs.
 			const inset = parseFloat(getComputedStyle(cow).paddingLeft) || 0;
 			const travel = Math.max(0, cow.clientWidth - 2 * inset - bodyWidth);
 			// Screen px moved per px of scroll.
@@ -394,7 +395,7 @@
 			if (lie === 0) facingLeft = headingLeft;
 
 			const progress = maxScroll > 0 ? clamp01(shownY / maxScroll) : 0;
-			body.style.transform = `translateX(${inset + progress * travel}px)`;
+			body.style.transform = `translateX(${progress * travel}px)`;
 
 			// Resting near either end facing out of the page: turn round first.
 			const facingOut = progress > 1 - END_ZONE ? !facingLeft : progress < END_ZONE ? facingLeft : false;
