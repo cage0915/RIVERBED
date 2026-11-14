@@ -12,7 +12,7 @@
 <div
 	data-yama-walker
 	aria-hidden="true"
-	class="pointer-events-none fixed inset-x-0 bottom-0 z-40 h-14"
+	class="pointer-events-none fixed inset-x-0 bottom-0 z-40 h-14 sm:px-2"
 	style="background: linear-gradient(to top, rgb(18 18 18 / 0.7) 0%, rgb(18 18 18 / 0.5) 30%, rgb(18 18 18 / 0.22) 62%, rgb(18 18 18 / 0.06) 85%, rgb(18 18 18 / 0) 100%);"
 >
 	<div
@@ -112,16 +112,19 @@
 <script>
 	import { installPageLifecycle } from "../lib/client-page-lifecycle";
 
+	// Speeds and distances below are on screen (px), not in page scroll, so
+	// the hiker looks the same however long the page is.
+
 	// Walking and running gaits; the hiker blends between them by speed.
-	// stride: scroll distance (px) for one full stride, left foot then right.
+	// stride: distance (px) for one full stride, left foot then right.
 	// kneeBend: extra knee bend while a leg swings forward. elbowBend: the
 	// elbow's resting bend. lean: forward tilt of the upper body (deg).
-	const WALK = { stride: 160, legSwing: 26, armSwing: 24, kneeBend: 40, elbowBend: 18, lean: 0 };
-	const RUN = { stride: 240, legSwing: 38, armSwing: 42, kneeBend: 85, elbowBend: 80, lean: 12 };
-	// Speeds (px/ms of scrolling) where running starts and where it is full,
+	const WALK = { stride: 20, legSwing: 26, armSwing: 24, kneeBend: 40, elbowBend: 18, lean: 0 };
+	const RUN = { stride: 30, legSwing: 38, armSwing: 42, kneeBend: 85, elbowBend: 80, lean: 12 };
+	// Speeds (px/ms) where running starts and where it is full,
 	// and how quickly the speed reading settles (ms).
-	const RUN_FROM_SPEED = 1;
-	const RUN_FULL_SPEED = 2.5;
+	const RUN_FROM_SPEED = 0.12;
+	const RUN_FULL_SPEED = 0.25;
 	const SPEED_SMOOTHING = 120;
 
 	// How long the page must rest before the camera comes up, how long raising
@@ -165,11 +168,11 @@
 	const STOP_RELEASE_DURATION = 120;
 
 	// Catching breath after a long run: if the hiker ran (at least halfway into
-	// a running gait) for this many px of scrolling before stopping, it bends
+	// a running gait) for this many px before stopping, it bends
 	// forward with knees bent and arms hanging, breathing hard, for a while
 	// (ms), then stands up straight again and skips the photo for that stop.
 	// After a shorter run it simply stops and takes a photo.
-	const PANT_MIN_RUN_DISTANCE = 1200;
+	const PANT_MIN_RUN_DISTANCE = 200;
 	const PANT_DURATION = 2200;
 	const PANT_IN_DURATION = 250;
 	const PANT_OUT_DURATION = 500;
@@ -183,11 +186,11 @@
 	// Once the pack is back on, the hiker walks to where the page now is: a
 	// share of the remaining gap per ms, but never slower than a floor (px/ms).
 	const CATCH_UP_RATE = 1 / 180;
-	const CATCH_UP_MIN_SPEED = 0.8;
-	// The hiker never moves faster than this (px of scroll per ms). When the
+	const CATCH_UP_MIN_SPEED = 0.04;
+	// The hiker never moves faster than this (px per ms). When the
 	// page scrolls faster, it falls behind and keeps running after the page
 	// stops, always heading for wherever the page is now.
-	const MAX_SPEED = 4;
+	const MAX_SPEED = 0.5;
 	// Resting near either end, the hiker turns to face back into the page
 	// (ms for the turn).
 	const FACE_BACK_DURATION = 400;
@@ -391,7 +394,7 @@
 		let catchingUp = false;
 		// Gait phase (radians), the smoothed walking speed (px/ms), and how far
 		// the gait is from walking (0) to running (1).
-		let phase = (shownY / WALK.stride) * Math.PI * 2;
+		let phase = 0;
 		let speed = 0;
 		let run = 0;
 		// Which heel strike last left a footprint.
@@ -510,6 +513,14 @@
 				packDown = reduced ? 0 : Math.max(0, packDown - elapsed / PACK_UP_DURATION);
 			}
 
+			// Measured once per frame, before the writes below dirty layout.
+			const bodyWidth = body.offsetWidth;
+			// On desktop the strip's side padding keeps the hiker off the screen edges.
+			const inset = parseFloat(getComputedStyle(walker).paddingLeft) || 0;
+			const travel = Math.max(0, walker.clientWidth - 2 * inset - bodyWidth);
+			// Screen px moved per px of scroll.
+			const screenPerScroll = maxScroll > 0 ? travel / maxScroll : 0;
+
 			// No walking until standing with the pack on; then catch up to the page.
 			const settledDown = packDown > 0 || sitAmount > 0 || lounge > 0;
 			let nextY = shownY;
@@ -517,9 +528,11 @@
 				if (y !== shownY) catchingUp = true;
 			} else if (!reduced) {
 				const gap = y - shownY;
-				const maxStep = elapsed * MAX_SPEED;
+				// Screen speeds as px of scroll for this frame.
+				const toScroll = (px: number) => (screenPerScroll > 0 ? px / screenPerScroll : Infinity);
+				const maxStep = toScroll(elapsed * MAX_SPEED);
 				const step = catchingUp
-					? Math.min(Math.max(Math.abs(gap) * elapsed * CATCH_UP_RATE, elapsed * CATCH_UP_MIN_SPEED), maxStep)
+					? Math.min(Math.max(Math.abs(gap) * elapsed * CATCH_UP_RATE, toScroll(elapsed * CATCH_UP_MIN_SPEED)), maxStep)
 					: maxStep;
 				nextY = Math.abs(gap) <= step ? y : shownY + Math.sign(gap) * step;
 			} else {
@@ -531,13 +544,14 @@
 			// plays forward relative to the way the hiker faces. Running strides
 			// are longer, so the legs don't flicker at speed.
 			const moved = Math.abs(nextY - shownY);
-			const instantSpeed = elapsed > 0 ? moved / elapsed : 0;
+			const movedOnScreen = moved * screenPerScroll;
+			const instantSpeed = elapsed > 0 ? movedOnScreen / elapsed : 0;
 			speed += (instantSpeed - speed) * clamp01(elapsed / SPEED_SMOOTHING);
-			if (speed < 0.01) speed = 0;
+			if (speed < 0.0005) speed = 0;
 			run = reduced
 				? 0
 				: easeInOut(clamp01((speed - RUN_FROM_SPEED) / (RUN_FULL_SPEED - RUN_FROM_SPEED)));
-			phase += (moved / mix(WALK.stride, RUN.stride, run)) * Math.PI * 2;
+			phase += (movedOnScreen / mix(WALK.stride, RUN.stride, run)) * Math.PI * 2;
 			shownY = nextY;
 
 			// Once moving stops for a moment, bring the feet together. After a long
@@ -546,7 +560,7 @@
 				lastMovedAt = now;
 				pantStartedAt = 0;
 				tiredStop = false;
-				if (run >= 0.5) runDistance += moved;
+				if (run >= 0.5) runDistance += movedOnScreen;
 			}
 			const stopped = now - lastMovedAt > STOP_AFTER;
 			if (stopped && runDistance > 0) {
@@ -571,10 +585,7 @@
 			if (!settledDown) facingLeft = headingLeft;
 
 			const progress = maxScroll > 0 ? Math.min(Math.max(shownY / maxScroll, 0), 1) : 0;
-			// Measured once per frame, before the writes below dirty layout.
-			const bodyWidth = body.offsetWidth;
-			const travel = walker.clientWidth - bodyWidth;
-			const bodyX = progress * travel;
+			const bodyX = inset + progress * travel;
 			body.style.transform = `translateX(${bodyX}px)`;
 
 			// Resting near either end facing out of the page: turn round to face

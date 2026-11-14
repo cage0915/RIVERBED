@@ -11,7 +11,7 @@
 <div
 	data-yama-cow
 	aria-hidden="true"
-	class="pointer-events-none fixed inset-x-0 bottom-0 z-40 h-14"
+	class="pointer-events-none fixed inset-x-0 bottom-0 z-40 h-14 sm:px-2"
 	style="background: linear-gradient(to top, rgb(18 18 18 / 0.7) 0%, rgb(18 18 18 / 0.5) 30%, rgb(18 18 18 / 0.22) 62%, rgb(18 18 18 / 0.06) 85%, rgb(18 18 18 / 0) 100%);"
 >
 	<div
@@ -138,23 +138,26 @@
 	const PIVOT = HIND_ROOT;
 	const FORE_SPAN = FORE_ROOT.x - HIND_ROOT.x;
 
-	// Walking: scroll distance (px) for one full gait cycle, which grows with
+	// Speeds and distances below are on screen (px), not in page scroll, so
+	// the cow looks the same however long the page is.
+
+	// Walking: distance (px) for one full gait cycle, which grows with
 	// speed so the legs never flicker; how far each hoof reaches forward and
 	// back, and how high a stepping hoof lifts.
-	const STRIDE_SLOW = 150;
-	const STRIDE_FAST = 360;
-	const FAST_SPEED = 3;
+	const STRIDE_SLOW = 7.5;
+	const STRIDE_FAST = 18;
+	const FAST_SPEED = 0.15;
 	const STEP_REACH = 2.6;
 	const STEP_LIFT = 2.2;
 	// Running: from RUN_FROM_SPEED to RUN_FULL_SPEED (px/ms) the walk (each
 	// leg a quarter cycle apart) blends into a bound: hind legs together, then
-	// front legs together, in long, unhurried strides (px of scroll per cycle)
+	// front legs together, in long, unhurried strides (px per cycle)
 	// that reach and lift further. The body rocks (deg), leaves the ground
 	// for a moment while the front legs reach forward (RUN_HOP, in figure
 	// units), and the tail streams out behind.
-	const RUN_FROM_SPEED = 1;
-	const RUN_FULL_SPEED = 2.5;
-	const RUN_STRIDE = 900;
+	const RUN_FROM_SPEED = 0.05;
+	const RUN_FULL_SPEED = 0.125;
+	const RUN_STRIDE = 45;
 	const RUN_REACH = 6.8;
 	const RUN_LIFT = 4.6;
 	const RUN_ROCK = 7;
@@ -165,13 +168,13 @@
 	const RUN_HIND_STAGGER = 0.2;
 	const RUN_FORE_STAGGER = 0.8;
 	const SPEED_SMOOTHING = 120;
-	// The cow never moves faster than this (px of scroll per ms); when the
-	// page scrolls faster it falls behind and keeps walking after it stops.
-	const MAX_SPEED = 4;
+	// The cow never moves faster than this (px per ms); when the page
+	// scrolls faster it falls behind and keeps walking after it stops.
+	const MAX_SPEED = 0.3;
 	// After getting up, it walks to where the page now is: a share of the
 	// remaining gap per ms, but never slower than a floor (px/ms).
 	const CATCH_UP_RATE = 1 / 180;
-	const CATCH_UP_MIN_SPEED = 0.8;
+	const CATCH_UP_MIN_SPEED = 0.04;
 	// Coming to a stop: after this long without moving (ms), the hooves come
 	// back under the body over the given times (ms).
 	const STOP_AFTER = 180;
@@ -343,15 +346,24 @@
 				resting && (restAction === "lie" || longIdle) && still() && graze === 0 && (lie > 0 || !facingOutNow);
 			lie = reduced ? Number(wantLie) : approach(lie, wantLie ? 1 : 0, elapsed, LIE_DURATION, RISE_DURATION);
 
+			const bodyWidth = body.offsetWidth;
+			// On desktop the strip's side padding keeps the cow off the screen edges.
+			const inset = parseFloat(getComputedStyle(cow).paddingLeft) || 0;
+			const travel = Math.max(0, cow.clientWidth - 2 * inset - bodyWidth);
+			// Screen px moved per px of scroll.
+			const screenPerScroll = maxScroll > 0 ? travel / maxScroll : 0;
+
 			// No walking until fully up; then catch up to the page.
 			let nextY = shownY;
 			if (lie > 0) {
 				if (y !== shownY) catchingUp = true;
 			} else if (!reduced) {
 				const gap = y - shownY;
-				const maxStep = elapsed * MAX_SPEED;
+				// Screen speeds as px of scroll for this frame.
+				const toScroll = (px: number) => (screenPerScroll > 0 ? px / screenPerScroll : Infinity);
+				const maxStep = toScroll(elapsed * MAX_SPEED);
 				const step = catchingUp
-					? Math.min(Math.max(Math.abs(gap) * elapsed * CATCH_UP_RATE, elapsed * CATCH_UP_MIN_SPEED), maxStep)
+					? Math.min(Math.max(Math.abs(gap) * elapsed * CATCH_UP_RATE, toScroll(elapsed * CATCH_UP_MIN_SPEED)), maxStep)
 					: maxStep;
 				nextY = Math.abs(gap) <= step ? y : shownY + Math.sign(gap) * step;
 			} else {
@@ -360,9 +372,10 @@
 			if (nextY === y) catchingUp = false;
 			if (nextY !== shownY) headingLeft = nextY < shownY;
 			const moved = Math.abs(nextY - shownY);
-			const instantSpeed = elapsed > 0 ? moved / elapsed : 0;
+			const movedOnScreen = moved * screenPerScroll;
+			const instantSpeed = elapsed > 0 ? movedOnScreen / elapsed : 0;
 			speed += (instantSpeed - speed) * clamp01(elapsed / SPEED_SMOOTHING);
-			if (speed < 0.01) speed = 0;
+			if (speed < 0.0005) speed = 0;
 			const run = reduced
 				? 0
 				: easeInOut(clamp01((speed - RUN_FROM_SPEED) / (RUN_FULL_SPEED - RUN_FROM_SPEED)));
@@ -371,7 +384,7 @@
 				RUN_STRIDE,
 				run,
 			);
-			phase += (moved / stride) * Math.PI * 2;
+			phase += (movedOnScreen / stride) * Math.PI * 2;
 			shownY = nextY;
 			if (moved > 0) lastMovedAt = now;
 			const stillTarget = now - lastMovedAt > STOP_AFTER ? 1 : 0;
@@ -381,9 +394,7 @@
 			if (lie === 0) facingLeft = headingLeft;
 
 			const progress = maxScroll > 0 ? clamp01(shownY / maxScroll) : 0;
-			const bodyWidth = body.offsetWidth;
-			const travel = cow.clientWidth - bodyWidth;
-			body.style.transform = `translateX(${progress * travel}px)`;
+			body.style.transform = `translateX(${inset + progress * travel}px)`;
 
 			// Resting near either end facing out of the page: turn round first.
 			const facingOut = progress > 1 - END_ZONE ? !facingLeft : progress < END_ZONE ? facingLeft : false;
