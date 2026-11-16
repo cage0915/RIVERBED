@@ -8,6 +8,7 @@ import ContentKeyboardNavigation from "../components/ContentKeyboardNavigation.a
 import PhotoLightbox from "../components/PhotoLightbox.astro";
 import PhotoFadeIn from "../components/PhotoFadeIn.astro";
 import NavigationProgress from "../components/NavigationProgress.astro";
+import AlbumTransitions from "../components/AlbumTransitions.astro";
 import YamaWalker from "../components/YamaWalker.astro";
 import YamaCow from "../components/YamaCow.astro";
 import YamaSki from "../components/YamaSki.astro";
@@ -82,6 +83,7 @@ const shareImageUrl = shareImage ? getShareImageUrl(shareImage) : undefined;
 		<ContentKeyboardNavigation />
 		<PhotoLightbox />
 		<PhotoFadeIn />
+		<AlbumTransitions />
 		<SiteFooter />
 		{walker === "hiker" && <YamaWalker />}
 		{walker === "cow" && <YamaCow />}

@@ -21,10 +21,11 @@ const { previous, next } = Astro.props;
                         href={`/${next.slug}`}
                         class="pagination-link pagination-link--left"
                         rel="next"
+                        data-album-transition-link={next.slug}
                         aria-label={`下一篇：${next.title}`}
                     >
                         <span class="pagination-arrow" aria-hidden="true">←</span>
-                        <span>{next.title}</span>
+                        <span data-album-transition-part="title">{next.title}</span>
                     </a>
                 )}
             </div>
@@ -35,9 +36,10 @@ const { previous, next } = Astro.props;
                         href={`/${previous.slug}`}
                         class="pagination-link pagination-link--right"
                         rel="prev"
+                        data-album-transition-link={previous.slug}
                         aria-label={`上一篇：${previous.title}`}
                     >
-                        <span>{previous.title}</span>
+                        <span data-album-transition-part="title">{previous.title}</span>
                         <span class="pagination-arrow" aria-hidden="true">→</span>
                     </a>
                 )}

@@ -214,15 +214,17 @@ const titleSections = extractTitleSections(albumRecord.blocks);
             </div>
         )}
 
-        <div class="mb-8 text-center" data-album-heading>
+        <div class="mb-8 text-center" data-album-heading data-album-transition-page={albumSlug}>
+            <!-- Sized to their text so the page transition moves the words, not a full-width box. -->
             <h1
-                class="text-xl tracking-widest uppercase mb-1"
+                class="mx-auto w-fit text-xl tracking-widest uppercase mb-1"
                 data-album-title
+                data-album-transition-part="title"
             >
                 {albumRecord.title}
             </h1>
             {albumRecord.info && (
-                <p class="text-sm text-zinc-500 font-sans font-light tracking-wider uppercase" data-album-info>
+                <p class="mx-auto w-fit text-sm text-zinc-500 font-sans font-light tracking-wider uppercase" data-album-info data-album-transition-part="info">
                     {albumRecord.info}
                 </p>
             )}

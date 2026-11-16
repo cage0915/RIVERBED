@@ -1,0 +1,240 @@
+---
+// Page transitions between an Album and the cards that lead to it.
+//
+// An Album's cover is often not a photo near the top of its page (or not on
+// the page at all), so the cover never morphs into an Album photo. Only the
+// title and date, which every card and Album heading share, travel between
+// pages:
+//
+//   card → Album   the card's title and date move into the Album heading;
+//                  the clicked cover lifts and fades out while the Album
+//                  page rises in underneath.
+//   Album → card   the heading moves back into its card on the folder or
+//                  home page, which shows its caption for a moment and
+//                  fades its cover in, so the eye lands where it left off.
+//
+// Markup opts in with data attributes:
+//   data-album-transition-card="<slug>"   a catalog card for an Album
+//   data-album-transition-link="<slug>"   any other link to an Album
+//                                         (pagination); used only when clicked
+//   data-album-transition-page="<slug>"   the Album page heading
+//   data-album-transition-part="title" | "info" | "cover"
+//
+// Names are written inline only for the duration of one navigation, so only
+// one element ever carries each name.
+---
+
+<script>
+    import type { TransitionBeforePreparationEvent, TransitionBeforeSwapEvent } from "astro:transitions/client";
+
+    const NAMED_ATTR = "data-album-transition-named";
+    const TARGET_ATTR = "data-album-transition-target";
+    const DIRECTION_ATTR = "data-album-transition";
+    // How long a returning card keeps its caption shown after the transition.
+    const TARGET_HOLD_MS = 900;
+
+    type Part = "title" | "info" | "cover";
+    const NAMES: Record<Part, string> = {
+        title: "album-title",
+        info: "album-info",
+        cover: "album-cover",
+    };
+
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    const part = (root: ParentNode, name: Part) =>
+        root.querySelector<HTMLElement>(`[data-album-transition-part="${name}"]`);
+
+    const nameElement = (element: HTMLElement | null, name: string) => {
+        if (!element) return;
+        element.style.viewTransitionName = name;
+        element.setAttribute(NAMED_ATTR, "");
+    };
+
+    const clearNames = (doc: Document) => {
+        doc.querySelectorAll<HTMLElement>(`[${NAMED_ATTR}]`).forEach((element) => {
+            element.style.viewTransitionName = "";
+            element.removeAttribute(NAMED_ATTR);
+        });
+        doc.documentElement.removeAttribute(DIRECTION_ATTR);
+    };
+
+    const pageSlug = (doc: Document) =>
+        doc.querySelector<HTMLElement>("[data-album-transition-page]")?.dataset.albumTransitionPage;
+
+    const cardFor = (doc: Document, slug: string) =>
+        doc.querySelector<HTMLElement>(`[data-album-transition-card="${CSS.escape(slug)}"]`);
+
+    // Title and date move only when both pages have them; the cover lives on
+    // the card side alone and gets its own lift/settle animation.
+    const pair = (from: HTMLElement, to: HTMLElement, card: HTMLElement) => {
+        for (const name of ["title", "info"] as const) {
+            const oldPart = part(from, name);
+            const newPart = part(to, name);
+            if (oldPart && newPart) {
+                nameElement(oldPart, NAMES[name]);
+                nameElement(newPart, NAMES[name]);
+            }
+        }
+        nameElement(part(card, "cover"), NAMES.cover);
+    };
+
+    const prepare = (event: TransitionBeforePreparationEvent) => {
+        const newDoc = event.newDocument;
+        const fromSlug = pageSlug(document);
+        const toSlug = pageSlug(newDoc);
+
+        if (toSlug && toSlug !== fromSlug) {
+            // Into an Album: from the clicked card or link, else (history
+            // navigation) from this page's card for that Album.
+            const clicked = event.sourceElement?.closest<HTMLElement>(
+                "[data-album-transition-card], [data-album-transition-link]",
+            );
+            const clickedSlug =
+                clicked?.dataset.albumTransitionCard ?? clicked?.dataset.albumTransitionLink;
+            const source = clicked && clickedSlug === toSlug ? clicked : cardFor(document, toSlug);
+            const heading = newDoc.querySelector<HTMLElement>("[data-album-transition-page]");
+            if (!source || !heading) return;
+            pair(source, heading, source);
+            document.documentElement.setAttribute(DIRECTION_ATTR, "enter");
+            newDoc.documentElement.setAttribute(DIRECTION_ATTR, "enter");
+            return;
+        }
+
+        if (fromSlug && fromSlug !== toSlug) {
+            // Out of an Album, back to a page that lists it.
+            const heading = document.querySelector<HTMLElement>("[data-album-transition-page]");
+            const card = cardFor(newDoc, fromSlug);
+            if (!heading || !card) return;
+            pair(heading, card, card);
+            card.setAttribute(TARGET_ATTR, "");
+            document.documentElement.setAttribute(DIRECTION_ATTR, "leave");
+            newDoc.documentElement.setAttribute(DIRECTION_ATTR, "leave");
+        }
+    };
+
+    document.addEventListener("astro:before-preparation", (event) => {
+        // A navigation that was interrupted can leave names behind.
+        clearNames(document);
+        if (reducedMotion.matches) return;
+
+        const loader = event.loader;
+        event.loader = async () => {
+            await loader();
+            if (event.newDocument) prepare(event);
+        };
+    });
+
+    document.addEventListener("astro:before-swap", (event: TransitionBeforeSwapEvent) => {
+        const done = () => {
+            clearNames(document);
+            const target = document.querySelector<HTMLElement>(`[${TARGET_ATTR}]`);
+            if (target) {
+                window.setTimeout(() => target.removeAttribute(TARGET_ATTR), TARGET_HOLD_MS);
+            }
+        };
+        if (event.viewTransition) event.viewTransition.finished.finally(done);
+        else done();
+    });
+</script>
+
+<style is:global>
+    :root {
+        --album-transition-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+        --album-transition-duration: 480ms;
+    }
+
+    /* Groups that exist only in the new page are stacked above the rest, so
+       on the way back the card's cover would hide the arriving title. Keep
+       the cover under the text and both under the navigation. */
+    ::view-transition-group(album-cover) {
+        z-index: 1;
+    }
+
+    ::view-transition-group(album-title),
+    ::view-transition-group(album-info) {
+        z-index: 2;
+    }
+
+    ::view-transition-group(site-navigation),
+    ::view-transition-group(navigation-progress) {
+        z-index: 3;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+        ::view-transition-group(album-title),
+        ::view-transition-group(album-info) {
+            animation-duration: var(--album-transition-duration);
+            animation-timing-function: var(--album-transition-ease);
+        }
+
+        ::view-transition-old(album-title),
+        ::view-transition-old(album-info),
+        ::view-transition-new(album-title),
+        ::view-transition-new(album-info) {
+            animation-duration: var(--album-transition-duration);
+            animation-timing-function: var(--album-transition-ease);
+        }
+
+        /* Card → Album: the clicked cover lifts and fades over the incoming
+           page, which rises into place. */
+        html[data-album-transition="enter"]::view-transition-old(album-cover) {
+            animation: album-cover-lift 360ms var(--album-transition-ease) both;
+        }
+
+        html[data-album-transition="enter"]::view-transition-old(root) {
+            animation: album-page-fade-out 220ms ease both;
+        }
+
+        html[data-album-transition="enter"]::view-transition-new(root) {
+            animation: album-page-rise var(--album-transition-duration) var(--album-transition-ease) 60ms both;
+        }
+
+        /* Album → card: the card's cover settles back in as the heading
+           lands on it. */
+        html[data-album-transition="leave"]::view-transition-new(album-cover) {
+            animation: album-cover-settle var(--album-transition-duration) var(--album-transition-ease) both;
+        }
+
+        html[data-album-transition="leave"]::view-transition-old(root) {
+            animation: album-page-fade-out 220ms ease both;
+        }
+
+        html[data-album-transition="leave"]::view-transition-new(root) {
+            animation: album-page-fade-in 320ms ease 80ms both;
+        }
+    }
+
+    @keyframes album-cover-lift {
+        to {
+            opacity: 0;
+            transform: scale(1.04);
+        }
+    }
+
+    @keyframes album-cover-settle {
+        from {
+            opacity: 0;
+            transform: scale(1.04);
+        }
+    }
+
+    @keyframes album-page-fade-out {
+        to {
+            opacity: 0;
+        }
+    }
+
+    @keyframes album-page-fade-in {
+        from {
+            opacity: 0;
+        }
+    }
+
+    @keyframes album-page-rise {
+        from {
+            opacity: 0;
+            transform: translateY(1.25rem);
+        }
+    }
+</style>
