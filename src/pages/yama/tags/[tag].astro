@@ -20,6 +20,7 @@ import {
     getThumbnailUrl,
     R2_DOMAIN,
 } from "../../../lib/constants";
+import { photoColorStyle } from "../../../lib/photo-color";
 import { tagPathParams } from "../../../lib/static-paths";
 
 export async function getStaticPaths() {
@@ -51,6 +52,9 @@ const representativePhotoSrcSet = representativePhotoKey
 const representativePhotoFallbackUrl = representativePhotoKey
     ? `${R2_DOMAIN}/${representativePhotoKey}`
     : undefined;
+const representativePhoto = representativePhotoKey
+    ? (await getAlbumCatalog()).getPhoto(representativePhotoKey)
+    : null;
 const isDev = import.meta.env.DEV;
 
 const photosByAlbum = matchingPhotos.reduce(
@@ -172,11 +176,17 @@ function chunkArray<T>(array: T[], size: number): T[][] {
         }
 
         {mountain && representativePhotoUrl && (
-            <figure class="mountain-representative-photo">
+            <figure
+                class="mountain-representative-photo photo-frame"
+                style={photoColorStyle(representativePhoto?.color) || undefined}
+            >
                 <img
+                    class="photo-img"
                     src={representativePhotoUrl}
                     srcset={representativePhotoSrcSet}
                     sizes="(max-width: 767px) calc(100vw - 2rem), (max-width: 1024px) calc(100vw - 4rem), 960px"
+                    width={representativePhoto?.width}
+                    height={representativePhoto?.height}
                     alt={`${decodedTag} cover photo`}
                     loading="eager"
                     fetchpriority="high"
@@ -218,6 +228,7 @@ function chunkArray<T>(array: T[], size: number): T[][] {
                                                 assetKey={photo.assetKey}
                                                 width={photo.width}
                                                 height={photo.height}
+                                                color={photo.color}
                                                 caption={photo.caption}
                                                 tags={photo.tags}
                                             />
@@ -275,7 +286,6 @@ function chunkArray<T>(array: T[], size: number): T[][] {
         width: 100%;
         margin: -1.5rem 0 4rem;
         overflow: hidden;
-        background: #1a1a1a;
     }
 
     .mountain-cover-choice {
@@ -497,15 +507,31 @@ function chunkArray<T>(array: T[], size: number): T[][] {
                         );
                         if (!figure) {
                             figure = document.createElement("figure");
-                            figure.className = "mountain-representative-photo";
+                            figure.className = "mountain-representative-photo photo-frame";
                             const image = document.createElement("img");
+                            image.className = "photo-img";
                             image.alt = `${mountainName} cover photo`;
                             image.loading = "eager";
                             figure.append(image);
                             status?.before(figure);
                         }
+                        // Load the new cover the way every photo loads: in its
+                        // own colour and size, then faded in.
+                        const sourceFrame = entry.querySelector<HTMLElement>(".photo-frame");
+                        const sourceColor = sourceFrame?.style.getPropertyValue("--photo-color");
+                        if (sourceColor) figure.style.setProperty("--photo-color", sourceColor);
+                        else figure.style.removeProperty("--photo-color");
                         const coverImage = figure.querySelector<HTMLImageElement>("img");
-                        if (coverImage) coverImage.src = sourceUrl;
+                        if (coverImage) {
+                            for (const attribute of ["width", "height"]) {
+                                const value = sourceImage?.getAttribute(attribute);
+                                if (value) coverImage.setAttribute(attribute, value);
+                                else coverImage.removeAttribute(attribute);
+                            }
+                            coverImage.removeAttribute("srcset");
+                            delete coverImage.dataset.loaded;
+                            coverImage.src = sourceUrl;
+                        }
                     }
 
                     history.scrollRestoration = "manual";

@@ -21,6 +21,8 @@ export type AlbumCatalog = {
     getAlbums(): NormalizedAlbum[];
     getAlbumsInFolder(folder: string): NormalizedAlbum[];
     getTaggedPhotos(tagName: string): TaggedPhoto[];
+    /** Any registered photo by its asset key (`folder/album/filename`), e.g. a cover. */
+    getPhoto(assetKey: string): ResolvedAlbumPhoto | null;
     getExternalCoverReferences(assetKey: string): AlbumSlug[];
     diagnostics: AlbumDiagnostic[];
 };
@@ -193,6 +195,9 @@ export function createAlbumCatalog(records: AlbumSourceRecord[]): AlbumCatalog {
     }
 
     const albums = [...indexedBySlug.values()].map(({ album }) => album).sort(compareAlbums);
+    const photosByAssetKey = new Map(
+        albums.flatMap((album) => album.photos.map((photo) => [photo.assetKey, photo] as const)),
+    );
     const trackedAssetKeys = new Set(albums.flatMap((album) => album.photos.map(({ assetKey }) => assetKey)));
 
     for (const album of albums) {
@@ -237,6 +242,10 @@ export function createAlbumCatalog(records: AlbumSourceRecord[]): AlbumCatalog {
                     photo.tags.some(({ name }) => name === tagName),
                 ).map(cloneTaggedPhoto)
             );
+        },
+        getPhoto(assetKey) {
+            const photo = photosByAssetKey.get(assetKey);
+            return photo === undefined ? null : cloneResolvedPhoto(photo);
         },
         getExternalCoverReferences(assetKey) {
             return albums.flatMap((album) =>

@@ -1,6 +1,7 @@
 ---
-// Marks each album photo (.photo-img) as loaded so Photo.astro's CSS can fade
-// it in. Lives here, mounted once by the Layout, so Photo itself emits no script.
+// Marks each photo (.photo-img) as loaded so the shared photo-frame CSS in
+// global.css can fade it in. Lives here, mounted once by the Layout, so the
+// components that render photos emit no script of their own.
 ---
 
 <script>
@@ -17,12 +18,14 @@
     document.addEventListener("error", (event) => markLoaded(event.target), true);
 
     // Photos that finished (from cache, or before this script ran) fire no
-    // further events; mark them on each page load.
+    // further events; mark them on each page load. An image with no source
+    // yet (a cover slide waiting for its turn) also reports complete, so it
+    // is skipped until it really loads.
     document.addEventListener("astro:page-load", () => {
         document
             .querySelectorAll<HTMLImageElement>(".photo-img:not([data-loaded])")
             .forEach((image) => {
-                if (image.complete) image.dataset.loaded = "";
+                if (image.complete && image.currentSrc) image.dataset.loaded = "";
             });
     });
 </script>

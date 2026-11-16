@@ -1,7 +1,8 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import CatalogCardInteractions from "../components/CatalogCardInteractions.astro";
-import { getAlbumSummaries } from "../lib/albums/catalog";
+import { getAlbumCatalog, getAlbumSummaries } from "../lib/albums/catalog";
+import { photoColorStyle } from "../lib/photo-color";
 import {
     getFolderTitle,
     getFolderOrder,
@@ -11,6 +12,7 @@ import {
 } from "../lib/constants";
 
 const allAlbums = await getAlbumSummaries();
+const catalog = await getAlbumCatalog();
 
 const latestAlbum = [...allAlbums].sort((a, b) => {
     const dateDifference =
@@ -27,6 +29,7 @@ if (!latestAlbum) {
 }
 
 const latestAlbumCoverKey = latestAlbum.cover.assetKey;
+const latestAlbumCoverColor = catalog.getPhoto(latestAlbumCoverKey)?.color;
 const latestAlbumFolder = latestAlbum.slug.split("/")[0];
 
 // Group albums by folder, sorted by album order (matching folder page logic)
@@ -36,6 +39,7 @@ const folderMap = new Map<
     {
         coverUrl: string;
         coverSrcSet?: string;
+        coverColor?: string;
         fallbackUrl: string;
         title: string;
         coverZoom?: number;
@@ -46,11 +50,12 @@ const folderMap = new Map<
 for (const slug of folderSlugs) {
     const albumsInFolder = allAlbums.filter((album) => album.slug.startsWith(`${slug}/`));
 
-    folderMap.set(slug, albumsInFolder.map(album => {
+    folderMap.set(slug, albumsInFolder.map((album) => {
         const resolvedCoverKey = album.cover.assetKey;
         return {
             coverUrl: getThumbnailUrl(resolvedCoverKey, 480),
             coverSrcSet: getThumbnailSrcSet(resolvedCoverKey, [320, 480, 720]),
+            coverColor: catalog.getPhoto(resolvedCoverKey)?.color,
             fallbackUrl: `${R2_DOMAIN}/${resolvedCoverKey}`,
             title: album.title,
             coverZoom: album.cover.zoom,
@@ -77,7 +82,7 @@ const sortedFolders = folderSlugs
         <section class="latest-post" aria-label="Latest post">
             <article class="album-card latest-post-card group" data-catalog-card data-keyboard-navigation-target>
                 <a href={`/${latestAlbum.slug}`} class="album-link">
-                    <div class="album-cover latest-post-cover">
+                    <div class="album-cover latest-post-cover photo-frame" style={photoColorStyle(latestAlbumCoverColor) || undefined}>
                         <picture>
                             <!-- The latest post is hidden on phones; an empty source keeps them from downloading it. -->
                             <source media="(max-width: 640px)" srcset="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
@@ -89,7 +94,7 @@ const sortedFolders = folderSlugs
                                 loading="eager"
                                 fetchpriority="high"
                                 decoding="async"
-                                class="slide active"
+                                class="slide photo-img active"
                                 style={`--zoom: ${latestAlbum.cover.zoom}; --ox: ${latestAlbum.cover.offset.x}%; --oy: ${latestAlbum.cover.offset.y}%;`}
                                 onerror={
                                     isDev
@@ -126,7 +131,7 @@ const sortedFolders = folderSlugs
                         data-covers={folder.covers.length}
                     >
                         <a href={`/${folder.id}`} class="album-link">
-                            <div class="album-cover">
+                            <div class="album-cover photo-frame" style={photoColorStyle(folder.covers[0]?.coverColor) || undefined}>
                                 {folder.covers.map((cover, i) => (
                                     <img
                                         src={i === 0 ? cover.coverUrl : undefined}
@@ -137,7 +142,7 @@ const sortedFolders = folderSlugs
                                         alt={cover.title}
                                         loading={i === 0 ? "eager" : "lazy"}
                                         decoding="async"
-                                        class={`slide ${i === 0 ? "active" : ""}`}
+                                        class={`slide photo-img ${i === 0 ? "active" : ""}`}
                                         style={`--zoom: ${cover.coverZoom ?? 1}; --ox: ${cover.coverOffset?.x ?? 50}%; --oy: ${cover.coverOffset?.y ?? 50}%;`}
                                         onerror={
                                             isDev
@@ -216,10 +221,13 @@ const sortedFolders = folderSlugs
         width: 100%;
         aspect-ratio: 177/100;
         overflow: hidden;
-        background: #1c1c1c;
+        /* Matches FADE_MS in CatalogCardInteractions. */
+        --photo-fade-duration: 0.8s;
     }
 
-    /* All slides stacked on top of each other */
+    /* All slides stacked on top of each other. Only the first one in a card
+       is ever seen loading (later ones are decoded before they fade in), so
+       the card's frame carries that cover's colour. */
     .album-cover .slide {
         position: absolute;
         inset: 0;
@@ -231,7 +239,7 @@ const sortedFolders = folderSlugs
         transform-origin: var(--ox) var(--oy);
         transform: scale(var(--zoom));
         transition:
-            opacity 0.8s ease,
+            opacity var(--photo-fade-duration) ease,
             transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
@@ -246,6 +254,14 @@ const sortedFolders = folderSlugs
     .album-cover .slide.leaving {
         opacity: 1;
         transition: none;
+    }
+
+    /* The shared photo fade-in (global.css) for the first slide, which the
+       active rule above would otherwise show before it has loaded. */
+    @media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+        .album-cover .slide.active:not([data-loaded]) {
+            opacity: 0;
+        }
     }
 
     /* Home captions stay visible; they sit on a bottom gradient over the photo. */

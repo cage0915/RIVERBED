@@ -4,7 +4,8 @@ import CatalogCardInteractions from "../../components/CatalogCardInteractions.as
 // Folder metadata uses the light CJK face; keep it out of unrelated routes.
 import "@fontsource/noto-sans-jp/300.css";
 import "@fontsource/noto-sans-tc/300.css";
-import { getAlbumSummaries } from "../../lib/albums/catalog";
+import { getAlbumCatalog, getAlbumSummaries } from "../../lib/albums/catalog";
+import { photoColorStyle } from "../../lib/photo-color";
 import {
     FOLDER_METADATA,
     getFolderCols,
@@ -27,6 +28,7 @@ export async function getStaticPaths() {
 const { folder } = Astro.params as { folder: string };
 
 const folderAlbums = (await getAlbumSummaries()).filter((album) => album.folder === folder);
+const catalog = await getAlbumCatalog();
 const folderTitle = getFolderTitle(folder);
 const folderCols = getFolderCols(folder);
 const isDev = import.meta.env.DEV;
@@ -76,6 +78,7 @@ const isYama = folder === "yama";
                             [320, 480, 720],
                         );
                         const fallbackUrl = `${R2_DOMAIN}/${resolvedCoverKey}`;
+                        const coverColor = catalog.getPhoto(resolvedCoverKey)?.color;
                         return (
                             <div
                                 class="album-card group"
@@ -91,8 +94,9 @@ const isYama = folder === "yama";
                                     href={`/${folder}/${albumSlug}`}
                                     class="album-link"
                                 >
-                                    <div class="album-cover">
+                                    <div class="album-cover photo-frame" style={photoColorStyle(coverColor) || undefined}>
                                         <img
+                                            class="photo-img"
                                             src={coverUrl}
                                             srcset={coverSrcSet}
                                             sizes="(max-width: 640px) calc(100vw - 2rem), (max-width: 1024px) calc((100vw - 4.5rem) / 2), 340px"
@@ -165,7 +169,6 @@ const isYama = folder === "yama";
         width: 100%;
         aspect-ratio: 177/100;
         overflow: hidden;
-        background: #1c1c1c;
     }
 
     .album-cover img {
@@ -175,7 +178,9 @@ const isYama = folder === "yama";
         object-position: var(--ox) var(--oy);
         transform-origin: var(--ox) var(--oy);
         transform: scale(var(--zoom));
-        transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        transition:
+            opacity var(--photo-fade-duration, 0.5s) ease,
+            transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     /* Caption sits on a bottom gradient so the photo stays visible behind it. */

@@ -24,6 +24,7 @@ import {
     getThumbnailUrl,
     R2_DOMAIN,
 } from "../lib/constants";
+import { photoColorStyle } from "../lib/photo-color";
 import RichText from "./RichText.astro";
 
 const { assetKey, width, height, color, caption, tags = [], priority = false, flex } = Astro.props;
@@ -48,9 +49,9 @@ const fallbackUrl = `${R2_DOMAIN}/${encodedAssetKey}`;
             data-pswp-width={width}
             data-pswp-height={height}
             target="_blank"
-            class="pswp-link block"
+            class="pswp-link photo-frame block"
             data-photo-lightbox-link
-            style={color ? `--photo-color: ${color}` : undefined}
+            style={photoColorStyle(color) || undefined}
         >
             <img
                 src={displayUrl}
@@ -116,35 +117,10 @@ const fallbackUrl = `${R2_DOMAIN}/${encodedAssetKey}`;
         /* removed overflow: hidden to allow tags near border to overflow smoothly */
     }
 
-    /* Lazy photos reserve their box from width/height; the link paints that box
-       in the photo's average colour (or a neutral grey) while the photo itself
-       is still transparent. Once the fade-in has finished the fill is dropped,
-       so it can't show around a photo drawn smaller than its box. */
-    .photo-wrapper .pswp-link {
-        background-color: var(--photo-color, #1c1c1c);
-    }
-
-    .photo-wrapper .pswp-link:has(img[data-loaded]) {
-        background-color: transparent;
-        transition: background-color 0s 0.5s;
-    }
-
     .photo-wrapper img {
         width: 100%;
         height: auto;
         display: block;
-    }
-
-    /* Fade each photo in once it has loaded. Without scripting nothing would
-       ever mark it loaded, so the photo stays plainly visible. */
-    @media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
-        .photo-wrapper img {
-            transition: opacity 0.5s ease;
-        }
-
-        .photo-wrapper img:not([data-loaded]) {
-            opacity: 0;
-        }
     }
 
     .photo-caption--photo {

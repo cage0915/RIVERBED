@@ -1322,7 +1322,7 @@ test('media behavior uses page-scoped lifecycle owners with deterministic cleanu
 
     assert.match(
         photo,
-        /<a[\s\S]*class="pswp-link block"[\s\S]*data-photo-lightbox-link/,
+        /<a[\s\S]*class="pswp-link photo-frame block"[\s\S]*data-photo-lightbox-link/,
     );
     assert.match(photo, /data-pswp-width=\{width\}[\s\S]*data-pswp-height=\{height\}/);
     // The dev-only fallback lives with the dev tool so Photo emits no script inside rows or tracks.
@@ -1401,7 +1401,7 @@ test('catalog routes share lifecycle-scoped card interactions', () => {
     );
     assert.match(
         homePage,
-        /<div class="album-cover">[\s\S]*<div class="album-overlay">\s*<h2 class="album-title">\{folder\.title\}<\/h2>/,
+        /<div class="album-cover photo-frame"[^>]*>[\s\S]*<div class="album-overlay">\s*<h2 class="album-title">\{folder\.title\}<\/h2>/,
     );
     assert.match(
         folderPage,
@@ -1423,7 +1423,7 @@ test('catalog routes share lifecycle-scoped card interactions', () => {
         folderPage,
         /@media \(hover: hover\) \{\s*\.album-overlay \{\s*opacity: 0;/,
     );
-    assert.doesNotMatch(homePage, /opacity: 0;\s*\}/);
+    assert.doesNotMatch(homePage, /\.album-overlay[^{]*\{[^}]*opacity: 0/);
     assert.doesNotMatch(
         interactions,
         /document\.querySelectorAll[^;]*\.album-card/,

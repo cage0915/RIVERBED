@@ -122,6 +122,8 @@ test("projects tags only from block content in stable Album and content order", 
     assert.ok(!tagged.some((photo) => photo.sourceAlbumSlug === "k/borrower"));
     assert.ok(tagged.every((photo) => photo.isContent === true));
     assert.deepEqual(catalog.getExternalCoverReferences("yama/first/A.jpg"), ["k/borrower"]);
+    assert.equal(catalog.getPhoto("yama/first/A.jpg")?.sourceAlbumSlug, "yama/first");
+    assert.equal(catalog.getPhoto("yama/first/missing.jpg"), null);
 });
 
 test("resolves external covers only to tracked manifest inventory", () => {
