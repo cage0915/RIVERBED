@@ -226,7 +226,9 @@ test('PhotoPanorama is a standalone block with full-width carousel and joined pr
     // One carousel dot per slide (a capsule for the current one); the panorama
     // capsule spans the dots' total width.
     assert.match(panorama, /const viewDots = slides\.map/);
-    assert.match(panorama, /--panorama-view-icon-width: calc\(var\(--panorama-view-dots, 3\) \* 7px \+ 3px\)/);
+    // The panorama capsule spans exactly the carousel dots it replaces.
+    assert.match(panorama, /--panorama-view-icon-width: calc\(\s*\(var\(--panorama-view-dots, 3\) - 1\) \* \(var\(--slide-dot-size\) \+ var\(--slide-dot-gap\)\)\s*\+ var\(--slide-dot-active-width\)\s*\)/);
+    assert.match(panorama, /\.photo-panorama-view-icon--carousel\s*\{[^}]*gap: var\(--slide-dot-gap\)/);
     assert.match(panorama, /dot\.classList\.toggle\("active", dotIndex === activeIndex\)/);
     assert.doesNotMatch(panorama, /tags-overlay[^}]*display:\s*none/);
     assert.doesNotMatch(readProjectFile('src/components/Photo.astro'), /\.photo-wrapper img\s*\{[^}]*border-radius/);

@@ -403,16 +403,16 @@ const showArrows = peek === 0;
         display: flex;
         justify-content: center;
         align-items: center;
-        gap: 0.35rem;
+        gap: var(--slide-dot-gap);
         margin-top: 0.75rem;
     }
 
     /* We use :global on dots because they're injected via JS natively */
     .carousel-section :global(.carousel-dot) {
-        width: 6px;
-        height: 6px;
+        width: var(--slide-dot-size);
+        height: var(--slide-dot-size);
         border-radius: 9999px;
-        background: rgba(100, 100, 100, 0.25);
+        background: var(--slide-dot-color);
         border: none;
         padding: 0;
         cursor: pointer;
@@ -422,12 +422,12 @@ const showArrows = peek === 0;
     }
 
     .carousel-section :global(.carousel-dot:hover) {
-        background: rgba(100, 100, 100, 0.5);
+        background: var(--slide-dot-hover-color);
     }
 
     .carousel-section :global(.carousel-dot.active) {
-        width: 18px; /* makes it expand into a pill shape */
-        background: rgba(120, 120, 120, 0.8);
+        width: var(--slide-dot-active-width); /* makes it expand into a pill shape */
+        background: var(--slide-dot-active-color);
     }
 
     /* Adapt to dark mode nicely if applicable */
@@ -440,16 +440,6 @@ const showArrows = peek === 0;
         :global(.carousel-section > .carousel-arrow:hover) {
             color: white;
             background: rgba(255, 255, 255, 0.22);
-        }
-
-        .carousel-section :global(.carousel-dot) {
-            background: rgba(200, 200, 200, 0.25);
-        }
-        .carousel-section :global(.carousel-dot:hover) {
-            background: rgba(200, 200, 200, 0.5);
-        }
-        .carousel-section :global(.carousel-dot.active) {
-            background: rgba(255, 255, 255, 0.8);
         }
     }
 

@@ -71,14 +71,15 @@ test("the view toggle shows one dot per slide with the current one as a capsule"
             (selector) => element.querySelector<HTMLElement>(selector)!.offsetWidth,
         )
     );
-    // Three slides: two 4px dots, one 10px capsule and two 3px gaps.
-    expect(iconWidths).toEqual([24, 24]);
+    // Three slides, drawn as PhotoCarousel's dots: two 6px dots, one 18px
+    // capsule and two 0.35rem (5.6px) gaps; the panorama capsule matches.
+    expect(iconWidths).toEqual([41, 41]);
 
     await expect(dots.nth(0)).toHaveClass(/active/);
     await section.locator(".photo-panorama-arrow--next").evaluate((button: HTMLButtonElement) => button.click());
     await expect(dots.nth(1)).toHaveClass(/active/);
     await expect(dots.nth(0)).not.toHaveClass(/active/);
-    await expect.poll(() => dots.nth(1).evaluate((dot: HTMLElement) => dot.offsetWidth)).toBe(10);
+    await expect.poll(() => dots.nth(1).evaluate((dot: HTMLElement) => dot.offsetWidth)).toBe(18);
 });
 
 test("switching views keeps the toggle where it was on screen", async ({ page }) => {

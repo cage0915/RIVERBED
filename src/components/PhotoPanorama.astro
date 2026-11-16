@@ -695,8 +695,13 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
     }
 
     .photo-panorama-view-toggle {
-        /* Dots are 4px, the current-slide capsule 10px, with 3px gaps: 7px per slide + 3px. */
-        --panorama-view-icon-width: calc(var(--panorama-view-dots, 3) * 7px + 3px);
+        /* The carousel symbol is PhotoCarousel's dots (global.css): n - 1 dots,
+           one current-slide capsule and n - 1 gaps. The panorama capsule takes
+           that same total width, so switching views joins the dots in place. */
+        --panorama-view-icon-width: calc(
+            (var(--panorama-view-dots, 3) - 1) * (var(--slide-dot-size) + var(--slide-dot-gap))
+            + var(--slide-dot-active-width)
+        );
         position: relative;
         display: inline-grid;
         min-width: 2rem;
@@ -704,10 +709,12 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
         flex: 0 0 auto;
         place-items: center;
         padding: 0 0.5rem;
-        border: 1px solid rgba(100, 100, 100, 0.2);
+        /* A filled pill, like the site's other round buttons, so it reads as
+           something to press rather than an outline around the dots. */
+        border: 1px solid rgba(100, 100, 100, 0.3);
         border-radius: 9999px;
         color: rgba(100, 100, 100, 0.75);
-        background: transparent;
+        background: rgba(100, 100, 100, 0.14);
         cursor: pointer;
         transition: color var(--duration-quick) var(--ease-standard), border-color var(--duration-quick) var(--ease-standard), background-color var(--duration-quick) var(--ease-standard);
     }
@@ -716,7 +723,7 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
     .photo-panorama-view-toggle:focus-visible {
         color: rgba(100, 100, 100, 1);
         border-color: rgba(100, 100, 100, 0.55);
-        background: rgba(100, 100, 100, 0.08);
+        background: rgba(100, 100, 100, 0.24);
     }
 
     .photo-panorama-view-toggle:focus-visible {
@@ -727,33 +734,42 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
     .photo-panorama-view-icon {
         grid-area: 1 / 1;
         width: var(--panorama-view-icon-width);
-        height: 4px;
+        height: var(--slide-dot-size);
         transition: opacity var(--duration-quick) var(--ease-standard), transform var(--duration-quick) var(--ease-standard);
     }
 
     .photo-panorama-view-icon--carousel {
         display: flex;
-        gap: 3px;
+        gap: var(--slide-dot-gap);
     }
 
     .photo-panorama-view-icon--panorama,
     .photo-panorama-section :global(.photo-panorama-view-dot) {
         border-radius: 9999px;
-        background: currentColor;
+    }
+
+    .photo-panorama-view-icon--panorama {
+        background: var(--slide-dot-active-color);
     }
 
     .photo-panorama-section :global(.photo-panorama-view-dot) {
-        width: 4px;
+        width: var(--slide-dot-size);
         height: 100%;
         flex: 0 0 auto;
-        opacity: 0.4;
-        transition: width var(--duration-moderate) var(--ease-emphasized), opacity var(--duration-moderate) var(--ease-standard);
+        background: var(--slide-dot-color);
+        transition: width var(--duration-moderate) var(--ease-emphasized), background-color var(--duration-moderate) var(--ease-standard);
+    }
+
+    /* The whole toggle is the target, so hovering it lifts every dot. */
+    .photo-panorama-view-toggle:hover :global(.photo-panorama-view-dot),
+    .photo-panorama-view-toggle:focus-visible :global(.photo-panorama-view-dot) {
+        background: var(--slide-dot-hover-color);
     }
 
     /* The current slide stretches into a capsule. */
     .photo-panorama-section :global(.photo-panorama-view-dot.active) {
-        width: 10px;
-        opacity: 1;
+        width: var(--slide-dot-active-width);
+        background: var(--slide-dot-active-color);
     }
 
     .photo-panorama-section[data-view="carousel"] .photo-panorama-view-icon--panorama,
@@ -899,7 +915,8 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
     @media (prefers-color-scheme: dark) {
         .photo-panorama-view-toggle {
             color: rgba(220, 220, 220, 0.78);
-            border-color: rgba(255, 255, 255, 0.18);
+            border-color: rgba(255, 255, 255, 0.22);
+            background: rgba(255, 255, 255, 0.14);
         }
 
         .photo-panorama-arrow {
@@ -916,7 +933,7 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
         .photo-panorama-view-toggle:focus-visible {
             color: white;
             border-color: rgba(255, 255, 255, 0.45);
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.22);
         }
     }
 

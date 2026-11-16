@@ -26,6 +26,26 @@
   --duration-slow: 600ms;
 }
 
+/* Slide dots: one dot per photo, the current one stretched into a capsule.
+   Shared by PhotoCarousel and the carousel symbol on PhotoPanorama's view
+   toggle, so both read as the same control. */
+:root {
+  --slide-dot-size: 6px;
+  --slide-dot-active-width: 18px;
+  --slide-dot-gap: 0.35rem;
+  --slide-dot-color: rgba(100, 100, 100, 0.25);
+  --slide-dot-hover-color: rgba(100, 100, 100, 0.5);
+  --slide-dot-active-color: rgba(120, 120, 120, 0.8);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --slide-dot-color: rgba(200, 200, 200, 0.25);
+    --slide-dot-hover-color: rgba(200, 200, 200, 0.5);
+    --slide-dot-active-color: rgba(255, 255, 255, 0.8);
+  }
+}
+
 /*
   The default border color has changed to `currentcolor` in Tailwind CSS v4,
   so we've added these compatibility styles to make sure everything still
