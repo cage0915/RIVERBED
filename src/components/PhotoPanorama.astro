@@ -129,7 +129,9 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
 
     const VIEW_HINT_STORAGE_KEY = "riverbed:panorama-view-hint-seen";
     const VIEW_HINT_DURATION_MS = 2600;
-    const VIEW_ANIMATION_MS = 650;
+    // Matches --duration-slow and --ease-emphasized (global.css).
+    const VIEW_ANIMATION_MS = 600;
+    const VIEW_ANIMATION_EASING = "cubic-bezier(0.16, 1, 0.3, 1)";
 
     // Storage can be unavailable (private mode, blocked site data); then the hint
     // simply plays once per page instead of once per visitor.
@@ -421,7 +423,7 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
                     // A target-less effect is only a clock: it turns elapsed time into eased progress.
                     const clock = new Animation(new KeyframeEffect(null, null, {
                         duration: VIEW_ANIMATION_MS,
-                        easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+                        easing: VIEW_ANIMATION_EASING,
                         fill: "both",
                     }));
                     clock.pause();
@@ -707,7 +709,7 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
         color: rgba(100, 100, 100, 0.75);
         background: transparent;
         cursor: pointer;
-        transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+        transition: color var(--duration-quick) var(--ease-standard), border-color var(--duration-quick) var(--ease-standard), background-color var(--duration-quick) var(--ease-standard);
     }
 
     .photo-panorama-view-toggle:hover,
@@ -726,7 +728,7 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
         grid-area: 1 / 1;
         width: var(--panorama-view-icon-width);
         height: 4px;
-        transition: opacity 0.18s ease, transform 0.18s ease;
+        transition: opacity var(--duration-quick) var(--ease-standard), transform var(--duration-quick) var(--ease-standard);
     }
 
     .photo-panorama-view-icon--carousel {
@@ -745,7 +747,7 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
         height: 100%;
         flex: 0 0 auto;
         opacity: 0.4;
-        transition: width 0.3s ease, opacity 0.3s ease;
+        transition: width var(--duration-moderate) var(--ease-emphasized), opacity var(--duration-moderate) var(--ease-standard);
     }
 
     /* The current slide stretches into a capsule. */
@@ -839,7 +841,7 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
         cursor: pointer;
         /* Stays hit-testable while transparent so hovering the arrow strip itself reveals it. */
         opacity: 0;
-        transition: opacity 0.2s ease, color 0.2s ease, background-color 0.2s ease;
+        transition: opacity var(--duration-quick) var(--ease-standard), color var(--duration-quick) var(--ease-standard), background-color var(--duration-quick) var(--ease-standard);
     }
 
     .photo-panorama-arrow:hover {

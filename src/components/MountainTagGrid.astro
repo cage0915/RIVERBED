@@ -351,9 +351,9 @@ const sortedGroups = groups.map((group) => ({
         line-height: 1.2;
         cursor: pointer;
         transition:
-            border-color 0.18s ease,
-            background 0.18s ease,
-            color 0.18s ease;
+            border-color var(--duration-quick) var(--ease-standard),
+            background var(--duration-quick) var(--ease-standard),
+            color var(--duration-quick) var(--ease-standard);
     }
 
     .mountain-tag-sort-badge:hover {
@@ -415,8 +415,8 @@ const sortedGroups = groups.map((group) => ({
         height: 100%;
         object-fit: cover;
         transition:
-            transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
-            opacity var(--photo-fade-duration) ease;
+            transform var(--duration-slow) var(--ease-emphasized),
+            opacity var(--photo-fade-duration) var(--ease-standard);
     }
 
     .mountain-tag-card .mountain-tag-card__contours {
@@ -428,7 +428,7 @@ const sortedGroups = groups.map((group) => ({
         object-fit: cover;
         opacity: 0;
         transform: none;
-        transition: opacity 0.4s ease;
+        transition: opacity var(--duration-moderate) var(--ease-standard);
     }
 
     .mountain-tag-card__overlay {
@@ -443,7 +443,7 @@ const sortedGroups = groups.map((group) => ({
         background: rgb(255 255 255 / 0.74);
         color: #111827;
         opacity: 0;
-        transition: opacity 0.4s ease;
+        transition: opacity var(--duration-moderate) var(--ease-standard);
     }
 
     .mountain-tag-card__overlay h3 {
@@ -533,7 +533,7 @@ const sortedGroups = groups.map((group) => ({
 
     .mountain-contour-attribution a {
         color: inherit;
-        transition: color 160ms ease;
+        transition: color var(--duration-quick) var(--ease-standard);
     }
 
     .mountain-contour-attribution a:hover {

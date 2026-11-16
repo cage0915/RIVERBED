@@ -134,7 +134,7 @@ const fallbackUrl = `${R2_DOMAIN}/${encodedAssetKey}`;
         position: absolute;
         inset: 0;
         opacity: 0;
-        transition: opacity 0.3s ease;
+        transition: opacity var(--duration-moderate) var(--ease-standard);
         pointer-events: none;
     }
 
@@ -182,10 +182,10 @@ const fallbackUrl = `${R2_DOMAIN}/${encodedAssetKey}`;
         white-space: nowrap;
         backdrop-filter: blur(4px);
         transition:
-            transform 0.2s ease,
-            background-color 0.2s ease,
-            color 0.2s ease,
-            box-shadow 0.2s ease;
+            transform var(--duration-quick) var(--ease-standard),
+            background-color var(--duration-quick) var(--ease-standard),
+            color var(--duration-quick) var(--ease-standard),
+            box-shadow var(--duration-quick) var(--ease-standard);
         border: 1px solid rgba(255, 255, 255, 0.2);
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         transform: rotate(-45deg);

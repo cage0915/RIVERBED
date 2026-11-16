@@ -76,7 +76,7 @@ const { previous, next } = Astro.props;
         letter-spacing: 0.08em;
         line-height: 1.5;
         text-decoration: none;
-        transition: color 200ms ease;
+        transition: color var(--duration-quick) var(--ease-standard);
     }
 
     .pagination-link--right {
@@ -96,7 +96,7 @@ const { previous, next } = Astro.props;
     .pagination-arrow {
         flex: 0 0 auto;
         font-size: 1rem;
-        transition: transform 200ms ease;
+        transition: transform var(--duration-quick) var(--ease-standard);
     }
 
     .pagination-link--left:hover .pagination-arrow,

@@ -247,7 +247,7 @@ test('PhotoPanorama is a standalone block with full-width carousel and joined pr
     assert.match(panorama, /html:has\(\.photo-panorama-section\[data-view-transitioning\]\)\)\s*\{\s*overflow-anchor: none/);
     assert.match(panorama, /useMobileCarouselReveal[\s\S]*?nextView === "carousel"[\s\S]*?activeIndex > 0[\s\S]*?max-width: 767px/);
     assert.match(panorama, /if \(useMobileCarouselReveal\) \{\s*frame\.slide\.style\.opacity = String\(progress\);/);
-    assert.match(panorama, /const VIEW_ANIMATION_MS = 650;[\s\S]*?duration: VIEW_ANIMATION_MS,\s*easing: "cubic-bezier\(0\.22, 1, 0\.36, 1\)"/);
+    assert.match(panorama, /const VIEW_ANIMATION_MS = 600;\s*const VIEW_ANIMATION_EASING = "cubic-bezier\(0\.16, 1, 0\.3, 1\)";[\s\S]*?duration: VIEW_ANIMATION_MS,\s*easing: VIEW_ANIMATION_EASING,/);
     // The view change waits for the frame loop, then hands layout back to CSS.
     assert.match(panorama, /else resolve\(\);[\s\S]*?clock\.cancel\(\);[\s\S]*?clearFrameStyles\(\);\s*holdBottomEdge\(\);/);
     assert.doesNotMatch(panorama, /scrollIntoView/);

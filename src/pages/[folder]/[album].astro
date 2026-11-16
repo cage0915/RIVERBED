@@ -86,7 +86,7 @@ const titleSections = extractTitleSections(albumRecord.blocks);
     <div class="fixed bottom-8 right-8 max-sm:right-4 z-40 flex flex-col gap-3">
         <button
             onclick="window.scrollTo({top: 0, behavior: 'smooth'})"
-            class="group text-zinc-500 hover:text-white transition-all duration-300 opacity-0 translate-y-4 pointer-events-none"
+            class="group text-zinc-500 hover:text-white transition-all duration-(--duration-moderate) ease-emphasized opacity-0 translate-y-4 pointer-events-none"
             id="back-to-top"
             aria-label="Scroll to top"
         >
@@ -108,7 +108,7 @@ const titleSections = extractTitleSections(albumRecord.blocks);
             </div>
         </button>
         <button
-            class="album-grid-toggle group text-zinc-500 hover:text-white transition-all duration-300"
+            class="album-grid-toggle group text-zinc-500 hover:text-white transition-all duration-(--duration-moderate) ease-emphasized"
             id="toggle-photo-grid"
             aria-label="Show photo grid"
             aria-pressed="false"
@@ -138,7 +138,7 @@ const titleSections = extractTitleSections(albumRecord.blocks);
             </div>
         </button>
         <button
-            class="album-tags-toggle group text-zinc-500 hover:text-white transition-all duration-300"
+            class="album-tags-toggle group text-zinc-500 hover:text-white transition-all duration-(--duration-moderate) ease-emphasized"
             id="toggle-all-tags"
             aria-label="Toggle all photo tags"
             data-active="false"
@@ -164,7 +164,7 @@ const titleSections = extractTitleSections(albumRecord.blocks);
         </button>
         <button
             onclick="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})"
-            class="group text-zinc-500 hover:text-white transition-all duration-300 opacity-0 translate-y-4 pointer-events-none"
+            class="group text-zinc-500 hover:text-white transition-all duration-(--duration-moderate) ease-emphasized opacity-0 translate-y-4 pointer-events-none"
             id="scroll-to-bottom"
             aria-label="Scroll to bottom"
         >
@@ -205,7 +205,7 @@ const titleSections = extractTitleSections(albumRecord.blocks);
                         <a
                             href={`#${section.id}`}
                             data-album-breadcrumb={section.id}
-                            class="album-breadcrumb-link text-xs uppercase tracking-[0.18em] text-zinc-500 transition-colors duration-200 hover:text-zinc-200"
+                            class="album-breadcrumb-link text-xs uppercase tracking-[0.18em] text-zinc-500 transition-colors hover:text-zinc-200"
                         >
                             {section.label}
                         </a>

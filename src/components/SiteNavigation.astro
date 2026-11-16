@@ -28,7 +28,7 @@ const currentPath = Astro.url.pathname;
 <nav
 	id="navbar"
 	data-site-navigation
-	class="fixed top-0 left-0 right-0 z-50 bg-[#121212]/80 backdrop-blur-md transition-transform duration-300 ease-in-out"
+	class="fixed top-0 left-0 right-0 z-50 bg-[#121212]/80 backdrop-blur-md transition-transform duration-(--duration-moderate) ease-emphasized"
 >
 	<div class="mx-auto max-w-[1100px] px-4 sm:px-8 h-24 flex items-center relative">
 		<!-- Menu Toggle - Mobile Only -->
@@ -98,7 +98,7 @@ const currentPath = Astro.url.pathname;
 								{folder.title}
 							</span>
 							<span
-								class={`absolute bottom-0 left-0 right-0 h-0.5 bg-white rounded-full transition-opacity duration-300 ${isActive ? 'opacity-100' : 'opacity-0'} ${folder.id === 'dalin' ? 'condensed-kanji' : ''}`}
+								class={`absolute bottom-0 left-0 right-0 h-0.5 bg-white rounded-full transition-opacity duration-(--duration-moderate) ${isActive ? 'opacity-100' : 'opacity-0'} ${folder.id === 'dalin' ? 'condensed-kanji' : ''}`}
 							/>
 						</a>
 					);
@@ -122,7 +122,7 @@ const currentPath = Astro.url.pathname;
 	<div
 		id="mobile-menu"
 		data-site-mobile-menu
-		class="hidden sm:hidden border-t border-white/5 bg-[#121212]/95 backdrop-blur-xl overflow-hidden transition-[max-height] duration-300 ease-in-out max-h-0"
+		class="hidden sm:hidden border-t border-white/5 bg-[#121212]/95 backdrop-blur-xl overflow-hidden transition-[max-height] duration-(--duration-moderate) ease-emphasized max-h-0"
 	>
 		<div class="flex items-center px-4">
 			<div class="flex min-w-0 flex-1 flex-row items-center gap-6 overflow-x-auto py-4 scrollbar-none mask-linear-right">
@@ -142,7 +142,7 @@ const currentPath = Astro.url.pathname;
 									{folder.title}
 								</span>
 								<span
-									class={`absolute bottom-0 left-0 right-0 h-0.5 bg-white rounded-full transition-opacity duration-300 ${isActive ? 'opacity-100' : 'opacity-0'} ${folder.id === 'dalin' ? 'condensed-kanji' : ''}`}
+									class={`absolute bottom-0 left-0 right-0 h-0.5 bg-white rounded-full transition-opacity duration-(--duration-moderate) ${isActive ? 'opacity-100' : 'opacity-0'} ${folder.id === 'dalin' ? 'condensed-kanji' : ''}`}
 								/>
 							</a>
 						);
@@ -190,12 +190,15 @@ const currentPath = Astro.url.pathname;
 				mobileMenu.style.maxHeight = `${mobileMenu.scrollHeight}px`;
 			} else {
 				mobileMenu.style.maxHeight = "0px";
+				// Hide once the collapse has played; its length is the menu's
+				// CSS transition (--duration-moderate).
+				const closeDelay = parseFloat(getComputedStyle(mobileMenu).transitionDuration) * 1000 || 0;
 				closeTimer = window.setTimeout(() => {
 					if (!menuOpen) {
 						mobileMenu.classList.add("hidden");
 					}
 					closeTimer = undefined;
-				}, 300);
+				}, closeDelay);
 			}
 		};
 

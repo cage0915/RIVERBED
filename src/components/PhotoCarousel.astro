@@ -374,8 +374,8 @@ const showArrows = peek === 0;
         opacity: 0.65;
         transform: scale(0.95);
         transition:
-            opacity 0.4s ease,
-            transform 0.4s ease;
+            opacity var(--duration-moderate) var(--ease-standard),
+            transform var(--duration-moderate) var(--ease-emphasized);
     }
 
     /*
@@ -417,8 +417,8 @@ const showArrows = peek === 0;
         padding: 0;
         cursor: pointer;
         transition:
-            width 0.3s ease,
-            background-color 0.3s ease;
+            width var(--duration-moderate) var(--ease-emphasized),
+            background-color var(--duration-moderate) var(--ease-standard);
     }
 
     .carousel-section :global(.carousel-dot:hover) {
@@ -472,7 +472,7 @@ const showArrows = peek === 0;
         cursor: pointer;
         /* Stays hit-testable while transparent so hovering the arrow strip itself reveals it. */
         opacity: 0;
-        transition: opacity 0.2s ease, color 0.2s ease, background-color 0.2s ease;
+        transition: opacity var(--duration-quick) var(--ease-standard), color var(--duration-quick) var(--ease-standard), background-color var(--duration-quick) var(--ease-standard);
     }
 
     :global(.carousel-section > .carousel-arrow:hover) {

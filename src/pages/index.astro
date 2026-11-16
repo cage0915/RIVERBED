@@ -239,8 +239,8 @@ const sortedFolders = folderSlugs
         transform-origin: var(--ox) var(--oy);
         transform: scale(var(--zoom));
         transition:
-            opacity var(--photo-fade-duration) ease,
-            transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            opacity var(--photo-fade-duration) var(--ease-standard),
+            transform var(--duration-slow) var(--ease-emphasized);
     }
 
     /* The incoming slide fades in on top of the outgoing one, which stays

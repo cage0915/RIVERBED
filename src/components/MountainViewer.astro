@@ -208,7 +208,7 @@ const contourSource = contourRegion === "taiwan"
         font-size: 0.6875rem;
         letter-spacing: 0.12em;
         cursor: pointer;
-        transition: color 160ms ease;
+        transition: color var(--duration-quick) var(--ease-standard);
     }
 
     .mountain-viewer__tab::after {
@@ -219,7 +219,7 @@ const contourSource = contourRegion === "taiwan"
         height: 1px;
         background: transparent;
         content: "";
-        transition: background-color 160ms ease;
+        transition: background-color var(--duration-quick) var(--ease-standard);
     }
 
     .mountain-viewer__tab:hover,
@@ -314,7 +314,7 @@ const contourSource = contourRegion === "taiwan"
 
     .mountain-viewer__footer a {
         color: inherit;
-        transition: color 160ms ease;
+        transition: color var(--duration-quick) var(--ease-standard);
     }
 
     .mountain-viewer__footer a:hover {
