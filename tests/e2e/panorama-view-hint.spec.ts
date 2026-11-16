@@ -157,3 +157,24 @@ test("the view toggle is an arrow at the row's right edge that flips with the vi
     await expect.poll(() => arrowOpacity("expand")).toBe("0");
     await expect.poll(() => arrowOpacity("collapse")).toBe("1");
 });
+
+for (const width of [390, 700]) {
+    test.describe(`full-bleed Panorama at ${width}px`, () => {
+        test.use({ viewport: { width, height: 844 } });
+
+        test("the view toggle lines up under the floating buttons", async ({ page }) => {
+            await page.addInitScript(() => localStorage.setItem("riverbed:panorama-view-hint-seen", "true"));
+            await page.goto("/yama/2026-tateyama-tsurugi");
+
+            const toggle = page.locator("[data-photo-panorama] .photo-panorama-view-toggle").first();
+            await toggle.evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
+            const centre = (selector: string) =>
+                page.locator(selector).first().evaluate((element) => {
+                    const box = element.getBoundingClientRect();
+                    return box.left + box.width / 2;
+                });
+            expect(await centre("[data-photo-panorama] .photo-panorama-view-toggle"))
+                .toBeCloseTo(await centre("#toggle-photo-grid > div"), 0);
+        });
+    });
+}

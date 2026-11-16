@@ -982,6 +982,13 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
             display: none;
         }
 
+        /* The block runs full-bleed here, so the toggle steps in by the page gutter
+           (which the album's floating buttons also sit from the screen edge) plus
+           half their width difference, centring it under that 2rem button column. */
+        .photo-panorama-view-toggle {
+            right: calc(var(--album-mobile-gutter, 1rem) + (2rem - 1.3125rem) / 2);
+        }
+
         /* Touch scrolling can rest anywhere instead of snapping slide by slide. */
         .photo-panorama-section[data-view="carousel"] .photo-panorama-track {
             scroll-snap-type: none;
