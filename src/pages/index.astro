@@ -80,9 +80,9 @@ const sortedFolders = folderSlugs
 <Layout title="RIVERBED" shareImage={latestAlbumCoverKey}>
     <div class="pt-6 pb-8" data-catalog-grid>
         <section class="latest-post" aria-label="Latest post">
-            <article class="album-card latest-post-card group" data-catalog-card data-keyboard-navigation-target data-album-transition-card={latestAlbum.slug}>
+            <article class="album-card latest-post-card group" data-catalog-card data-keyboard-navigation-target>
                 <a href={`/${latestAlbum.slug}`} class="album-link">
-                    <div class="album-cover latest-post-cover photo-frame" style={photoColorStyle(latestAlbumCoverColor) || undefined} data-album-transition-part="cover">
+                    <div class="album-cover latest-post-cover photo-frame" style={photoColorStyle(latestAlbumCoverColor) || undefined}>
                         <picture>
                             <!-- The latest post is hidden on phones; an empty source keeps them from downloading it. -->
                             <source media="(max-width: 640px)" srcset="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
@@ -107,9 +107,9 @@ const sortedFolders = folderSlugs
                             <p class="latest-post-label">
                                 Latest · {getFolderTitle(latestAlbumFolder)}
                             </p>
-                            <h1 class="album-title latest-post-title" data-album-transition-part="title">{latestAlbum.title}</h1>
+                            <h1 class="album-title latest-post-title">{latestAlbum.title}</h1>
                             {latestAlbum.info && (
-                                <p class="latest-post-meta" data-album-transition-part="info">{latestAlbum.info}</p>
+                                <p class="latest-post-meta">{latestAlbum.info}</p>
                             )}
                         </div>
                     </div>
@@ -182,13 +182,6 @@ const sortedFolders = folderSlugs
 
     .latest-post-overlay {
         padding: 4rem 1.5rem 1.25rem;
-    }
-
-    /* Sized to their text so the page transition moves the words, not the
-       full card width (AlbumTransitions). */
-    .latest-post-title,
-    .latest-post-meta {
-        width: fit-content;
     }
 
     .latest-post-title {

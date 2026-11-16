@@ -85,7 +85,6 @@ const isYama = folder === "yama";
                                 data-catalog-card
                                 data-keyboard-navigation-target
                                 data-album-slug={album.slug}
-                                data-album-transition-card={album.slug}
                                 data-cover-key={resolvedCoverKey}
                                 data-cover-zoom={album.cover.zoom}
                                 data-cover-offset-x={album.cover.offset.x}
@@ -95,7 +94,7 @@ const isYama = folder === "yama";
                                     href={`/${folder}/${albumSlug}`}
                                     class="album-link"
                                 >
-                                    <div class="album-cover photo-frame" style={photoColorStyle(coverColor) || undefined} data-album-transition-part="cover">
+                                    <div class="album-cover photo-frame" style={photoColorStyle(coverColor) || undefined}>
                                         <img
                                             class="photo-img"
                                             src={coverUrl}
@@ -112,11 +111,11 @@ const isYama = folder === "yama";
                                             }
                                         />
                                         <div class="album-overlay">
-                                            <h2 class="album-title" data-album-transition-part="title">
+                                            <h2 class="album-title">
                                                 {album.title}
                                             </h2>
                                             {album.info && (
-                                                <p class="album-info" data-album-transition-part="info">{album.info}</p>
+                                                <p class="album-info">{album.info}</p>
                                             )}
                                         </div>
                                     </div>
@@ -195,13 +194,6 @@ const isYama = folder === "yama";
         transition: opacity 0.4s ease;
     }
 
-    /* Sized to their text so the page transition moves the words, not the
-       full card width (AlbumTransitions). */
-    .album-title,
-    .album-info {
-        width: fit-content;
-    }
-
     .album-title {
         margin: 0;
         font-family: "Noto Sans TC", "Noto Sans JP", sans-serif;
@@ -232,8 +224,7 @@ const isYama = folder === "yama";
         }
 
         .album-card:hover .album-overlay,
-        .album-card:focus-within .album-overlay,
-        .album-card[data-album-transition-target] .album-overlay {
+        .album-card:focus-within .album-overlay {
             opacity: 1;
         }
     }
