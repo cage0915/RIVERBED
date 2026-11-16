@@ -121,3 +121,39 @@ test("switching views keeps the toggle where it was on screen", async ({ page })
         expect(Math.abs((await toggleTop()) - startTop)).toBeLessThan(1);
     }
 });
+
+test("the view toggle is an arrow at the row's right edge that flips with the view", async ({ page }) => {
+    await page.addInitScript(() => localStorage.setItem("riverbed:panorama-view-hint-seen", "true"));
+    await page.goto("/yama/2026-tateyama-tsurugi");
+
+    // Pin the block by position: a data-view filter would re-match after switching.
+    const index = await page.evaluate(() =>
+        [...document.querySelectorAll<HTMLElement>("[data-photo-panorama]")].findIndex(
+            (section) => section.dataset.panoramaSlices === "3" && section.dataset.view === "carousel",
+        )
+    );
+    const section = page.locator("[data-photo-panorama]").nth(index);
+    const toggle = section.locator(".photo-panorama-view-toggle");
+    await toggle.scrollIntoViewIfNeeded();
+
+    const edges = await section.evaluate((element) => {
+        const row = element.querySelector(".photo-panorama-controls")!.getBoundingClientRect();
+        const button = element.querySelector(".photo-panorama-view-toggle")!.getBoundingClientRect();
+        const dots = element.querySelector(".photo-panorama-view-indicator")!.getBoundingClientRect();
+        return {
+            rightGap: Math.round(row.right - button.right),
+            dotsOffCentre: Math.round(dots.left + dots.width / 2 - (row.left + row.width / 2)),
+        };
+    });
+    expect(edges).toEqual({ rightGap: 0, dotsOffCentre: 0 });
+
+    const arrowOpacity = (name: string) =>
+        section.locator(`.photo-panorama-view-arrow--${name}`).evaluate((arrow) => getComputedStyle(arrow).opacity);
+    await expect.poll(() => arrowOpacity("expand")).toBe("1");
+    await expect.poll(() => arrowOpacity("collapse")).toBe("0");
+
+    await toggle.click();
+    await expect(section).toHaveAttribute("data-view", "panorama");
+    await expect.poll(() => arrowOpacity("expand")).toBe("0");
+    await expect.poll(() => arrowOpacity("collapse")).toBe("1");
+});

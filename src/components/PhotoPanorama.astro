@@ -96,19 +96,28 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
     </div>
 
     <div class="photo-panorama-controls">
+        <!--
+            The script adds one dot per slide to the carousel symbol, the current slide
+            drawn as a capsule; the panorama symbol is one capsule of the same total
+            width, so the two read as split and joined.
+        -->
+        <span class="photo-panorama-view-indicator" aria-hidden="true">
+            <span class="photo-panorama-view-icon photo-panorama-view-icon--carousel"></span>
+            <span class="photo-panorama-view-icon photo-panorama-view-icon--panorama"></span>
+        </span>
         <button
             class="photo-panorama-view-toggle"
             type="button"
             aria-label={view === "carousel" ? "Switch to panorama view" : "Switch to carousel view"}
             aria-pressed={view === "panorama" ? "true" : "false"}
         >
-            <!--
-                The script adds one dot per slide to the carousel symbol, the current slide
-                drawn as a capsule; the panorama symbol is one capsule of the same total
-                width, so the two read as split and joined.
-            -->
-            <span class="photo-panorama-view-icon photo-panorama-view-icon--carousel" aria-hidden="true"></span>
-            <span class="photo-panorama-view-icon photo-panorama-view-icon--panorama" aria-hidden="true"></span>
+            <!-- Arrows point outward to spread into the panorama, inward to split back. -->
+            <svg class="photo-panorama-view-arrow photo-panorama-view-arrow--expand" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"></path>
+            </svg>
+            <svg class="photo-panorama-view-arrow photo-panorama-view-arrow--collapse" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7"></path>
+            </svg>
             <span class="photo-panorama-view-label" aria-live="polite">
                 {view === "carousel" ? "Carousel view" : "Panorama view"}
             </span>
@@ -274,7 +283,7 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
                 generatedViewDots.push(dot);
                 return dot;
             });
-            toggle.style.setProperty("--panorama-view-dots", String(Math.max(slides.length, 1)));
+            carouselIcon.parentElement?.style.setProperty("--panorama-view-dots", String(Math.max(slides.length, 1)));
             const requestedInitialIndex = Number.parseInt(section.dataset.initialSlide || "0", 10);
             let activeIndex = Math.min(
                 Math.max(Number.isFinite(requestedInitialIndex) ? requestedInitialIndex : 0, 0),
@@ -557,8 +566,6 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
                 section.dataset.viewHint = "true";
                 hintTimer = window.setTimeout(() => {
                     delete section.dataset.viewHint;
-                section.querySelector<HTMLElement>(".photo-panorama-view-toggle")
-                    ?.style.removeProperty("--panorama-view-dots");
                     hintTimer = undefined;
                 }, VIEW_HINT_DURATION_MS);
             }, { threshold: 1, rootMargin: "0px 0px -15% 0px" });
@@ -694,7 +701,7 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
         margin-top: 0.75rem;
     }
 
-    .photo-panorama-view-toggle {
+    .photo-panorama-view-indicator {
         /* The carousel symbol is PhotoCarousel's dots (global.css): n - 1 dots,
            one current-slide capsule and n - 1 gaps. The panorama capsule takes
            that same total width, so switching views joins the dots in place. */
@@ -702,33 +709,78 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
             (var(--panorama-view-dots, 3) - 1) * (var(--slide-dot-size) + var(--slide-dot-gap))
             + var(--slide-dot-active-width)
         );
-        position: relative;
         display: inline-grid;
-        min-width: 2rem;
-        height: 1.5rem;
-        flex: 0 0 auto;
         place-items: center;
-        padding: 0 0.5rem;
-        /* A filled pill, like the site's other round buttons, so it reads as
-           something to press rather than an outline around the dots. */
-        border: 1px solid rgba(100, 100, 100, 0.3);
-        border-radius: 9999px;
-        color: rgba(100, 100, 100, 0.75);
-        background: rgba(100, 100, 100, 0.14);
+    }
+
+    /* The dots stay centred on the row; the toggle sits at its right edge. */
+    .photo-panorama-view-toggle {
+        position: absolute;
+        top: 50%;
+        right: 0;
+        display: grid;
+        width: 1.3125rem;
+        height: 1.3125rem;
+        place-items: center;
+        padding: 0;
+        transform: translateY(-50%);
+        /* No fill and no sides: only the four rounded corners of a square, like a
+           viewfinder, in the album page's round-button colour (zinc-500, white on
+           hover). The page is always dark, so this holds whatever the system
+           colour scheme. */
+        border: 0;
+        border-radius: 0.28125rem;
+        color: #71717a;
+        background: transparent;
         cursor: pointer;
-        transition: color var(--duration-quick) var(--ease-standard), border-color var(--duration-quick) var(--ease-standard), background-color var(--duration-quick) var(--ease-standard);
+        transition: color var(--duration-moderate) var(--ease-emphasized);
+    }
+
+    .photo-panorama-view-toggle::before {
+        --corner: 0.375rem;
+        content: "";
+        position: absolute;
+        inset: 0;
+        /* The arrow's colour, so corners and arrow read as one drawing; a touch
+           heavier than its stroke so the frame holds its own around it. */
+        border: 2px solid currentColor;
+        border-radius: inherit;
+        /* Four corner squares of the outline survive the mask; the sides between drop out. */
+        mask:
+            linear-gradient(#000 0 0) top left / var(--corner) var(--corner) no-repeat,
+            linear-gradient(#000 0 0) top right / var(--corner) var(--corner) no-repeat,
+            linear-gradient(#000 0 0) bottom left / var(--corner) var(--corner) no-repeat,
+            linear-gradient(#000 0 0) bottom right / var(--corner) var(--corner) no-repeat;
+        pointer-events: none;
     }
 
     .photo-panorama-view-toggle:hover,
     .photo-panorama-view-toggle:focus-visible {
-        color: rgba(100, 100, 100, 1);
-        border-color: rgba(100, 100, 100, 0.55);
-        background: rgba(100, 100, 100, 0.24);
+        color: white;
     }
 
     .photo-panorama-view-toggle:focus-visible {
         outline: 2px solid rgba(59, 130, 246, 0.9);
         outline-offset: 2px;
+    }
+
+    .photo-panorama-view-arrow {
+        grid-area: 1 / 1;
+        width: 0.65625rem;
+        height: 0.65625rem;
+        fill: none;
+        stroke: currentColor;
+        /* Thicker in icon units so the smaller arrow keeps its line weight. */
+        stroke-width: 2.67;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        transition: opacity var(--duration-quick) var(--ease-standard), transform var(--duration-quick) var(--ease-standard);
+    }
+
+    .photo-panorama-section[data-view="carousel"] .photo-panorama-view-arrow--collapse,
+    .photo-panorama-section[data-view="panorama"] .photo-panorama-view-arrow--expand {
+        opacity: 0;
+        transform: scale(0.6);
     }
 
     .photo-panorama-view-icon {
@@ -760,12 +812,6 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
         transition: width var(--duration-moderate) var(--ease-emphasized), background-color var(--duration-moderate) var(--ease-standard);
     }
 
-    /* The whole toggle is the target, so hovering it lifts every dot. */
-    .photo-panorama-view-toggle:hover :global(.photo-panorama-view-dot),
-    .photo-panorama-view-toggle:focus-visible :global(.photo-panorama-view-dot) {
-        background: var(--slide-dot-hover-color);
-    }
-
     /* The current slide stretches into a capsule. */
     .photo-panorama-section :global(.photo-panorama-view-dot.active) {
         width: var(--slide-dot-active-width);
@@ -779,12 +825,11 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
     }
 
     /*
-     * One-time hint: two rings spread from the toggle while its icon briefly
-     * previews the other view, then everything settles back.
+     * One-time hint: two rings spread from the toggle while the dots briefly
+     * preview the other view, then everything settles back.
      */
     .photo-panorama-section[data-view-hint] .photo-panorama-view-toggle {
-        color: rgba(255, 255, 255, 0.95);
-        border-color: rgba(255, 255, 255, 0.5);
+        color: white;
         animation: photo-panorama-hint-ring 1.2s ease-out 2;
     }
 
@@ -913,12 +958,6 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
     }
 
     @media (prefers-color-scheme: dark) {
-        .photo-panorama-view-toggle {
-            color: rgba(220, 220, 220, 0.78);
-            border-color: rgba(255, 255, 255, 0.22);
-            background: rgba(255, 255, 255, 0.14);
-        }
-
         .photo-panorama-arrow {
             color: rgba(220, 220, 220, 0.78);
             background: rgba(255, 255, 255, 0.12);
@@ -926,13 +965,6 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
 
         .photo-panorama-arrow:hover {
             color: white;
-            background: rgba(255, 255, 255, 0.22);
-        }
-
-        .photo-panorama-view-toggle:hover,
-        .photo-panorama-view-toggle:focus-visible {
-            color: white;
-            border-color: rgba(255, 255, 255, 0.45);
             background: rgba(255, 255, 255, 0.22);
         }
     }
@@ -964,6 +996,7 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
         }
 
         .photo-panorama-view-toggle,
+        .photo-panorama-view-arrow,
         .photo-panorama-view-icon,
         .photo-panorama-section :global(.photo-panorama-view-dot),
         .photo-panorama-arrow {
