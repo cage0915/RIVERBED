@@ -1,0 +1,39 @@
+---
+// A bamboo shoot drawn at the foot of /dalin pages, in the same thin-line
+// style as the Yama hiker: rounded strokes in currentColor, layered sheaths
+// overlapping up to a tuft of new leaves at the tip.
+---
+
+<svg
+	class="block overflow-visible"
+	viewBox="3 0 40 60"
+	width="18.7"
+	height="28"
+	fill="none"
+	stroke="currentColor"
+	stroke-width="2.7"
+	stroke-linecap="round"
+	stroke-linejoin="round"
+	aria-hidden="true"
+>
+	<!-- The whole shoot leans 10° to the right, pivoting on its foot. -->
+	<g transform="rotate(10 20 55)">
+		<!-- New leaves at the tip, filled faintly like the hiker's torso. -->
+		<g fill="currentColor" fill-opacity="0.2" stroke-width="2">
+			<path d="M20.2 9 Q17.4 6 17.6 2.2 Q20 5 20.9 8.4" />
+			<path d="M21 8.6 Q21.6 4.4 24 1.6 Q24.2 5.6 22 9" />
+			<path d="M22 9.4 Q24.6 7.4 27.4 7.2 Q25.6 9.6 22.6 10.6" />
+		</g>
+
+		<!-- Outline: a plump, slightly leaning cone with a rounded foot. -->
+		<path
+			d="M20 9.2 C16.4 17 10 29 8.8 42 C8 47.5 7.4 51.5 8.6 53.8 Q20 57.8 31.8 53.8 C33.2 49.5 32.6 44 30.4 36 C28.8 27 25.6 17 22.6 9.6"
+		/>
+
+		<!-- Sheath edges, alternating sides, each tip poking past the outline. -->
+		<path d="M9 43 Q20 40.6 32.4 31.6 L30.3 35.4" />
+		<path d="M24.5 37.2 Q17 28.2 9.8 23.2 L11.6 27.8" />
+		<path d="M14.6 28.8 Q20.4 20.2 27.2 13.4 L25.7 18.4" />
+		<path d="M22.4 18.4 Q19.6 14.6 16 12.2 L17.4 15.4" />
+	</g>
+</svg>
