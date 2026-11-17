@@ -1,5 +1,6 @@
 ---
 import RssLink from "./RssLink.astro";
+import ThemeToggle from "./ThemeToggle.astro";
 import { getAlbumSummaries } from "../lib/albums/catalog";
 import { getFolderTitle, getFolderOrder, FOLDER_METADATA } from "../lib/constants";
 
@@ -35,7 +36,7 @@ const currentPath = Astro.url.pathname;
 <nav
 	id="navbar"
 	data-site-navigation
-	class="fixed top-0 left-0 right-0 z-50 bg-page/80 backdrop-blur-md transition-transform duration-(--duration-moderate) ease-emphasized"
+	class="fixed top-0 left-0 right-0 z-50 bg-surface/85 backdrop-blur-md transition-transform duration-(--duration-moderate) ease-emphasized"
 >
 	<div class="mx-auto max-w-[1100px] px-4 sm:px-8 h-24 flex items-center relative">
 		<!-- Menu Toggle - Mobile Only -->
@@ -123,13 +124,17 @@ const currentPath = Astro.url.pathname;
 			</a>
 		</div>
 
+		<!-- Theme toggle - right edge; phones reach it from the menu -->
+		<div class="ml-auto hidden sm:flex">
+			<ThemeToggle />
+		</div>
 	</div>
 
 	<!-- Mobile Navigation Dropdown -->
 	<div
 		id="mobile-menu"
 		data-site-mobile-menu
-		class="hidden sm:hidden border-t border-line-subtle bg-page/95 backdrop-blur-xl overflow-hidden transition-[max-height] duration-(--duration-moderate) ease-emphasized max-h-0"
+		class="hidden sm:hidden border-t border-line-subtle bg-surface/95 backdrop-blur-xl overflow-hidden transition-[max-height] duration-(--duration-moderate) ease-emphasized max-h-0"
 	>
 		<div class="flex items-center px-4">
 			<div class="flex min-w-0 flex-1 flex-row items-center gap-6 overflow-x-auto py-4 scrollbar-none mask-linear-right">
@@ -156,7 +161,8 @@ const currentPath = Astro.url.pathname;
 					})
 				}
 			</div>
-			<RssLink class="ml-4 shrink-0" />
+			<ThemeToggle class="ml-4 shrink-0" />
+			<RssLink class="ml-2 shrink-0" />
 		</div>
 	</div>
 </nav>

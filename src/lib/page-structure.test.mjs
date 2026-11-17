@@ -1196,7 +1196,7 @@ test('Layout delegates navigation rendering and lifecycle ownership', () => {
     assert.match(siteNavigation, /data-site-mobile-menu/);
     assert.match(
         siteNavigation,
-        /data-site-mobile-menu[\s\S]*<RssLink class="ml-4 shrink-0" \/>[\s\S]*<\/nav>/,
+        /data-site-mobile-menu[\s\S]*<ThemeToggle class="ml-4 shrink-0" \/>\s*<RssLink class="ml-2 shrink-0" \/>[\s\S]*<\/nav>/,
     );
     assert.match(siteNavigation, /installPageLifecycle/);
     assert.match(siteNavigation, /new AbortController\(\)/);

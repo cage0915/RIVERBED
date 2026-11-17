@@ -68,6 +68,57 @@ const shareImageUrl = shareImage ? getShareImageUrl(shareImage) : undefined;
 		<link rel="alternate" type="application/rss+xml" title="RIVERBED RSS" href="/rss.xml" />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
+		{/* Theme: runs before the first paint so the page never flashes the
+		   wrong theme. The visitor's choice (saved by the navbar toggle) wins,
+		   else their system setting, which is followed live until they choose.
+		   ClientRouter replaces <html>'s attributes on every navigation, so the
+		   theme is copied onto each incoming page before it swaps in. The
+		   listeners are installed once; the guard skips them if this reruns. */}
+		<script is:inline>
+			(() => {
+				const KEY = "riverbed-theme";
+				const BAR_COLORS = { dark: "#121212", light: "#e4e4e7" };
+				const media = matchMedia("(prefers-color-scheme: light)");
+				const saved = () => {
+					try {
+						const value = localStorage.getItem(KEY);
+						return value === "light" || value === "dark" ? value : null;
+					} catch {
+						return null;
+					}
+				};
+				const resolve = () => saved() ?? (media.matches ? "light" : "dark");
+				const apply = (doc, theme) => {
+					doc.documentElement.dataset.theme = theme;
+					doc.querySelector('meta[name="theme-color"]')?.setAttribute("content", BAR_COLORS[theme]);
+				};
+				const switchTo = (theme) => {
+					const root = document.documentElement;
+					root.setAttribute("data-theme-switching", "");
+					apply(document, theme);
+					requestAnimationFrame(() => requestAnimationFrame(() => root.removeAttribute("data-theme-switching")));
+				};
+
+				apply(document, resolve());
+				if (window.__riverbedTheme) return;
+				window.__riverbedTheme = true;
+
+				document.addEventListener("astro:before-swap", (event) => {
+					apply(event.newDocument, document.documentElement.dataset.theme);
+				});
+				media.addEventListener("change", () => {
+					if (!saved()) switchTo(resolve());
+				});
+				document.addEventListener("click", (event) => {
+					if (!(event.target instanceof Element) || !event.target.closest("[data-theme-toggle]")) return;
+					const next = document.documentElement.dataset.theme === "light" ? "dark" : "light";
+					try {
+						localStorage.setItem(KEY, next);
+					} catch {}
+					switchTo(next);
+				});
+			})();
+		</script>
 		<ClientRouter />
 	</head>
 	<body

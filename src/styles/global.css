@@ -30,8 +30,10 @@
      line-*             borders and dividers
      fill-*             tinted backgrounds for buttons and chips
      focus              keyboard focus outlines
-     ink                dark text on a light chip
-     on-photo-*         text laid over a photo; stays light in every theme */
+     ink                dark text on a light chip over a photo; stays dark
+     on-photo-*         text laid over a photo; stays light in every theme
+   The values below are the dark theme, the default. The light theme
+   overrides them further down. */
 @theme static {
   --color-page: #121212;
   --color-surface: #1a1a1a;
@@ -59,6 +61,47 @@
 
   --color-on-photo: #fafafa;
   --color-on-photo-soft: #d4d4d8;
+}
+
+/* Themes: the inline script in Layout sets `data-theme` on <html> before the
+   page paints, from the visitor's choice (the navbar toggle) or else their
+   system setting. Without scripting the page stays dark. */
+:root {
+  color-scheme: dark;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+
+  --color-page: #e4e4e7;
+  --color-surface: #d4d4d8;
+  --color-surface-2: #c4c4cc;
+
+  --color-fg-strong: #09090b;
+  --color-fg: #18181b;
+  --color-fg-soft: #3f3f46;
+  --color-muted: #52525b;
+  --color-subtle: #71717a;
+  --color-faint: #a1a1aa;
+
+  --color-line-subtle: rgb(0 0 0 / 0.07);
+  --color-line: rgb(0 0 0 / 0.12);
+  --color-line-strong: rgb(0 0 0 / 0.3);
+  --color-focus: rgb(0 0 0 / 0.5);
+
+  --color-fill-subtle: rgb(0 0 0 / 0.04);
+  --color-fill: rgb(0 0 0 / 0.07);
+  --color-fill-strong: rgb(0 0 0 / 0.1);
+
+  --color-scrollbar: #a1a1aa;
+}
+
+/* Switching themes recolours everything at once: transitions are held off
+   for that frame so hover fades don't lag behind the page. */
+:root[data-theme-switching] *,
+:root[data-theme-switching] *::before,
+:root[data-theme-switching] *::after {
+  transition: none !important;
 }
 
 :root {
