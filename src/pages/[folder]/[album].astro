@@ -89,12 +89,12 @@ const titleSections = extractTitleSections(albumRecord.blocks);
     >
         <button
             onclick="window.scrollTo({top: 0, behavior: 'smooth'})"
-            class="group text-zinc-500 hover:text-white transition-all duration-(--duration-moderate) ease-emphasized opacity-0 translate-y-4 pointer-events-none"
+            class="group text-zinc-500 max-md:text-zinc-200 hover:text-white transition-all duration-(--duration-moderate) ease-emphasized opacity-0 translate-y-4 pointer-events-none"
             id="back-to-top"
             aria-label="Scroll to top"
         >
             <div
-                class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center group-hover:border-white/30 transition-colors bg-white/20 backdrop-blur-xs"
+                class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center group-hover:border-white/30 transition-colors bg-white/20 backdrop-blur-xs max-md:border-white/20 max-md:bg-[#121212]/60 max-md:backdrop-blur-md max-md:shadow-md max-md:shadow-black/40"
             >
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -111,7 +111,7 @@ const titleSections = extractTitleSections(albumRecord.blocks);
             </div>
         </button>
         <button
-            class="album-grid-toggle group text-zinc-500 hover:text-white transition-all duration-(--duration-moderate) ease-emphasized"
+            class="album-grid-toggle group text-zinc-500 max-md:text-zinc-200 hover:text-white transition-all duration-(--duration-moderate) ease-emphasized"
             id="toggle-photo-grid"
             aria-label="Show photo grid"
             aria-pressed="false"
@@ -119,7 +119,7 @@ const titleSections = extractTitleSections(albumRecord.blocks);
             type="button"
         >
             <div
-                class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center group-hover:border-white/30 transition-colors bg-white/20 backdrop-blur-xs"
+                class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center group-hover:border-white/30 transition-colors bg-white/20 backdrop-blur-xs max-md:border-white/20 max-md:bg-[#121212]/60 max-md:backdrop-blur-md max-md:shadow-md max-md:shadow-black/40"
             >
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -141,7 +141,7 @@ const titleSections = extractTitleSections(albumRecord.blocks);
             </div>
         </button>
         <button
-            class="album-tags-toggle group text-zinc-500 hover:text-white transition-all duration-(--duration-moderate) ease-emphasized"
+            class="album-tags-toggle group text-zinc-500 max-md:text-zinc-200 hover:text-white transition-all duration-(--duration-moderate) ease-emphasized"
             id="toggle-all-tags"
             aria-label="Toggle all photo tags"
             data-active="false"
@@ -149,7 +149,7 @@ const titleSections = extractTitleSections(albumRecord.blocks);
             type="button"
         >
             <div
-                class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center group-hover:border-white/30 transition-colors bg-white/20 backdrop-blur-xs"
+                class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center group-hover:border-white/30 transition-colors bg-white/20 backdrop-blur-xs max-md:border-white/20 max-md:bg-[#121212]/60 max-md:backdrop-blur-md max-md:shadow-md max-md:shadow-black/40"
             >
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -167,12 +167,12 @@ const titleSections = extractTitleSections(albumRecord.blocks);
         </button>
         <button
             onclick="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})"
-            class="group text-zinc-500 hover:text-white transition-all duration-(--duration-moderate) ease-emphasized opacity-0 translate-y-4 pointer-events-none max-md:hidden"
+            class="group text-zinc-500 max-md:text-zinc-200 hover:text-white transition-all duration-(--duration-moderate) ease-emphasized opacity-0 translate-y-4 pointer-events-none max-md:hidden"
             id="scroll-to-bottom"
             aria-label="Scroll to bottom"
         >
             <div
-                class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center group-hover:border-white/30 transition-colors bg-white/20 backdrop-blur-xs"
+                class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center group-hover:border-white/30 transition-colors bg-white/20 backdrop-blur-xs max-md:border-white/20 max-md:bg-[#121212]/60 max-md:backdrop-blur-md max-md:shadow-md max-md:shadow-black/40"
             >
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
