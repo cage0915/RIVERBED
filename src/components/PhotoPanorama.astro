@@ -725,12 +725,11 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
         padding: 0;
         transform: translateY(-50%);
         /* No fill and no sides: only the four rounded corners of a square, like a
-           viewfinder, in the album page's round-button colour (zinc-500, white on
-           hover). The page is always dark, so this holds whatever the system
-           colour scheme. */
+           viewfinder, in the album page's round-button colour (subtle, fg-strong on
+           hover). */
         border: 0;
         border-radius: 0.28125rem;
-        color: #71717a;
+        color: var(--color-subtle);
         background: transparent;
         cursor: pointer;
         transition: color var(--duration-moderate) var(--ease-emphasized);
@@ -756,11 +755,11 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
 
     .photo-panorama-view-toggle:hover,
     .photo-panorama-view-toggle:focus-visible {
-        color: white;
+        color: var(--color-fg-strong);
     }
 
     .photo-panorama-view-toggle:focus-visible {
-        outline: 2px solid rgba(59, 130, 246, 0.9);
+        outline: 2px solid var(--color-focus);
         outline-offset: 2px;
     }
 
@@ -829,7 +828,7 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
      * preview the other view, then everything settles back.
      */
     .photo-panorama-section[data-view-hint] .photo-panorama-view-toggle {
-        color: white;
+        color: var(--color-fg-strong);
         animation: photo-panorama-hint-ring 1.2s ease-out 2;
     }
 
@@ -845,10 +844,10 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
 
     @keyframes photo-panorama-hint-ring {
         from {
-            box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.45);
+            box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-fg-strong) 45%, transparent);
         }
         to {
-            box-shadow: 0 0 0 0.75rem rgba(255, 255, 255, 0);
+            box-shadow: 0 0 0 0.75rem color-mix(in srgb, var(--color-fg-strong) 0%, transparent);
         }
     }
 
@@ -896,9 +895,9 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
         place-items: center;
         padding: 0;
         border: 0;
-        color: rgba(100, 100, 100, 0.75);
+        color: var(--color-fg-soft);
         /* Tinted so the whole click strip reads as a target, not just the icon. */
-        background: rgba(100, 100, 100, 0.16);
+        background: var(--color-fill);
         cursor: pointer;
         /* Stays hit-testable while transparent so hovering the arrow strip itself reveals it. */
         opacity: 0;
@@ -906,8 +905,8 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
     }
 
     .photo-panorama-arrow:hover {
-        color: rgba(100, 100, 100, 1);
-        background: rgba(100, 100, 100, 0.28);
+        color: var(--color-fg-strong);
+        background: var(--color-fill-strong);
     }
 
     .photo-panorama-arrow svg {
@@ -940,12 +939,12 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
     }
 
     .photo-panorama-arrow:focus-visible {
-        outline: 2px solid rgba(59, 130, 246, 0.9);
+        outline: 2px solid var(--color-focus);
         outline-offset: 0;
     }
 
     :global(.photo-panorama-section > .photo-caption) {
-        color: #898989;
+        color: var(--color-muted);
         font-size: 0.875rem;
     }
 
@@ -957,17 +956,6 @@ if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
         margin-top: 0.5rem;
     }
 
-    @media (prefers-color-scheme: dark) {
-        .photo-panorama-arrow {
-            color: rgba(220, 220, 220, 0.78);
-            background: rgba(255, 255, 255, 0.12);
-        }
-
-        .photo-panorama-arrow:hover {
-            color: white;
-            background: rgba(255, 255, 255, 0.22);
-        }
-    }
 
     @media (max-width: 767px) {
         .photo-panorama-section[data-view="panorama"][data-single-photo-sliced]

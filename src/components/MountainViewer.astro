@@ -195,7 +195,7 @@ const contourSource = contourRegion === "taiwan"
         gap: 1.25rem;
         min-height: 1.75rem;
         margin-bottom: 0.5rem;
-        border-bottom: 1px solid rgb(255 255 255 / 0.07);
+        border-bottom: 1px solid var(--color-line-subtle);
     }
 
     .mountain-viewer__tab {
@@ -203,7 +203,7 @@ const contourSource = contourRegion === "taiwan"
         padding: 0 0 0.45rem;
         border: 0;
         background: transparent;
-        color: rgb(113 113 122);
+        color: var(--color-subtle);
         font: inherit;
         font-size: 0.6875rem;
         letter-spacing: 0.12em;
@@ -224,15 +224,15 @@ const contourSource = contourRegion === "taiwan"
 
     .mountain-viewer__tab:hover,
     .mountain-viewer__tab[aria-selected="true"] {
-        color: rgb(228 228 231);
+        color: var(--color-fg-soft);
     }
 
     .mountain-viewer__tab[aria-selected="true"]::after {
-        background: rgb(228 228 231 / 0.72);
+        background: currentColor;
     }
 
     .mountain-viewer__tab:focus-visible {
-        outline: 1px solid rgb(255 255 255 / 0.55);
+        outline: 1px solid var(--color-focus);
         outline-offset: 3px;
     }
 
@@ -242,17 +242,17 @@ const contourSource = contourRegion === "taiwan"
 
     .mountain-viewer__panorama-shell {
         overflow: hidden;
-        border: 1px solid rgb(255 255 255 / 0.07);
-        background: rgb(255 255 255 / 0.012);
+        border: 1px solid var(--color-line-subtle);
+        background: var(--color-surface);
     }
 
     .mountain-viewer__contour-shell {
         position: relative;
         overflow: hidden;
-        border: 1px solid rgb(255 255 255 / 0.07);
+        border: 1px solid var(--color-line-subtle);
         background:
-            radial-gradient(circle at center, rgb(255 255 255 / 0.035), transparent 68%),
-            #18181b;
+            radial-gradient(circle at center, var(--color-fill-subtle), transparent 68%),
+            var(--color-surface);
     }
 
     .mountain-viewer__contour-marker {
@@ -273,7 +273,7 @@ const contourSource = contourRegion === "taiwan"
         width: 100%;
         height: 1.5px;
         border-radius: 999px;
-        background: rgb(113 113 122);
+        background: var(--color-subtle);
         content: "";
     }
 
@@ -289,7 +289,7 @@ const contourSource = contourRegion === "taiwan"
         display: block;
         width: 100%;
         aspect-ratio: 16 / 10;
-        background: rgb(113 113 122);
+        background: var(--color-subtle);
         -webkit-mask: var(--mountain-contour-image) center / 100% 100% no-repeat;
         mask: var(--mountain-contour-image) center / 100% 100% no-repeat;
         pointer-events: none;
@@ -301,12 +301,12 @@ const contourSource = contourRegion === "taiwan"
         width: 100%;
         border: 0;
         aspect-ratio: 16 / 10;
-        background: rgb(24 24 27);
+        background: var(--color-surface);
     }
 
     .mountain-viewer__footer {
         margin-top: 0.5rem;
-        color: rgb(82 82 91);
+        color: var(--color-faint);
         font-size: 0.5625rem;
         letter-spacing: 0.04em;
         text-align: right;
@@ -318,7 +318,7 @@ const contourSource = contourRegion === "taiwan"
     }
 
     .mountain-viewer__footer a:hover {
-        color: rgb(161 161 170);
+        color: var(--color-muted);
     }
 </style>
 

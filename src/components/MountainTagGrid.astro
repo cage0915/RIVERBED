@@ -342,10 +342,10 @@ const sortedGroups = groups.map((group) => ({
         align-items: center;
         gap: 0.25rem;
         padding: 0.2rem 0.5rem;
-        border: 1px solid rgb(255 255 255 / 0.14);
+        border: 1px solid var(--color-line);
         border-radius: 999px;
-        background: rgb(255 255 255 / 0.04);
-        color: rgb(161 161 170);
+        background: var(--color-fill-subtle);
+        color: var(--color-muted);
         font: inherit;
         font-size: 0.65rem;
         line-height: 1.2;
@@ -357,14 +357,14 @@ const sortedGroups = groups.map((group) => ({
     }
 
     .mountain-tag-sort-badge:hover {
-        border-color: rgb(255 255 255 / 0.3);
-        color: rgb(228 228 231);
+        border-color: var(--color-line-strong);
+        color: var(--color-fg-soft);
     }
 
     .mountain-tag-sort-badge.is-active {
-        border-color: rgb(255 255 255 / 0.72);
-        background: rgb(255 255 255 / 0.2);
-        color: white;
+        border-color: var(--color-fg-soft);
+        background: var(--color-fill-strong);
+        color: var(--color-fg-strong);
         backdrop-filter: blur(4px);
     }
 
@@ -376,7 +376,7 @@ const sortedGroups = groups.map((group) => ({
 
     .mountain-tag-group__title {
         margin: 0 0 1rem;
-        color: rgb(161 161 170);
+        color: var(--color-muted);
         font-family: "Noto Sans TC", "Noto Sans JP", sans-serif;
         font-size: 0.75rem;
         font-weight: 400;
@@ -395,7 +395,7 @@ const sortedGroups = groups.map((group) => ({
     .mountain-tag-card {
         position: relative;
         min-width: 0;
-        background: #1a1a1a;
+        background: var(--color-surface);
     }
 
     .mountain-tag-card__link {
@@ -441,7 +441,7 @@ const sortedGroups = groups.map((group) => ({
         padding: clamp(0.4rem, 8cqw, 1.5rem);
         z-index: 2;
         background: rgb(255 255 255 / 0.74);
-        color: #111827;
+        color: var(--color-ink);
         opacity: 0;
         transition: opacity var(--duration-moderate) var(--ease-standard);
     }
@@ -475,8 +475,8 @@ const sortedGroups = groups.map((group) => ({
 
     .mountain-tag-card--without-cover .mountain-tag-card__overlay {
         opacity: 1;
-        background: #1a1a1a;
-        color: rgb(228 228 231);
+        background: var(--color-surface);
+        color: var(--color-fg-soft);
     }
 
     @media (hover: hover) {
@@ -499,7 +499,7 @@ const sortedGroups = groups.map((group) => ({
         .mountain-tag-card--without-cover:hover .mountain-tag-card__overlay,
         .mountain-tag-card--without-cover:focus-within .mountain-tag-card__overlay {
             background: rgb(255 255 255 / 0.92);
-            color: #111827;
+            color: var(--color-ink);
         }
     }
 
@@ -519,13 +519,13 @@ const sortedGroups = groups.map((group) => ({
 
         .mountain-tag-card--without-cover.show-info .mountain-tag-card__overlay {
             background: rgb(255 255 255 / 0.92);
-            color: #111827;
+            color: var(--color-ink);
         }
     }
 
     .mountain-contour-attribution {
         margin: 2rem 0 0;
-        color: rgb(82 82 91);
+        color: var(--color-faint);
         font-size: 0.5625rem;
         letter-spacing: 0.03em;
         text-align: right;
@@ -537,7 +537,7 @@ const sortedGroups = groups.map((group) => ({
     }
 
     .mountain-contour-attribution a:hover {
-        color: rgb(161 161 170);
+        color: var(--color-muted);
     }
 
     @media (prefers-reduced-motion: reduce) {

@@ -20,6 +20,47 @@
   --default-transition-timing-function: var(--ease-standard);
 }
 
+/* Colour: every colour on the site comes from these, so a theme only has to
+   redefine this block. Tailwind turns each into utilities (`bg-page`,
+   `text-muted`, `border-line`, `bg-page/80`); component styles use the
+   variables directly. `static` keeps them in the output even where only
+   component styles use them.
+     page … surface-2   backgrounds, from the page up to raised panels
+     fg-strong … faint  text, brightest to faintest
+     line-*             borders and dividers
+     fill-*             tinted backgrounds for buttons and chips
+     focus              keyboard focus outlines
+     ink                dark text on a light chip
+     on-photo-*         text laid over a photo; stays light in every theme */
+@theme static {
+  --color-page: #121212;
+  --color-surface: #1a1a1a;
+  --color-surface-2: #27272a;
+
+  --color-fg-strong: #ffffff;
+  --color-fg: #f4f4f5;
+  --color-fg-soft: #d4d4d8;
+  --color-muted: #a1a1aa;
+  --color-subtle: #71717a;
+  --color-faint: #52525b;
+
+  --color-line-subtle: rgb(255 255 255 / 0.07);
+  --color-line: rgb(255 255 255 / 0.12);
+  --color-line-strong: rgb(255 255 255 / 0.3);
+  --color-focus: rgb(255 255 255 / 0.55);
+
+  --color-fill-subtle: rgb(255 255 255 / 0.04);
+  --color-fill: rgb(255 255 255 / 0.12);
+  --color-fill-strong: rgb(255 255 255 / 0.2);
+
+  --color-scrollbar: #3f3f46;
+
+  --color-ink: #18181b;
+
+  --color-on-photo: #fafafa;
+  --color-on-photo-soft: #d4d4d8;
+}
+
 :root {
   --duration-quick: 200ms;
   --duration-moderate: 350ms;
@@ -33,17 +74,9 @@
   --slide-dot-size: 6px;
   --slide-dot-active-width: 18px;
   --slide-dot-gap: 0.35rem;
-  --slide-dot-color: rgba(100, 100, 100, 0.25);
-  --slide-dot-hover-color: rgba(100, 100, 100, 0.5);
-  --slide-dot-active-color: rgba(120, 120, 120, 0.8);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --slide-dot-color: rgba(200, 200, 200, 0.25);
-    --slide-dot-hover-color: rgba(200, 200, 200, 0.5);
-    --slide-dot-active-color: rgba(255, 255, 255, 0.8);
-  }
+  --slide-dot-color: var(--color-line-strong);
+  --slide-dot-hover-color: var(--color-focus);
+  --slide-dot-active-color: color-mix(in srgb, var(--color-fg-strong) 80%, transparent);
 }
 
 /*
@@ -114,14 +147,15 @@
 
 /* Photo loading, shared by every photo on the site. A `.photo-frame` holds a
    `.photo-img` and paints the photo's average colour (`--photo-color`, set
-   inline via photoColorStyle) or a neutral grey while the photo loads.
+   inline via photoColorStyle) or, when that is unknown, the surface colour
+   while the photo loads.
    PhotoFadeIn marks the photo `data-loaded`, it fades in, and once the fade
    has finished the fill is dropped so it can't show around a photo drawn
    smaller than its frame. A frame whose photo fades more slowly sets
    `--photo-fade-duration` to match. Without scripting nothing would ever mark
    a photo loaded, so photos then stay plainly visible. */
 .photo-frame {
-  background-color: var(--photo-color, #1c1c1c);
+  background-color: var(--photo-color, var(--color-surface));
 }
 
 .photo-frame:has(.photo-img[data-loaded]) {

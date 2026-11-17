@@ -29,7 +29,16 @@ test("album breadcrumbs follow the section on screen in both directions", async 
         }, index);
 
     await expect.poll(activeLabel).toContain("D1");
-    await expect(links.first()).toHaveCSS("color", "rgba(255, 255, 255, 0.9)");
+    // The active link takes the theme's strongest text colour.
+    const fgStrong = await page.evaluate(() => {
+        const probe = document.createElement("span");
+        probe.style.color = "var(--color-fg-strong)";
+        document.body.append(probe);
+        const color = getComputedStyle(probe).color;
+        probe.remove();
+        return color;
+    });
+    await expect(links.first()).toHaveCSS("color", fgStrong);
 
     await scrollToTitle(1);
     await expect.poll(activeLabel).toContain("D2");

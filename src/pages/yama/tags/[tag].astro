@@ -98,12 +98,12 @@ function chunkArray<T>(array: T[], size: number): T[][] {
     >
         <button
             onclick="window.scrollTo({top: 0, behavior: 'smooth'})"
-            class="group text-zinc-500 max-md:text-zinc-200 hover:text-white transition-all duration-(--duration-moderate) ease-emphasized opacity-0 translate-y-4 pointer-events-none"
+            class="group text-subtle max-md:text-fg-soft hover:text-fg-strong transition-all duration-(--duration-moderate) ease-emphasized opacity-0 translate-y-4 pointer-events-none"
             id="back-to-top"
             aria-label="Scroll to top"
         >
             <div
-                class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center group-hover:border-white/30 transition-colors bg-white/20 backdrop-blur-xs max-md:border-white/20 max-md:bg-[#121212]/60 max-md:backdrop-blur-md max-md:shadow-md max-md:shadow-black/40"
+                class="w-8 h-8 rounded-full border border-line flex items-center justify-center group-hover:border-line-strong transition-colors bg-fill-strong backdrop-blur-xs max-md:border-line-strong max-md:bg-page/60 max-md:backdrop-blur-md max-md:shadow-md max-md:shadow-black/40"
             >
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -123,10 +123,10 @@ function chunkArray<T>(array: T[], size: number): T[][] {
             href="/yama/tags"
             title="Back to mountains"
             aria-label="Back to mountain view"
-            class="group text-zinc-500 max-md:text-zinc-200 hover:text-white transition-all duration-(--duration-moderate) ease-emphasized"
+            class="group text-subtle max-md:text-fg-soft hover:text-fg-strong transition-all duration-(--duration-moderate) ease-emphasized"
         >
             <div
-                class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center group-hover:border-white/30 transition-colors bg-white/20 backdrop-blur-xs max-md:border-white/20 max-md:bg-[#121212]/60 max-md:backdrop-blur-md max-md:shadow-md max-md:shadow-black/40"
+                class="w-8 h-8 rounded-full border border-line flex items-center justify-center group-hover:border-line-strong transition-colors bg-fill-strong backdrop-blur-xs max-md:border-line-strong max-md:bg-page/60 max-md:backdrop-blur-md max-md:shadow-md max-md:shadow-black/40"
             >
                 <svg
                     width="16"
@@ -141,12 +141,12 @@ function chunkArray<T>(array: T[], size: number): T[][] {
         </a>
         <button
             onclick="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})"
-            class="group text-zinc-500 max-md:text-zinc-200 hover:text-white transition-all duration-(--duration-moderate) ease-emphasized opacity-0 translate-y-4 pointer-events-none max-md:hidden"
+            class="group text-subtle max-md:text-fg-soft hover:text-fg-strong transition-all duration-(--duration-moderate) ease-emphasized opacity-0 translate-y-4 pointer-events-none max-md:hidden"
             id="scroll-to-bottom"
             aria-label="Scroll to bottom"
         >
             <div
-                class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center group-hover:border-white/30 transition-colors bg-white/20 backdrop-blur-xs max-md:border-white/20 max-md:bg-[#121212]/60 max-md:backdrop-blur-md max-md:shadow-md max-md:shadow-black/40"
+                class="w-8 h-8 rounded-full border border-line flex items-center justify-center group-hover:border-line-strong transition-colors bg-fill-strong backdrop-blur-xs max-md:border-line-strong max-md:bg-page/60 max-md:backdrop-blur-md max-md:shadow-md max-md:shadow-black/40"
             >
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -208,9 +208,9 @@ function chunkArray<T>(array: T[], size: number): T[][] {
         <div class="tag-photos flex flex-col gap-12">
             {
                 albums.map((album) => (
-                    <div class="tag-album-group group border-b border-white/5 pb-12 last:border-0">
+                    <div class="tag-album-group group border-b border-line-subtle pb-12 last:border-0">
                         <div class="mb-6 flex items-baseline justify-between px-2">
-                            <h2 class="text-[10px] font-medium tracking-[0.2em] text-zinc-500 uppercase">
+                            <h2 class="text-[10px] font-medium tracking-[0.2em] text-subtle uppercase">
                                 {album.albumTitle}
                             </h2>
                         </div>
@@ -255,7 +255,7 @@ function chunkArray<T>(array: T[], size: number): T[][] {
                         <div class="mt-8 flex justify-end items-center px-2">
                             <a
                                 href={`/${album.sourceAlbumSlug}`}
-                                class="text-[10px] text-zinc-400 hover:text-white transition-colors tracking-widest uppercase border-b border-transparent hover:border-white/40 pb-0.5"
+                                class="text-[10px] text-muted hover:text-fg-strong transition-colors tracking-widest uppercase border-b border-transparent hover:border-line-strong pb-0.5"
                             >
                                 View Full Album →
                             </a>
@@ -268,12 +268,12 @@ function chunkArray<T>(array: T[], size: number): T[][] {
         {
             matchingPhotos.length === 0 && (
                 <div class="text-center py-32">
-                    <p class="text-zinc-500 font-light italic text-sm">
+                    <p class="text-subtle font-light italic text-sm">
                         No captures found with this tag.
                     </p>
                     <a
                         href="/"
-                        class="text-xs mt-8 inline-block text-zinc-400 hover:text-white border border-white/10 px-6 py-2 rounded-full transition-all hover:bg-white/5"
+                        class="text-xs mt-8 inline-block text-muted hover:text-fg-strong border border-line px-6 py-2 rounded-full transition-all hover:bg-fill-subtle"
                     >
                         Return to Folders
                     </a>
@@ -292,24 +292,24 @@ function chunkArray<T>(array: T[], size: number): T[][] {
     }
 
     .mountain-cover-choice {
-        border: 1px solid rgb(255 255 255 / 0.2);
+        border: 1px solid var(--color-line);
         border-radius: 999px;
-        background: rgb(18 18 18 / 0.82);
-        color: rgb(228 228 231);
+        background: color-mix(in srgb, var(--color-page) 80%, transparent);
+        color: var(--color-fg-soft);
         font-size: 0.68rem;
         letter-spacing: 0.08em;
         transition: border-color var(--duration-quick) var(--ease-standard), background var(--duration-quick) var(--ease-standard);
     }
 
     .mountain-cover-choice:hover {
-        border-color: rgb(255 255 255 / 0.45);
-        background: rgb(18 18 18 / 0.95);
+        border-color: var(--color-line-strong);
+        background: color-mix(in srgb, var(--color-page) 95%, transparent);
     }
 
     .mountain-cover-status {
         min-height: 1.25rem;
         margin: -3rem 0 2rem;
-        color: rgb(161 161 170);
+        color: var(--color-muted);
         font-size: 0.72rem;
         text-align: center;
     }
@@ -334,7 +334,7 @@ function chunkArray<T>(array: T[], size: number): T[][] {
 
     .tag-photo-entry--cover .mountain-cover-choice {
         border-color: rgb(212 175 55 / 0.95);
-        background: rgb(18 18 18 / 0.9);
+        background: color-mix(in srgb, var(--color-page) 95%, transparent);
         color: rgb(254 240 138);
         cursor: default;
     }

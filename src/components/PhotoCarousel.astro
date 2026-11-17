@@ -430,19 +430,6 @@ const showArrows = peek === 0;
         background: var(--slide-dot-active-color);
     }
 
-    /* Adapt to dark mode nicely if applicable */
-    @media (prefers-color-scheme: dark) {
-        :global(.carousel-section > .carousel-arrow) {
-            color: rgba(220, 220, 220, 0.78);
-            background: rgba(255, 255, 255, 0.12);
-        }
-
-        :global(.carousel-section > .carousel-arrow:hover) {
-            color: white;
-            background: rgba(255, 255, 255, 0.22);
-        }
-    }
-
     /* ── Arrows (full-width carousels only) ─────────────────────────
        Global so the dev tool's pending page-structure preview can reuse them. */
     /* Arrows sit beside the photo (within the page gutter) so they never cover it. */
@@ -456,9 +443,9 @@ const showArrows = peek === 0;
         place-items: center;
         padding: 0;
         border: 0;
-        color: rgba(100, 100, 100, 0.75);
+        color: var(--color-fg-soft);
         /* Tinted so the whole click strip reads as a target, not just the icon. */
-        background: rgba(100, 100, 100, 0.16);
+        background: var(--color-fill);
         cursor: pointer;
         /* Stays hit-testable while transparent so hovering the arrow strip itself reveals it. */
         opacity: 0;
@@ -466,8 +453,8 @@ const showArrows = peek === 0;
     }
 
     :global(.carousel-section > .carousel-arrow:hover) {
-        color: rgba(100, 100, 100, 1);
-        background: rgba(100, 100, 100, 0.28);
+        color: var(--color-fg-strong);
+        background: var(--color-fill-strong);
     }
 
     :global(.carousel-section > .carousel-arrow svg) {
@@ -494,7 +481,7 @@ const showArrows = peek === 0;
     }
 
     :global(.carousel-section > .carousel-arrow:focus-visible) {
-        outline: 2px solid rgba(59, 130, 246, 0.9);
+        outline: 2px solid var(--color-focus);
         outline-offset: 0;
     }
 
@@ -522,7 +509,7 @@ const showArrows = peek === 0;
         position: relative;
         z-index: 1;
         font-size: 0.875rem;
-        color: #898989;
+        color: var(--color-muted);
     }
 
     :global(.carousel-section > .photo-caption.top) {

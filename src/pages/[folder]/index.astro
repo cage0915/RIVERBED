@@ -48,9 +48,9 @@ const isYama = folder === "yama";
                         href={"/yama/tags"}
                         title="Switch to mountains"
                         aria-label="Switch to mountain view"
-                        class="group text-zinc-500 max-md:text-zinc-200 hover:text-white transition-all duration-(--duration-moderate) ease-emphasized"
+                        class="group text-subtle max-md:text-fg-soft hover:text-fg-strong transition-all duration-(--duration-moderate) ease-emphasized"
                     >
-                        <div class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center group-hover:border-white/30 transition-colors bg-white/20 backdrop-blur-xs max-md:border-white/20 max-md:bg-[#121212]/60 max-md:backdrop-blur-md max-md:shadow-md max-md:shadow-black/40">
+                        <div class="w-8 h-8 rounded-full border border-line flex items-center justify-center group-hover:border-line-strong transition-colors bg-fill-strong backdrop-blur-xs max-md:border-line-strong max-md:bg-page/60 max-md:backdrop-blur-md max-md:shadow-md max-md:shadow-black/40">
                             <svg
                                 width="16"
                                 height="16"
@@ -200,7 +200,7 @@ const isYama = folder === "yama";
         font-size: 1.05rem;
         font-weight: 400;
         letter-spacing: 0.05em;
-        color: #fafafa;
+        color: var(--color-on-photo);
         text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
     }
 
@@ -210,7 +210,7 @@ const isYama = folder === "yama";
         font-size: 0.8rem;
         font-weight: 300;
         letter-spacing: 0.05em;
-        color: #d4d4d8;
+        color: var(--color-on-photo-soft);
     }
 
     /* Pointer devices reveal the caption on hover; touch devices always show it. */

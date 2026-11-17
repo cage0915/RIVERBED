@@ -34,14 +34,14 @@ const tokens = parseRichText(text);
     .rich-text__link {
         color: inherit;
         text-decoration-line: underline;
-        text-decoration-color: rgb(161 161 170 / 0.7);
+        text-decoration-color: var(--color-subtle);
         text-decoration-thickness: 1px;
         text-underline-offset: 0.2em;
         transition: color var(--duration-quick) var(--ease-standard), text-decoration-color var(--duration-quick) var(--ease-standard);
     }
 
     .rich-text__link:hover {
-        color: rgb(244 244 245);
+        color: var(--color-fg);
         text-decoration-color: currentColor;
     }
 

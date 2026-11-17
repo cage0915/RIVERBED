@@ -105,10 +105,10 @@ const interactionHelpId = `${contextId}-map-help`;
 
     .mountain-map__frame {
         overflow: hidden;
-        border: 1px solid rgb(255 255 255 / 0.07);
+        border: 1px solid var(--color-line-subtle);
         background:
-            radial-gradient(circle at center, rgb(255 255 255 / 0.035), transparent 68%),
-            rgb(255 255 255 / 0.012);
+            radial-gradient(circle at center, var(--color-fill-subtle), transparent 68%),
+            var(--color-surface);
     }
 
     .mountain-map__canvas {
@@ -125,32 +125,32 @@ const interactionHelpId = `${contextId}-map-help`;
     }
 
     .mountain-map__canvas:focus-visible {
-        outline: 1px solid rgb(255 255 255 / 0.55);
+        outline: 1px solid var(--color-focus);
         outline-offset: -3px;
     }
 
     .mountain-map__feature {
-        fill: rgb(39 39 42);
-        stroke: rgb(113 113 122 / 0.72);
+        fill: var(--color-surface-2);
+        stroke: var(--color-subtle);
         stroke-width: var(--mountain-map-feature-stroke-width, 0.75);
         stroke-linecap: round;
         stroke-linejoin: round;
     }
 
     .mountain-map__marker-halo {
-        fill: rgb(250 250 250 / 0.2);
+        fill: color-mix(in srgb, var(--color-fg-strong) 20%, transparent);
     }
 
     .mountain-map__marker-core {
-        fill: rgb(250 250 250);
-        stroke: rgb(24 24 27);
+        fill: var(--color-fg-strong);
+        stroke: var(--color-ink);
         stroke-width: 1;
         vector-effect: non-scaling-stroke;
     }
 
     .mountain-map__footer {
         margin-top: 0.5rem;
-        color: rgb(82 82 91);
+        color: var(--color-faint);
         font-size: 0.5625rem;
         letter-spacing: 0.04em;
         text-align: right;
@@ -162,7 +162,7 @@ const interactionHelpId = `${contextId}-map-help`;
     }
 
     .mountain-map__footer a:hover {
-        color: rgb(161 161 170);
+        color: var(--color-muted);
     }
 </style>
 

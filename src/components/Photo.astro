@@ -125,7 +125,7 @@ const fallbackUrl = `${R2_DOMAIN}/${encodedAssetKey}`;
 
     .photo-caption--photo {
         margin-top: 0.5rem;
-        color: #71717a;
+        color: var(--color-muted);
         font-size: 0.875rem;
         text-align: center;
     }
@@ -174,7 +174,7 @@ const fallbackUrl = `${R2_DOMAIN}/${encodedAssetKey}`;
 
     .tag-name {
         display: inline-block;
-        color: rgba(0, 0, 0, 0.85);
+        color: var(--color-ink);
         background: rgba(255, 255, 255, 0.7);
         padding: 0.15rem 0.35rem;
         border-radius: 1rem;
@@ -201,15 +201,9 @@ const fallbackUrl = `${R2_DOMAIN}/${encodedAssetKey}`;
 
     .tag-link:hover .tag-name {
         background: rgba(255, 255, 255, 0.95);
-        color: #000;
+        color: var(--color-ink);
         transform: rotate(-45deg) scale(1.05) translate(2px, -2px);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    }
-
-    @media (prefers-color-scheme: dark) {
-        .photo-caption--photo {
-            color: #c4c4cc;
-        }
     }
 
 

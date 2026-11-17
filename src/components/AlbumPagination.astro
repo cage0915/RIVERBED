@@ -58,7 +58,7 @@ const { previous, next } = Astro.props;
          */
         margin-top: 3rem;
         padding-top: 3rem;
-        border-top: 1px solid rgba(255, 255, 255, 0.16);
+        border-top: 1px solid var(--color-line);
     }
 
     .pagination-side {
@@ -74,7 +74,7 @@ const { previous, next } = Astro.props;
         align-items: center;
         gap: 0.75rem;
         max-width: 100%;
-        color: rgb(161 161 170);
+        color: var(--color-muted);
         font-family: "Noto Sans TC", "Noto Sans JP", sans-serif;
         font-size: 0.875rem;
         font-weight: 300;
@@ -90,11 +90,11 @@ const { previous, next } = Astro.props;
 
     .pagination-link:hover,
     .pagination-link:focus-visible {
-        color: rgb(244 244 245);
+        color: var(--color-fg);
     }
 
     .pagination-link:focus-visible {
-        outline: 1px solid rgba(255, 255, 255, 0.5);
+        outline: 1px solid var(--color-focus);
         outline-offset: 0.4rem;
     }
 

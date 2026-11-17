@@ -71,7 +71,7 @@ const shareImageUrl = shareImage ? getShareImageUrl(shareImage) : undefined;
 		<ClientRouter />
 	</head>
 	<body
-		class="bg-[#121212] text-zinc-100 min-h-screen antialiased selection:bg-white/20 selection:text-white"
+		class="bg-page text-fg min-h-screen antialiased selection:bg-fill-strong selection:text-fg-strong"
 	>
 		<NavigationProgress />
 		<SiteNavigation />
@@ -97,21 +97,21 @@ const shareImageUrl = shareImage ? getShareImageUrl(shareImage) : undefined;
 		width: 8px;
 	}
 	::-webkit-scrollbar-track {
-		background: #121212;
+		background: var(--color-page);
 	}
 	::-webkit-scrollbar-thumb {
-		background: #3f3f46;
+		background: var(--color-scrollbar);
 		border-radius: 4px;
 	}
 	::-webkit-scrollbar-thumb:hover {
-		background: #52525b;
+		background: var(--color-faint);
 	}
 
 	/* Firefox has no ::-webkit-scrollbar. Chromium would let scrollbar-color
 	   override the rules above, so apply it only where they don't exist. */
 	@supports not selector(::-webkit-scrollbar) {
 		:root {
-			scrollbar-color: #3f3f46 #121212;
+			scrollbar-color: var(--color-scrollbar) var(--color-page);
 		}
 	}
 

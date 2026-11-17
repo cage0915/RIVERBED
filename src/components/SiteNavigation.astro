@@ -35,7 +35,7 @@ const currentPath = Astro.url.pathname;
 <nav
 	id="navbar"
 	data-site-navigation
-	class="fixed top-0 left-0 right-0 z-50 bg-[#121212]/80 backdrop-blur-md transition-transform duration-(--duration-moderate) ease-emphasized"
+	class="fixed top-0 left-0 right-0 z-50 bg-page/80 backdrop-blur-md transition-transform duration-(--duration-moderate) ease-emphasized"
 >
 	<div class="mx-auto max-w-[1100px] px-4 sm:px-8 h-24 flex items-center relative">
 		<!-- Menu Toggle - Mobile Only -->
@@ -43,7 +43,7 @@ const currentPath = Astro.url.pathname;
 			id="menu-toggle"
 			data-site-menu-toggle
 			type="button"
-			class="sm:hidden p-1 text-zinc-400 hover:text-white transition-colors"
+			class="sm:hidden p-1 text-muted hover:text-fg-strong transition-colors"
 			aria-label="Toggle menu"
 			aria-controls="mobile-menu"
 			aria-expanded="false"
@@ -95,17 +95,17 @@ const currentPath = Astro.url.pathname;
 					return (
 						<a
 							href={`/${folder.id}`}
-							class={`text-base font-sans tracking-wide transition-colors hover:text-white relative py-1 ${
+							class={`text-base font-sans tracking-wide transition-colors hover:text-fg-strong relative py-1 ${
 								isActive
-									? "text-white"
-									: "text-zinc-400"
+									? "text-fg-strong"
+									: "text-muted"
 							}`}
 						>
 							<span class={folder.labelClass}>
 								{folder.title}
 							</span>
 							<span
-								class={`absolute bottom-0 left-0 right-0 h-0.5 bg-white rounded-full transition-opacity duration-(--duration-moderate) ${isActive ? 'opacity-100' : 'opacity-0'}`}
+								class={`absolute bottom-0 left-0 right-0 h-0.5 bg-fg-strong rounded-full transition-opacity duration-(--duration-moderate) ${isActive ? 'opacity-100' : 'opacity-0'}`}
 							/>
 						</a>
 					);
@@ -117,7 +117,7 @@ const currentPath = Astro.url.pathname;
 		<div class="absolute left-1/2 -translate-x-1/2">
 			<a
 				href="/"
-				class="text-3xl font-sans tracking-[0.2em] hover:text-white transition-colors"
+				class="text-3xl font-sans tracking-[0.2em] hover:text-fg-strong transition-colors"
 			>
 				RIVERBED
 			</a>
@@ -129,7 +129,7 @@ const currentPath = Astro.url.pathname;
 	<div
 		id="mobile-menu"
 		data-site-mobile-menu
-		class="hidden sm:hidden border-t border-white/5 bg-[#121212]/95 backdrop-blur-xl overflow-hidden transition-[max-height] duration-(--duration-moderate) ease-emphasized max-h-0"
+		class="hidden sm:hidden border-t border-line-subtle bg-page/95 backdrop-blur-xl overflow-hidden transition-[max-height] duration-(--duration-moderate) ease-emphasized max-h-0"
 	>
 		<div class="flex items-center px-4">
 			<div class="flex min-w-0 flex-1 flex-row items-center gap-6 overflow-x-auto py-4 scrollbar-none mask-linear-right">
@@ -141,15 +141,15 @@ const currentPath = Astro.url.pathname;
 								href={`/${folder.id}`}
 								class={`text-base font-sans tracking-wide transition-all whitespace-nowrap relative py-1 ${
 									isActive
-										? "text-white"
-										: "text-zinc-400"
+										? "text-fg-strong"
+										: "text-muted"
 								}`}
 							>
 								<span class={folder.labelClass}>
 									{folder.title}
 								</span>
 								<span
-									class={`absolute bottom-0 left-0 right-0 h-0.5 bg-white rounded-full transition-opacity duration-(--duration-moderate) ${isActive ? 'opacity-100' : 'opacity-0'}`}
+									class={`absolute bottom-0 left-0 right-0 h-0.5 bg-fg-strong rounded-full transition-opacity duration-(--duration-moderate) ${isActive ? 'opacity-100' : 'opacity-0'}`}
 								/>
 							</a>
 						);
