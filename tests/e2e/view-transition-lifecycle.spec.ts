@@ -34,6 +34,17 @@ async function isolateRemotePhotos(page: Page) {
     });
 }
 
+// On phones the floating controls tuck away while the page scrolls down (opening
+// a photo or returning to the Album can do that) and come back on a scroll up,
+// as a reader would do before reaching for them.
+async function revealFloatingControls(page: Page) {
+    const controls = page.locator("[data-floating-controls]");
+    if ((await controls.getAttribute("data-scroll-hidden")) === "true") {
+        await page.evaluate(() => window.scrollBy(0, -50));
+    }
+    await expect(controls).toHaveAttribute("data-scroll-hidden", "false");
+}
+
 async function openYamaFromHomeWithTouch(page: Page) {
     // Touch devices always show card captions, so cards navigate on the first tap.
     const yamaCard = page.locator(
@@ -164,6 +175,7 @@ test.describe("album lifecycle", () => {
         await page.goto("/yama/2024-beinandawu");
 
         for (let iteration = 0; iteration < 2; iteration += 1) {
+            await revealFloatingControls(page);
             await page.locator("#toggle-all-tags").click();
             await page.locator("[data-mountain-tag-link]").first().click();
             await expect(page).toHaveURL(/\/yama\/tags\//);
@@ -180,6 +192,7 @@ test.describe("album lifecycle", () => {
         await photoSwipe.closeButton.click();
         await expect(photoSwipe.root).toHaveCount(0);
 
+        await revealFloatingControls(page);
         await page.locator("#toggle-all-tags").click();
         await page.locator("[data-mountain-tag-link]").first().click();
         await expect(page).toHaveURL(/\/yama\/tags\//);
