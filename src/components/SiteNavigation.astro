@@ -39,12 +39,13 @@ const currentPath = Astro.url.pathname;
 	class="fixed top-0 left-0 right-0 z-50 bg-surface/85 backdrop-blur-md transition-transform duration-(--duration-moderate) ease-emphasized"
 >
 	<div class="mx-auto max-w-[1100px] px-4 sm:px-8 h-24 flex items-center relative">
-		<!-- Menu Toggle - Mobile Only -->
+		<!-- Menu Toggle - Mobile Only. The negative margin cancels the 4px padding
+		     so the ripples line up with the catalog thumbnails below. -->
 		<button
 			id="menu-toggle"
 			data-site-menu-toggle
 			type="button"
-			class="sm:hidden p-1 text-muted hover:text-fg-strong transition-colors"
+			class="sm:hidden p-1 -ml-1 text-muted hover:text-fg-strong transition-colors"
 			aria-label="Toggle menu"
 			aria-controls="mobile-menu"
 			aria-expanded="false"
@@ -61,12 +62,10 @@ const currentPath = Astro.url.pathname;
 				stroke-linecap="round"
 				stroke-linejoin="round"
 				class="menu-icon"
-				><line x1="3" y1="12" x2="21" y2="12"></line><line
-					x1="3"
-					y1="6"
-					x2="21"
-					y2="6"></line><line x1="3" y1="18" x2="21" y2="18"
-				></line></svg
+				><!-- A ripple over two flat lines, echoing the RIVERBED name. --><path
+					d="M3 6q2.25-2.5 4.5 0t4.5 0t4.5 0t4.5 0"></path><path
+					d="M3 12h18"></path><path
+					d="M3 18h18"></path></svg
 			>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
