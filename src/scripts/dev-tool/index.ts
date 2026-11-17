@@ -1266,6 +1266,9 @@ const getDirectPageStructure = async (albumSlug: string) => {
             } as PageStructureDraft,
         imports: stagedStructure ? [...stagedStructure.imports] : [] as File[],
         localPhotoNames: new Set<string>((page.localPhotos || []).map((photo: { name: string }) => photo.name)),
+        localCoverName: typeof page.metadata?.cover?.assetKey === 'string' && page.metadata.cover.assetKey.startsWith(`${albumSlug}/`)
+            ? page.metadata.cover.assetKey.slice(albumSlug.length + 1)
+            : '',
     };
 };
 
@@ -1472,6 +1475,7 @@ const reconcileDirectPhotoRemovals = (page: Awaited<ReturnType<typeof getDirectP
     const referenced = new Set(page.draft.blocks.flatMap((block: any) =>
         (block.photos || []).map((photo: any) => basename(photo.itemKey)),
     ));
+    if (page.localCoverName) referenced.add(page.localCoverName);
     page.draft.removeLocal = [...page.localPhotoNames].filter((name) => !referenced.has(name)).sort();
     page.imports = page.imports.filter((file) => referenced.has(file.name));
 };
