@@ -78,7 +78,10 @@ const sortedFolders = folderSlugs
 ---
 
 <Layout title="RIVERBED" shareImage={latestAlbumCoverKey}>
-    <div class="pt-6 pb-8" data-catalog-grid>
+    <!-- main reserves 112px under the 96px navbar. On phones that leaves 1rem,
+         matching main's side padding; from sm up, pull up 0.5rem so the first
+         row sits one grid gap below the navbar, like the rows between. -->
+    <div class="sm:-mt-2 pb-8" data-catalog-grid>
         <section class="latest-post" aria-label="Latest post">
             <article class="album-card latest-post-card group" data-catalog-card data-keyboard-navigation-target>
                 <a href={`/${latestAlbum.slug}`} class="album-link">

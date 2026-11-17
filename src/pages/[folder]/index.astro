@@ -40,7 +40,10 @@ const isYama = folder === "yama";
     description={getFolderFooter(folder) ?? folderTitle}
     shareImage={folderAlbums[0]?.cover.assetKey}
 >
-    <div class="py-8">
+    <!-- main reserves 112px under the 96px navbar. On phones that leaves 1rem,
+         matching main's side padding; from sm up, pull up 0.5rem so the first
+         row sits one grid gap below the navbar, like the rows between. -->
+    <div class="sm:-mt-2">
         {
             isYama && (
                 <div class="fixed bottom-8 right-8 max-sm:right-4 z-40">

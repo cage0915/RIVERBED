@@ -50,7 +50,9 @@ const mountainGroups = MOUNTAIN_REGION_DEFINITIONS.map((region) => ({
             </div>
         </a>
     </div>
-    <div class="py-8">
+    <!-- Same top spacing as the album catalogs: 1rem below the navbar on
+         phones, matching main's side padding, and 0.5rem from sm up. -->
+    <div class="sm:-mt-2 pb-8">
         <MountainTagGrid
             groups={mountainGroups}
             tagColumns={mountainViewSettings.tagColumns}
