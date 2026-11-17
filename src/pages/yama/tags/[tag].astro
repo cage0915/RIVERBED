@@ -92,7 +92,10 @@ function chunkArray<T>(array: T[], size: number): T[][] {
 ---
 
 <Layout title={`#${decodedTag} - RIVERBED`} shareImage={representativePhotoKey ?? matchingPhotos[0]?.assetKey}>
-    <div class="fixed bottom-8 right-8 max-sm:right-4 z-40 flex flex-col gap-3">
+    <div
+        class="fixed bottom-8 right-8 max-sm:right-4 z-40 flex flex-col gap-3 transition-[translate,opacity] duration-(--duration-moderate) ease-emphasized data-[scroll-hidden=true]:translate-x-16 data-[scroll-hidden=true]:opacity-0"
+        data-floating-controls
+    >
         <button
             onclick="window.scrollTo({top: 0, behavior: 'smooth'})"
             class="group text-zinc-500 hover:text-white transition-all duration-(--duration-moderate) ease-emphasized opacity-0 translate-y-4 pointer-events-none"
@@ -138,7 +141,7 @@ function chunkArray<T>(array: T[], size: number): T[][] {
         </a>
         <button
             onclick="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})"
-            class="group text-zinc-500 hover:text-white transition-all duration-(--duration-moderate) ease-emphasized opacity-0 translate-y-4 pointer-events-none"
+            class="group text-zinc-500 hover:text-white transition-all duration-(--duration-moderate) ease-emphasized opacity-0 translate-y-4 pointer-events-none max-md:hidden"
             id="scroll-to-bottom"
             aria-label="Scroll to bottom"
         >
@@ -397,6 +400,7 @@ function chunkArray<T>(array: T[], size: number): T[][] {
 
 <script>
     import { installPageLifecycle } from "../../../lib/client-page-lifecycle";
+    import { installFloatingControlsAutoHide } from "../../../lib/floating-controls";
 
     const COVER_SCROLL_RESET_KEY = "riverbed:mountain-cover:scroll-top";
 
@@ -617,6 +621,12 @@ function chunkArray<T>(array: T[], size: number): T[][] {
             passive: true,
             signal: controller.signal,
         });
+        const floatingControls = document.querySelector<HTMLElement>(
+            "[data-floating-controls]",
+        );
+        if (floatingControls) {
+            installFloatingControlsAutoHide(floatingControls, controller.signal);
+        }
 
         return () => {
             controller.abort();

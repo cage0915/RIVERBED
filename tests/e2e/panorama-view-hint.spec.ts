@@ -168,13 +168,20 @@ for (const width of [390, 700]) {
 
             const toggle = page.locator("[data-photo-panorama] .photo-panorama-view-toggle").first();
             await toggle.evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
+            // Scrolling down tucks the floating buttons away on phones; a nudge
+            // up brings them back to their resting place. Let the first scroll's
+            // event land before the nudge, or the two merge into one downward step.
+            await page.evaluate(() => new Promise((resolve) =>
+                requestAnimationFrame(() => requestAnimationFrame(resolve))));
+            await page.evaluate(() => window.scrollBy({ top: -1, behavior: "instant" }));
+            await expect(page.locator("[data-floating-controls]")).toHaveCSS("opacity", "1");
             const centre = (selector: string) =>
                 page.locator(selector).first().evaluate((element) => {
                     const box = element.getBoundingClientRect();
                     return box.left + box.width / 2;
                 });
-            expect(await centre("[data-photo-panorama] .photo-panorama-view-toggle"))
-                .toBeCloseTo(await centre("#toggle-photo-grid > div"), 0);
+            const toggleCentre = await centre("[data-photo-panorama] .photo-panorama-view-toggle");
+            await expect.poll(() => centre("#toggle-photo-grid > div")).toBeCloseTo(toggleCentre, 0);
         });
     });
 }
