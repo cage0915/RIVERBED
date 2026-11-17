@@ -1,11 +1,14 @@
 <script>
     import { installPageLifecycle } from "../lib/client-page-lifecycle";
 
-    const INTERVAL_MS = 5000;
     const FADE_MS = 800; // Matches the slide opacity transition in index.astro.
-    // Cards change one after another in page order (top to bottom): each
-    // card's fade starts as the previous card's fade finishes.
-    const STAGGER_MS = FADE_MS;
+    // Cards change one after another in page order (top to bottom), each
+    // starting this long after the previous one. Kept above FADE_MS so the
+    // fades never overlap.
+    const STAGGER_MS = 1500;
+    // Once every card has changed, all of them rest this long before the
+    // next round starts.
+    const ROUND_PAUSE_MS = 3000;
 
     installPageLifecycle(document, () => {
         const root = document.querySelector<HTMLElement>("[data-catalog-grid]");
@@ -21,8 +24,8 @@
         const slideshowCards = Array.from(cards).filter(
             (card) => card.querySelectorAll("img.slide").length > 1,
         );
-        // Stretch the cycle when the cascade wouldn't fit, so fades never overlap.
-        const cycle = Math.max(INTERVAL_MS, slideshowCards.length * STAGGER_MS);
+        // A round: each card fades in turn, then a pause before the next round.
+        const cycle = slideshowCards.length * STAGGER_MS + ROUND_PAUSE_MS;
 
         slideshowCards.forEach((card, order) => {
             const slides = Array.from(
