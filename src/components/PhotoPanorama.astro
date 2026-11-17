@@ -1,4 +1,5 @@
 ---
+import { scaledSpace } from "../lib/rem-spacing";
 import RichText from "./RichText.astro";
 
 type PanoramaView = "carousel" | "panorama";
@@ -45,8 +46,8 @@ const styles: string[] = [];
 const finalMT = mt || (hasTopCaption ? captionMargin : undefined);
 const finalMB = mb || blockMargin || (hasBottomCaption ? captionMargin : undefined);
 
-if (finalMT) styles.push(`margin-top: ${finalMT} !important;`);
-if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
+if (finalMT) styles.push(`margin-top: ${scaledSpace(finalMT)} !important;`);
+if (finalMB) styles.push(`margin-bottom: ${scaledSpace(finalMB)} !important;`);
 ---
 
 <section

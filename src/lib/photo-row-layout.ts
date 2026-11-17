@@ -33,7 +33,11 @@ export function rowItemWidths(items: RowItemMetrics[], available: number): numbe
     return items.map(({ ratio, extraHeight }) => (height - extraHeight) * ratio);
 }
 
-/** Album Columns stack photos with a 0.5rem gap (see the album page styles). */
+/**
+ * Album Columns stack photos with --photo-row-gap: 0.5rem, narrower on phones
+ * (see global.css). The server can't know the viewport, so it uses the wide
+ * gap and the Row script corrects phones from the computed gap.
+ */
 export const COLUMN_GAP_PX = 8;
 
 /**

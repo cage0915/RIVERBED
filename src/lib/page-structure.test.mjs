@@ -450,7 +450,7 @@ test('Page Manager delegates all Text settings to the direct Text toolbar', () =
     assert.match(devTool, /pendingTextChanges\.set\(pendingTextKey/);
     assert.match(devTool, /textButton\?\.classList\.toggle\('has-pending', !matchesFile\)/);
     assert.match(text, /data-dev-block=\{isDev \? "text" : undefined\}/);
-    assert.match(text, /margin-bottom: \$\{finalBlockMargin\}/);
+    assert.match(text, /margin-bottom: \$\{scaledSpace\(finalBlockMargin\)\}/);
     assert.doesNotMatch(text, /margin-top:/);
 });
 
@@ -1463,7 +1463,7 @@ test('album blocks use native margin collapsing for predictable spacing', () => 
     );
     assert.match(
         albumPage,
-        /\*:has\(\+ \.carousel-section:not\(\.dev-preview-as-row\)\)[\s\S]*?margin-bottom:\s*1\.5rem/,
+        /\*:has\(\+ \.carousel-section:not\(\.dev-preview-as-row\)\)[\s\S]*?margin-bottom:\s*calc\(1\.5rem \* var\(--space-scale\)\)/,
     );
     assert.doesNotMatch(carousel, /["']2rem["']/);
     assert.match(text, /const finalBlockMargin = blockMargin \|\| mb \|\| '0\.5rem'/);

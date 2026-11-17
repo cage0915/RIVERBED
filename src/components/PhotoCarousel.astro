@@ -1,4 +1,5 @@
 ---
+import { scaledSpace } from "../lib/rem-spacing";
 import RichText from "./RichText.astro";
 
 interface Props {
@@ -45,10 +46,10 @@ const finalMT = mt || (hasTopCaption ? captionMargin : undefined);
 const finalMB = mb || blockMargin || (hasBottomCaption ? captionMargin : undefined);
 
 if (finalMT) {
-    styles.push(`margin-top: ${finalMT} !important;`);
+    styles.push(`margin-top: ${scaledSpace(finalMT)} !important;`);
 }
 
-if (finalMB) styles.push(`margin-bottom: ${finalMB} !important;`);
+if (finalMB) styles.push(`margin-bottom: ${scaledSpace(finalMB)} !important;`);
 
 // Each slide occupies (100 - peekPercent)% of the scroll container width.
 // Half the remaining is distributed to each side as a "peek".

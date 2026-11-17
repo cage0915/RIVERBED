@@ -290,13 +290,13 @@ const titleSections = extractTitleSections(albumRecord.blocks);
     .album-content :global(.photo-column) {
         display: flex;
         flex-direction: column;
-        gap: 0.5rem;
+        gap: var(--photo-row-gap);
         min-width: 0;
     }
 
     /* Apply the gap to all blocks except the last one */
     .album-content > :global(*) {
-        margin-bottom: var(--album-block-gap, 0.5rem);
+        margin-bottom: calc(var(--album-block-gap, 0.5rem) * var(--space-scale));
     }
 
     /* Component scripts render beside their first instance; skip them. */
@@ -315,7 +315,7 @@ const titleSections = extractTitleSections(albumRecord.blocks);
     .album-content > :global(*:has(+ .photo-panorama-section)),
     .album-content > :global(*:has(+ script + .photo-panorama-section)),
     .album-content > :global(.photo-panorama-section) {
-        margin-bottom: 1.5rem;
+        margin-bottom: calc(1.5rem * var(--space-scale));
     }
 
     .album-content :global(h2) {
@@ -328,8 +328,10 @@ const titleSections = extractTitleSections(albumRecord.blocks);
         scroll-margin-top: 7rem;
     }
 
+    /* Paragraph margins collapse into the Text block's gap, so they scale
+       with it; otherwise phones would keep the full 0.5rem below Text. */
     .album-content :global(p) {
-        margin: 0.5rem 0;
+        margin: calc(0.5rem * var(--space-scale)) 0;
         line-height: 1.6;
     }
 
@@ -522,11 +524,11 @@ const titleSections = extractTitleSections(albumRecord.blocks);
         }
 
         .album-content :global([data-mobile-row-pan]::before) {
-            margin-inline-end: -0.5rem;
+            margin-inline-end: calc(0px - var(--photo-row-gap));
         }
 
         .album-content :global([data-mobile-row-pan]::after) {
-            margin-inline-start: -0.5rem;
+            margin-inline-start: calc(0px - var(--photo-row-gap));
         }
 
         .album-content :global(.photo-wrapper:not(.show-info) .tags-overlay) {

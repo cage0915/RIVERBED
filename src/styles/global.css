@@ -110,6 +110,20 @@
   --duration-slow: 600ms;
 }
 
+/* Album spacing is authored at desktop size. Phones scale every gap, both
+   between blocks and between photos inside a Row, by the same factor, so
+   the two keep the proportion they have on desktop. */
+:root {
+  --space-scale: 1;
+  --photo-row-gap: calc(0.5rem * var(--space-scale));
+}
+
+@media (max-width: 767px) {
+  :root {
+    --space-scale: calc(2 / 3);
+  }
+}
+
 /* Slide dots: one dot per photo, the current one stretched into a capsule.
    Shared by PhotoCarousel and the carousel symbol on PhotoPanorama's view
    toggle, so both read as the same control. */

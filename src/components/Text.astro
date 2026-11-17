@@ -1,4 +1,6 @@
 ---
+import { scaledSpace } from "../lib/rem-spacing";
+
 interface Props {
   align?: 'left' | 'center' | 'right';
   size?: 'caption' | 'title';
@@ -11,7 +13,7 @@ const finalBlockMargin = blockMargin || mb || '0.5rem';
 const isDev = import.meta.env.DEV;
 
 const style = [
-  `margin-bottom: ${finalBlockMargin};`,
+  `margin-bottom: ${scaledSpace(finalBlockMargin)};`,
   `text-align: ${align};`,
 ].join(' ');
 ---

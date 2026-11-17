@@ -19,3 +19,13 @@ export function remValueFromInput(value: unknown): string {
     const numericValue = remValueForInput(value);
     return numericValue === "" ? "" : `${numericValue}rem`;
 }
+
+/**
+ * A block margin as rendered: the authored (desktop) value times
+ * --space-scale, which global.css lowers on phones so every gap shrinks in
+ * proportion. A unitless 0 stays 0, since calc(0 * n) is not a length.
+ */
+export function scaledSpace(value: string): string {
+    const text = value.trim();
+    return /^[+-]?0*\.?0*$/.test(text) ? "0" : `calc(${text} * var(--space-scale, 1))`;
+}
