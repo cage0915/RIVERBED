@@ -1412,7 +1412,8 @@ test('catalog routes share lifecycle-scoped card interactions', () => {
     assert.match(interactions.trim(), /^<script>[\s\S]*<\/script>$/);
     assert.match(interactions, /installPageLifecycle/);
     assert.match(interactions, /root\.querySelectorAll[^;]*data-catalog-card/);
-    assert.match(interactions, /const INTERVAL_MS = 5000/);
+    assert.match(interactions, /const STAGGER_MS = 1500/);
+    assert.match(interactions, /const ROUND_PAUSE_MS = 3000/);
     assert.match(interactions, /window\.setInterval/);
     assert.match(interactions, /clearInterval/);
     // Captions are always visible on touch devices, so a tap navigates directly.
