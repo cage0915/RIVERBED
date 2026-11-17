@@ -1221,7 +1221,14 @@ test('Layout delegates navigation rendering and lifecycle ownership', () => {
         2,
     );
     assert.doesNotMatch(layout, /\.condensed-kanji\s*\{|\.mask-linear-right\s*\{|\.mask-none\s*\{/);
-    assert.match(siteNavigation, /\.condensed-kanji\s*\{/);
+    assert.doesNotMatch(siteNavigation, /condensed-kanji/);
+    assert.equal((siteNavigation.match(/<span class=\{folder\.labelClass\}>/g) ?? []).length, 2);
+    assert.match(siteNavigation, /\\p\{Script=Han\}\/u\.test\(getFolderTitle\(slug\)\) \? "nav-label-cjk" : "nav-label-latin"/);
+    assert.match(siteNavigation, /\.nav-label-cjk\s*\{\s*font-family:\s*"Noto Sans TC"[^}]*font-size:\s*0\.95em[^}]*letter-spacing:\s*-0\.03em/);
+    assert.doesNotMatch(siteNavigation, /\.nav-label-latin\s*\{[^}]*letter-spacing/);
+    assert.match(siteNavigation, /\.nav-label-latin\s*\{\s*font-family:\s*"Source Sans 3"[^}]*font-size:\s*1\.1em/);
+    assert.match(layout, /import "@fontsource\/source-sans-3\/400\.css";/);
+    assert.match(siteNavigation, /\.nav-label-descender\s*\{[^}]*top:\s*-0\.1em/);
     assert.match(siteNavigation, /\.mask-linear-right\s*\{/);
     assert.doesNotMatch(siteNavigation, /astro:after-swap/);
     assert.doesNotMatch(siteNavigation, /cloneNode|replaceChild/);

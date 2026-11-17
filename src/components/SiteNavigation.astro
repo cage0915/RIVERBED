@@ -18,6 +18,13 @@ const sortedFolders = folderSlugs
 		id: slug,
 		title: getFolderTitle(slug),
 		order: getFolderOrder(slug),
+		labelClass: [
+			// Han glyphs fill the em box while Latin capitals reach 0.7em, so
+			// shrink the one and grow the other to narrow that gap; at these
+			// sizes both scripts also share the same vertical centre.
+			/\p{Script=Han}/u.test(getFolderTitle(slug)) ? "nav-label-cjk" : "nav-label-latin",
+			slug === "y" ? "nav-label-descender" : "",
+		].filter(Boolean).join(" "),
 	}))
 	.sort((a, b) => a.order - b.order);
 
@@ -94,11 +101,11 @@ const currentPath = Astro.url.pathname;
 									: "text-zinc-400"
 							}`}
 						>
-							<span class={folder.id === 'dalin' ? 'condensed-kanji' : ''}>
+							<span class={folder.labelClass}>
 								{folder.title}
 							</span>
 							<span
-								class={`absolute bottom-0 left-0 right-0 h-0.5 bg-white rounded-full transition-opacity duration-(--duration-moderate) ${isActive ? 'opacity-100' : 'opacity-0'} ${folder.id === 'dalin' ? 'condensed-kanji' : ''}`}
+								class={`absolute bottom-0 left-0 right-0 h-0.5 bg-white rounded-full transition-opacity duration-(--duration-moderate) ${isActive ? 'opacity-100' : 'opacity-0'}`}
 							/>
 						</a>
 					);
@@ -138,11 +145,11 @@ const currentPath = Astro.url.pathname;
 										: "text-zinc-400"
 								}`}
 							>
-								<span class={folder.id === 'dalin' ? 'condensed-kanji' : ''}>
+								<span class={folder.labelClass}>
 									{folder.title}
 								</span>
 								<span
-									class={`absolute bottom-0 left-0 right-0 h-0.5 bg-white rounded-full transition-opacity duration-(--duration-moderate) ${isActive ? 'opacity-100' : 'opacity-0'} ${folder.id === 'dalin' ? 'condensed-kanji' : ''}`}
+									class={`absolute bottom-0 left-0 right-0 h-0.5 bg-white rounded-full transition-opacity duration-(--duration-moderate) ${isActive ? 'opacity-100' : 'opacity-0'}`}
 								/>
 							</a>
 						);
@@ -230,11 +237,29 @@ const currentPath = Astro.url.pathname;
 </script>
 
 <style>
-	.condensed-kanji {
-		display: inline-block;
-		transform: scaleX(0.7);
-		transform-origin: center;
-		letter-spacing: -0.05em;
+	/* Han labels use Noto Sans TC (Adobe's Source Han Sans); Latin labels use
+	   Source Sans 3, the Latin face Adobe drew to sit beside it, so both
+	   scripts share a stroke weight while the Latin stays slender.
+
+	   Han glyphs nearly fill the em box while Source Sans capitals reach only
+	   0.656em; at these sizes both scripts share one vertical centre. */
+	.nav-label-cjk {
+		font-family: "Noto Sans TC", "Noto Sans JP", sans-serif;
+		font-size: 0.95em;
+		/* Draw 大林's two glyphs a touch closer than the link's tracking-wide. */
+		letter-spacing: -0.03em;
+	}
+
+	.nav-label-latin {
+		font-family: "Source Sans 3", "Noto Sans TC", sans-serif;
+		font-size: 1.1em;
+	}
+
+	/* Lift the lowercase y until its x-height bowl centres on the capitals'
+	   centre line; a full descender lift leaves the bowl floating. */
+	.nav-label-descender {
+		position: relative;
+		top: -0.1em;
 	}
 
 	.mask-linear-right {
