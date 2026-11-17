@@ -24,9 +24,17 @@
     },
     {
       "type": "Row",
-      "blockMargin": "2rem",
+      "caption": "關渡",
+      "blockMargin": "1.5rem",
       "photos": [
-        "001.jpg",
+        "001.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "caption": "頭前溪",
+      "blockMargin": "5rem",
+      "photos": [
         "002.jpg"
       ]
     },
@@ -40,16 +48,19 @@
     {
       "type": "Row",
       "photos": [
-        "003.jpg",
-        "004.jpg",
+        {
+          "column": [
+            "003.jpg",
+            "004.jpg"
+          ]
+        },
         "005.jpg"
       ]
     },
     {
       "type": "Row",
       "caption": "(右) 台中發電廠.烏溪",
-      "captionPosition": "left bottom",
-      "blockMargin": "1.5rem",
+      "blockMargin": "3rem",
       "photos": [
         "006.jpg",
         "007.jpg"
@@ -57,31 +68,24 @@
     },
     {
       "type": "Row",
+      "blockMargin": "3rem",
       "photos": [
         "008.jpg"
       ]
     },
     {
       "type": "Row",
-      "caption": "高美燈塔",
-      "captionPosition": "left bottom",
-      "blockMargin": "1.5rem",
+      "caption": "高美燈塔(左). 芳苑燈塔(右)",
+      "blockMargin": "3rem",
       "photos": [
-        "009.jpg"
-      ]
-    },
-    {
-      "type": "Row",
-      "caption": "芳苑燈塔",
-      "captionPosition": "left bottom",
-      "blockMargin": "1.5rem",
-      "photos": [
+        "009.jpg",
         "010.jpg"
       ]
     },
     {
       "type": "Row",
-      "blockMargin": "1.5rem",
+      "caption": "鹿港",
+      "blockMargin": "3rem",
       "photos": [
         "011.jpg"
       ]
@@ -89,8 +93,7 @@
     {
       "type": "Row",
       "caption": "濁水溪",
-      "captionPosition": "left bottom",
-      "blockMargin": "1.5rem",
+      "blockMargin": "5rem",
       "photos": [
         "012.jpg"
       ]
@@ -105,14 +108,14 @@
     {
       "type": "Row",
       "caption": "急水溪",
-      "captionPosition": "left bottom",
-      "blockMargin": "1.5rem",
+      "blockMargin": "3rem",
       "photos": [
         "013.jpg"
       ]
     },
     {
       "type": "Row",
+      "blockMargin": "3rem",
       "photos": [
         "014.jpg"
       ]
@@ -126,8 +129,7 @@
     {
       "type": "Row",
       "caption": "烏山頭水庫溢洪道",
-      "captionPosition": "left bottom",
-      "blockMargin": "1.5rem",
+      "blockMargin": "3rem",
       "photos": [
         "016.jpg"
       ]
@@ -135,8 +137,7 @@
     {
       "type": "Row",
       "caption": "曾文溪",
-      "captionPosition": "left bottom",
-      "blockMargin": "1.5rem",
+      "blockMargin": "5rem",
       "photos": [
         "017.jpg"
       ]
@@ -170,8 +171,7 @@
     {
       "type": "Row",
       "caption": "七股，國聖港燈塔",
-      "captionPosition": "left bottom",
-      "blockMargin": "1.5rem",
+      "blockMargin": "3rem",
       "photos": [
         "022.jpg"
       ]
@@ -179,15 +179,14 @@
     {
       "type": "Row",
       "caption": "蚵仔寮漁港",
-      "captionPosition": "left bottom",
-      "blockMargin": "1.5rem",
+      "blockMargin": "3rem",
       "photos": [
         "023.jpg"
       ]
     },
     {
       "type": "Row",
-      "blockMargin": "2rem",
+      "blockMargin": "5rem",
       "photos": [
         "024.jpg"
       ]
@@ -208,16 +207,16 @@
     },
     {
       "type": "Row",
+      "blockMargin": "3rem",
       "photos": [
         "027.jpg",
-        "028.jpg",
         "029.jpg",
         "030.jpg"
       ]
     },
     {
       "type": "Row",
-      "blockMargin": "2rem",
+      "blockMargin": "5rem",
       "photos": [
         "031.jpg",
         "032.jpg"
@@ -239,8 +238,7 @@
     {
       "type": "Row",
       "caption": "谷川大橋 | 台灣最高橋墩。",
-      "captionPosition": "left bottom",
-      "blockMargin": "1.5rem",
+      "blockMargin": "3rem",
       "photos": [
         "034.jpg"
       ]
@@ -254,8 +252,7 @@
     {
       "type": "Row",
       "caption": "霧台基督長老教會",
-      "captionPosition": "left bottom",
-      "blockMargin": "1.5rem",
+      "blockMargin": "3rem",
       "photos": [
         "036.jpg",
         "037.jpg"
@@ -263,13 +260,21 @@
     },
     {
       "type": "Row",
-      "blockMargin": "1.5rem",
+      "blockMargin": "3rem",
       "photos": [
-        "038.jpg",
-        "039.jpg",
-        "040.jpg",
-        "041.jpg",
-        "042.jpg"
+        {
+          "column": [
+            "038.jpg",
+            "042.jpg"
+          ]
+        },
+        {
+          "column": [
+            "039.jpg",
+            "040.jpg",
+            "041.jpg"
+          ]
+        }
       ]
     },
     {
@@ -290,6 +295,7 @@
     },
     {
       "type": "Row",
+      "blockMargin": "3rem",
       "photos": [
         "047.jpg",
         "048.jpg"
@@ -304,14 +310,14 @@
     {
       "type": "Row",
       "caption": "Vudai 霧台",
-      "captionPosition": "left bottom",
-      "blockMargin": "1.5rem",
+      "blockMargin": "3rem",
       "photos": [
         "050.jpg"
       ]
     },
     {
       "type": "Row",
+      "blockMargin": "3rem",
       "photos": [
         "051.jpg",
         "052.jpg"
@@ -330,7 +336,6 @@
     {
       "type": "Row",
       "caption": "阿禮大崩壁",
-      "captionPosition": "left bottom",
       "blockMargin": "1.5rem",
       "photos": [
         "055.jpg"
@@ -354,7 +359,6 @@
     {
       "type": "Row",
       "caption": "Labuwan 大武",
-      "captionPosition": "left bottom",
       "blockMargin": "1.5rem",
       "photos": [
         "058.jpg"
@@ -376,7 +380,6 @@
     {
       "type": "Row",
       "caption": "隘寮北溪",
-      "captionPosition": "left bottom",
       "blockMargin": "1.5rem",
       "photos": [
         "062.jpg"
@@ -393,7 +396,7 @@
       "type": "Row",
       "caption": "曾經是卡車能通行的道路，往內延伸到知本主山周圍的大理石礦場。",
       "captionPosition": "left bottom",
-      "blockMargin": "1.5rem",
+      "blockMargin": "3rem",
       "photos": [
         "065.jpg"
       ]
@@ -422,7 +425,7 @@
     },
     {
       "type": "Row",
-      "blockMargin": "2rem",
+      "blockMargin": "5rem",
       "photos": [
         "073.jpg",
         "074.jpg"
@@ -438,8 +441,7 @@
     {
       "type": "Row",
       "caption": "琉球嶼燈塔",
-      "captionPosition": "left bottom",
-      "blockMargin": "1.5rem",
+      "blockMargin": "5rem",
       "photos": [
         "075.jpg",
         "076.jpg"
@@ -663,13 +665,6 @@
       "tags": []
     },
     {
-      "filename": "028.jpg",
-      "width": 1840,
-      "height": 1232,
-      "color": "#5e8573",
-      "tags": []
-    },
-    {
       "filename": "029.jpg",
       "width": 1840,
       "height": 1232,
@@ -740,6 +735,13 @@
       "tags": []
     },
     {
+      "filename": "042.jpg",
+      "width": 3000,
+      "height": 1995,
+      "color": "#5a6a77",
+      "tags": []
+    },
+    {
       "filename": "039.jpg",
       "width": 3000,
       "height": 1995,
@@ -758,13 +760,6 @@
       "width": 3000,
       "height": 1995,
       "color": "#71765e",
-      "tags": []
-    },
-    {
-      "filename": "042.jpg",
-      "width": 3000,
-      "height": 1995,
-      "color": "#5a6a77",
       "tags": []
     },
     {

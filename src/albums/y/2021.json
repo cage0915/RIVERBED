@@ -22,7 +22,7 @@
     },
     {
       "type": "Row",
-      "blockMargin": "2rem",
+      "blockMargin": "3rem",
       "photos": [
         "002.jpg",
         "003.jpg"
@@ -36,23 +36,23 @@
     },
     {
       "type": "Row",
-      "blockMargin": "2rem",
       "photos": [
         "005.jpg"
       ]
     },
     {
       "type": "Row",
+      "blockMargin": "3rem",
       "photos": [
-        "006.jpg",
-        "007.jpg"
+        "008.jpg"
       ]
     },
     {
       "type": "Row",
-      "blockMargin": "2rem",
+      "blockMargin": "5rem",
       "photos": [
-        "008.jpg"
+        "006.jpg",
+        "007.jpg"
       ]
     },
     {
@@ -77,21 +77,24 @@
     {
       "type": "Row",
       "photos": [
-        "011.jpg",
-        "012.jpg"
-      ]
-    },
-    {
-      "type": "Row",
-      "photos": [
-        "013.jpg",
+        {
+          "column": [
+            "013.jpg",
+            "012.jpg"
+          ]
+        },
         "014.jpg"
       ]
     },
     {
       "type": "Row",
       "photos": [
-        "015.jpg",
+        {
+          "column": [
+            "011.jpg",
+            "015.jpg"
+          ]
+        },
         "016.jpg"
       ]
     },
@@ -159,6 +162,13 @@
       "tags": []
     },
     {
+      "filename": "008.jpg",
+      "width": 3000,
+      "height": 1989,
+      "color": "#95948f",
+      "tags": []
+    },
+    {
       "filename": "006.jpg",
       "width": 3000,
       "height": 1989,
@@ -170,13 +180,6 @@
       "width": 3000,
       "height": 1989,
       "color": "#766350",
-      "tags": []
-    },
-    {
-      "filename": "008.jpg",
-      "width": 3000,
-      "height": 1989,
-      "color": "#95948f",
       "tags": []
     },
     {
@@ -194,10 +197,10 @@
       "tags": []
     },
     {
-      "filename": "011.jpg",
+      "filename": "013.jpg",
       "width": 3000,
       "height": 1989,
-      "color": "#c0c2c1",
+      "color": "#b4b7b8",
       "tags": []
     },
     {
@@ -208,17 +211,17 @@
       "tags": []
     },
     {
-      "filename": "013.jpg",
-      "width": 3000,
-      "height": 1989,
-      "color": "#b4b7b8",
-      "tags": []
-    },
-    {
       "filename": "014.jpg",
       "width": 3000,
       "height": 1989,
       "color": "#9ca9aa",
+      "tags": []
+    },
+    {
+      "filename": "011.jpg",
+      "width": 3000,
+      "height": 1989,
+      "color": "#c0c2c1",
       "tags": []
     },
     {

@@ -73,7 +73,7 @@
     },
     {
       "type": "Row",
-      "blockMargin": "2rem",
+      "blockMargin": "5rem",
       "photos": [
         "010.jpg"
       ]

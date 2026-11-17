@@ -38,7 +38,7 @@
     },
     {
       "type": "Row",
-      "blockMargin": "2rem",
+      "blockMargin": "5rem",
       "photos": [
         "005.jpg"
       ]
@@ -67,7 +67,7 @@
     },
     {
       "type": "Row",
-      "blockMargin": "2rem",
+      "blockMargin": "5rem",
       "photos": [
         "010.jpg"
       ]
@@ -112,7 +112,7 @@
     {
       "type": "Row",
       "caption": "清水斷崖",
-      "blockMargin": "1.5rem",
+      "blockMargin": "5rem",
       "photos": [
         "017.jpg"
       ]
@@ -160,7 +160,7 @@
     },
     {
       "type": "Row",
-      "blockMargin": "2rem",
+      "blockMargin": "5rem",
       "photos": [
         "006.jpg"
       ]
@@ -180,7 +180,7 @@
     },
     {
       "type": "Row",
-      "blockMargin": "2rem",
+      "blockMargin": "5rem",
       "photos": [
         "025.jpg",
         "026.jpg"
@@ -202,7 +202,6 @@
     {
       "type": "Row",
       "photos": [
-        "028.jpg",
         "029.jpg"
       ]
     },
@@ -214,7 +213,7 @@
     },
     {
       "type": "Row",
-      "blockMargin": "2rem",
+      "blockMargin": "5rem",
       "photos": [
         "031.jpg"
       ]
@@ -228,7 +227,7 @@
     },
     {
       "type": "Row",
-      "blockMargin": "2rem",
+      "blockMargin": "5rem",
       "photos": [
         "032.jpg",
         "033.jpg"
@@ -251,10 +250,17 @@
     {
       "type": "Row",
       "caption": "鯉魚潭鋸齒堰",
-      "blockMargin": "1.5rem",
+      "blockMargin": "5rem",
       "photos": [
         "036.jpg"
       ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "monochrome"
     },
     {
       "type": "Row",
@@ -498,13 +504,6 @@
           "y": 29.49
         }
       ]
-    },
-    {
-      "filename": "028.jpg",
-      "width": 3000,
-      "height": 1989,
-      "color": "#758b95",
-      "tags": []
     },
     {
       "filename": "029.jpg",

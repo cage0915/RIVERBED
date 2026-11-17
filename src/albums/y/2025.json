@@ -79,7 +79,7 @@
     },
     {
       "type": "Row",
-      "blockMargin": "2rem",
+      "blockMargin": "5rem",
       "photos": [
         "012.jpg"
       ]
@@ -111,7 +111,7 @@
     },
     {
       "type": "Row",
-      "blockMargin": "2rem",
+      "blockMargin": "5rem",
       "photos": [
         "016.jpg"
       ]
@@ -146,6 +146,7 @@
     },
     {
       "type": "Row",
+      "blockMargin": "3rem",
       "photos": [
         "022.jpg"
       ]
@@ -179,6 +180,7 @@
     },
     {
       "type": "Row",
+      "blockMargin": "3rem",
       "photos": [
         "030.jpg"
       ]
@@ -197,7 +199,7 @@
     },
     {
       "type": "Row",
-      "blockMargin": "2rem",
+      "blockMargin": "5rem",
       "photos": [
         "033.jpg"
       ]

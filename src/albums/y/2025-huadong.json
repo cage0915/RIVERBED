@@ -24,6 +24,7 @@
     },
     {
       "type": "Row",
+      "blockMargin": "0.5rem",
       "photos": [
         "001.jpg"
       ]
@@ -94,6 +95,8 @@
     },
     {
       "type": "Row",
+      "caption": "大武地壘",
+      "blockMargin": "1.5rem",
       "photos": [
         "011.jpg"
       ]
@@ -101,7 +104,7 @@
     {
       "type": "Row",
       "caption": "台東市區",
-      "blockMargin": "1.5rem",
+      "blockMargin": "5rem",
       "photos": [
         "012.jpg"
       ]
@@ -141,7 +144,7 @@
     },
     {
       "type": "Row",
-      "blockMargin": "2rem",
+      "blockMargin": "5rem",
       "photos": [
         "017.jpg"
       ]
@@ -179,6 +182,7 @@
     },
     {
       "type": "Row",
+      "blockMargin": "3rem",
       "photos": [
         "022.jpg",
         "023.jpg"
@@ -191,14 +195,14 @@
       ]
     },
     {
-      "type": "PhotoCarousel",
+      "type": "Row",
       "photos": [
-        "025.jpg",
-        "026.jpg"
+        "025.jpg"
       ]
     },
     {
       "type": "Row",
+      "blockMargin": "0.5rem",
       "photos": [
         "027.jpg"
       ]
@@ -212,9 +216,17 @@
     },
     {
       "type": "Row",
+      "blockMargin": "5rem",
       "photos": [
         "030.jpg"
       ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "東197"
     },
     {
       "type": "Row",
@@ -230,6 +242,7 @@
     },
     {
       "type": "Row",
+      "blockMargin": "0.5rem",
       "photos": [
         "033.jpg",
         "034.jpg"
@@ -239,7 +252,6 @@
       "type": "PhotoCarousel",
       "photos": [
         "035.jpg",
-        "036.jpg",
         "037.jpg"
       ]
     },
@@ -880,29 +892,6 @@
       ]
     },
     {
-      "filename": "026.jpg",
-      "width": 3000,
-      "height": 2000,
-      "color": "#1e4257",
-      "tags": [
-        {
-          "name": "馬博拉斯山",
-          "x": 73.27,
-          "y": 45.03
-        },
-        {
-          "name": "秀姑巒山",
-          "x": 51.74,
-          "y": 43.46
-        },
-        {
-          "name": "大水窟山北峰",
-          "x": 33.5,
-          "y": 45.29
-        }
-      ]
-    },
-    {
       "filename": "027.jpg",
       "width": 3000,
       "height": 2000,
@@ -968,19 +957,6 @@
           "name": "都蘭山",
           "x": 27.32,
           "y": 61.45
-        }
-      ]
-    },
-    {
-      "filename": "036.jpg",
-      "width": 3000,
-      "height": 2000,
-      "color": "#486a77",
-      "tags": [
-        {
-          "name": "都蘭山",
-          "x": 37.07,
-          "y": 53.3
         }
       ]
     },

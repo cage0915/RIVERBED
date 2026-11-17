@@ -23,7 +23,7 @@
     },
     {
       "type": "Row",
-      "blockMargin": "2rem",
+      "blockMargin": "5rem",
       "photos": [
         "001.jpg",
         "002.jpg"
@@ -44,24 +44,32 @@
     },
     {
       "type": "Row",
-      "blockMargin": "1.5rem",
       "photos": [
         "004.jpg"
       ]
     },
     {
       "type": "Row",
+      "blockMargin": "3rem",
       "photos": [
-        "005.jpg",
-        "006.jpg",
-        "007.jpg"
+        "007.jpg",
+        {
+          "column": [
+            "006.jpg",
+            "005.jpg"
+          ]
+        }
       ]
     },
     {
       "type": "Row",
       "photos": [
-        "008.jpg",
-        "009.jpg",
+        {
+          "column": [
+            "008.jpg",
+            "009.jpg"
+          ]
+        },
         "010.jpg"
       ]
     },
@@ -75,8 +83,7 @@
     {
       "type": "Row",
       "caption": "55mm・f2.8・Micro",
-      "captionPosition": "left bottom",
-      "blockMargin": "1.5rem",
+      "blockMargin": "3rem",
       "photos": [
         "013.jpg",
         "014.jpg"
@@ -85,8 +92,7 @@
     {
       "type": "Row",
       "caption": "101大樓.中央百世大樓",
-      "captionPosition": "left bottom",
-      "blockMargin": "1.5rem",
+      "blockMargin": "3rem",
       "photos": [
         "015.jpg",
         "016.jpg"
@@ -101,8 +107,7 @@
     {
       "type": "Row",
       "caption": "大塊噫氣其名為風。",
-      "captionPosition": "left bottom",
-      "blockMargin": "1.5rem",
+      "blockMargin": "1rem",
       "photos": [
         "018.jpg"
       ]
@@ -116,7 +121,7 @@
     },
     {
       "type": "Row",
-      "blockMargin": "2rem",
+      "blockMargin": "5rem",
       "photos": [
         "021.jpg"
       ]
@@ -138,9 +143,13 @@
     {
       "type": "Row",
       "photos": [
-        "024.jpg",
-        "025.jpg",
-        "026.jpg"
+        {
+          "column": [
+            "024.jpg",
+            "026.jpg"
+          ]
+        },
+        "025.jpg"
       ]
     },
     {
@@ -153,7 +162,6 @@
     {
       "type": "Row",
       "caption": "日久他鄉是故鄉",
-      "captionPosition": "left bottom",
       "blockMargin": "1.5rem",
       "photos": [
         "029.jpg"
@@ -162,7 +170,6 @@
     {
       "type": "Row",
       "caption": "北接山高送涼風",
-      "captionPosition": "left bottom",
       "blockMargin": "1.5rem",
       "photos": [
         "030.jpg"
@@ -171,7 +178,6 @@
     {
       "type": "Row",
       "caption": "左營高鐵新兵集合",
-      "captionPosition": "left bottom",
       "photos": [
         "031.jpg"
       ]
@@ -207,10 +213,10 @@
       "tags": []
     },
     {
-      "filename": "005.jpg",
+      "filename": "007.jpg",
       "width": 1840,
       "height": 1232,
-      "color": "#67624e",
+      "color": "#757376",
       "tags": []
     },
     {
@@ -221,10 +227,10 @@
       "tags": []
     },
     {
-      "filename": "007.jpg",
+      "filename": "005.jpg",
       "width": 1840,
       "height": 1232,
-      "color": "#757376",
+      "color": "#67624e",
       "tags": []
     },
     {
@@ -347,17 +353,17 @@
       "tags": []
     },
     {
-      "filename": "025.jpg",
-      "width": 1840,
-      "height": 1232,
-      "color": "#887b81",
-      "tags": []
-    },
-    {
       "filename": "026.jpg",
       "width": 1840,
       "height": 1232,
       "color": "#6e7a81",
+      "tags": []
+    },
+    {
+      "filename": "025.jpg",
+      "width": 1840,
+      "height": 1232,
+      "color": "#887b81",
       "tags": []
     },
     {

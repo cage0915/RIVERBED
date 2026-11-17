@@ -29,6 +29,7 @@
     },
     {
       "type": "Row",
+      "blockMargin": "3rem",
       "photos": [
         "KCS03361.jpg"
       ]
@@ -36,34 +37,23 @@
     {
       "type": "Row",
       "photos": [
-        "KCS03368.jpg"
-      ]
-    },
-    {
-      "type": "Row",
-      "photos": [
+        "KCS03368.jpg",
         "KCS03386.jpg"
       ]
     },
     {
       "type": "Row",
+      "blockMargin": "3rem",
       "photos": [
         "KCS03370.jpg",
         "KCS03380.jpg"
       ]
     },
     {
-      "type": "Row",
-      "blockMargin": "2rem",
-      "photos": [
-        "KCS03392.jpg"
-      ]
-    },
-    {
       "type": "PhotoCarousel",
+      "blockMargin": "3rem",
       "photos": [
         "KCS03397.jpg",
-        "KCS03406.jpg",
         "KCS03409.jpg"
       ]
     },
@@ -92,6 +82,7 @@
     {
       "type": "Row",
       "caption": "基隆嶼燈塔",
+      "blockMargin": "3rem",
       "photos": [
         "2026-0530-1523-00.123.jpg",
         "2026-0530-1523-53.146.jpg"
@@ -99,16 +90,11 @@
     },
     {
       "type": "PhotoCarousel",
+      "blockMargin": "3rem",
       "photos": [
         "KCS03445.jpg",
         "KCS03441.jpg",
         "KCS03447.jpg"
-      ]
-    },
-    {
-      "type": "Row",
-      "photos": [
-        "KCS03455.jpg"
       ]
     },
     {
@@ -131,16 +117,17 @@
     },
     {
       "type": "Row",
+      "blockMargin": "3rem",
       "photos": [
         "KCS03479.jpg"
       ]
     },
     {
       "type": "PhotoCarousel",
+      "blockMargin": "1rem",
       "photos": [
         "KCS03506.jpg",
-        "KCS03505.jpg",
-        "KCS03508.jpg"
+        "KCS03505.jpg"
       ]
     },
     {
@@ -207,13 +194,6 @@
       "tags": []
     },
     {
-      "filename": "KCS03392.jpg",
-      "width": 3000,
-      "height": 2000,
-      "color": "#373425",
-      "tags": []
-    },
-    {
       "filename": "KCS03397.jpg",
       "width": 3000,
       "height": 2000,
@@ -223,19 +203,6 @@
           "name": "小基隆嶼",
           "x": 54.01,
           "y": 23.53
-        }
-      ]
-    },
-    {
-      "filename": "KCS03406.jpg",
-      "width": 3000,
-      "height": 2000,
-      "color": "#4e7587",
-      "tags": [
-        {
-          "name": "小基隆嶼",
-          "x": 56.69,
-          "y": 26.36
         }
       ]
     },
@@ -335,19 +302,6 @@
       "tags": []
     },
     {
-      "filename": "KCS03455.jpg",
-      "width": 3000,
-      "height": 2000,
-      "color": "#5b8094",
-      "tags": [
-        {
-          "name": "小基隆嶼",
-          "x": 52.8,
-          "y": 28.91
-        }
-      ]
-    },
-    {
       "filename": "KCS03462.jpg",
       "width": 3000,
       "height": 2000,
@@ -426,24 +380,6 @@
           "name": "基隆山東峰",
           "x": 36.55,
           "y": 43.42
-        }
-      ]
-    },
-    {
-      "filename": "KCS03508.jpg",
-      "width": 3000,
-      "height": 2000,
-      "color": "#447087",
-      "tags": [
-        {
-          "name": "基隆山",
-          "x": 62.59,
-          "y": 27.87
-        },
-        {
-          "name": "基隆山東峰",
-          "x": 43.16,
-          "y": 37.16
         }
       ]
     },

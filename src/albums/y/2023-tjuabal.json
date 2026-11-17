@@ -24,7 +24,7 @@
     },
     {
       "type": "Row",
-      "blockMargin": "1.5rem",
+      "blockMargin": "3rem",
       "photos": [
         "001.jpg"
       ]
@@ -32,13 +32,14 @@
     {
       "type": "Row",
       "caption": "光復溪",
-      "captionPosition": "center top",
+      "blockMargin": "1rem",
       "photos": [
         "002.jpg"
       ]
     },
     {
       "type": "PhotoCarousel",
+      "blockMargin": "1rem",
       "initialSlide": 1,
       "photos": [
         "003.jpg",
@@ -48,7 +49,7 @@
     },
     {
       "type": "Row",
-      "blockMargin": "2rem",
+      "blockMargin": "5rem",
       "photos": [
         "006.jpg"
       ]
@@ -80,7 +81,7 @@
     },
     {
       "type": "Row",
-      "blockMargin": "2rem",
+      "blockMargin": "5rem",
       "photos": [
         "010.jpg"
       ]
@@ -94,6 +95,7 @@
     },
     {
       "type": "PhotoCarousel",
+      "blockMargin": "1rem",
       "photos": [
         "011.jpg",
         "012.jpg"
@@ -109,7 +111,7 @@
     },
     {
       "type": "Row",
-      "blockMargin": "2rem",
+      "blockMargin": "5rem",
       "photos": [
         "014.jpg"
       ]
@@ -136,7 +138,7 @@
     {
       "type": "Row",
       "caption": "大竹高溪",
-      "blockMargin": "1.5rem",
+      "blockMargin": "3rem",
       "photos": [
         "017.jpg"
       ]
@@ -180,7 +182,7 @@
     },
     {
       "type": "Row",
-      "blockMargin": "2rem",
+      "blockMargin": "5rem",
       "photos": [
         "030.jpg",
         "031.jpg"
@@ -201,7 +203,7 @@
     },
     {
       "type": "Row",
-      "blockMargin": "2rem",
+      "blockMargin": "5rem",
       "photos": [
         "033.jpg",
         "034.jpg"
@@ -229,7 +231,7 @@
     {
       "type": "Row",
       "caption": "金崙溪",
-      "blockMargin": "1.5rem",
+      "blockMargin": "3rem",
       "photos": [
         "037.jpg",
         "038.jpg"
@@ -238,7 +240,7 @@
     {
       "type": "Row",
       "caption": "@瀧溪",
-      "blockMargin": "1.5rem",
+      "blockMargin": "3rem",
       "photos": [
         "039.jpg"
       ]
@@ -246,7 +248,7 @@
     {
       "type": "Row",
       "caption": "@台坂",
-      "blockMargin": "1.5rem",
+      "blockMargin": "3rem",
       "photos": [
         "040.jpg",
         "041.jpg"

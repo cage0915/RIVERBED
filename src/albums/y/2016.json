@@ -35,6 +35,7 @@
     },
     {
       "type": "Row",
+      "blockMargin": "3rem",
       "photos": [
         "003.jpg",
         "004.jpg"
@@ -42,6 +43,7 @@
     },
     {
       "type": "Row",
+      "blockMargin": "3rem",
       "photos": [
         "005.jpg",
         "006.jpg"
@@ -58,7 +60,7 @@
     },
     {
       "type": "Row",
-      "blockMargin": "2rem",
+      "blockMargin": "5rem",
       "photos": [
         "009.jpg",
         "010.jpg"
@@ -87,7 +89,7 @@
     {
       "type": "Row",
       "caption": "三貂角燈塔",
-      "blockMargin": "1.5rem",
+      "blockMargin": "5rem",
       "photos": [
         "014.jpg",
         "015.jpg"
@@ -102,11 +104,15 @@
     },
     {
       "type": "Row",
-      "blockMargin": "2rem",
+      "blockMargin": "5rem",
       "photos": [
         "016.jpg",
-        "017.jpg",
-        "018.jpg"
+        {
+          "column": [
+            "018.jpg",
+            "017.jpg"
+          ]
+        }
       ]
     },
     {
@@ -118,10 +124,15 @@
     },
     {
       "type": "Row",
+      "blockMargin": "3rem",
       "photos": [
-        "019.jpg",
-        "020.jpg",
-        "021.jpg"
+        {
+          "column": [
+            "019.jpg",
+            "021.jpg"
+          ]
+        },
+        "020.jpg"
       ]
     },
     {
@@ -133,17 +144,28 @@
     {
       "type": "Row",
       "caption": "旗後燈塔",
-      "blockMargin": "1.5rem",
+      "blockMargin": "5rem",
       "photos": [
-        "023.jpg",
-        "024.jpg",
-        "025.jpg"
+        {
+          "column": [
+            "023.jpg",
+            "025.jpg"
+          ]
+        },
+        "024.jpg"
       ]
+    },
+    {
+      "type": "Text",
+      "align": "left",
+      "size": "title",
+      "blockMargin": "1.5rem",
+      "text": "桃園.台北"
     },
     {
       "type": "Row",
       "caption": "白沙岬燈塔",
-      "blockMargin": "1.5rem",
+      "blockMargin": "3rem",
       "photos": [
         "026.jpg"
       ]
@@ -151,7 +173,7 @@
     {
       "type": "Row",
       "caption": "景美看守所",
-      "blockMargin": "1.5rem",
+      "blockMargin": "3rem",
       "photos": [
         "027.jpg",
         "028.jpg"
@@ -160,20 +182,15 @@
     {
       "type": "Row",
       "caption": "長興淨水場",
-      "blockMargin": "1.5rem",
+      "blockMargin": "3rem",
       "photos": [
         "029.jpg"
       ]
     },
     {
-      "type": "Text",
-      "align": "left",
-      "size": "title",
-      "blockMargin": "1.5rem",
-      "text": "台大農場"
-    },
-    {
       "type": "Row",
+      "caption": "台大農場",
+      "blockMargin": "1rem",
       "photos": [
         "030.jpg"
       ]
@@ -187,7 +204,7 @@
     },
     {
       "type": "Row",
-      "blockMargin": "2rem",
+      "blockMargin": "5rem",
       "photos": [
         "033.jpg",
         "034.jpg"
@@ -204,7 +221,7 @@
       "type": "Row",
       "caption": "山上很涼，需要輪流騎機車才不會睡著。",
       "captionPosition": "left bottom",
-      "blockMargin": "1.5rem",
+      "blockMargin": "1rem",
       "photos": [
         "035.jpg"
       ]
@@ -342,17 +359,17 @@
       "tags": []
     },
     {
-      "filename": "017.jpg",
-      "width": 1840,
-      "height": 1232,
-      "color": "#8c9b9a",
-      "tags": []
-    },
-    {
       "filename": "018.jpg",
       "width": 1840,
       "height": 1232,
       "color": "#777f7d",
+      "tags": []
+    },
+    {
+      "filename": "017.jpg",
+      "width": 1840,
+      "height": 1232,
+      "color": "#8c9b9a",
       "tags": []
     },
     {
@@ -363,17 +380,17 @@
       "tags": []
     },
     {
-      "filename": "020.jpg",
-      "width": 1840,
-      "height": 1232,
-      "color": "#6b899d",
-      "tags": []
-    },
-    {
       "filename": "021.jpg",
       "width": 1840,
       "height": 1232,
       "color": "#5a6249",
+      "tags": []
+    },
+    {
+      "filename": "020.jpg",
+      "width": 1840,
+      "height": 1232,
+      "color": "#6b899d",
       "tags": []
     },
     {
@@ -391,17 +408,17 @@
       "tags": []
     },
     {
-      "filename": "024.jpg",
-      "width": 1840,
-      "height": 1232,
-      "color": "#586b87",
-      "tags": []
-    },
-    {
       "filename": "025.jpg",
       "width": 1840,
       "height": 1232,
       "color": "#9ea7b4",
+      "tags": []
+    },
+    {
+      "filename": "024.jpg",
+      "width": 1840,
+      "height": 1232,
+      "color": "#586b87",
       "tags": []
     },
     {

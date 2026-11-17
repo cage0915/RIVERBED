@@ -36,6 +36,7 @@
     },
     {
       "type": "Row",
+      "blockMargin": "3rem",
       "photos": [
         "003.jpg",
         "004.jpg"
@@ -44,12 +45,20 @@
     {
       "type": "Row",
       "photos": [
-        "005.jpg",
         "006.jpg"
       ]
     },
     {
       "type": "Row",
+      "caption": "花蓮市",
+      "blockMargin": "3rem",
+      "photos": [
+        "005.jpg"
+      ]
+    },
+    {
+      "type": "Row",
+      "blockMargin": "3rem",
       "photos": [
         "007.jpg",
         "008.jpg"
@@ -57,6 +66,7 @@
     },
     {
       "type": "Row",
+      "blockMargin": "3rem",
       "photos": [
         "009.jpg",
         "010.jpg"
@@ -65,6 +75,7 @@
     {
       "type": "Row",
       "caption": "花東縱谷.六十石山",
+      "blockMargin": "5rem",
       "photos": [
         "011.jpg",
         "012.jpg"
@@ -80,11 +91,15 @@
     {
       "type": "Row",
       "caption": "初來橋.卑南溪",
-      "blockMargin": "1.5rem",
+      "blockMargin": "3rem",
       "photos": [
         "013.jpg",
-        "014.jpg",
-        "015.jpg"
+        {
+          "column": [
+            "014.jpg",
+            "015.jpg"
+          ]
+        }
       ]
     },
     {
@@ -95,7 +110,8 @@
     },
     {
       "type": "Row",
-      "blockMargin": "2rem",
+      "caption": "利稻",
+      "blockMargin": "5rem",
       "photos": [
         "017.jpg",
         "018.jpg"
@@ -152,17 +168,17 @@
       "tags": []
     },
     {
-      "filename": "005.jpg",
-      "width": 1840,
-      "height": 1232,
-      "color": "#535e68",
-      "tags": []
-    },
-    {
       "filename": "006.jpg",
       "width": 1840,
       "height": 1232,
       "color": "#69585a",
+      "tags": []
+    },
+    {
+      "filename": "005.jpg",
+      "width": 1840,
+      "height": 1232,
+      "color": "#535e68",
       "tags": []
     },
     {

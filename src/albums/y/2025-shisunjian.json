@@ -29,7 +29,7 @@
     },
     {
       "type": "Row",
-      "blockMargin": "2rem",
+      "blockMargin": "3rem",
       "photos": [
         "KCS02242.jpg"
       ]
@@ -50,7 +50,7 @@
     {
       "type": "Row",
       "caption": "十分瀑布",
-      "blockMargin": "1.5rem",
+      "blockMargin": "3rem",
       "photos": [
         "KCS02267.jpg"
       ]

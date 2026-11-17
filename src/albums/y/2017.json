@@ -29,7 +29,7 @@
     },
     {
       "type": "Row",
-      "blockMargin": "2rem",
+      "blockMargin": "5rem",
       "photos": [
         "002.jpg",
         "003.jpg"
@@ -44,7 +44,7 @@
     },
     {
       "type": "Row",
-      "blockMargin": "2rem",
+      "blockMargin": "5rem",
       "photos": [
         "004.jpg",
         "005.jpg",
@@ -62,7 +62,7 @@
       "type": "Row",
       "caption": "論口音差異：ian-tshiâng/ian-tshiân/kuàn-tshiâng。",
       "captionPosition": "left bottom",
-      "blockMargin": "1.5rem",
+      "blockMargin": "3rem",
       "photos": [
         "007.jpg"
       ]
@@ -71,17 +71,21 @@
       "type": "Row",
       "caption": "紅媠，烏大範。",
       "captionPosition": "left bottom",
-      "blockMargin": "1.5rem",
+      "blockMargin": "3rem",
       "photos": [
         "008.jpg"
       ]
     },
     {
       "type": "Row",
-      "blockMargin": "2rem",
+      "blockMargin": "5rem",
       "photos": [
-        "009.jpg",
-        "010.jpg",
+        {
+          "column": [
+            "009.jpg",
+            "010.jpg"
+          ]
+        },
         "011.jpg"
       ]
     },
@@ -96,7 +100,7 @@
       "type": "Row",
       "caption": "到不了鼻頭角燈塔的鼻頭角，太陽很烈但風很涼。",
       "captionPosition": "left bottom",
-      "blockMargin": "1.5rem",
+      "blockMargin": "3rem",
       "photos": [
         "012.jpg"
       ]
@@ -111,7 +115,7 @@
       "type": "Row",
       "caption": "燭台雙嶼 | 深深的海深深的藍。",
       "captionPosition": "left bottom",
-      "blockMargin": "1.5rem",
+      "blockMargin": "3rem",
       "photos": [
         "014.jpg"
       ]
@@ -120,7 +124,7 @@
       "type": "Row",
       "caption": "富貴角燈塔",
       "captionPosition": "left bottom",
-      "blockMargin": "1.5rem",
+      "blockMargin": "5rem",
       "photos": [
         "015.jpg"
       ]
@@ -143,7 +147,7 @@
       "type": "Row",
       "caption": "這個時間點橋下的人應該比前方聚落的人還要多。",
       "captionPosition": "left bottom",
-      "blockMargin": "1.5rem",
+      "blockMargin": "1rem",
       "photos": [
         "018.jpg"
       ]
@@ -158,7 +162,7 @@
       "type": "Row",
       "caption": "屏東二峰圳 / 伏流水 | ft. 哪裡都能烤肉的台灣人",
       "captionPosition": "left bottom",
-      "blockMargin": "1.5rem",
+      "blockMargin": "3rem",
       "photos": [
         "020.jpg"
       ]
@@ -166,8 +170,7 @@
     {
       "type": "Row",
       "caption": "大潮州地下水補注湖",
-      "captionPosition": "left bottom",
-      "blockMargin": "1.5rem",
+      "blockMargin": "3rem",
       "photos": [
         "021.jpg"
       ]
@@ -175,8 +178,7 @@
     {
       "type": "Row",
       "caption": "力力溪 伏流水集水廊道",
-      "captionPosition": "left bottom",
-      "blockMargin": "1.5rem",
+      "blockMargin": "3rem",
       "photos": [
         "022.jpg"
       ]
@@ -191,8 +193,7 @@
     {
       "type": "Row",
       "caption": "五溝水",
-      "captionPosition": "left bottom",
-      "blockMargin": "1.5rem",
+      "blockMargin": "5rem",
       "photos": [
         "025.jpg"
       ]
@@ -225,7 +226,7 @@
     },
     {
       "type": "Row",
-      "blockMargin": "2rem",
+      "blockMargin": "5rem",
       "photos": [
         "030.jpg"
       ]
@@ -240,8 +241,7 @@
     {
       "type": "Row",
       "caption": "耶穌遇到期末報告的樣子。",
-      "captionPosition": "left bottom",
-      "blockMargin": "1.5rem",
+      "blockMargin": "3rem",
       "photos": [
         "031.jpg",
         "032.jpg"
@@ -251,7 +251,7 @@
       "type": "Row",
       "caption": "灰階留下的彩色夕陽。",
       "captionPosition": "left bottom",
-      "blockMargin": "1.5rem",
+      "blockMargin": "3rem",
       "photos": [
         "033.jpg"
       ]

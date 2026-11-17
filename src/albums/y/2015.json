@@ -1,7 +1,6 @@
 {
   "schemaVersion": 2,
   "title": "２０１５",
-  "info": "",
   "order": 10,
   "cover": {
     "photo": {
@@ -17,18 +16,28 @@
   "blocks": [
     {
       "type": "Row",
+      "caption": "基隆",
+      "blockMargin": "3rem",
       "photos": [
         "001.jpg",
-        "002.jpg",
-        "003.jpg"
+        {
+          "column": [
+            "002.jpg",
+            "003.jpg"
+          ]
+        }
       ]
     },
     {
       "type": "Row",
       "photos": [
         "004.jpg",
-        "005.jpg",
-        "006.jpg"
+        {
+          "column": [
+            "005.jpg",
+            "006.jpg"
+          ]
+        }
       ]
     },
     {
@@ -40,6 +49,8 @@
     },
     {
       "type": "Row",
+      "caption": "艋舺",
+      "blockMargin": "3rem",
       "photos": [
         "009.jpg"
       ]
@@ -48,12 +59,13 @@
       "type": "Row",
       "photos": [
         "010.jpg",
-        "011.jpg",
-        "012.jpg"
+        "011.jpg"
       ]
     },
     {
       "type": "Row",
+      "caption": "果菜批發市場",
+      "blockMargin": "3rem",
       "photos": [
         "013.jpg",
         "014.jpg"
@@ -61,6 +73,8 @@
     },
     {
       "type": "Row",
+      "caption": "教育部",
+      "blockMargin": "3rem",
       "photos": [
         "015.jpg",
         "016.jpg",
@@ -76,6 +90,8 @@
     },
     {
       "type": "Row",
+      "caption": "台大",
+      "blockMargin": "3rem",
       "photos": [
         "020.jpg",
         "021.jpg",
@@ -84,6 +100,7 @@
     },
     {
       "type": "Row",
+      "caption": "北投",
       "photos": [
         "024.jpg",
         "023.jpg"
@@ -166,13 +183,6 @@
       "width": 1840,
       "height": 1232,
       "color": "#2c343d",
-      "tags": []
-    },
-    {
-      "filename": "012.jpg",
-      "width": 1840,
-      "height": 1232,
-      "color": "#36453f",
       "tags": []
     },
     {

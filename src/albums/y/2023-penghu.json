@@ -24,6 +24,7 @@
     },
     {
       "type": "Row",
+      "blockMargin": "3rem",
       "photos": [
         "001.jpg",
         "002.jpg"
@@ -31,6 +32,7 @@
     },
     {
       "type": "PhotoCarousel",
+      "blockMargin": "1rem",
       "photos": [
         "003.jpg",
         "004.jpg"
@@ -51,18 +53,19 @@
     {
       "type": "Row",
       "photos": [
-        "007.jpg",
         "008.jpg"
       ]
     },
     {
       "type": "Row",
+      "blockMargin": "0.5rem",
       "photos": [
         "009.jpg"
       ]
     },
     {
       "type": "PhotoCarousel",
+      "blockMargin": "1rem",
       "initialSlide": 2,
       "photos": [
         "010.jpg",
@@ -73,7 +76,7 @@
     },
     {
       "type": "Row",
-      "blockMargin": "2rem",
+      "blockMargin": "5rem",
       "photos": [
         "014.jpg"
       ]
@@ -93,7 +96,7 @@
     },
     {
       "type": "Row",
-      "blockMargin": "2rem",
+      "blockMargin": "5rem",
       "photos": [
         "016.jpg"
       ]
@@ -107,7 +110,7 @@
     },
     {
       "type": "Row",
-      "blockMargin": "2rem",
+      "blockMargin": "5rem",
       "photos": [
         "017.jpg",
         "018.jpg"
@@ -186,13 +189,6 @@
       "width": 3000,
       "height": 2000,
       "color": "#707569",
-      "tags": []
-    },
-    {
-      "filename": "007.jpg",
-      "width": 3000,
-      "height": 2000,
-      "color": "#868d85",
       "tags": []
     },
     {

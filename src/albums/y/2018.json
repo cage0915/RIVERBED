@@ -1,7 +1,6 @@
 {
   "schemaVersion": 2,
   "title": "２０１８",
-  "info": "",
   "order": 60,
   "cover": {
     "photo": {
@@ -17,6 +16,7 @@
   "blocks": [
     {
       "type": "Row",
+      "blockMargin": "3rem",
       "photos": [
         "001.jpg"
       ]
@@ -45,6 +45,9 @@
     },
     {
       "type": "Row",
+      "caption": "小時候會玩一種叫檨仔人的遊戲，基本上就是鬼抓人，只是鬼是吃完芒果身上沾了最多芒果汁液的人。一開始都是我在當鬼，但等堂妹會跑後鬼就都是她在當了。",
+      "captionPosition": "left bottom",
+      "blockMargin": "3rem",
       "photos": [
         "009.jpg"
       ]

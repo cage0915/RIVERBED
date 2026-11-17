@@ -36,10 +36,9 @@
     },
     {
       "type": "Row",
-      "blockMargin": "1.5rem",
+      "blockMargin": "3rem",
       "photos": [
-        "003.jpg",
-        "004.jpg"
+        "003.jpg"
       ]
     },
     {
@@ -83,6 +82,7 @@
     },
     {
       "type": "Row",
+      "blockMargin": "3rem",
       "photos": [
         "014.jpg"
       ]
@@ -95,7 +95,7 @@
     },
     {
       "type": "Row",
-      "blockMargin": "2rem",
+      "blockMargin": "5rem",
       "photos": [
         "016.jpg"
       ]
@@ -116,8 +116,7 @@
     {
       "type": "Row",
       "caption": "抹茶風味牛肉湯",
-      "captionPosition": "left bottom",
-      "blockMargin": "1.5rem",
+      "blockMargin": "5rem",
       "photos": [
         "018.jpg"
       ]
@@ -149,7 +148,7 @@
     },
     {
       "type": "Row",
-      "blockMargin": "2rem",
+      "blockMargin": "5rem",
       "photos": [
         "022.jpg"
       ]
@@ -194,13 +193,6 @@
       "width": 3000,
       "height": 2004,
       "color": "#5c8cad",
-      "tags": []
-    },
-    {
-      "filename": "004.jpg",
-      "width": 3000,
-      "height": 2004,
-      "color": "#3c7c9c",
       "tags": []
     },
     {

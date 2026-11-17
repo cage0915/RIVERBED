@@ -17,6 +17,7 @@
   "blocks": [
     {
       "type": "Row",
+      "blockMargin": "3rem",
       "photos": [
         "001.jpg"
       ]
@@ -38,15 +39,14 @@
     },
     {
       "type": "Row",
+      "blockMargin": "3rem",
       "photos": [
-        "005.jpg",
-        "006.jpg"
-      ]
-    },
-    {
-      "type": "Row",
-      "photos": [
-        "007.jpg",
+        {
+          "column": [
+            "005.jpg",
+            "006.jpg"
+          ]
+        },
         "008.jpg"
       ]
     },
@@ -85,7 +85,7 @@
     {
       "type": "Row",
       "caption": "藍腹鷴 Lophura swinhoii",
-      "blockMargin": "1.5rem",
+      "blockMargin": "1rem",
       "photos": [
         "015.jpg"
       ]
@@ -97,46 +97,29 @@
       ]
     },
     {
-      "type": "Row",
+      "type": "PhotoCarousel",
       "caption": "繡眼畫眉 Alcippe morrisonia",
-      "blockMargin": "1.5rem",
       "photos": [
-        "017.jpg"
-      ]
-    },
-    {
-      "type": "Row",
-      "photos": [
+        "017.jpg",
         "018.jpg"
       ]
     },
     {
-      "type": "Row",
+      "type": "PhotoCarousel",
       "caption": "大彎嘴 Pomatorhinus erythrogenys",
-      "blockMargin": "1.5rem",
       "photos": [
-        "019.jpg"
-      ]
-    },
-    {
-      "type": "Row",
-      "photos": [
+        "019.jpg",
         "020.jpg"
       ]
     },
     {
-      "type": "Row",
+      "type": "PhotoCarousel",
       "caption": "白腹鶇 Turdus pallidus",
-      "blockMargin": "1.5rem",
-      "photos": [
-        "021.jpg"
-      ]
-    },
-    {
-      "type": "Row",
+      "blockMargin": "3rem",
       "photos": [
         "022.jpg",
-        "023.jpg"
+        "023.jpg",
+        "021.jpg"
       ]
     },
     {
@@ -194,13 +177,6 @@
       "width": 3000,
       "height": 2000,
       "color": "#3f4419",
-      "tags": []
-    },
-    {
-      "filename": "007.jpg",
-      "width": 3000,
-      "height": 2000,
-      "color": "#424737",
       "tags": []
     },
     {
@@ -295,13 +271,6 @@
       "tags": []
     },
     {
-      "filename": "021.jpg",
-      "width": 3000,
-      "height": 2000,
-      "color": "#5e5531",
-      "tags": []
-    },
-    {
       "filename": "022.jpg",
       "width": 3000,
       "height": 2000,
@@ -313,6 +282,13 @@
       "width": 3000,
       "height": 2000,
       "color": "#2c3414",
+      "tags": []
+    },
+    {
+      "filename": "021.jpg",
+      "width": 3000,
+      "height": 2000,
+      "color": "#5e5531",
       "tags": []
     },
     {
