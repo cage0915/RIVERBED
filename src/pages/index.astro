@@ -56,7 +56,7 @@ for (const slug of folderSlugs) {
         const coverPhoto = catalog.getPhoto(resolvedCoverKey);
         return {
             coverUrl: getThumbnailUrl(resolvedCoverKey, 480),
-            coverSrcSet: getThumbnailSrcSet(resolvedCoverKey, [320, 480, 720]),
+            coverSrcSet: getThumbnailSrcSet(resolvedCoverKey, [480, 720]),
             coverColor: coverPhoto?.color,
             coverThumbHash: coverPhoto?.thumbhash,
             fallbackUrl: `${R2_DOMAIN}/${resolvedCoverKey}`,

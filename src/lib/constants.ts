@@ -38,9 +38,15 @@ export const getThumbnailUrl = (itemKey: string, width = 480) => {
     return `${R2_DOMAIN}/cdn-cgi/image/width=${safeWidth},quality=75,format=auto,onerror=redirect/${itemKey}`;
 };
 
+/**
+ * Every width is a separate Cloudflare Images transformation per photo, counted
+ * against a monthly quota, so the set stays small and shared: content photos
+ * use 1100 (1x desktops, most phones) and 1600 (retina, 3x phones, tablets);
+ * covers use 480 and 720.
+ */
 export const getThumbnailSrcSet = (
     itemKey: string,
-    widths: readonly number[] = [480, 768, 1100, 1600],
+    widths: readonly number[] = [1100, 1600],
 ) => {
     if (import.meta.env.DEV) return undefined;
 
