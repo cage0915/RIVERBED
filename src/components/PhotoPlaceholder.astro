@@ -1,10 +1,28 @@
 ---
-// Marks each photo (.photo-img) as loaded so the shared photo-frame CSS in
-// global.css can fade it in. Lives here, mounted once by the Layout, so the
+// Placeholders for every photo (.photo-img) while it loads, styled by the
+// shared photo-frame CSS in global.css: paints each photo's ThumbHash, a
+// blurred preview, behind it, and marks it loaded so its frame can drop the
+// average-colour fill. Lives here, mounted once by the Layout, so the
 // components that render photos emit no script of their own.
 ---
 
 <script>
+    import { thumbHashToDataURL } from "thumbhash";
+
+    const paintPreviews = () => {
+        document
+            .querySelectorAll<HTMLImageElement>("img.photo-img[data-thumbhash]")
+            .forEach((image) => {
+                if (image.style.backgroundImage || (image.complete && image.naturalWidth)) return;
+                try {
+                    const hash = Uint8Array.from(atob(image.dataset.thumbhash!), (c) => c.charCodeAt(0));
+                    image.style.backgroundImage = `url(${thumbHashToDataURL(hash)})`;
+                } catch {
+                    // A malformed hash leaves the average colour showing.
+                }
+            });
+    };
+
     // load/error don't bubble, so listen in the capture phase. One listener on
     // the document covers every page the client router swaps in, plus photos
     // the dev tools add later.
@@ -16,6 +34,11 @@
 
     document.addEventListener("load", (event) => markLoaded(event.target), true);
     document.addEventListener("error", (event) => markLoaded(event.target), true);
+
+    // after-swap runs before a client-routed page is first shown, so its
+    // previews are there from the first frame.
+    paintPreviews();
+    document.addEventListener("astro:after-swap", paintPreviews);
 
     // Photos that finished (from cache, or before this script ran) fire no
     // further events; mark them on each page load. An image with no source

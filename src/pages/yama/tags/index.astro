@@ -31,6 +31,9 @@ const mountainGroups = MOUNTAIN_REGION_DEFINITIONS.map((region) => ({
             coverColor: mountain.coverKey
                 ? catalog.getPhoto(mountain.coverKey)?.color
                 : undefined,
+            coverThumbHash: mountain.coverKey
+                ? catalog.getPhoto(mountain.coverKey)?.thumbhash
+                : undefined,
         })),
 }));
 ---

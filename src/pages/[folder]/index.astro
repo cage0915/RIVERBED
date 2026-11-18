@@ -81,7 +81,8 @@ const isYama = folder === "yama";
                             [320, 480, 720],
                         );
                         const fallbackUrl = `${R2_DOMAIN}/${resolvedCoverKey}`;
-                        const coverColor = catalog.getPhoto(resolvedCoverKey)?.color;
+                        const coverPhoto = catalog.getPhoto(resolvedCoverKey);
+                        const coverColor = coverPhoto?.color;
                         return (
                             <div
                                 class="album-card group"
@@ -100,6 +101,7 @@ const isYama = folder === "yama";
                                     <div class="album-cover photo-frame" style={photoColorStyle(coverColor) || undefined}>
                                         <img
                                             class="photo-img"
+                                            data-thumbhash={coverPhoto?.thumbhash}
                                             src={coverUrl}
                                             srcset={coverSrcSet}
                                             sizes="(max-width: 640px) calc(100vw - 2rem), (max-width: 1024px) calc((100vw - 4.5rem) / 2), 340px"
@@ -181,9 +183,7 @@ const isYama = folder === "yama";
         object-position: var(--ox) var(--oy);
         transform-origin: var(--ox) var(--oy);
         transform: scale(var(--zoom));
-        transition:
-            opacity var(--photo-fade-duration, var(--duration-slow)) var(--ease-standard),
-            transform var(--duration-slow) var(--ease-emphasized);
+        transition: transform var(--duration-slow) var(--ease-emphasized);
     }
 
     /* Caption sits on a bottom gradient so the photo stays visible behind it. */

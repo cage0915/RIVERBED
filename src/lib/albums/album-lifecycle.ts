@@ -888,7 +888,7 @@ export function buildAlbumPageProposal(input: {
     manifest: AlbumManifest;
     blocks: AlbumBlock[];
     importedFilenames: string[];
-    importedPhotoDimensions?: Record<string, { width: number; height: number; color?: string }>;
+    importedPhotoDimensions?: Record<string, { width: number; height: number; color?: string; thumbhash?: string }>;
     metadata?: Pick<AlbumManifest, 'title' | 'info' | 'gap'>;
 }): AlbumManifest {
     const albumSlug = validateAlbumSlug(input.albumSlug);

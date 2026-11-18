@@ -29,7 +29,7 @@ if (!latestAlbum) {
 }
 
 const latestAlbumCoverKey = latestAlbum.cover.assetKey;
-const latestAlbumCoverColor = catalog.getPhoto(latestAlbumCoverKey)?.color;
+const latestAlbumCoverPhoto = catalog.getPhoto(latestAlbumCoverKey);
 const latestAlbumFolder = latestAlbum.slug.split("/")[0];
 
 // Group albums by folder, sorted by album order (matching folder page logic)
@@ -40,6 +40,7 @@ const folderMap = new Map<
         coverUrl: string;
         coverSrcSet?: string;
         coverColor?: string;
+        coverThumbHash?: string;
         fallbackUrl: string;
         title: string;
         coverZoom?: number;
@@ -52,10 +53,12 @@ for (const slug of folderSlugs) {
 
     folderMap.set(slug, albumsInFolder.map((album) => {
         const resolvedCoverKey = album.cover.assetKey;
+        const coverPhoto = catalog.getPhoto(resolvedCoverKey);
         return {
             coverUrl: getThumbnailUrl(resolvedCoverKey, 480),
             coverSrcSet: getThumbnailSrcSet(resolvedCoverKey, [320, 480, 720]),
-            coverColor: catalog.getPhoto(resolvedCoverKey)?.color,
+            coverColor: coverPhoto?.color,
+            coverThumbHash: coverPhoto?.thumbhash,
             fallbackUrl: `${R2_DOMAIN}/${resolvedCoverKey}`,
             title: album.title,
             coverZoom: album.cover.zoom,
@@ -85,7 +88,7 @@ const sortedFolders = folderSlugs
         <section class="latest-post" aria-label="Latest post">
             <article class="album-card latest-post-card group" data-catalog-card data-keyboard-navigation-target>
                 <a href={`/${latestAlbum.slug}`} class="album-link">
-                    <div class="album-cover latest-post-cover photo-frame" style={photoColorStyle(latestAlbumCoverColor) || undefined}>
+                    <div class="album-cover latest-post-cover photo-frame" style={photoColorStyle(latestAlbumCoverPhoto?.color) || undefined}>
                         <picture>
                             <!-- The latest post is hidden on phones; an empty source keeps them from downloading it. -->
                             <source media="(max-width: 640px)" srcset="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
@@ -98,6 +101,7 @@ const sortedFolders = folderSlugs
                                 fetchpriority="high"
                                 decoding="async"
                                 class="slide photo-img active"
+                                data-thumbhash={latestAlbumCoverPhoto?.thumbhash}
                                 style={`--zoom: ${latestAlbum.cover.zoom}; --ox: ${latestAlbum.cover.offset.x}%; --oy: ${latestAlbum.cover.offset.y}%;`}
                                 onerror={
                                     isDev
@@ -146,6 +150,7 @@ const sortedFolders = folderSlugs
                                         loading={i === 0 ? "eager" : "lazy"}
                                         decoding="async"
                                         class={`slide photo-img ${i === 0 ? "active" : ""}`}
+                                        data-thumbhash={i === 0 ? cover.coverThumbHash : undefined}
                                         style={`--zoom: ${cover.coverZoom ?? 1}; --ox: ${cover.coverOffset?.x ?? 50}%; --oy: ${cover.coverOffset?.y ?? 50}%;`}
                                         onerror={
                                             isDev
@@ -225,7 +230,7 @@ const sortedFolders = folderSlugs
         aspect-ratio: 177/100;
         overflow: hidden;
         /* Matches FADE_MS in CatalogCardInteractions. */
-        --photo-fade-duration: 0.8s;
+        --slide-fade-duration: 0.8s;
     }
 
     /* All slides stacked on top of each other. Only the first one in a card
@@ -242,7 +247,7 @@ const sortedFolders = folderSlugs
         transform-origin: var(--ox) var(--oy);
         transform: scale(var(--zoom));
         transition:
-            opacity var(--photo-fade-duration) var(--ease-standard),
+            opacity var(--slide-fade-duration) var(--ease-standard),
             transform var(--duration-slow) var(--ease-emphasized);
     }
 
@@ -257,14 +262,6 @@ const sortedFolders = folderSlugs
     .album-cover .slide.leaving {
         opacity: 1;
         transition: none;
-    }
-
-    /* The shared photo fade-in (global.css) for the first slide, which the
-       active rule above would otherwise show before it has loaded. */
-    @media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
-        .album-cover .slide.active:not([data-loaded]) {
-            opacity: 0;
-        }
     }
 
     /* Home captions stay visible; they sit on a bottom gradient over the photo. */

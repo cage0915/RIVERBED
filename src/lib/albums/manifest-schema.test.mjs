@@ -79,6 +79,26 @@ test("parses an optional average photo colour", () => {
     assert.equal("color" in manifest.photos[1], false);
 });
 
+test("parses an optional photo ThumbHash", () => {
+    const input = validManifest();
+    input.photos[0].thumbhash = "1QcSHQRnh493V4dIh4eXh1h4kJUI";
+
+    const manifest = parseAlbumManifest(input, "taiwan/morning-walk");
+    assert.equal(manifest.photos[0].thumbhash, "1QcSHQRnh493V4dIh4eXh1h4kJUI");
+    assert.equal("thumbhash" in manifest.photos[1], false);
+});
+
+test("rejects a photo ThumbHash that is not base64", () => {
+    for (const thumbhash of ["", "not base64!", "abc", 0]) {
+        const input = validManifest();
+        input.photos[0].thumbhash = thumbhash;
+        assert.throws(
+            () => parseAlbumManifest(input, "taiwan/morning-walk"),
+            /photo 0 thumbhash/i,
+        );
+    }
+});
+
 test("rejects a photo colour that is not lowercase #rrggbb", () => {
     for (const color of ["#3A4250", "#abc", "3a4250", "rgb(0, 0, 0)", 0]) {
         const input = validManifest();

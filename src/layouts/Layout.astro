@@ -6,7 +6,7 @@ import SiteFooter from "../components/SiteFooter.astro";
 import SiteNavigation from "../components/SiteNavigation.astro";
 import ContentKeyboardNavigation from "../components/ContentKeyboardNavigation.astro";
 import PhotoLightbox from "../components/PhotoLightbox.astro";
-import PhotoFadeIn from "../components/PhotoFadeIn.astro";
+import PhotoPlaceholder from "../components/PhotoPlaceholder.astro";
 import NavigationProgress from "../components/NavigationProgress.astro";
 import YamaWalker from "../components/YamaWalker.astro";
 import YamaCow from "../components/YamaCow.astro";
@@ -133,7 +133,7 @@ const shareImageUrl = shareImage ? getShareImageUrl(shareImage) : undefined;
 
 		<ContentKeyboardNavigation />
 		<PhotoLightbox />
-		<PhotoFadeIn />
+		<PhotoPlaceholder />
 		<SiteFooter />
 		{walker === "hiker" && <YamaWalker />}
 		{walker === "cow" && <YamaCow />}

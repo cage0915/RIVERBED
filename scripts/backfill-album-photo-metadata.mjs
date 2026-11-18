@@ -1,10 +1,11 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 
-import { averageColor, orientedSize } from "../src/dev-api/_photo-metadata.ts";
+import { averageColor, orientedSize, photoThumbHash } from "../src/dev-api/_photo-metadata.ts";
 
-// Fills in each manifest photo's intrinsic width/height and average colour,
-// reading the local source in ./r2 or, failing that, the public R2 copy.
+// Fills in each manifest photo's intrinsic width/height, average colour and
+// ThumbHash, reading the local source in ./r2 or, failing that, the public R2
+// copy.
 // Run with `npm run albums:metadata` (needs tsx for the shared helper).
 
 const projectRoot = process.cwd();
@@ -52,22 +53,24 @@ async function readDimensions(assetKey) {
     return { width: metadata.width, height: metadata.height };
 }
 
-async function readColor(assetKey) {
+// The local source, or else the original from R2. Deliberately not a
+// /cdn-cgi/image resize: each new size of each photo counts against the
+// account's monthly Cloudflare Images transformations, which the site's own
+// thumbnails rely on.
+async function readPreviewSource(assetKey) {
     const localPath = path.join(localPhotoRoot, ...assetKey.split("/"));
     try {
         await fs.access(localPath);
-        return await averageColor(localPath);
+        return localPath;
     } catch (error) {
         if (error?.code !== "ENOENT") throw error;
     }
 
-    const response = await fetch(
-        `${remotePhotoRoot}/cdn-cgi/image/width=64,format=jpeg/${encodeAssetKey(assetKey)}`,
-    );
+    const response = await fetch(`${remotePhotoRoot}/${encodeAssetKey(assetKey)}`);
     if (!response.ok) {
-        throw new Error(`Unable to read image for colour ${assetKey}: ${response.status}`);
+        throw new Error(`Unable to read image ${assetKey}: ${response.status}`);
     }
-    return averageColor(new Uint8Array(await response.arrayBuffer()));
+    return new Uint8Array(await response.arrayBuffer());
 }
 
 async function mapWithConcurrency(items, concurrency, mapper) {
@@ -96,7 +99,8 @@ await mapWithConcurrency(manifestFiles, 8, async (manifestFile) => {
     manifest.photos = await mapWithConcurrency(manifest.photos, 4, async (photo) => {
         const hasDimensions = Number.isInteger(photo.width) && Number.isInteger(photo.height);
         const hasColor = typeof photo.color === "string";
-        if (hasDimensions && hasColor) {
+        const hasThumbHash = typeof photo.thumbhash === "string";
+        if (hasDimensions && hasColor && hasThumbHash) {
             unchangedPhotos += 1;
             return photo;
         }
@@ -104,11 +108,20 @@ await mapWithConcurrency(manifestFiles, 8, async (manifestFile) => {
         const dimensions = hasDimensions
             ? { width: photo.width, height: photo.height }
             : await readDimensions(assetKey);
-        const color = hasColor ? photo.color : await readColor(assetKey);
-        const { filename, width: _width, height: _height, color: _color, ...rest } = photo;
+        const preview = await readPreviewSource(assetKey);
+        const color = hasColor ? photo.color : await averageColor(preview);
+        const thumbhash = hasThumbHash ? photo.thumbhash : await photoThumbHash(preview);
+        const {
+            filename,
+            width: _width,
+            height: _height,
+            color: _color,
+            thumbhash: _thumbhash,
+            ...rest
+        } = photo;
         changed = true;
         updatedPhotos += 1;
-        return { filename, ...dimensions, color, ...rest };
+        return { filename, ...dimensions, color, thumbhash, ...rest };
     });
 
     if (changed) {

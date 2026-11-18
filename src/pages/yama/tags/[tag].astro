@@ -185,6 +185,7 @@ function chunkArray<T>(array: T[], size: number): T[][] {
             >
                 <img
                     class="photo-img"
+                    data-thumbhash={representativePhoto?.thumbhash}
                     src={representativePhotoUrl}
                     srcset={representativePhotoSrcSet}
                     sizes="(max-width: 767px) calc(100vw - 2rem), (max-width: 1024px) calc(100vw - 4rem), 960px"
@@ -232,6 +233,7 @@ function chunkArray<T>(array: T[], size: number): T[][] {
                                                 width={photo.width}
                                                 height={photo.height}
                                                 color={photo.color}
+                                                thumbhash={photo.thumbhash}
                                                 caption={photo.caption}
                                                 tags={photo.tags}
                                             />
@@ -520,7 +522,7 @@ function chunkArray<T>(array: T[], size: number): T[][] {
                             status?.before(figure);
                         }
                         // Load the new cover the way every photo loads: in its
-                        // own colour and size, then faded in.
+                        // own colour and size, drawn over that fill.
                         const sourceFrame = entry.querySelector<HTMLElement>(".photo-frame");
                         const sourceColor = sourceFrame?.style.getPropertyValue("--photo-color");
                         if (sourceColor) figure.style.setProperty("--photo-color", sourceColor);
@@ -533,6 +535,11 @@ function chunkArray<T>(array: T[], size: number): T[][] {
                                 else coverImage.removeAttribute(attribute);
                             }
                             coverImage.removeAttribute("srcset");
+                            // Carry over the preview the entry already decoded.
+                            const thumbhash = sourceImage?.dataset.thumbhash;
+                            if (thumbhash) coverImage.dataset.thumbhash = thumbhash;
+                            else delete coverImage.dataset.thumbhash;
+                            coverImage.style.backgroundImage = sourceImage?.style.backgroundImage ?? "";
                             delete coverImage.dataset.loaded;
                             coverImage.src = sourceUrl;
                         }

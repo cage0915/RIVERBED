@@ -76,6 +76,8 @@ export type AlbumManifest = {
         height?: number;
         /** Average colour (#rrggbb), painted while the photo loads. */
         color?: string;
+        /** Base64 ThumbHash: a blurred preview drawn over the colour while the photo loads. */
+        thumbhash?: string;
         caption?: string;
         tags: PhotoTag[];
     }>;
@@ -89,6 +91,7 @@ export type ResolvedAlbumPhoto = {
     width?: number;
     height?: number;
     color?: string;
+    thumbhash?: string;
     caption?: string;
     tags: PhotoTag[];
     isContent: boolean;

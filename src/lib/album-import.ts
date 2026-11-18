@@ -30,7 +30,7 @@ type AlbumImportOptions = {
     albumSlug: string;
     title: string;
     filenames: string[];
-    photoDimensions?: Record<string, { width: number; height: number; color?: string }>;
+    photoDimensions?: Record<string, { width: number; height: number; color?: string; thumbhash?: string }>;
     publishedAt?: string;
     order: number;
 };

@@ -73,7 +73,7 @@ export const POST: APIRoute = async ({ request }) => {
         }));
         const payloads = importedPhotos.map(({ name, bytes }) => ({ name, bytes }));
         const importedPhotoDimensions = Object.fromEntries(
-            importedPhotos.map(({ name, width, height, color }) => [name, { width, height, color }]),
+            importedPhotos.map(({ name, width, height, color, thumbhash }) => [name, { width, height, color, thumbhash }]),
         );
         const initialManifests = await readAllAlbumManifestFiles(projectRoot);
         if (!initialManifests[albumSlug]) return json({ error: 'Page does not exist' }, 404);

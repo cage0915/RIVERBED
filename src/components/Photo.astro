@@ -11,6 +11,8 @@ interface Props {
     height?: number;
     /** Average colour (#rrggbb) shown in the photo's box while it loads. */
     color?: string;
+    /** Base64 ThumbHash drawn as a blurred preview while the photo loads. */
+    thumbhash?: string;
     caption?: string;
     tags?: Tag[];
     priority?: boolean;
@@ -27,7 +29,7 @@ import {
 import { photoColorStyle } from "../lib/photo-color";
 import RichText from "./RichText.astro";
 
-const { assetKey, width, height, color, caption, tags = [], priority = false, flex } = Astro.props;
+const { assetKey, width, height, color, thumbhash, caption, tags = [], priority = false, flex } = Astro.props;
 const encodedAssetKey = assetKey.split("/").map(encodeURIComponent).join("/");
 const imageUrl = getImageUrl(encodedAssetKey);
 const displayUrl = getThumbnailUrl(encodedAssetKey, 1100);
@@ -64,6 +66,7 @@ const fallbackUrl = `${R2_DOMAIN}/${encodedAssetKey}`;
                 fetchpriority={priority ? "high" : undefined}
                 decoding="async"
                 class="photo-img"
+                data-thumbhash={thumbhash}
                 data-dev-fallback-url={isDev ? fallbackUrl : undefined}
             />
         </a>

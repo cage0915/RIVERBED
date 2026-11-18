@@ -204,28 +204,27 @@
 
 /* Photo loading, shared by every photo on the site. A `.photo-frame` holds a
    `.photo-img` and paints the photo's average colour (`--photo-color`, set
-   inline via photoColorStyle) or, when that is unknown, the surface colour
-   while the photo loads.
-   PhotoFadeIn marks the photo `data-loaded`, it fades in, and once the fade
-   has finished the fill is dropped so it can't show around a photo drawn
-   smaller than its frame. A frame whose photo fades more slowly sets
-   `--photo-fade-duration` to match. Without scripting nothing would ever mark
-   a photo loaded, so photos then stay plainly visible. */
+   inline via photoColorStyle) or, when that is unknown, the surface colour.
+   A photo with a `data-thumbhash` also gets that blurred preview as its own
+   background (PhotoPlaceholder decodes it), placed like the photo itself so
+   it lines up with a zoomed or offset cover. The photo simply draws over
+   both as it arrives: it is never hidden until loaded, so a photo the
+   browser already holds shows at once, including on a page the client
+   router swaps in.
+   PhotoPlaceholder marks the photo `data-loaded` and the fill is dropped,
+   a moment later so a photo still decoding is never left over bare page,
+   so it can't show around a photo drawn smaller than its frame. */
 .photo-frame {
   background-color: var(--photo-color, var(--color-surface));
 }
 
 .photo-frame:has(.photo-img[data-loaded]) {
   background-color: transparent;
-  transition: background-color 0s var(--photo-fade-duration, var(--duration-slow));
+  transition: background-color 0s var(--duration-moderate);
 }
 
-@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
-  .photo-img {
-    transition: opacity var(--photo-fade-duration, var(--duration-slow)) var(--ease-standard);
-  }
-
-  .photo-img:not([data-loaded]) {
-    opacity: 0;
-  }
+.photo-img[data-thumbhash] {
+  background-position: var(--ox, 50%) var(--oy, 50%);
+  background-size: cover;
+  background-repeat: no-repeat;
 }

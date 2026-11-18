@@ -15,6 +15,7 @@ interface MountainTagCard {
     longitude: number;
     coverKey?: string;
     coverColor?: string;
+    coverThumbHash?: string;
 }
 
 interface MountainTagGroup {
@@ -111,6 +112,7 @@ const sortedGroups = groups.map((group) => ({
                                     {coverUrl && (
                                         <img
                                             class="photo-img"
+                                            data-thumbhash={mountain.coverThumbHash}
                                             src={coverUrl}
                                             alt={`${mountain.name} cover photo`}
                                             loading="lazy"
@@ -406,8 +408,6 @@ const sortedGroups = groups.map((group) => ({
         color: inherit;
         text-decoration: none;
         container-type: inline-size;
-        /* The cover's load fade (global.css) runs at its hover-fade speed. */
-        --photo-fade-duration: 0.4s;
     }
 
     .mountain-tag-card img {
@@ -416,7 +416,7 @@ const sortedGroups = groups.map((group) => ({
         object-fit: cover;
         transition:
             transform var(--duration-slow) var(--ease-emphasized),
-            opacity var(--photo-fade-duration) var(--ease-standard);
+            opacity 0.4s var(--ease-standard);
     }
 
     .mountain-tag-card .mountain-tag-card__contours {

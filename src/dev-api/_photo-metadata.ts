@@ -1,18 +1,21 @@
 import sharp from 'sharp';
+import { rgbaToThumbHash } from 'thumbhash';
 
-export type PhotoMetadata = { width: number; height: number; color: string };
+export type PhotoMetadata = { width: number; height: number; color: string; thumbhash: string };
 
 /**
- * Intrinsic size and average colour (#rrggbb) of an imported photo. The colour
- * is the mean of a small sRGB thumbnail, painted behind the photo while it
- * loads. scripts/backfill-album-photo-metadata.mjs reuses averageColor for existing photos.
+ * Intrinsic size, average colour (#rrggbb) and ThumbHash of an imported photo.
+ * The colour is the mean of a small sRGB thumbnail and the ThumbHash a blurred
+ * preview of it, both painted behind the photo while it loads.
+ * scripts/backfill-album-photo-metadata.mjs reuses these for existing photos.
  */
 export async function readPhotoMetadata(bytes: Uint8Array, name: string): Promise<PhotoMetadata> {
     const { width, height } = await orientedSize(bytes);
     if (!width || !height) {
         throw new Error(`Unable to read image dimensions: ${name}`);
     }
-    return { width, height, color: await averageColor(bytes) };
+    const [color, thumbhash] = await Promise.all([averageColor(bytes), photoThumbHash(bytes)]);
+    return { width, height, color, thumbhash };
 }
 
 /**
@@ -40,4 +43,19 @@ export async function averageColor(input: Uint8Array | string): Promise<string> 
         sums[2] += data[index + 2];
     }
     return `#${sums.map((sum) => Math.round(sum / pixels).toString(16).padStart(2, '0')).join('')}`;
+}
+
+/**
+ * Base64 ThumbHash of the photo as displayed (EXIF-oriented). ThumbHash takes
+ * at most 100×100 pixels.
+ */
+export async function photoThumbHash(input: Uint8Array | string): Promise<string> {
+    const { data, info } = await sharp(input)
+        .autoOrient()
+        .resize(100, 100, { fit: 'inside' })
+        .toColourspace('srgb')
+        .ensureAlpha()
+        .raw()
+        .toBuffer({ resolveWithObject: true });
+    return Buffer.from(rgbaToThumbHash(info.width, info.height, data)).toString('base64');
 }

@@ -48,6 +48,15 @@ function requireFiniteNumber(value: unknown, field: string): number {
     return value;
 }
 
+function optionalThumbHash(value: unknown, field: string): string | undefined {
+    if (value === undefined) return undefined;
+    const hash = requireString(value, field);
+    if (!/^[A-Za-z0-9+/]{8,64}={0,2}$/.test(hash)) {
+        throw new Error(`${field} must be a base64 ThumbHash`);
+    }
+    return hash;
+}
+
 function optionalHexColor(value: unknown, field: string): string | undefined {
     if (value === undefined) return undefined;
     const color = requireString(value, field);
@@ -261,7 +270,7 @@ export function parseAlbumManifest(input: unknown, albumSlug: string): AlbumMani
         const photo = requireRecord(value, `photo ${photoIndex}`);
         rejectUnknownFields(
             photo,
-            ["filename", "width", "height", "color", "caption", "tags"],
+            ["filename", "width", "height", "color", "thumbhash", "caption", "tags"],
             `photo ${photoIndex}`,
         );
         const filename = validateLocalPhotoFilename(
@@ -278,10 +287,12 @@ export function parseAlbumManifest(input: unknown, albumSlug: string): AlbumMani
             throw new Error(`photo ${photoIndex} width and height must be provided together`);
         }
         const color = optionalHexColor(photo.color, `photo ${photoIndex} color`);
+        const thumbhash = optionalThumbHash(photo.thumbhash, `photo ${photoIndex} thumbhash`);
         return {
             filename,
             ...(width !== undefined && height !== undefined ? { width, height } : {}),
             ...(color !== undefined ? { color } : {}),
+            ...(thumbhash !== undefined ? { thumbhash } : {}),
             caption: optionalString(photo.caption, `photo ${photoIndex} caption`),
             tags: tagValues.map((tag, tagIndex) => parseTag(tag, tagIndex)),
         };
