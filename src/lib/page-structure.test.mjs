@@ -1410,7 +1410,7 @@ test('catalog routes share lifecycle-scoped card interactions', () => {
     );
     assert.match(
         homePage,
-        /<div class="album-cover photo-frame"[^>]*>[\s\S]*<div class="album-overlay">\s*<h2 class="album-title">\{folder\.title\}<\/h2>/,
+        /<div class="album-cover photo-frame"[^>]*>[\s\S]*<div class="album-overlay">\s*(?:\{folder\.volume && \([\s\S]*?<\/svg>\s*\)\}\s*)?<h2 class="album-title">\{folder\.title\}<\/h2>/,
     );
     assert.match(
         folderPage,

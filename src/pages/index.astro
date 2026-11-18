@@ -3,6 +3,8 @@ import Layout from "../layouts/Layout.astro";
 import CatalogCardInteractions from "../components/CatalogCardInteractions.astro";
 import { getAlbumCatalog, getAlbumSummaries } from "../lib/albums/catalog";
 import { photoColorStyle } from "../lib/photo-color";
+import { getPostVolumes } from "../lib/albums/post-volumes";
+import { postVolumeCurve } from "../lib/post-volume-curve";
 import {
     getFolderTitle,
     getFolderOrder,
@@ -67,6 +69,10 @@ for (const slug of folderSlugs) {
     }));
 }
 
+// Every curve shares one vertical scale, set by the largest post across all
+// folders, so it grows as bigger posts appear.
+const postVolumes = await getPostVolumes();
+
 const isDev = import.meta.env.DEV;
 
 const sortedFolders = folderSlugs
@@ -75,6 +81,7 @@ const sortedFolders = folderSlugs
         title: getFolderTitle(slug),
         order: getFolderOrder(slug),
         covers: folderMap.get(slug) ?? [],
+        volume: postVolumeCurve(postVolumes.byFolder.get(slug) ?? [], postVolumes.max),
     }))
     .sort((a, b) => a.order - b.order);
 
@@ -160,6 +167,17 @@ const sortedFolders = folderSlugs
                                     />
                                 ))}
                                 <div class="album-overlay">
+                                    {folder.volume && (
+                                        <svg
+                                            class="post-volume"
+                                            viewBox="0 0 100 100"
+                                            preserveAspectRatio="none"
+                                            aria-hidden="true"
+                                        >
+                                            <path class="post-volume-area" d={folder.volume.area} />
+                                            <path class="post-volume-line" d={folder.volume.line} />
+                                        </svg>
+                                    )}
                                     <h2 class="album-title">{folder.title}</h2>
                                 </div>
                             </div>
@@ -274,7 +292,35 @@ const sortedFolders = folderSlugs
         pointer-events: none;
     }
 
+    /* Folder cards size the post-volume curve off their own width. */
+    .folder-card .album-cover {
+        container-type: inline-size;
+    }
+
+    /* Post-volume curve: sits on the caption gradient, under the title, and
+       peaks at a third of the card's height (the card is 177:100). */
+    .post-volume {
+        position: absolute;
+        inset: auto 0 0;
+        width: 100%;
+        height: calc(100cqw * 100 / 177 / 3);
+        overflow: visible;
+    }
+
+    .post-volume-area {
+        fill: rgba(255, 255, 255, 0.08);
+    }
+
+    .post-volume-line {
+        fill: none;
+        stroke: rgba(255, 255, 255, 0.6);
+        stroke-width: 1.25;
+        stroke-linejoin: round;
+        vector-effect: non-scaling-stroke;
+    }
+
     .album-title {
+        position: relative;
         margin: 0;
         font-family: "Noto Sans TC", "Noto Sans JP", sans-serif;
         font-size: 1.05rem;
